@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mise à jour requise</title>
+<style>
+    :root {
+        --bg: #14161a; --panel: #1c1f25; --panel-2: #22262d; --border: #2e333b;
+        --text: #e7e9ec; --muted: #9aa2ad; --accent: #e0a63c; --accent-hover: #f0b64c;
+        --warn: #e0a63c; --trap: #3ccb7f; --danger: #e0554c;
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; background:var(--bg); color:var(--text);
+        font-family:'Segoe UI','Inter',Arial,sans-serif; display:flex; flex-direction:column; }
+    header { background:var(--panel); border-bottom:1px solid var(--border); padding:14px 20px;
+        font-size:0.95em; letter-spacing:0.03em; color:var(--muted); text-transform:uppercase; }
+    main { flex:1; display:flex; align-items:center; justify-content:center; padding:24px; }
+
+    .popup-card { background:var(--panel); border:1px solid var(--border); border-radius:10px;
+        padding:28px; width:100%; max-width:440px; text-align:center; box-shadow:0 10px 40px rgba(0,0,0,0.4); }
+    .popup-icon { width:56px; height:56px; border-radius:12px; background:var(--accent);
+        display:flex; align-items:center; justify-content:center; font-size:1.8em; margin:0 auto 14px auto; }
+    h1 { font-size:1.15em; margin:0 0 8px 0; font-weight:700; }
+    .sous-texte { color:var(--muted); font-size:0.88em; margin-bottom:20px; line-height:1.5; }
+    .version-box { background:var(--panel-2); border:1px solid var(--border); border-radius:8px;
+        padding:12px 14px; margin-bottom:20px; font-size:0.82em; text-align:left; font-family:'Consolas',monospace; color:var(--muted); }
+    .version-box .actuelle { color:var(--danger); }
+    .version-box .disponible { color:var(--trap); }
+
+    button.submit { width:100%; background:var(--accent); color:#1a1204; border:none; padding:13px;
+        border-radius:6px; font-size:1em; font-weight:700; cursor:pointer; margin-bottom:10px; }
+    button.submit:hover { background:var(--accent-hover); }
+    button.ignorer { width:100%; background:none; border:1px solid var(--border); color:var(--muted);
+        padding:9px; border-radius:6px; font-size:0.82em; cursor:pointer; }
+    button.ignorer:hover { color:var(--text); }
+
+    .telechargement { display:none; text-align:center; padding:16px 0; }
+    .barre-fond { background:var(--panel-2); border-radius:6px; height:10px; overflow:hidden; margin-bottom:10px; }
+    .barre-remplissage { height:100%; width:0%; background:var(--accent); border-radius:6px; transition:width 0.1s; }
+    .telechargement .label { font-size:0.8em; color:var(--muted); }
+    .lien-comparer { display:block; text-align:center; margin-top:14px; font-size:0.82em; color:var(--accent);
+        cursor:pointer; text-decoration:underline; }
+    .lien-comparer:hover { color:var(--accent-hover); }
+
+    .app-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6);
+        align-items:center; justify-content:center; padding:20px; z-index:90; }
+    .app-window { background:#2b2b2e; border:1px solid #444; border-radius:10px; width:100%; max-width:420px;
+        overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.6); }
+    .app-titlebar { background:#3a3a3e; padding:10px 14px; display:flex; align-items:center; gap:8px;
+        font-size:0.82em; color:#ccc; }
+    .app-titlebar .dots { display:flex; gap:6px; }
+    .app-titlebar .dot { width:10px; height:10px; border-radius:50%; }
+    .app-body { padding:20px; color:#ddd; font-size:0.9em; }
+    .app-menu { display:flex; gap:14px; font-size:0.8em; color:#999; margin-bottom:16px; border-bottom:1px solid #444; padding-bottom:10px; }
+    .app-menu span.actif { color:#fff; font-weight:600; border-bottom:2px solid var(--accent); padding-bottom:10px; margin-bottom:-11px; }
+    .app-btn { background:var(--accent); color:#fff; border:none; padding:10px 16px; border-radius:6px;
+        font-size:0.85em; cursor:pointer; }
+    .app-btn:hover { background:var(--accent-hover); }
+    .app-resultat { margin-top:14px; font-size:0.85em; color:#aaa; min-height:20px; }
+    .app-close { margin-top:16px; background:none; border:1px solid #555; color:#ccc; padding:8px 14px;
+        border-radius:6px; cursor:pointer; font-size:0.8em; width:100%; }
+
+    .hint { margin-top:16px; font-size:0.8em; color:var(--muted); line-height:1.5;
+        background:var(--panel-2); border:1px solid var(--border); border-radius:6px; padding:10px 12px; text-align:left; }
+
+    footer { text-align:center; padding:14px; font-size:0.78em; color:var(--muted);
+        border-top:1px solid var(--border); background:var(--panel); }
+    footer a { color:var(--muted); text-decoration:underline; cursor:pointer; }
+    footer a:hover { color:var(--text); }
+    .footer-flag { display:block; margin-bottom:4px; color:var(--warn); font-weight:600; letter-spacing:0.02em; }
+
+    #reveal-screen { display:none; }
+    .reveal-card { background:var(--panel); border:1px solid var(--trap); border-radius:10px;
+        padding:36px; width:100%; max-width:480px; }
+    .reveal-title { font-size:1.4em; font-weight:700; margin:0 0 6px 0; color:var(--trap); }
+    .reveal-sub { color:var(--muted); margin-bottom:22px; }
+    .reveal-explication { font-size:0.92em; line-height:1.6; color:var(--text); }
+    .reveal-explication code { background:var(--panel-2); border:1px solid var(--border);
+        border-radius:4px; padding:1px 6px; }
+    .reveal-btn { margin-top:22px; background:var(--panel-2); border:1px solid var(--border);
+        color:var(--text); padding:10px 16px; border-radius:6px; cursor:pointer; font-size:0.9em; }
+    .reveal-btn:hover { border-color:var(--accent); }
+
+    .correction-box { margin-top:24px; border:1px solid var(--trap); border-radius:8px; overflow:hidden; }
+    .correction-toggle { width:100%; text-align:left; background:rgba(60,203,127,0.08); border:none;
+        color:var(--trap); padding:14px 16px; font-size:0.95em; font-weight:600; cursor:pointer;
+        display:flex; justify-content:space-between; align-items:center; }
+    .correction-content { display:none; padding:16px 18px 20px 18px; font-size:0.88em;
+        line-height:1.6; border-top:1px solid var(--border); }
+    .correction-content h3 { font-size:0.95em; margin:16px 0 6px 0; color:var(--text); }
+    .correction-content h3:first-child { margin-top:0; }
+    .correction-content code { background:var(--panel-2); border:1px solid var(--border);
+        border-radius:4px; padding:1px 6px; }
+
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7);
+        align-items:center; justify-content:center; padding:20px; z-index:100; }
+    .modal-box { background:var(--panel); border:1px solid var(--border); border-radius:10px;
+        padding:26px; max-width:480px; font-size:0.9em; line-height:1.6; }
+    .modal-box h2 { margin-top:0; font-size:1.1em; }
+    .modal-close { margin-top:16px; background:var(--accent); border:none; color:#1a1204;
+        padding:9px 16px; border-radius:6px; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<header>🌐 Page web visitée (environnement de démonstration)</header>
+
+<main>
+    <div id="login-screen" class="popup-card">
+        <div class="popup-icon">⬇️</div>
+        <h1>Votre lecteur vidéo est obsolète</h1>
+        <div class="sous-texte">Une mise à jour est nécessaire pour continuer à regarder cette vidéo correctement.</div>
+
+        <div class="version-box">
+            Version installée : <span class="actuelle">11.2.0 (obsolète)</span><br>
+            Version disponible : <span class="disponible">14.8.3</span>
+        </div>
+
+        <button type="button" class="submit" id="btn-telecharger">⬇️ Mettre à jour maintenant</button>
+        <button type="button" class="ignorer" id="btn-ignorer">Continuer sans mettre à jour</button>
+
+        <div class="hint">
+            ⚠️ Un vrai lecteur vidéo se met à jour depuis lui-même ou depuis un store officiel — jamais depuis
+            une pop-up sur une page web.
+        </div>
+
+        <div class="telechargement" id="telechargement">
+            <div class="barre-fond"><div class="barre-remplissage" id="barre"></div></div>
+            <div class="label" id="label-telechargement">Téléchargement de "lecteur_update_14.8.3.exe"...</div>
+        </div>
+
+        <span class="lien-comparer" id="lien-comparer">🖥️ Voir la vraie méthode de mise à jour, en direct</span>
+    </div>
+
+    <div class="app-overlay" id="app-overlay">
+        <div class="app-window">
+            <div class="app-titlebar">
+                <div class="dots">
+                    <div class="dot" style="background:#ff5f56;"></div>
+                    <div class="dot" style="background:#ffbd2e;"></div>
+                    <div class="dot" style="background:#27c93f;"></div>
+                </div>
+                <span>Lecteur Vidéo — Application installée</span>
+            </div>
+            <div class="app-body">
+                <div class="app-menu">
+                    <span>Lecture</span>
+                    <span>Bibliothèque</span>
+                    <span class="actif">Paramètres</span>
+                </div>
+                <p style="margin-top:0;">Version installée : 11.2.0</p>
+                <button type="button" class="app-btn" id="btn-verif-officielle">🔍 Rechercher des mises à jour</button>
+                <div class="app-resultat" id="app-resultat"></div>
+                <button type="button" class="app-close" id="btn-fermer-app">Fermer cette fenêtre</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="reveal-screen" class="reveal-card">
+        <div class="reveal-title">🎣 Te voilà piégé·e !</div>
+        <div class="reveal-sub">C'était une fausse mise à jour — technique appelée <strong>drive-by download</strong>.</div>
+
+        <div class="reveal-explication">
+            Ce genre de pop-up apparaît en général sur des sites de streaming illégal ou via une pub piégée.
+            Le fichier proposé au téléchargement ("lecteur_update_....exe") n'est pas une mise à jour — c'est
+            en réalité un logiciel malveillant (souvent un cheval de Troie ou un rançongiciel) déguisé.
+            <br><br>
+            Dans cette démo, rien n'a réellement été téléchargé — la barre de progression était une animation.
+            Mais sur un vrai piège, cliquer "Mettre à jour" aurait lancé un vrai téléchargement, et
+            l'exécuter aurait infecté l'appareil.
+            <br><br>
+            Même cliquer sur "Continuer sans mettre à jour" mène à cette même explication : le seul geste
+            vraiment sûr ici aurait été de fermer complètement l'onglet, sans cliquer sur rien dans la pop-up.
+        </div>
+
+        <div class="correction-box">
+            <button type="button" class="correction-toggle" id="btn-toggle-correction">
+                <span>🔧 Comment reconnaître et réagir, pour de vrai ?</span>
+                <span id="correction-chevron">▾</span>
+            </button>
+            <div class="correction-content" id="correction-content">
+                <h3>Le problème</h3>
+                Un site web ne peut pas légitimement savoir quelle version d'un logiciel installé sur ton
+                ordinateur tu utilises. Toute pop-up qui prétend le savoir et te pousse à télécharger quelque
+                chose est suspecte par nature.
+
+                <h3>Les signaux d'alerte</h3>
+                Urgence artificielle ("obsolète", "sécurité compromise"), fichier <code>.exe</code> proposé
+                directement sur une page web, design qui imite un vrai logiciel mais avec des détails qui
+                clochent (fautes, mise en page approximative).
+
+                <h3>Les règles à retenir</h3>
+                1. Les mises à jour se font <strong>depuis le logiciel lui-même</strong> (menu "Vérifier les mises à jour") ou depuis un store officiel — jamais depuis une pop-up web.<br>
+                2. Ne jamais exécuter un fichier téléchargé depuis une pop-up ou une pub.<br>
+                3. En cas de doute sur une pop-up, fermer l'onglet entier plutôt que de cliquer sur un bouton à l'intérieur.<br>
+                4. Garder son antivirus et son système à jour reste la meilleure protection contre ce qui passerait quand même.
+            </div>
+        </div>
+
+        <button type="button" class="reveal-btn" id="btn-reset">↺ Recommencer</button>
+    </div>
+</main>
+
+<footer>
+    <span class="footer-flag">🔒 Page pédagogique — cours de cybersécurité</span>
+    Aucun fichier n'est réellement téléchargé. <a id="lien-mentions">Mentions légales</a>
+</footer>
+
+<div class="modal-overlay" id="modal-overlay">
+    <div class="modal-box">
+        <h2>Mentions légales</h2>
+        <p>Cette page est une <strong>reconstitution fictive</strong> créée dans le cadre d'un cours de
+        cybersécurité, à des fins pédagogiques uniquement. Aucun fichier n'est réellement proposé au
+        téléchargement — la barre de progression est une simple animation visuelle.</p>
+        <p>Aucune donnée n'est envoyée, transmise, collectée ou conservée par cette page.</p>
+        <button class="modal-close" id="btn-close-modal">Fermer</button>
+    </div>
+</div>
+
+<script>
+    // Page 100% statique : la barre de progression est une animation, aucun fichier n'est réellement téléchargé.
+
+    document.getElementById('btn-telecharger').addEventListener('click', function() {
+        this.disabled = true;
+        document.getElementById('btn-ignorer').disabled = true;
+        document.getElementById('telechargement').style.display = 'block';
+        let pct = 0;
+        const interval = setInterval(() => {
+            pct += 4;
+            document.getElementById('barre').style.width = Math.min(pct, 100) + '%';
+            if (pct >= 100) {
+                clearInterval(interval);
+                setTimeout(afficherRevelation, 400);
+            }
+        }, 60);
+    });
+
+    document.getElementById('btn-ignorer').addEventListener('click', afficherRevelation);
+
+    document.getElementById('lien-comparer').addEventListener('click', function() {
+        document.getElementById('app-overlay').style.display = 'flex';
+        document.getElementById('app-resultat').innerText = '';
+    });
+    document.getElementById('btn-fermer-app').addEventListener('click', function() {
+        document.getElementById('app-overlay').style.display = 'none';
+    });
+    document.getElementById('app-overlay').addEventListener('click', function(e) {
+        if (e.target === this) this.style.display = 'none';
+    });
+    document.getElementById('btn-verif-officielle').addEventListener('click', function() {
+        this.disabled = true;
+        const resultat = document.getElementById('app-resultat');
+        resultat.innerText = '🔄 Vérification auprès du serveur officiel de l\'éditeur...';
+        setTimeout(() => {
+            resultat.innerHTML = '✅ Mise à jour <strong>14.8.3</strong> trouvée — installation proposée directement depuis l\'application, jamais depuis une page web.';
+            this.disabled = false;
+        }, 1200);
+    });
+
+    function afficherRevelation() {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('reveal-screen').style.display = 'block';
+    }
+
+    document.getElementById('btn-reset').addEventListener('click', function() {
+        document.getElementById('reveal-screen').style.display = 'none';
+        document.getElementById('login-screen').style.display = 'block';
+        document.getElementById('correction-content').style.display = 'none';
+        document.getElementById('correction-chevron').innerText = '▾';
+        document.getElementById('telechargement').style.display = 'none';
+        document.getElementById('barre').style.width = '0%';
+        document.getElementById('btn-telecharger').disabled = false;
+        document.getElementById('btn-ignorer').disabled = false;
+    });
+
+    document.getElementById('btn-toggle-correction').addEventListener('click', function() {
+        const contenu = document.getElementById('correction-content');
+        const ouvert = contenu.style.display === 'block';
+        contenu.style.display = ouvert ? 'none' : 'block';
+        document.getElementById('correction-chevron').innerText = ouvert ? '▾' : '▴';
+    });
+
+    document.getElementById('lien-mentions').addEventListener('click', function() {
+        document.getElementById('modal-overlay').style.display = 'flex';
+    });
+    document.getElementById('btn-close-modal').addEventListener('click', function() {
+        document.getElementById('modal-overlay').style.display = 'none';
+    });
+    document.getElementById('modal-overlay').addEventListener('click', function(e) {
+        if (e.target === this) this.style.display = 'none';
+    });
+</script>
+
+</body>
+</html>

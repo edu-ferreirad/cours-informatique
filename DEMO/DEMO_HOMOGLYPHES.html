@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Message reçu</title>
+<style>
+
+    :root {
+        --bg: #14161a; --panel: #1c1f25; --panel-2: #22262d; --border: #2e333b;
+        --text: #e7e9ec; --muted: #9aa2ad; --accent: #2f6fed; --accent-hover: #4c84f0;
+        --warn: #e0a63c; --trap: #3ccb7f; --danger: #e0554c;
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; background:var(--bg); color:var(--text);
+        font-family:'Segoe UI','Inter',Arial,sans-serif; display:flex; flex-direction:column; }
+    header { background:var(--panel); border-bottom:1px solid var(--border); padding:14px 20px;
+        font-size:0.95em; letter-spacing:0.03em; color:var(--muted); text-transform:uppercase; text-align:center; }
+    main { flex:1; display:flex; align-items:center; justify-content:center; padding:24px; }
+    .card { background:var(--panel); border:1px solid var(--border); border-radius:10px;
+        padding:30px; width:100%; max-width:540px; }
+    h1 { font-size:1.2em; margin:0 0 8px 0; font-weight:700; }
+    .sous-texte { color:var(--muted); font-size:0.87em; margin-bottom:20px; line-height:1.5; }
+    label { display:block; font-size:0.85em; color:var(--muted); margin-bottom:6px; }
+    input[type="text"], input[type="password"], textarea, select { width:100%; background:var(--panel-2);
+        border:1px solid var(--border); color:var(--text); padding:11px 13px; border-radius:6px;
+        font-size:0.95em; font-family:inherit; outline:none; margin-bottom:14px; }
+    textarea { font-family:'Consolas',monospace; min-height:70px; resize:vertical; }
+    input:focus, textarea:focus, select:focus { border-color:var(--accent); }
+    button { font-family:inherit; }
+    button.submit { width:100%; background:var(--accent); color:#fff; border:none; padding:13px;
+        border-radius:6px; font-size:1em; font-weight:600; cursor:pointer; margin-bottom:8px; }
+    button.submit:hover { background:var(--accent-hover); }
+    button.secondaire { width:100%; background:none; border:1px solid var(--border); color:var(--muted);
+        padding:10px; border-radius:6px; font-size:0.85em; cursor:pointer; }
+    button.secondaire:hover { color:var(--text); border-color:var(--accent); }
+    .hint { margin-top:14px; font-size:0.8em; color:var(--muted); line-height:1.5;
+        background:var(--panel-2); border:1px solid var(--border); border-radius:6px; padding:10px 12px; }
+
+    #reveal-screen { display:none; }
+    .reveal-card { background:var(--panel); border:1px solid var(--trap); border-radius:10px;
+        padding:32px; width:100%; max-width:560px; }
+    .reveal-title { font-size:1.35em; font-weight:700; margin:0 0 6px 0; color:var(--trap); }
+    .reveal-sub { color:var(--muted); margin-bottom:20px; }
+    .reveal-explication { font-size:0.92em; line-height:1.6; color:var(--text); }
+    .reveal-explication code { background:var(--panel-2); border:1px solid var(--border);
+        border-radius:4px; padding:1px 6px; }
+    .reveal-btn { margin-top:20px; background:var(--panel-2); border:1px solid var(--border);
+        color:var(--text); padding:10px 16px; border-radius:6px; cursor:pointer; font-size:0.9em; }
+    .reveal-btn:hover { border-color:var(--accent); }
+
+    .correction-box { margin-top:22px; border:1px solid var(--trap); border-radius:8px; overflow:hidden; text-align:left; }
+    .correction-toggle { width:100%; text-align:left; background:rgba(60,203,127,0.08); border:none;
+        color:var(--trap); padding:14px 16px; font-size:0.95em; font-weight:600; cursor:pointer;
+        display:flex; justify-content:space-between; align-items:center; }
+    .correction-content { display:none; padding:16px 18px 20px 18px; font-size:0.88em;
+        line-height:1.6; border-top:1px solid var(--border); }
+    .correction-content h3 { font-size:0.95em; margin:16px 0 6px 0; color:var(--text); }
+    .correction-content h3:first-child { margin-top:0; }
+    .correction-content ul, .correction-content ol { padding-left:20px; margin:6px 0; }
+    .correction-content code { background:var(--panel-2); border:1px solid var(--border);
+        border-radius:4px; padding:1px 6px; }
+    .code-compare { display:grid; grid-template-columns:1fr; gap:10px; margin:8px 0 14px 0; }
+    .code-block { background:var(--panel-2); border:1px solid var(--border); border-radius:6px;
+        padding:10px 12px; font-family:'Consolas',monospace; font-size:0.85em;
+        white-space:pre-wrap; word-break:break-word; }
+    .code-block.bad { border-left:3px solid #e0554c; }
+    .code-block.good { border-left:3px solid var(--trap); }
+    .code-label { font-size:0.78em; color:var(--muted); margin-bottom:4px;
+        text-transform:uppercase; letter-spacing:0.03em; }
+
+    footer { text-align:center; padding:14px; font-size:0.78em; color:var(--muted);
+        border-top:1px solid var(--border); background:var(--panel); }
+    footer a { color:var(--muted); text-decoration:underline; cursor:pointer; }
+    footer a:hover { color:var(--text); }
+    .footer-flag { display:block; margin-bottom:4px; color:var(--warn); font-weight:600; letter-spacing:0.02em; }
+
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7);
+        align-items:center; justify-content:center; padding:20px; z-index:100; }
+    .modal-box { background:var(--panel); border:1px solid var(--border); border-radius:10px;
+        padding:26px; max-width:480px; font-size:0.9em; line-height:1.6; }
+    .modal-box h2 { margin-top:0; font-size:1.1em; }
+    .modal-close { margin-top:16px; background:var(--accent); border:none; color:#fff;
+        padding:9px 16px; border-radius:6px; cursor:pointer; }
+
+
+    .lien-suspect-box { background:var(--panel-2); border:1px solid var(--border); border-radius:8px;
+        padding:18px; margin-bottom:18px; text-align:center; }
+    .lien-suspect-box .lien { font-size:1.15em; color:var(--accent); text-decoration:underline;
+        cursor:pointer; font-family:'Consolas',monospace; word-break:break-all; }
+    .lien-suspect-box .lien:hover { color:var(--accent-hover); }
+    .analyse-box { display:none; margin-top:16px; }
+    .outil-box { margin-top:10px; }
+    .outil-resultat { display:none; margin-top:10px; border-radius:6px; padding:10px 12px;
+        font-size:0.85em; font-family:'Consolas',monospace; word-break:break-all; }
+    .outil-resultat.danger { background:rgba(224,85,76,0.1); border:1px solid var(--danger); }
+    .outil-resultat.ok { background:rgba(60,203,127,0.1); border:1px solid var(--trap); }
+
+</style>
+</head>
+<body>
+
+<header>🔤 Démo : les domaines à faux caractères (homoglyphes)</header>
+
+<main>
+
+    <div id="login-screen" class="card">
+        <h1>🔎 Un message vous envoie ce lien</h1>
+        <div class="sous-texte">« Votre commande Apple a un problème de livraison, cliquez pour la résoudre : »</div>
+
+        <div class="lien-suspect-box">
+            <span class="lien" id="lien-suspect">https://аpple.com/support-livraison</span>
+        </div>
+
+        <button type="button" class="submit" id="btn-verifier">🔍 Analyser cette adresse avant de cliquer</button>
+
+        <div class="analyse-box" id="analyse-box">
+            <div class="hint" id="analyse-resultat"></div>
+        </div>
+
+        <div class="hint">
+            💡 Ce lien a l'air parfaitement identique à apple.com — regarde bien après l'analyse.
+        </div>
+    </div>
+
+    <div id="reveal-screen" class="reveal-card">
+        <div class="reveal-title">🎣 C'était un piège d'homoglyphes !</div>
+        <div class="reveal-sub">Un caractère invisible à l'œil nu changeait tout.</div>
+
+        <div class="reveal-explication">
+            Le "a" du lien n'était pas un vrai "a" latin, mais un <strong>"а" cyrillique</strong> —
+            visuellement identique, mais un caractère totalement différent pour un ordinateur. Résultat : ce
+            n'est <strong>pas</strong> le domaine apple.com, même si tes yeux ne voient aucune différence.
+        </div>
+
+        <div class="correction-box">
+            <button type="button" class="correction-toggle" id="btn-toggle-correction">
+                <span>🔧 Comment s'en protéger, pour de vrai ?</span>
+                <span id="correction-chevron">▾</span>
+            </button>
+            <div class="correction-content" id="correction-content">
+                <h3>Le problème</h3>
+                Beaucoup d'alphabets (cyrillique, grec...) ont des lettres qui ressemblent trait pour trait à
+                des lettres latines. Un domaine peut mélanger ces caractères pour créer un faux presque
+                indétectable à l'œil.
+
+                <h3>La bonne nouvelle</h3>
+                Les navigateurs détectent ce genre de mélange et convertissent automatiquement ces adresses
+                dans un format spécial appelé <strong>punycode</strong> (qui commence par <code>xn--</code>) —
+                souvent visible directement dans la barre d'adresse une fois le lien réellement ouvert.
+
+                <h3>🔬 Essaie l'outil toi-même</h3>
+                Colle n'importe quelle adresse : ce champ utilise la vraie fonction de conversion des
+                navigateurs pour révéler si des caractères "spéciaux" se cachent dedans.
+                <div class="outil-box">
+                    <input type="text" id="outil-input" placeholder="colle une adresse à vérifier...">
+                    <button type="button" class="secondaire" id="btn-outil" style="border-color:var(--trap); color:var(--trap);">🔍 Vérifier</button>
+                    <div class="outil-resultat" id="outil-resultat"></div>
+                </div>
+
+                <h3>Les règles à retenir</h3>
+                1. En cas de doute, retaper l'adresse à la main plutôt que de cliquer sur un lien reçu.<br>
+                2. Si la barre d'adresse affiche <code>xn--</code>, c'est un signal d'alerte immédiat.<br>
+                3. Cette technique s'appelle une "attaque homographe" — elle cible aussi les e-mails et les noms d'utilisateur.
+            </div>
+        </div>
+
+        <button type="button" class="reveal-btn" id="btn-reset">↺ Recommencer</button>
+    </div>
+
+</main>
+
+<footer>
+    <span class="footer-flag">🔒 Page pédagogique — cours de cybersécurité</span>
+    Adresse fictive, non cliquable. <a id="lien-mentions">Mentions légales</a>
+</footer>
+
+<div class="modal-overlay" id="modal-overlay">
+    <div class="modal-box">
+        <h2>Mentions légales</h2>
+        <p>Cette page est une <strong>reconstitution fictive</strong> créée dans le cadre d'un cours de
+cybersécurité, à des fins pédagogiques uniquement. L'adresse affichée n'est pas cliquable au sens propre et ne
+mène nulle part.</p>
+<p>Aucune donnée n'est envoyée, transmise, collectée ou conservée par cette page.</p>
+        <button class="modal-close" id="btn-close-modal">Fermer</button>
+    </div>
+</div>
+
+<script>
+
+    // Vraie analyse d'URL avec l'API native du navigateur (URL) — la conversion punycode ci-dessous est réelle.
+
+    function analyserURL(texte) {
+        let brut = texte.trim();
+        if (!brut) return null;
+        if (!/^[a-z][a-z0-9+.-]*:\/\//i.test(brut)) brut = 'https://' + brut;
+        try { return new URL(brut).hostname; } catch(e) { return null; }
+    }
+
+    document.getElementById('lien-suspect').addEventListener('click', function() {
+        document.getElementById('btn-verifier').click();
+    });
+
+    document.getElementById('btn-verifier').addEventListener('click', function() {
+        const texteAffiche = document.getElementById('lien-suspect').textContent;
+        const hostname = analyserURL(texteAffiche);
+        const suspect = hostname && hostname.startsWith('xn--');
+        document.getElementById('analyse-box').style.display = 'block';
+        document.getElementById('analyse-resultat').innerHTML =
+            `Hostname réel détecté par le navigateur : <code>${hostname}</code><br>` +
+            (suspect ? '🚩 Ce préfixe <code>xn--</code> signifie que le nom contient des caractères non-latins déguisés !' : '');
+        this.disabled = true;
+        setTimeout(() => {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('reveal-screen').style.display = 'block';
+        }, 1800);
+    });
+
+    document.getElementById('btn-outil').addEventListener('click', function() {
+        const valeur = document.getElementById('outil-input').value;
+        const hostname = analyserURL(valeur);
+        const resultat = document.getElementById('outil-resultat');
+        if (!hostname) {
+            resultat.style.display = 'block';
+            resultat.className = 'outil-resultat danger';
+            resultat.innerText = "⚠️ Adresse invalide.";
+            return;
+        }
+        const suspect = hostname.split('.').some(part => part.startsWith('xn--'));
+        resultat.style.display = 'block';
+        resultat.className = 'outil-resultat ' + (suspect ? 'danger' : 'ok');
+        resultat.innerText = suspect
+            ? `🚩 Hostname réel : ${hostname} — contient des caractères non-latins déguisés en lettres normales !`
+            : `✅ Hostname réel : ${hostname} — pas de caractère suspect détecté.`;
+    });
+
+    document.getElementById('btn-reset').addEventListener('click', function() {
+        document.getElementById('reveal-screen').style.display = 'none';
+        document.getElementById('login-screen').style.display = 'block';
+        document.getElementById('correction-content').style.display = 'none';
+        document.getElementById('correction-chevron').innerText = '▾';
+        document.getElementById('analyse-box').style.display = 'none';
+        document.getElementById('btn-verifier').disabled = false;
+        document.getElementById('outil-input').value = '';
+        document.getElementById('outil-resultat').style.display = 'none';
+    });
+
+
+    document.getElementById('btn-toggle-correction').addEventListener('click', function() {
+        const contenu = document.getElementById('correction-content');
+        const ouvert = contenu.style.display === 'block';
+        contenu.style.display = ouvert ? 'none' : 'block';
+        document.getElementById('correction-chevron').innerText = ouvert ? '▾' : '▴';
+    });
+    document.getElementById('lien-mentions').addEventListener('click', function() {
+        document.getElementById('modal-overlay').style.display = 'flex';
+    });
+    document.getElementById('btn-close-modal').addEventListener('click', function() {
+        document.getElementById('modal-overlay').style.display = 'none';
+    });
+    document.getElementById('modal-overlay').addEventListener('click', function(e) {
+        if (e.target === this) this.style.display = 'none';
+    });
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚠️ Alerte de sécurité système</title>
+<style>
+    :root {
+        --bg: #0a0a0a; --panel: #1a1414; --panel-2: #221818; --border: #3a2424;
+        --text: #eee; --muted: #b39a9a; --accent: #e0342f; --accent-hover: #f04540;
+        --warn: #e0a63c; --trap: #3ccb7f;
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; background:var(--bg); color:var(--text);
+        font-family:'Segoe UI','Inter',Arial,sans-serif; display:flex; flex-direction:column; }
+    header { background:var(--panel); border-bottom:1px solid var(--border); padding:14px 20px;
+        font-size:0.95em; letter-spacing:0.03em; color:var(--muted); text-transform:uppercase; }
+    main { flex:1; display:flex; align-items:center; justify-content:center; padding:24px; }
+
+    .alert-card { background:var(--panel); border:2px solid var(--accent); border-radius:10px;
+        padding:36px; width:100%; max-width:480px; text-align:center;
+        animation: pulse-border 1.4s infinite; }
+    @keyframes pulse-border {
+        0%,100% { box-shadow:0 0 0 0 rgba(224,52,47,0.4); }
+        50% { box-shadow:0 0 0 10px rgba(224,52,47,0); }
+    }
+    .alert-icon { font-size:3em; margin-bottom:6px; }
+    h1 { font-size:1.35em; margin:0 0 10px 0; font-weight:800; color:var(--accent); line-height:1.3; }
+    .sous-texte { color:var(--muted); font-size:0.92em; margin-bottom:22px; line-height:1.55; }
+    .compteur { font-family:'Consolas',monospace; font-size:1.6em; font-weight:700; color:var(--accent);
+        margin-bottom:20px; }
+    .liste-menaces { text-align:left; background:var(--panel-2); border:1px solid var(--border);
+        border-radius:8px; padding:14px 18px; margin-bottom:22px; font-size:0.85em; line-height:1.8; }
+    .liste-menaces .item { display:flex; justify-content:space-between; }
+    .liste-menaces .statut { color:var(--accent); font-weight:600; }
+    button.submit { width:100%; background:var(--accent); color:#fff; border:none; padding:15px;
+        border-radius:6px; font-size:1.08em; font-weight:700; cursor:pointer; margin-bottom:10px;
+        animation: pulse-btn 1.4s infinite; }
+    @keyframes pulse-btn { 0%,100% { transform:scale(1); } 50% { transform:scale(1.02); } }
+    button.submit:hover { background:var(--accent-hover); }
+    button.ignorer { width:100%; background:none; border:1px solid var(--border); color:var(--muted);
+        padding:10px; border-radius:6px; font-size:0.85em; cursor:pointer; }
+    button.ignorer:hover { color:var(--text); }
+    .hint { margin-top:16px; font-size:0.8em; color:var(--muted); line-height:1.5;
+        background:var(--panel-2); border:1px solid var(--border); border-radius:6px; padding:10px 12px; }
+
+    footer { text-align:center; padding:14px; font-size:0.78em; color:var(--muted);
+        border-top:1px solid var(--border); background:var(--panel); }
+    footer a { color:var(--muted); text-decoration:underline; cursor:pointer; }
+    footer a:hover { color:var(--text); }
+    .footer-flag { display:block; margin-bottom:4px; color:var(--warn); font-weight:600; letter-spacing:0.02em; }
+
+    #reveal-screen { display:none; }
+    .reveal-card { background:var(--panel); border:1px solid var(--trap); border-radius:10px;
+        padding:36px; width:100%; max-width:480px; }
+    .reveal-title { font-size:1.4em; font-weight:700; margin:0 0 6px 0; color:var(--trap); }
+    .reveal-sub { color:var(--muted); margin-bottom:22px; }
+    .reveal-explication { font-size:0.92em; line-height:1.6; color:var(--text); }
+    .reveal-explication code { background:var(--panel-2); border:1px solid var(--border);
+        border-radius:4px; padding:1px 6px; }
+    .reveal-btn { margin-top:22px; background:var(--panel-2); border:1px solid var(--border);
+        color:var(--text); padding:10px 16px; border-radius:6px; cursor:pointer; font-size:0.9em; }
+    .reveal-btn:hover { border-color:var(--accent); }
+
+    .correction-box { margin-top:24px; border:1px solid var(--trap); border-radius:8px; overflow:hidden; }
+    .correction-toggle { width:100%; text-align:left; background:rgba(60,203,127,0.08); border:none;
+        color:var(--trap); padding:14px 16px; font-size:0.95em; font-weight:600; cursor:pointer;
+        display:flex; justify-content:space-between; align-items:center; }
+    .correction-content { display:none; padding:16px 18px 20px 18px; font-size:0.88em;
+        line-height:1.6; border-top:1px solid var(--border); }
+    .correction-content h3 { font-size:0.95em; margin:16px 0 6px 0; color:var(--text); }
+    .correction-content h3:first-child { margin-top:0; }
+    .code-compare { display:grid; grid-template-columns:1fr; gap:10px; margin:8px 0 14px 0; }
+    .code-block { background:var(--panel-2); border:1px solid var(--border); border-radius:6px;
+        padding:10px 12px; font-family:'Consolas',monospace; font-size:0.85em;
+        white-space:pre-wrap; word-break:break-word; }
+    .code-block.bad { border-left:3px solid #e0554c; }
+    .code-block.good { border-left:3px solid var(--trap); }
+    .code-label { font-size:0.78em; color:var(--muted); margin-bottom:4px;
+        text-transform:uppercase; letter-spacing:0.03em; }
+
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7);
+        align-items:center; justify-content:center; padding:20px; z-index:100; }
+    .modal-box { background:var(--panel); border:1px solid var(--border); border-radius:10px;
+        padding:26px; max-width:480px; font-size:0.9em; line-height:1.6; }
+    .modal-box h2 { margin-top:0; font-size:1.1em; }
+    .modal-close { margin-top:16px; background:var(--accent); border:none; color:#fff;
+        padding:9px 16px; border-radius:6px; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<header>Centre de sécurité système (environnement de démonstration)</header>
+
+<main>
+    <div id="login-screen" class="alert-card">
+        <div class="alert-icon">⚠️</div>
+        <h1>VOTRE APPAREIL EST INFECTÉ</h1>
+        <div class="sous-texte">Notre scan a détecté des menaces actives sur cet ordinateur. Une action immédiate est requise.</div>
+
+        <div class="compteur">🦠 <span id="nb-virus">7</span> menaces détectées</div>
+
+        <div class="liste-menaces">
+            <div class="item"><span>Trojan.GenericKD.4471</span><span class="statut">ACTIF</span></div>
+            <div class="item"><span>Spyware.PasswordStealer</span><span class="statut">ACTIF</span></div>
+            <div class="item"><span>Adware.PopUnder.223</span><span class="statut">ACTIF</span></div>
+        </div>
+
+        <button type="button" class="submit" id="btn-scanner">🛡️ Nettoyer maintenant (recommandé)</button>
+        <button type="button" class="ignorer" id="btn-ignorer">Ignorer et rester vulnérable</button>
+
+        <div class="hint">
+            ⚠️ Un vrai antivirus ne s'affiche jamais comme une page web plein écran qui te met la pression.
+        </div>
+    </div>
+
+    <div id="reveal-screen" class="reveal-card">
+        <div class="reveal-title">🎣 Te voilà piégé·e !</div>
+        <div class="reveal-sub">C'était un faux message d'alerte — technique appelée le <strong>scareware</strong>.</div>
+
+        <div class="reveal-explication">
+            Ce genre de fausse alerte ("7 virus détectés !") apparaît en général dans une pub, une fenêtre
+            pop-up, ou une page web piégée. Elle n'a <strong>aucun accès réel</strong> à ton ordinateur — un
+            site web ne peut pas scanner tes fichiers. Le nombre de "virus" est juste écrit à l'avance dans le
+            code, comme ici : <code>&lt;span id="nb-virus"&gt;7&lt;/span&gt;</code>.
+            <br><br>
+            Le but est de te faire paniquer pour que tu cliques sur "Nettoyer maintenant" — ce clic mène
+            généralement à télécharger un vrai logiciel malveillant (déguisé en "antivirus"), ou à une page qui
+            demande ta carte bancaire pour un faux abonnement.
+            <br><br>
+            Même cliquer sur "Ignorer" n'aurait rien changé ici — dans cette démo, aucun des deux boutons
+            n'envoie ou ne télécharge quoi que ce soit.
+        </div>
+
+        <div class="correction-box">
+            <button type="button" class="correction-toggle" id="btn-toggle-correction">
+                <span>🔧 Comment reconnaître et réagir, pour de vrai ?</span>
+                <span id="correction-chevron">▾</span>
+            </button>
+            <div class="correction-content" id="correction-content">
+                <h3>Le problème</h3>
+                Un navigateur web n'a pas accès à l'antivirus installé sur ton ordinateur, ni à tes fichiers.
+                Aucune page web ne peut légitimement "scanner" ta machine.
+
+                <h3>Comment reconnaître une fausse alerte</h3>
+                <div class="code-compare">
+                    <div>
+                        <div class="code-label">🚩 Signaux d'un scareware</div>
+                        <div class="code-block bad">- Urgence extrême, compte à rebours, clignotement
+- Impossible de fermer la fenêtre normalement
+- Un site web qui prétend "scanner ton PC"
+- Design qui imite Windows/macOS mais pas exact</div>
+                    </div>
+                    <div>
+                        <div class="code-label">✅ Bon réflexe</div>
+                        <div class="code-block good">Fermer l'onglet (pas juste la pop-up) via le
+gestionnaire de tâches si besoin. Ne jamais
+télécharger le "nettoyeur" proposé. Utiliser
+uniquement l'antivirus déjà installé sur l'appareil.</div>
+                    </div>
+                </div>
+
+                <h3>Les règles à retenir</h3>
+                1. Un vrai antivirus s'exécute comme un programme installé, jamais comme une page web.<br>
+                2. Aucun site ne peut scanner les fichiers de ton ordinateur depuis le navigateur.<br>
+                3. Face à une urgence fabriquée ("agis maintenant !"), le bon réflexe est justement de ne rien précipiter.<br>
+                4. En cas de doute, fermer l'onglet et vérifier avec l'antivirus réel de l'appareil.
+
+                <h3>🔬 La preuve, en direct</h3>
+                Une page web ne peut techniquement voir un fichier de ton appareil QUE si tu le choisis
+                toi-même dans une fenêtre de sélection — jamais toute seule, jamais en scannant ton disque.
+                Essaie :
+                <div style="margin-top:10px;">
+                    <input type="file" id="file-input-cache" style="display:none;">
+                    <button type="button" id="btn-choisir-fichier" style="background:var(--trap); border:none; color:#08130d; padding:9px 14px; border-radius:6px; font-size:0.88em; font-weight:700; cursor:pointer;">📁 Choisir UN fichier pour tester</button>
+                    <div id="resultat-fichier" style="display:none; margin-top:10px; background:var(--panel-2); border:1px solid var(--border); border-radius:6px; padding:10px 12px; font-family:'Consolas',monospace; font-size:0.85em;"></div>
+                </div>
+                <p style="font-size:0.85em; color:var(--muted); margin-top:10px;">
+                    C'est tout ce qu'une page web peut obtenir — le nom et la taille d'<strong>un seul</strong>
+                    fichier, et seulement parce que tu l'as choisi explicitement dans cette fenêtre système.
+                    Aucun site ne peut lister ou lire le reste de ton disque, ni "scanner tes virus" sans que
+                    tu choisisses activement chaque fichier un par un — ce que ferait un vrai antivirus, lui,
+                    en tant que programme installé avec des droits différents.
+                </p>
+            </div>
+        </div>
+
+        <button type="button" class="reveal-btn" id="btn-reset">↺ Recommencer</button>
+    </div>
+</main>
+
+<footer>
+    <span class="footer-flag">🔒 Page pédagogique — cours de cybersécurité</span>
+    Ceci n'est pas une vraie alerte de sécurité. <a id="lien-mentions">Mentions légales</a>
+</footer>
+
+<div class="modal-overlay" id="modal-overlay">
+    <div class="modal-box">
+        <h2>Mentions légales</h2>
+        <p>Cette page est une <strong>reconstitution fictive</strong> créée dans le cadre d'un cours de
+        cybersécurité, à des fins pédagogiques uniquement. Elle n'effectue aucun scan, ne détecte aucune vraie
+        menace, et n'appartient à aucun éditeur d'antivirus réel.</p>
+        <p>Aucun bouton de cette page ne télécharge, n'envoie ou ne collecte quoi que ce soit. Tout est
+        statique et local à votre navigateur.</p>
+        <button class="modal-close" id="btn-close-modal">Fermer</button>
+    </div>
+</div>
+
+<script>
+    // Page 100% statique : aucun scan, aucun téléchargement, aucune requête réseau, quel que soit le bouton cliqué.
+
+    document.getElementById('btn-scanner').addEventListener('click', function() {
+        afficherRevelation();
+    });
+    document.getElementById('btn-ignorer').addEventListener('click', function() {
+        afficherRevelation();
+    });
+
+    function afficherRevelation() {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('reveal-screen').style.display = 'block';
+    }
+
+    document.getElementById('btn-reset').addEventListener('click', function() {
+        document.getElementById('reveal-screen').style.display = 'none';
+        document.getElementById('login-screen').style.display = 'block';
+        document.getElementById('correction-content').style.display = 'none';
+        document.getElementById('correction-chevron').innerText = '▾';
+    });
+
+    document.getElementById('btn-choisir-fichier').addEventListener('click', function() {
+        document.getElementById('file-input-cache').click();
+    });
+    document.getElementById('file-input-cache').addEventListener('change', function() {
+        if (this.files.length === 0) return;
+        const f = this.files[0];
+        const tailleKo = (f.size / 1024).toFixed(1);
+        document.getElementById('resultat-fichier').innerText =
+            `📄 ${f.name}  —  ${tailleKo} Ko\n\nC'est TOUT ce que cette page connaît. Rien n'a été envoyé nulle part, et elle ne sait rien des autres fichiers de ton appareil.`;
+        document.getElementById('resultat-fichier').style.display = 'block';
+    });
+
+    document.getElementById('btn-toggle-correction').addEventListener('click', function() {
+        const contenu = document.getElementById('correction-content');
+        const ouvert = contenu.style.display === 'block';
+        contenu.style.display = ouvert ? 'none' : 'block';
+        document.getElementById('correction-chevron').innerText = ouvert ? '▾' : '▴';
+    });
+
+    document.getElementById('lien-mentions').addEventListener('click', function() {
+        document.getElementById('modal-overlay').style.display = 'flex';
+    });
+    document.getElementById('btn-close-modal').addEventListener('click', function() {
+        document.getElementById('modal-overlay').style.display = 'none';
+    });
+    document.getElementById('modal-overlay').addEventListener('click', function(e) {
+        if (e.target === this) this.style.display = 'none';
+    });
+</script>
+
+</body>
+</html>

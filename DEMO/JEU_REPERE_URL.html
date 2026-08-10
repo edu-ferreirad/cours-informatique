@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Repère la fausse URL</title>
+<style>
+    :root {
+        --bg: #14161a; --panel: #1c1f25; --panel-2: #22262d; --border: #2e333b;
+        --text: #e7e9ec; --muted: #9aa2ad; --accent: #2f6fed; --accent-hover: #4c84f0;
+        --warn: #e0a63c; --trap: #3ccb7f; --danger: #e0554c;
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; background:var(--bg); color:var(--text);
+        font-family:'Segoe UI','Inter',Arial,sans-serif; display:flex; flex-direction:column; }
+    header { background:var(--panel); border-bottom:1px solid var(--border); padding:14px 20px;
+        font-size:0.95em; letter-spacing:0.03em; color:var(--muted); text-transform:uppercase;
+        display:flex; justify-content:space-between; align-items:center; }
+    #score-box { font-family:'Consolas',monospace; color:var(--text); font-size:0.95em; }
+    main { flex:1; display:flex; align-items:center; justify-content:center; padding:24px; }
+    .card { background:var(--panel); border:1px solid var(--border); border-radius:10px;
+        padding:32px; width:100%; max-width:520px; }
+    h1 { font-size:1.2em; margin:0 0 6px 0; font-weight:700; }
+    .sous-texte { color:var(--muted); font-size:0.88em; margin-bottom:22px; line-height:1.5; }
+    .progression { font-size:0.8em; color:var(--muted); margin-bottom:10px; }
+
+    .url-affichee { background:#0d0e11; border:1px solid var(--border); border-radius:8px;
+        padding:20px; font-family:'Consolas',monospace; font-size:1.15em; text-align:center;
+        margin-bottom:22px; word-break:break-all; }
+    .url-contexte { text-align:center; color:var(--muted); font-size:0.82em; margin-top:-14px; margin-bottom:22px; }
+
+    .choix-btns { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:8px; }
+    .btn-choix { padding:16px; border-radius:8px; border:1px solid var(--border); background:var(--panel-2);
+        color:var(--text); font-size:1em; font-weight:600; cursor:pointer; }
+    .btn-choix.vrai:hover { border-color:var(--trap); color:var(--trap); }
+    .btn-choix.faux:hover { border-color:var(--danger); color:var(--danger); }
+
+    .feedback { display:none; margin-top:18px; padding:14px 16px; border-radius:8px;
+        font-size:0.9em; line-height:1.55; }
+    .feedback.correct { background:rgba(60,203,127,0.1); border:1px solid var(--trap); }
+    .feedback.incorrect { background:rgba(224,85,76,0.1); border:1px solid var(--danger); }
+    .feedback .titre { font-weight:700; margin-bottom:6px; }
+    .feedback.correct .titre { color:var(--trap); }
+    .feedback.incorrect .titre { color:var(--danger); }
+    button.suivant { width:100%; margin-top:16px; background:var(--accent); color:#fff; border:none;
+        padding:13px; border-radius:6px; font-size:1em; font-weight:600; cursor:pointer; display:none; }
+    button.suivant:hover { background:var(--accent-hover); }
+
+    #fin-screen { display:none; text-align:center; }
+    #fin-screen .score-final { font-size:2.2em; font-weight:800; color:var(--accent); margin:14px 0; }
+    button.rejouer { background:var(--panel-2); border:1px solid var(--border); color:var(--text);
+        padding:10px 18px; border-radius:6px; cursor:pointer; font-size:0.92em; margin-top:14px; }
+    button.rejouer:hover { border-color:var(--accent); }
+
+    footer { text-align:center; padding:14px; font-size:0.78em; color:var(--muted);
+        border-top:1px solid var(--border); background:var(--panel); }
+    footer a { color:var(--muted); text-decoration:underline; cursor:pointer; }
+    footer a:hover { color:var(--text); }
+    .footer-flag { display:block; margin-bottom:4px; color:var(--warn); font-weight:600; letter-spacing:0.02em; }
+
+    .correction-box { margin-top:20px; border:1px solid var(--trap); border-radius:8px; overflow:hidden; text-align:left; }
+    .correction-toggle { width:100%; text-align:left; background:rgba(60,203,127,0.08); border:none;
+        color:var(--trap); padding:14px 16px; font-size:0.95em; font-weight:600; cursor:pointer;
+        display:flex; justify-content:space-between; align-items:center; }
+    .correction-content { display:none; padding:16px 18px 20px 18px; font-size:0.88em;
+        line-height:1.6; border-top:1px solid var(--border); }
+    .correction-content h3 { font-size:0.95em; margin:16px 0 6px 0; color:var(--text); }
+    .correction-content h3:first-child { margin-top:0; }
+    .correction-content ul { margin:6px 0; padding-left:20px; }
+    .extracteur { margin-top:16px; }
+    .extracteur input { width:100%; background:var(--panel-2); border:1px solid var(--border); color:var(--text);
+        padding:10px 12px; border-radius:6px; font-size:0.92em; font-family:'Consolas',monospace;
+        margin-bottom:8px; outline:none; }
+    .extracteur input:focus { border-color:var(--accent); }
+    .extracteur-resultat { display:none; background:#0d0e11; border:1px solid var(--border); border-radius:8px;
+        padding:12px 14px; font-family:'Consolas',monospace; font-size:0.88em; word-break:break-all; }
+    .extracteur-resultat .domaine-confiance { color:var(--trap); font-weight:700; }
+    .extracteur-resultat .reste { color:var(--muted); }
+    .extracteur-erreur { display:none; color:var(--danger); font-size:0.85em; margin-top:6px; }
+
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7);
+        align-items:center; justify-content:center; padding:20px; z-index:100; }
+    .modal-box { background:var(--panel); border:1px solid var(--border); border-radius:10px;
+        padding:26px; max-width:480px; font-size:0.9em; line-height:1.6; }
+    .modal-box h2 { margin-top:0; font-size:1.1em; }
+    .modal-close { margin-top:16px; background:var(--accent); border:none; color:#fff;
+        padding:9px 16px; border-radius:6px; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<header>
+    <span>🔎 Repère la fausse URL</span>
+    <span id="score-box">Score : 0/0</span>
+</header>
+
+<main>
+    <div id="jeu-card" class="card">
+        <h1>Cette adresse mène-t-elle vraiment au bon site ?</h1>
+        <div class="sous-texte">Lis attentivement l'adresse affichée, puis dis si elle est authentique ou piégée.</div>
+        <div class="progression" id="progression"></div>
+
+        <div class="url-affichee" id="url-affichee"></div>
+        <div class="url-contexte" id="url-contexte"></div>
+
+        <div class="choix-btns">
+            <button type="button" class="btn-choix vrai" id="btn-vrai">✅ Authentique</button>
+            <button type="button" class="btn-choix faux" id="btn-faux">🚩 Piégée</button>
+        </div>
+
+        <div class="feedback" id="feedback">
+            <div class="titre" id="feedback-titre"></div>
+            <div id="feedback-texte"></div>
+        </div>
+
+        <button type="button" class="suivant" id="btn-suivant">Suivant →</button>
+    </div>
+
+    <div id="fin-screen" class="card">
+        <h1>Partie terminée !</h1>
+        <div class="score-final" id="score-final-texte"></div>
+        <div class="sous-texte" id="score-final-commentaire"></div>
+
+        <div class="correction-box">
+            <button type="button" class="correction-toggle" id="btn-toggle-correction">
+                <span>🔧 Les réflexes à retenir</span>
+                <span id="correction-chevron">▾</span>
+            </button>
+            <div class="correction-content" id="correction-content">
+                <h3>Ce qui trompe le plus souvent</h3>
+                <ul>
+                    <li><strong>Caractères qui se ressemblent</strong> : "1" pour "l", "0" pour "o", "rn" pour "m"</li>
+                    <li><strong>Sous-domaines trompeurs</strong> : <code>paypal.securite-connexion.com</code> — le vrai domaine est <code>securite-connexion.com</code>, pas <code>paypal.com</code> !</li>
+                    <li><strong>Extensions différentes</strong> : <code>.ch</code> vs <code>.com</code> vs <code>.info</code></li>
+                    <li><strong>Mots ajoutés</strong> : <code>ecole-geneve-connexion.ch</code> au lieu de <code>ge.ch</code></li>
+                </ul>
+                <h3>La bonne méthode</h3>
+                Dans une adresse comme <code>https://compte.exemple.paypa1-secure.info/login</code>, le vrai
+                domaine est toujours <strong>le dernier "mot.extension" juste avant le premier <code>/</code></strong>
+                — ici <code>paypa1-secure.info</code>, pas <code>paypal</code>. Tout ce qui vient avant (même
+                si ça contient "paypal") est juste un sous-domaine que n'importe qui peut choisir librement.
+                <h3>Le réflexe</h3>
+                En cas de doute, ne jamais cliquer sur le lien reçu — retaper l'adresse connue directement dans
+                le navigateur, ou passer par les favoris déjà enregistrés.
+
+                <h3>🔬 Essaie l'outil toi-même</h3>
+                Colle n'importe quelle adresse (même une des adresses vues plus haut) : cette page va
+                réellement l'analyser avec la même méthode que ton navigateur utilise en interne, et te
+                montrer le seul nom de domaine qui compte.
+                <div class="extracteur">
+                    <input type="text" id="extracteur-input" placeholder="colle une adresse ici, ex : https://compte.paypal.reset-securite.net/signin">
+                    <button type="button" class="btn-choix" style="width:100%; text-align:center;" id="btn-extraire">🔍 Analyser cette adresse</button>
+                    <div class="extracteur-erreur" id="extracteur-erreur">⚠️ Ceci ne ressemble pas à une adresse valide.</div>
+                    <div class="extracteur-resultat" id="extracteur-resultat"></div>
+                </div>
+            </div>
+        </div>
+
+        <button type="button" class="rejouer" id="btn-rejouer">↺ Rejouer</button>
+    </div>
+</main>
+
+<footer>
+    <span class="footer-flag">🔒 Page pédagogique — cours de cybersécurité</span>
+    Jeu d'entraînement, aucune de ces adresses n'est cliquable. <a id="lien-mentions">Mentions légales</a>
+</footer>
+
+<div class="modal-overlay" id="modal-overlay">
+    <div class="modal-box">
+        <h2>Mentions légales</h2>
+        <p>Cette page est un <strong>exercice pédagogique fictif</strong> créé dans le cadre d'un cours de
+        cybersécurité. Les adresses affichées sont des exemples illustratifs, non cliquables, et ne mènent
+        vers aucun site réel.</p>
+        <p>Aucune donnée n'est envoyée, transmise, collectée ou conservée par cette page.</p>
+        <button class="modal-close" id="btn-close-modal">Fermer</button>
+    </div>
+</div>
+
+<script>
+    // Jeu 100% local : aucune des adresses affichées n'est un vrai lien, aucune requête réseau n'est faite.
+
+    const QUESTIONS = [
+        { url: "https://www.ge.ch/ecole-en-ligne", contexte: "Reçue par e-mail : « Connectez-vous à votre espace élève »", authentique: true,
+          explication: "Domaine officiel du canton (ge.ch), pas de sous-domaine suspect ni de caractère trompeur." },
+        { url: "https://ssoeel.geneveid-connexion.info/login", contexte: "Reçue par SMS : « Votre session a expiré »", authentique: false,
+          explication: "Le vrai domaine attendu serait geneveid.ch — ici c'est geneveid-connexion.info, un domaine .info totalement différent qui n'appartient pas au canton." },
+        { url: "https://www.paypal.com/signin", contexte: "Lien dans un e-mail « Confirmez votre paiement »", authentique: true,
+          explication: "Domaine exact paypal.com, sans mot ajouté ni sous-domaine trompeur." },
+        { url: "https://paypa1-secure-verify.com/signin", contexte: "Lien dans un e-mail « Confirmez votre paiement »", authentique: false,
+          explication: "'paypa1' avec un chiffre '1' à la place du 'l' — un classique du phishing. Le vrai domaine (paypal.com) n'apparaît nulle part." },
+        { url: "https://compte.paypal.reset-securite.net/signin", contexte: "Lien reçu par message privé", authentique: false,
+          explication: "'paypal' n'est ici qu'un sous-domaine du vrai site : reset-securite.net. C'est ce dernier mot qui compte, pas ce qui est écrit avant." },
+        { url: "https://accounts.google.com/signin", contexte: "Fenêtre de connexion Gmail", authentique: true,
+          explication: "Sous-domaine 'accounts' du vrai domaine google.com — schéma classique et légitime chez Google." },
+        { url: "https://accounts-google-secure.com/signin", contexte: "Lien reçu par SMS « Activité suspecte détectée »", authentique: false,
+          explication: "'google' est noyé dans un nom de domaine différent (accounts-google-secure.com) — Google n'a jamais ce domaine." },
+        { url: "https://www.instagram.com/accounts/login", contexte: "Lien partagé par un ami sur Discord", authentique: true,
+          explication: "Domaine officiel instagram.com avec un chemin classique /accounts/login." }
+    ];
+
+    let ordre = [];
+    let indexActuel = 0;
+    let bonnesReponses = 0;
+    let reponduCetteQuestion = false;
+
+    function melanger(tableau) {
+        const copie = tableau.slice();
+        for (let i = copie.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [copie[i], copie[j]] = [copie[j], copie[i]];
+        }
+        return copie;
+    }
+
+    function demarrer() {
+        ordre = melanger(QUESTIONS.map((_, i) => i));
+        indexActuel = 0;
+        bonnesReponses = 0;
+        document.getElementById('jeu-card').style.display = 'block';
+        document.getElementById('fin-screen').style.display = 'none';
+        afficherQuestion();
+        majScore();
+    }
+
+    function majScore() {
+        document.getElementById('score-box').innerText = `Score : ${bonnesReponses}/${indexActuel}`;
+    }
+
+    function afficherQuestion() {
+        reponduCetteQuestion = false;
+        const q = QUESTIONS[ordre[indexActuel]];
+        document.getElementById('progression').innerText = `Question ${indexActuel + 1} / ${QUESTIONS.length}`;
+        document.getElementById('url-affichee').innerText = q.url;
+        document.getElementById('url-contexte').innerText = q.contexte;
+        document.getElementById('feedback').style.display = 'none';
+        document.getElementById('feedback').className = 'feedback';
+        document.getElementById('btn-suivant').style.display = 'none';
+        document.getElementById('btn-vrai').disabled = false;
+        document.getElementById('btn-faux').disabled = false;
+    }
+
+    function repondre(reponseAuthentique) {
+        if (reponduCetteQuestion) return;
+        reponduCetteQuestion = true;
+        const q = QUESTIONS[ordre[indexActuel]];
+        const correct = (reponseAuthentique === q.authentique);
+        if (correct) bonnesReponses++;
+
+        const feedback = document.getElementById('feedback');
+        feedback.style.display = 'block';
+        feedback.className = 'feedback ' + (correct ? 'correct' : 'incorrect');
+        document.getElementById('feedback-titre').innerText = correct
+            ? '✅ Bonne réponse !'
+            : (q.authentique ? '❌ En fait, cette adresse était authentique.' : '❌ En fait, cette adresse était piégée.');
+        document.getElementById('feedback-texte').innerText = q.explication;
+
+        document.getElementById('btn-vrai').disabled = true;
+        document.getElementById('btn-faux').disabled = true;
+        document.getElementById('btn-suivant').style.display = 'block';
+
+        indexActuel++;
+        majScore();
+        indexActuel--; // le compteur d'affichage reflète les questions déjà répondues sans avancer l'index réel ici
+    }
+
+    document.getElementById('btn-vrai').addEventListener('click', () => repondre(true));
+    document.getElementById('btn-faux').addEventListener('click', () => repondre(false));
+
+    document.getElementById('btn-suivant').addEventListener('click', function() {
+        indexActuel++;
+        if (indexActuel < QUESTIONS.length) {
+            afficherQuestion();
+        } else {
+            terminerPartie();
+        }
+    });
+
+    function terminerPartie() {
+        document.getElementById('jeu-card').style.display = 'none';
+        document.getElementById('fin-screen').style.display = 'block';
+        document.getElementById('score-final-texte').innerText = `${bonnesReponses} / ${QUESTIONS.length}`;
+        let commentaire;
+        if (bonnesReponses === QUESTIONS.length) commentaire = "Score parfait ! Tu as l'œil.";
+        else if (bonnesReponses >= QUESTIONS.length * 0.7) commentaire = "Très solide — encore un peu d'entraînement et c'est acquis.";
+        else commentaire = "C'est justement pour ça qu'on s'entraîne — relis les explications ci-dessous.";
+        document.getElementById('score-final-commentaire').innerText = commentaire;
+    }
+
+    document.getElementById('btn-rejouer').addEventListener('click', demarrer);
+
+    // Vraie analyse d'URL avec l'API native du navigateur (URL) — pas une simulation de texte.
+    function extraireHostname(texte) {
+        let brut = texte.trim();
+        if (!brut) return null;
+        if (!/^[a-z][a-z0-9+.-]*:\/\//i.test(brut)) brut = 'https://' + brut;
+        try {
+            return new URL(brut).hostname;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function surlignerDomaine(hostname) {
+        const segments = hostname.split('.');
+        if (segments.length < 2) return `<span class="domaine-confiance">${hostname}</span>`;
+        const reste = segments.slice(0, -2).join('.');
+        const domainePrincipal = segments.slice(-2).join('.');
+        return (reste ? `<span class="reste">${reste}.</span>` : '') + `<span class="domaine-confiance">${domainePrincipal}</span>`;
+    }
+
+    document.getElementById('btn-extraire').addEventListener('click', function() {
+        const valeur = document.getElementById('extracteur-input').value;
+        const hostname = extraireHostname(valeur);
+        const resultat = document.getElementById('extracteur-resultat');
+        const erreur = document.getElementById('extracteur-erreur');
+
+        if (!hostname) {
+            erreur.style.display = 'block';
+            resultat.style.display = 'none';
+            return;
+        }
+        erreur.style.display = 'none';
+        resultat.innerHTML = `Nom d'hôte complet : <strong>${hostname}</strong><br><br>` +
+            `Domaine qui compte vraiment (à qui tu fais confiance) :<br>${surlignerDomaine(hostname)}` +
+            `<br><br><span style="font-size:0.82em; color:var(--muted);">⚠️ Cette règle "2 derniers segments" est une bonne approximation, mais quelques extensions comme <code>.co.uk</code> ou <code>.gouv.fr</code> comptent 3 segments — en cas de doute, vérifie toujours à la main.</span>`;
+        resultat.style.display = 'block';
+    });
+
+    document.getElementById('btn-toggle-correction').addEventListener('click', function() {
+        const contenu = document.getElementById('correction-content');
+        const ouvert = contenu.style.display === 'block';
+        contenu.style.display = ouvert ? 'none' : 'block';
+        document.getElementById('correction-chevron').innerText = ouvert ? '▾' : '▴';
+    });
+
+    document.getElementById('lien-mentions').addEventListener('click', function() {
+        document.getElementById('modal-overlay').style.display = 'flex';
+    });
+    document.getElementById('btn-close-modal').addEventListener('click', function() {
+        document.getElementById('modal-overlay').style.display = 'none';
+    });
+    document.getElementById('modal-overlay').addEventListener('click', function(e) {
+        if (e.target === this) this.style.display = 'none';
+    });
+
+    demarrer();
+</script>
+
+</body>
+</html>

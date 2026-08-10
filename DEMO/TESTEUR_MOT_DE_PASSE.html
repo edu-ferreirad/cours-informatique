@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Testeur de mot de passe</title>
+<style>
+    :root {
+        --bg: #14161a; --panel: #1c1f25; --panel-2: #22262d; --border: #2e333b;
+        --text: #e7e9ec; --muted: #9aa2ad; --accent: #2f6fed; --accent-hover: #4c84f0;
+        --warn: #e0a63c; --trap: #3ccb7f; --danger: #e0554c;
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; background:var(--bg); color:var(--text);
+        font-family:'Segoe UI','Inter',Arial,sans-serif; display:flex; flex-direction:column; }
+    header { background:var(--panel); border-bottom:1px solid var(--border); padding:14px 20px;
+        font-size:0.95em; letter-spacing:0.03em; color:var(--muted); text-transform:uppercase; }
+    main { flex:1; display:flex; align-items:center; justify-content:center; padding:24px; }
+    .card { background:var(--panel); border:1px solid var(--border); border-radius:10px;
+        padding:32px; width:100%; max-width:480px; }
+    h1 { font-size:1.2em; margin:0 0 8px 0; font-weight:700; }
+    .sous-texte { color:var(--muted); font-size:0.88em; margin-bottom:22px; line-height:1.5; }
+
+    .field { margin-bottom:8px; position:relative; }
+    input[type="text"], input[type="password"] { width:100%; background:var(--panel-2);
+        border:1px solid var(--border); color:var(--text); padding:12px 14px; padding-right:42px;
+        border-radius:6px; font-size:1.05em; font-family:'Consolas',monospace; outline:none; }
+    input:focus { border-color:var(--accent); }
+    .toggle-eye { position:absolute; right:10px; top:12px; background:none; border:none;
+        color:var(--muted); cursor:pointer; font-size:1.1em; padding:4px; line-height:1; }
+    .toggle-eye:hover { color:var(--text); }
+
+    .jauge-wrap { margin:18px 0 6px 0; }
+    .jauge-fond { background:var(--panel-2); border-radius:6px; height:12px; overflow:hidden; }
+    .jauge-remplissage { height:100%; width:0%; border-radius:6px; transition:width 0.25s, background 0.25s; }
+    .jauge-label { display:flex; justify-content:space-between; font-size:0.82em; margin-top:6px; color:var(--muted); }
+    .jauge-label #niveau-texte { font-weight:700; }
+
+    .estimation { text-align:center; background:var(--panel-2); border:1px solid var(--border);
+        border-radius:8px; padding:16px; margin:18px 0; }
+    .estimation .valeur { font-size:1.5em; font-weight:800; font-family:'Consolas',monospace; }
+    .estimation .legende { font-size:0.78em; color:var(--muted); margin-top:4px; }
+
+    .criteres { font-size:0.85em; line-height:1.9; margin-top:14px; }
+    .critere { display:flex; align-items:center; gap:8px; }
+    .critere .coche { width:16px; text-align:center; }
+    .critere.ok { color:var(--trap); }
+    .critere.ko { color:var(--muted); }
+
+    footer { text-align:center; padding:14px; font-size:0.78em; color:var(--muted);
+        border-top:1px solid var(--border); background:var(--panel); }
+    footer a { color:var(--muted); text-decoration:underline; cursor:pointer; }
+    footer a:hover { color:var(--text); }
+    .footer-flag { display:block; margin-bottom:4px; color:var(--warn); font-weight:600; letter-spacing:0.02em; }
+
+    .correction-box { margin-top:22px; border:1px solid var(--trap); border-radius:8px; overflow:hidden; }
+    .correction-toggle { width:100%; text-align:left; background:rgba(60,203,127,0.08); border:none;
+        color:var(--trap); padding:14px 16px; font-size:0.95em; font-weight:600; cursor:pointer;
+        display:flex; justify-content:space-between; align-items:center; }
+    .correction-content { display:none; padding:16px 18px 20px 18px; font-size:0.88em;
+        line-height:1.6; border-top:1px solid var(--border); }
+    .correction-content h3 { font-size:0.95em; margin:16px 0 6px 0; color:var(--text); }
+    .correction-content h3:first-child { margin-top:0; }
+    .correction-content code { background:var(--panel-2); border:1px solid var(--border);
+        border-radius:4px; padding:1px 6px; }
+
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7);
+        align-items:center; justify-content:center; padding:20px; z-index:100; }
+    .modal-box { background:var(--panel); border:1px solid var(--border); border-radius:10px;
+        padding:26px; max-width:480px; font-size:0.9em; line-height:1.6; }
+    .modal-box h2 { margin-top:0; font-size:1.1em; }
+    .modal-close { margin-top:16px; background:var(--accent); border:none; color:#fff;
+        padding:9px 16px; border-radius:6px; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<header>🔑 Testeur de robustesse de mot de passe</header>
+
+<main>
+    <div class="card">
+        <h1>Teste un mot de passe INVENTÉ</h1>
+        <div class="sous-texte">Tape n'importe quel mot de passe fictif pour voir combien de temps il résisterait, en théorie, à une tentative de deviner tous les mots de passe possibles un par un.</div>
+
+        <div class="field">
+            <input type="password" id="mdp-input" placeholder="Tape un mot de passe inventé...">
+            <button type="button" class="toggle-eye" id="btn-eye">👁</button>
+        </div>
+
+        <div class="jauge-wrap">
+            <div class="jauge-fond"><div class="jauge-remplissage" id="jauge"></div></div>
+            <div class="jauge-label">
+                <span>Faible</span>
+                <span id="niveau-texte">—</span>
+                <span>Très robuste</span>
+            </div>
+        </div>
+
+        <div class="estimation">
+            <div class="valeur" id="temps-estime">—</div>
+            <div class="legende">temps estimé pour un ordinateur pour essayer toutes les combinaisons possibles</div>
+        </div>
+
+        <div class="criteres" id="criteres"></div>
+
+        <div class="correction-box">
+            <button type="button" class="correction-toggle" id="btn-toggle-correction">
+                <span>🔧 Comment construire un mot de passe robuste ?</span>
+                <span id="correction-chevron">▾</span>
+            </button>
+            <div class="correction-content" id="correction-content">
+                <h3>Pourquoi la longueur compte plus que la complexité</h3>
+                Chaque caractère ajouté multiplie le nombre de combinaisons possibles. Un mot de passe long
+                mais simple (<code>chevalbleuforêtnuage</code>) résiste souvent mieux qu'un mot de passe court
+                mais "complexe" (<code>P@ss1!</code>).
+
+                <h3>La méthode recommandée</h3>
+                Une <strong>phrase de passe</strong> : 4-5 mots sans rapport entre eux, faciles à retenir pour
+                toi, difficiles à deviner pour les autres. Exemple (à ne pas réutiliser) :
+                <code>tortue-piano-orage-42</code>.
+
+                <h3>💡 Astuce pour en inventer une facilement</h3>
+                Pense à une phrase que tu connais par cœur — une réplique de film, une ligne de chanson, un
+                titre de manga, le début d'un livre que tu aimes — puis ne garde que la <strong>première
+                lettre de chaque mot</strong>, en glissant un chiffre ou un symbole quelque part. Une phrase
+                longue et mémorable devient un mot de passe court à taper, mais très difficile à deviner pour
+                quelqu'un d'autre. Exemple avec une phrase inventée : <code>"Mon chat gris dort sur trois
+                coussins depuis 2020"</code> → <code>Mcgdst2020c</code>. Le secret n'existe que dans ta tête,
+                jamais écrit nulle part.
+
+                <h3>Les règles à retenir</h3>
+                1. Plus c'est long, mieux c'est — viser au moins 12-14 caractères.<br>
+                2. Un mot de passe unique par site : jamais le même partout (sinon une seule fuite compromet tout).<br>
+                3. Un gestionnaire de mots de passe (intégré au navigateur ou dédié) retient les mots de passe complexes à ta place.<br>
+                4. Cette estimation est théorique et simplifiée — elle ne prend pas en compte les fuites de données, qui rendent inutile même un mot de passe "fort" s'il est réutilisé ailleurs.
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer>
+    <span class="footer-flag">🔒 Page pédagogique — cours de cybersécurité</span>
+    Ce que tu tapes ici ne quitte jamais ton navigateur. <a id="lien-mentions">Mentions légales</a>
+</footer>
+
+<div class="modal-overlay" id="modal-overlay">
+    <div class="modal-box">
+        <h2>Mentions légales</h2>
+        <p>Cet outil est une <strong>démonstration pédagogique</strong> créée dans le cadre d'un cours de
+        cybersécurité. L'estimation de robustesse est calculée par une formule simplifiée, entièrement dans
+        votre navigateur.</p>
+        <p>Ce que vous tapez n'est <strong>jamais envoyé, transmis, collecté ni conservé</strong> nulle part —
+        ni sur un serveur, ni dans le stockage local du navigateur. Tapez uniquement des mots de passe
+        inventés, jamais un mot de passe que vous utilisez réellement.</p>
+        <button class="modal-close" id="btn-close-modal">Fermer</button>
+    </div>
+</div>
+
+<script>
+    // Tout le calcul se fait ici, en local. Rien n'est envoyé, stocké (localStorage/cookie) ou transmis.
+
+    document.getElementById('btn-eye').addEventListener('click', function() {
+        const champ = document.getElementById('mdp-input');
+        champ.type = (champ.type === 'password') ? 'text' : 'password';
+    });
+
+    function tailleAlphabet(mdp) {
+        let taille = 0;
+        if (/[a-z]/.test(mdp)) taille += 26;
+        if (/[A-Z]/.test(mdp)) taille += 26;
+        if (/[0-9]/.test(mdp)) taille += 10;
+        if (/[^a-zA-Z0-9]/.test(mdp)) taille += 33;
+        return taille || 1;
+    }
+
+    function formaterDuree(secondes) {
+        if (secondes < 1) return "Instantané";
+        const unites = [
+            ["siècle(s)", 3153600000],
+            ["année(s)", 31536000],
+            ["jour(s)", 86400],
+            ["heure(s)", 3600],
+            ["minute(s)", 60],
+            ["seconde(s)", 1]
+        ];
+        for (const [nom, valeur] of unites) {
+            if (secondes >= valeur) {
+                const n = secondes / valeur;
+                if (n > 1e6) return `> ${(n/1e6).toFixed(0)} million(s) de ${nom}`;
+                return `${n < 10 ? n.toFixed(1) : Math.round(n)} ${nom}`;
+            }
+        }
+        return "Instantané";
+    }
+
+    function evaluer() {
+        const mdp = document.getElementById('mdp-input').value;
+        const criteresList = document.getElementById('criteres');
+
+        if (mdp.length === 0) {
+            document.getElementById('jauge').style.width = '0%';
+            document.getElementById('niveau-texte').innerText = '—';
+            document.getElementById('temps-estime').innerText = '—';
+            criteresList.innerHTML = '';
+            return;
+        }
+
+        const alphabet = tailleAlphabet(mdp);
+        // Hypothèse pédagogique simplifiée : 10 milliards d'essais par seconde (attaque hors-ligne rapide)
+        const combinaisons = Math.pow(alphabet, mdp.length);
+        const secondesEstimees = combinaisons / 2 / 10e9;
+
+        const criteres = [
+            { ok: mdp.length >= 12, texte: `Au moins 12 caractères (${mdp.length} actuellement)` },
+            { ok: /[a-z]/.test(mdp) && /[A-Z]/.test(mdp), texte: 'Mélange de minuscules et majuscules' },
+            { ok: /[0-9]/.test(mdp), texte: 'Contient au moins un chiffre' },
+            { ok: /[^a-zA-Z0-9]/.test(mdp), texte: 'Contient au moins un symbole (!?-_ etc.)' }
+        ];
+        criteresList.innerHTML = criteres.map(c =>
+            `<div class="critere ${c.ok ? 'ok' : 'ko'}"><span class="coche">${c.ok ? '✓' : '○'}</span> ${c.texte}</div>`
+        ).join('');
+
+        const score = criteres.filter(c => c.ok).length + (mdp.length >= 16 ? 1 : 0);
+        let pct, couleur, niveau;
+        if (score <= 1) { pct = 20; couleur = '#e0554c'; niveau = 'Faible'; }
+        else if (score === 2) { pct = 45; couleur = '#e0a63c'; niveau = 'Moyen'; }
+        else if (score === 3) { pct = 70; couleur = '#e0d23c'; niveau = 'Bon'; }
+        else if (score === 4) { pct = 90; couleur = '#8ed23c'; niveau = 'Très bon'; }
+        else { pct = 100; couleur = '#3ccb7f'; niveau = 'Excellent'; }
+
+        document.getElementById('jauge').style.width = pct + '%';
+        document.getElementById('jauge').style.background = couleur;
+        document.getElementById('niveau-texte').innerText = niveau;
+        document.getElementById('niveau-texte').style.color = couleur;
+        document.getElementById('temps-estime').innerText = formaterDuree(secondesEstimees);
+    }
+
+    document.getElementById('mdp-input').addEventListener('input', evaluer);
+
+    document.getElementById('btn-toggle-correction').addEventListener('click', function() {
+        const contenu = document.getElementById('correction-content');
+        const ouvert = contenu.style.display === 'block';
+        contenu.style.display = ouvert ? 'none' : 'block';
+        document.getElementById('correction-chevron').innerText = ouvert ? '▾' : '▴';
+    });
+
+    document.getElementById('lien-mentions').addEventListener('click', function() {
+        document.getElementById('modal-overlay').style.display = 'flex';
+    });
+    document.getElementById('btn-close-modal').addEventListener('click', function() {
+        document.getElementById('modal-overlay').style.display = 'none';
+    });
+    document.getElementById('modal-overlay').addEventListener('click', function(e) {
+        if (e.target === this) this.style.display = 'none';
+    });
+</script>
+
+</body>
+</html>

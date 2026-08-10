@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Démo : appel du « support informatique »</title>
+<style>
+    :root {
+        --bg: #14161a; --panel: #1c1f25; --panel-2: #22262d; --border: #2e333b;
+        --text: #e7e9ec; --muted: #9aa2ad; --accent: #2f6fed; --accent-hover: #4c84f0;
+        --warn: #e0a63c; --trap: #3ccb7f; --danger: #e0554c;
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; background:var(--bg); color:var(--text);
+        font-family:'Segoe UI','Inter',Arial,sans-serif; display:flex; flex-direction:column; }
+    header { background:var(--panel); border-bottom:1px solid var(--border); padding:14px 20px;
+        font-size:0.95em; letter-spacing:0.03em; color:var(--muted); text-transform:uppercase; }
+    main { flex:1; display:flex; align-items:center; justify-content:center; padding:24px; }
+    .card { background:var(--panel); border:1px solid var(--border); border-radius:10px;
+        padding:32px; width:100%; max-width:480px; }
+
+    .appel-header { display:flex; align-items:center; gap:12px; background:var(--panel-2);
+        border:1px solid var(--border); border-radius:8px; padding:14px 16px; margin-bottom:22px; }
+    .appel-icon { width:40px; height:40px; border-radius:50%; background:var(--accent);
+        display:flex; align-items:center; justify-content:center; font-size:1.3em; flex-shrink:0; }
+    .appel-info b { display:block; font-size:1em; }
+    .appel-info span { color:var(--muted); font-size:0.82em; }
+
+    .dialogue { min-height:80px; margin-bottom:20px; }
+    .bulle-appelant { background:var(--panel-2); border:1px solid var(--border); border-radius:10px;
+        padding:14px 16px; font-size:0.95em; line-height:1.5; position:relative; }
+    .bulle-appelant::before { content:"📞"; margin-right:6px; }
+
+    .progression { font-size:0.78em; color:var(--muted); margin-bottom:8px; }
+
+    .choix-list { display:flex; flex-direction:column; gap:10px; }
+    .btn-choix { text-align:left; padding:13px 16px; border-radius:8px; border:1px solid var(--border);
+        background:var(--panel-2); color:var(--text); font-size:0.92em; cursor:pointer; line-height:1.4; }
+    .btn-choix:hover { border-color:var(--accent); }
+
+    .feedback { display:none; margin-top:16px; padding:14px 16px; border-radius:8px; font-size:0.88em; line-height:1.55; }
+    .feedback.bon { background:rgba(60,203,127,0.1); border:1px solid var(--trap); }
+    .feedback.risque { background:rgba(224,85,76,0.1); border:1px solid var(--danger); }
+    .feedback .titre { font-weight:700; margin-bottom:6px; }
+    .feedback.bon .titre { color:var(--trap); }
+    .feedback.risque .titre { color:var(--danger); }
+    button.suivant { width:100%; margin-top:14px; background:var(--accent); color:#fff; border:none;
+        padding:12px; border-radius:6px; font-size:0.95em; font-weight:600; cursor:pointer; display:none; }
+    button.suivant:hover { background:var(--accent-hover); }
+
+    #fin-screen { display:none; text-align:center; }
+    button.rejouer { background:var(--panel-2); border:1px solid var(--border); color:var(--text);
+        padding:10px 18px; border-radius:6px; cursor:pointer; font-size:0.92em; margin-top:14px; }
+    button.rejouer:hover { border-color:var(--accent); }
+
+    footer { text-align:center; padding:14px; font-size:0.78em; color:var(--muted);
+        border-top:1px solid var(--border); background:var(--panel); }
+    footer a { color:var(--muted); text-decoration:underline; cursor:pointer; }
+    footer a:hover { color:var(--text); }
+    .footer-flag { display:block; margin-bottom:4px; color:var(--warn); font-weight:600; letter-spacing:0.02em; }
+
+    .correction-box { margin-top:20px; border:1px solid var(--trap); border-radius:8px; overflow:hidden; text-align:left; }
+    .correction-toggle { width:100%; text-align:left; background:rgba(60,203,127,0.08); border:none;
+        color:var(--trap); padding:14px 16px; font-size:0.95em; font-weight:600; cursor:pointer;
+        display:flex; justify-content:space-between; align-items:center; }
+    .correction-content { display:none; padding:16px 18px 20px 18px; font-size:0.88em;
+        line-height:1.6; border-top:1px solid var(--border); }
+    .correction-content h3 { font-size:0.95em; margin:16px 0 6px 0; color:var(--text); }
+    .correction-content h3:first-child { margin-top:0; }
+    .correction-content ul { padding-left:20px; margin:6px 0; }
+
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7);
+        align-items:center; justify-content:center; padding:20px; z-index:100; }
+    .modal-box { background:var(--panel); border:1px solid var(--border); border-radius:10px;
+        padding:26px; max-width:480px; font-size:0.9em; line-height:1.6; }
+    .modal-box h2 { margin-top:0; font-size:1.1em; }
+    .modal-close { margin-top:16px; background:var(--accent); border:none; color:#fff;
+        padding:9px 16px; border-radius:6px; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<header>☎️ Démo : ingénierie sociale au téléphone</header>
+
+<main>
+    <div id="jeu-card" class="card">
+        <div class="appel-header">
+            <div class="appel-icon">👤</div>
+            <div class="appel-info">
+                <b>Numéro inconnu</b>
+                <span>« Support informatique de l'école »</span>
+            </div>
+        </div>
+
+        <div class="progression" id="progression"></div>
+        <div class="dialogue">
+            <div class="bulle-appelant" id="texte-appelant"></div>
+        </div>
+
+        <div class="choix-list" id="choix-list"></div>
+
+        <div class="feedback" id="feedback">
+            <div class="titre" id="feedback-titre"></div>
+            <div id="feedback-texte"></div>
+        </div>
+
+        <button type="button" class="suivant" id="btn-suivant">Suite de l'appel →</button>
+    </div>
+
+    <div id="fin-screen" class="card">
+        <h1 style="text-align:center; font-size:1.2em;">Appel terminé</h1>
+        <p style="color:var(--muted); text-align:center; font-size:0.9em;" id="fin-commentaire"></p>
+
+        <div class="correction-box">
+            <button type="button" class="correction-toggle" id="btn-toggle-correction">
+                <span>🔧 Les réflexes à retenir</span>
+                <span id="correction-chevron">▾</span>
+            </button>
+            <div class="correction-content" id="correction-content">
+                <h3>Le principe de l'ingénierie sociale</h3>
+                Contrairement au phishing par mail, ici c'est un être humain, en direct, qui joue sur
+                l'autorité ("je suis du support"), l'urgence ("votre compte va être bloqué") et la confiance
+                pour te faire baisser ta garde plus facilement qu'un mail.
+
+                <h3>Les signaux d'alerte</h3>
+                <ul>
+                    <li>On te demande un mot de passe, un code reçu par SMS, ou un accès à distance à ton ordinateur</li>
+                    <li>La personne crée un sentiment d'urgence ou de panique</li>
+                    <li>Impossible de vérifier facilement son identité</li>
+                    <li>Elle insiste quand tu hésites ou poses des questions</li>
+                </ul>
+
+                <h3>Le bon réflexe</h3>
+                Aucun vrai service informatique ne demande jamais ton mot de passe par téléphone. En cas de
+                doute : raccroche, et rappelle toi-même le numéro officiel connu (jamais celui donné par
+                l'appelant) pour vérifier.
+            </div>
+        </div>
+
+        <div style="text-align:center;">
+            <button type="button" class="rejouer" id="btn-rejouer">↺ Rejouer</button>
+        </div>
+    </div>
+</main>
+
+<footer>
+    <span class="footer-flag">🔒 Page pédagogique — cours de cybersécurité</span>
+    Dialogue scénarisé, aucun appel réel. <a id="lien-mentions">Mentions légales</a>
+</footer>
+
+<div class="modal-overlay" id="modal-overlay">
+    <div class="modal-box">
+        <h2>Mentions légales</h2>
+        <p>Cette page est un <strong>exercice pédagogique fictif</strong> créé dans le cadre d'un cours de
+        cybersécurité. Le dialogue est entièrement pré-écrit et rejoué localement — il n'y a ni vrai appel,
+        ni vraie personne, ni enregistrement.</p>
+        <p>Aucune donnée n'est envoyée, transmise, collectée ou conservée par cette page.</p>
+        <button class="modal-close" id="btn-close-modal">Fermer</button>
+    </div>
+</div>
+
+<script>
+    // Dialogue 100% scénarisé et local. Aucun vrai appel, aucune requête réseau.
+
+    const ARBRE = {
+        debut: {
+            texte: "Bonjour, je suis du support informatique de l'école. On a détecté une activité suspecte sur votre compte élève, il faut le vérifier tout de suite avant qu'il soit bloqué.",
+            choix: [
+                { texte: "D'accord, qu'est-ce qu'il faut faire ?", suite: 'demande_id', risque: false },
+                { texte: "Comment puis-je vérifier que vous êtes vraiment du support ?", suite: 'verification', risque: false },
+                { texte: "Je raccroche tout de suite.", suite: 'fin_raccroche', risque: false }
+            ]
+        },
+        demande_id: {
+            texte: "Parfait. Pour vérifier votre identité, donnez-moi votre identifiant et votre mot de passe de connexion.",
+            choix: [
+                { texte: "Voilà : [identifiant] / [mot de passe]", suite: 'fin_piege', risque: true },
+                { texte: "Je ne donne jamais mon mot de passe par téléphone, désolé·e.", suite: 'insistance', risque: false }
+            ]
+        },
+        verification: {
+            texte: "Euh... je vous appelle du bureau, c'est urgent, on n'a pas le temps pour ça. Donnez-moi juste votre mot de passe et je règle le problème en 2 minutes.",
+            choix: [
+                { texte: "Non, je préfère vérifier avant. Je raccroche et je rappelle le numéro officiel de l'école.", suite: 'fin_bon_reflexe', risque: false },
+                { texte: "Bon d'accord, voici mon mot de passe...", suite: 'fin_piege', risque: true }
+            ]
+        },
+        insistance: {
+            texte: "Écoutez, si vous ne le faites pas maintenant, votre compte sera bloqué définitivement dans 10 minutes ! C'est très urgent !",
+            choix: [
+                { texte: "Tant pis, je raccroche et je vérifie par moi-même.", suite: 'fin_bon_reflexe', risque: false },
+                { texte: "Bon... d'accord, je le donne.", suite: 'fin_piege', risque: true }
+            ]
+        },
+        fin_raccroche: {
+            texte: "Vous avez raccroché immédiatement. Fin de l'appel.",
+            choix: []
+        },
+        fin_bon_reflexe: {
+            texte: "Vous avez raccroché et décidé de vérifier par vous-même. Fin de l'appel.",
+            choix: []
+        },
+        fin_piege: {
+            texte: "« Parfait, merci ! » *clic* — la personne a raccroché aussitôt après avoir eu l'information. Fin de l'appel.",
+            choix: []
+        }
+    };
+
+    let noeudActuel = 'debut';
+    let etapeNum = 1;
+
+    function afficherNoeud(cle) {
+        const noeud = ARBRE[cle];
+        document.getElementById('progression').innerText = `Étape ${etapeNum}`;
+        document.getElementById('texte-appelant').innerText = noeud.texte;
+        document.getElementById('feedback').style.display = 'none';
+        document.getElementById('btn-suivant').style.display = 'none';
+
+        const listeDiv = document.getElementById('choix-list');
+        listeDiv.innerHTML = '';
+
+        if (noeud.choix.length === 0) {
+            terminerAppel(cle);
+            return;
+        }
+
+        noeud.choix.forEach(c => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'btn-choix';
+            btn.innerText = c.texte;
+            btn.addEventListener('click', function() { choisir(c); });
+            listeDiv.appendChild(btn);
+        });
+    }
+
+    function choisir(choix) {
+        document.getElementById('choix-list').innerHTML = '';
+        const feedback = document.getElementById('feedback');
+        feedback.style.display = 'block';
+        feedback.className = 'feedback ' + (choix.risque ? 'risque' : 'bon');
+        document.getElementById('feedback-titre').innerText = choix.risque
+            ? '⚠️ Risqué'
+            : '✅ Bon réflexe';
+        document.getElementById('feedback-texte').innerText = choix.risque
+            ? "Donner un mot de passe par téléphone, même sous pression, expose ton compte — même à un appelant qui semble légitime."
+            : "Prendre le temps de douter et de vérifier est exactement le bon réflexe face à une demande urgente.";
+
+        document.getElementById('btn-suivant').style.display = 'block';
+        document.getElementById('btn-suivant').onclick = function() {
+            noeudActuel = choix.suite;
+            etapeNum++;
+            afficherNoeud(noeudActuel);
+        };
+    }
+
+    function terminerAppel(cleFinale) {
+        document.getElementById('jeu-card').style.display = 'none';
+        document.getElementById('fin-screen').style.display = 'block';
+        const commentaires = {
+            fin_raccroche: "Tu as raccroché tout de suite — prudent, même si tu n'as pas eu l'occasion de comprendre la ruse en détail.",
+            fin_bon_reflexe: "Excellent réflexe : tu as refusé de céder à la pression et choisi de vérifier par toi-même.",
+            fin_piege: "Le mot de passe a été donné — c'est exactement ce que visait l'appelant. Regarde les réflexes à adopter ci-dessous."
+        };
+        document.getElementById('fin-commentaire').innerText = commentaires[cleFinale] || '';
+    }
+
+    document.getElementById('btn-rejouer').addEventListener('click', function() {
+        noeudActuel = 'debut';
+        etapeNum = 1;
+        document.getElementById('fin-screen').style.display = 'none';
+        document.getElementById('jeu-card').style.display = 'block';
+        document.getElementById('correction-content').style.display = 'none';
+        document.getElementById('correction-chevron').innerText = '▾';
+        afficherNoeud('debut');
+    });
+
+    document.getElementById('btn-toggle-correction').addEventListener('click', function() {
+        const contenu = document.getElementById('correction-content');
+        const ouvert = contenu.style.display === 'block';
+        contenu.style.display = ouvert ? 'none' : 'block';
+        document.getElementById('correction-chevron').innerText = ouvert ? '▾' : '▴';
+    });
+
+    document.getElementById('lien-mentions').addEventListener('click', function() {
+        document.getElementById('modal-overlay').style.display = 'flex';
+    });
+    document.getElementById('btn-close-modal').addEventListener('click', function() {
+        document.getElementById('modal-overlay').style.display = 'none';
+    });
+    document.getElementById('modal-overlay').addEventListener('click', function(e) {
+        if (e.target === this) this.style.display = 'none';
+    });
+
+    afficherNoeud('debut');
+</script>
+
+</body>
+</html>

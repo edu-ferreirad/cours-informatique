@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grand jeu-concours</title>
+<style>
+
+    :root {
+        --bg: #14161a; --panel: #1c1f25; --panel-2: #22262d; --border: #2e333b;
+        --text: #e7e9ec; --muted: #9aa2ad; --accent: #2f6fed; --accent-hover: #4c84f0;
+        --warn: #e0a63c; --trap: #3ccb7f; --danger: #e0554c;
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; background:var(--bg); color:var(--text);
+        font-family:'Segoe UI','Inter',Arial,sans-serif; display:flex; flex-direction:column; }
+    header { background:var(--panel); border-bottom:1px solid var(--border); padding:14px 20px;
+        font-size:0.95em; letter-spacing:0.03em; color:var(--muted); text-transform:uppercase; text-align:center; }
+    main { flex:1; display:flex; align-items:center; justify-content:center; padding:24px; }
+    .card { background:var(--panel); border:1px solid var(--border); border-radius:10px;
+        padding:30px; width:100%; max-width:540px; }
+    h1 { font-size:1.2em; margin:0 0 8px 0; font-weight:700; }
+    .sous-texte { color:var(--muted); font-size:0.87em; margin-bottom:20px; line-height:1.5; }
+    label { display:block; font-size:0.85em; color:var(--muted); margin-bottom:6px; }
+    input[type="text"], input[type="password"], textarea, select { width:100%; background:var(--panel-2);
+        border:1px solid var(--border); color:var(--text); padding:11px 13px; border-radius:6px;
+        font-size:0.95em; font-family:inherit; outline:none; margin-bottom:14px; }
+    textarea { font-family:'Consolas',monospace; min-height:70px; resize:vertical; }
+    input:focus, textarea:focus, select:focus { border-color:var(--accent); }
+    button { font-family:inherit; }
+    button.submit { width:100%; background:var(--accent); color:#fff; border:none; padding:13px;
+        border-radius:6px; font-size:1em; font-weight:600; cursor:pointer; margin-bottom:8px; }
+    button.submit:hover { background:var(--accent-hover); }
+    button.secondaire { width:100%; background:none; border:1px solid var(--border); color:var(--muted);
+        padding:10px; border-radius:6px; font-size:0.85em; cursor:pointer; }
+    button.secondaire:hover { color:var(--text); border-color:var(--accent); }
+    .hint { margin-top:14px; font-size:0.8em; color:var(--muted); line-height:1.5;
+        background:var(--panel-2); border:1px solid var(--border); border-radius:6px; padding:10px 12px; }
+
+    #reveal-screen { display:none; }
+    .reveal-card { background:var(--panel); border:1px solid var(--trap); border-radius:10px;
+        padding:32px; width:100%; max-width:560px; }
+    .reveal-title { font-size:1.35em; font-weight:700; margin:0 0 6px 0; color:var(--trap); }
+    .reveal-sub { color:var(--muted); margin-bottom:20px; }
+    .reveal-explication { font-size:0.92em; line-height:1.6; color:var(--text); }
+    .reveal-explication code { background:var(--panel-2); border:1px solid var(--border);
+        border-radius:4px; padding:1px 6px; }
+    .reveal-btn { margin-top:20px; background:var(--panel-2); border:1px solid var(--border);
+        color:var(--text); padding:10px 16px; border-radius:6px; cursor:pointer; font-size:0.9em; }
+    .reveal-btn:hover { border-color:var(--accent); }
+
+    .correction-box { margin-top:22px; border:1px solid var(--trap); border-radius:8px; overflow:hidden; text-align:left; }
+    .correction-toggle { width:100%; text-align:left; background:rgba(60,203,127,0.08); border:none;
+        color:var(--trap); padding:14px 16px; font-size:0.95em; font-weight:600; cursor:pointer;
+        display:flex; justify-content:space-between; align-items:center; }
+    .correction-content { display:none; padding:16px 18px 20px 18px; font-size:0.88em;
+        line-height:1.6; border-top:1px solid var(--border); }
+    .correction-content h3 { font-size:0.95em; margin:16px 0 6px 0; color:var(--text); }
+    .correction-content h3:first-child { margin-top:0; }
+    .correction-content ul, .correction-content ol { padding-left:20px; margin:6px 0; }
+    .correction-content code { background:var(--panel-2); border:1px solid var(--border);
+        border-radius:4px; padding:1px 6px; }
+    .code-compare { display:grid; grid-template-columns:1fr; gap:10px; margin:8px 0 14px 0; }
+    .code-block { background:var(--panel-2); border:1px solid var(--border); border-radius:6px;
+        padding:10px 12px; font-family:'Consolas',monospace; font-size:0.85em;
+        white-space:pre-wrap; word-break:break-word; }
+    .code-block.bad { border-left:3px solid #e0554c; }
+    .code-block.good { border-left:3px solid var(--trap); }
+    .code-label { font-size:0.78em; color:var(--muted); margin-bottom:4px;
+        text-transform:uppercase; letter-spacing:0.03em; }
+
+    footer { text-align:center; padding:14px; font-size:0.78em; color:var(--muted);
+        border-top:1px solid var(--border); background:var(--panel); }
+    footer a { color:var(--muted); text-decoration:underline; cursor:pointer; }
+    footer a:hover { color:var(--text); }
+    .footer-flag { display:block; margin-bottom:4px; color:var(--warn); font-weight:600; letter-spacing:0.02em; }
+
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7);
+        align-items:center; justify-content:center; padding:20px; z-index:100; }
+    .modal-box { background:var(--panel); border:1px solid var(--border); border-radius:10px;
+        padding:26px; max-width:480px; font-size:0.9em; line-height:1.6; }
+    .modal-box h2 { margin-top:0; font-size:1.1em; }
+    .modal-close { margin-top:16px; background:var(--accent); border:none; color:#fff;
+        padding:9px 16px; border-radius:6px; cursor:pointer; }
+
+
+    .sondage-box { background:var(--panel-2); border:1px solid var(--border); border-radius:10px;
+        padding:20px; margin-bottom:18px; text-align:center; }
+    .sondage-box .titre { font-weight:800; font-size:1.15em; margin-bottom:6px; }
+    .sondage-box .lot { color:var(--accent); font-size:0.9em; margin-bottom:14px; }
+    .question-sondage { margin-bottom:14px; text-align:left; }
+
+</style>
+</head>
+<body>
+
+<header>🎁 Démo : le faux sondage collecteur de données</header>
+
+<main>
+
+    <div id="login-screen" class="card">
+        <div class="sondage-box">
+            <div class="titre">🎁 GRAND JEU-CONCOURS</div>
+            <div class="lot">Tente de gagner une carte cadeau de CHF 100.- !</div>
+        </div>
+
+        <div class="sous-texte">Réponds à ce petit quiz personnalité pour participer :</div>
+
+        <div class="question-sondage">
+            <label>1. Quel est le nom de jeune fille de ta mère ?</label>
+            <input type="text" id="q1">
+        </div>
+        <div class="question-sondage">
+            <label>2. Quel était le nom de ton premier animal de compagnie ?</label>
+            <input type="text" id="q2">
+        </div>
+        <div class="question-sondage">
+            <label>3. Dans quelle ville es-tu né·e ?</label>
+            <input type="text" id="q3">
+        </div>
+        <div class="question-sondage">
+            <label>4. Quelle est ta couleur préférée ?</label>
+            <input type="text" id="q4">
+        </div>
+
+        <button type="button" class="submit" id="btn-participer">Participer au tirage</button>
+
+        <div class="hint">
+            💡 Regarde bien la nature des 3 premières questions avant de valider.
+        </div>
+    </div>
+
+    <div id="reveal-screen" class="reveal-card">
+        <div class="reveal-title">🎣 Te voilà piégé·e !</div>
+        <div class="reveal-sub">Ce "sondage" collectait en réalité des réponses de sécurité.</div>
+
+        <div class="reveal-explication">
+            Regarde les questions 1 à 3 : <strong>nom de jeune fille de la mère, premier animal, ville de
+            naissance</strong> — ce sont exactement les questions de sécurité les plus utilisées pour
+            réinitialiser un mot de passe sur de nombreux sites (banques, e-mail...). Un faux sondage "sympa"
+            est un excellent prétexte pour les faire remplir volontairement, sans éveiller les soupçons.
+            <br><br>
+            Aucune vraie carte cadeau n'existe dans ce genre de piège — l'objectif est uniquement de collecter
+            ces réponses pour les réutiliser ailleurs.
+        </div>
+
+        <div class="correction-box">
+            <button type="button" class="correction-toggle" id="btn-toggle-correction">
+                <span>🔧 Comment se protéger, pour de vrai ?</span>
+                <span id="correction-chevron">▾</span>
+            </button>
+            <div class="correction-content" id="correction-content">
+                <h3>Les règles à retenir</h3>
+                1. Se méfier de tout questionnaire "ludique" qui demande des informations personnelles précises, même sous forme de jeu.<br>
+                2. Ne jamais donner de vraies réponses à des questions de sécurité en dehors des vrais formulaires officiels d'un compte.<br>
+                3. Inventer une fausse réponse mémorisable pour les questions de sécurité — rien n'oblige à répondre honnêtement à "quel est le nom de ton premier animal ?".<br>
+                4. Une carte cadeau gratuite en échange d'un simple quiz est presque toujours un signal d'alerte.
+            </div>
+        </div>
+
+        <button type="button" class="reveal-btn" id="btn-reset">↺ Recommencer</button>
+    </div>
+
+</main>
+
+<footer>
+    <span class="footer-flag">🔒 Page pédagogique — cours de cybersécurité</span>
+    Concours entièrement fictif, aucune donnée collectée. <a id="lien-mentions">Mentions légales</a>
+</footer>
+
+<div class="modal-overlay" id="modal-overlay">
+    <div class="modal-box">
+        <h2>Mentions légales</h2>
+        <p>Cette page est une <strong>reconstitution fictive</strong> créée dans le cadre d'un cours de
+cybersécurité, à des fins pédagogiques uniquement. Aucune carte cadeau réelle n'est en jeu.</p>
+<p>Aucune donnée saisie n'est envoyée, transmise, collectée ou conservée par cette page.</p>
+        <button class="modal-close" id="btn-close-modal">Fermer</button>
+    </div>
+</div>
+
+<script>
+
+    // Sondage 100% fictif. Aucune reponse n'est envoyee, transmise ni conservee nulle part.
+
+    document.getElementById('btn-participer').addEventListener('click', function() {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('reveal-screen').style.display = 'block';
+    });
+
+    document.getElementById('btn-reset').addEventListener('click', function() {
+        document.getElementById('reveal-screen').style.display = 'none';
+        document.getElementById('login-screen').style.display = 'block';
+        document.getElementById('correction-content').style.display = 'none';
+        document.getElementById('correction-chevron').innerText = '▾';
+        ['q1','q2','q3','q4'].forEach(id => document.getElementById(id).value = '');
+    });
+
+
+    document.getElementById('btn-toggle-correction').addEventListener('click', function() {
+        const contenu = document.getElementById('correction-content');
+        const ouvert = contenu.style.display === 'block';
+        contenu.style.display = ouvert ? 'none' : 'block';
+        document.getElementById('correction-chevron').innerText = ouvert ? '▾' : '▴';
+    });
+    document.getElementById('lien-mentions').addEventListener('click', function() {
+        document.getElementById('modal-overlay').style.display = 'flex';
+    });
+    document.getElementById('btn-close-modal').addEventListener('click', function() {
+        document.getElementById('modal-overlay').style.display = 'none';
+    });
+    document.getElementById('modal-overlay').addEventListener('click', function(e) {
+        if (e.target === this) this.style.display = 'none';
+    });
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Navigation web</title>
+<style>
+
+    :root {
+        --bg: #14161a; --panel: #1c1f25; --panel-2: #22262d; --border: #2e333b;
+        --text: #e7e9ec; --muted: #9aa2ad; --accent: #2f6fed; --accent-hover: #4c84f0;
+        --warn: #e0a63c; --trap: #3ccb7f; --danger: #e0554c;
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; background:var(--bg); color:var(--text);
+        font-family:'Segoe UI','Inter',Arial,sans-serif; display:flex; flex-direction:column; }
+    header { background:var(--panel); border-bottom:1px solid var(--border); padding:14px 20px;
+        font-size:0.95em; letter-spacing:0.03em; color:var(--muted); text-transform:uppercase; text-align:center; }
+    main { flex:1; display:flex; align-items:center; justify-content:center; padding:24px; }
+    .card { background:var(--panel); border:1px solid var(--border); border-radius:10px;
+        padding:30px; width:100%; max-width:540px; }
+    h1 { font-size:1.2em; margin:0 0 8px 0; font-weight:700; }
+    .sous-texte { color:var(--muted); font-size:0.87em; margin-bottom:20px; line-height:1.5; }
+    label { display:block; font-size:0.85em; color:var(--muted); margin-bottom:6px; }
+    input[type="text"], input[type="password"], textarea, select { width:100%; background:var(--panel-2);
+        border:1px solid var(--border); color:var(--text); padding:11px 13px; border-radius:6px;
+        font-size:0.95em; font-family:inherit; outline:none; margin-bottom:14px; }
+    textarea { font-family:'Consolas',monospace; min-height:70px; resize:vertical; }
+    input:focus, textarea:focus, select:focus { border-color:var(--accent); }
+    button { font-family:inherit; }
+    button.submit { width:100%; background:var(--accent); color:#fff; border:none; padding:13px;
+        border-radius:6px; font-size:1em; font-weight:600; cursor:pointer; margin-bottom:8px; }
+    button.submit:hover { background:var(--accent-hover); }
+    button.secondaire { width:100%; background:none; border:1px solid var(--border); color:var(--muted);
+        padding:10px; border-radius:6px; font-size:0.85em; cursor:pointer; }
+    button.secondaire:hover { color:var(--text); border-color:var(--accent); }
+    .hint { margin-top:14px; font-size:0.8em; color:var(--muted); line-height:1.5;
+        background:var(--panel-2); border:1px solid var(--border); border-radius:6px; padding:10px 12px; }
+
+    #reveal-screen { display:none; }
+    .reveal-card { background:var(--panel); border:1px solid var(--trap); border-radius:10px;
+        padding:32px; width:100%; max-width:560px; }
+    .reveal-title { font-size:1.35em; font-weight:700; margin:0 0 6px 0; color:var(--trap); }
+    .reveal-sub { color:var(--muted); margin-bottom:20px; }
+    .reveal-explication { font-size:0.92em; line-height:1.6; color:var(--text); }
+    .reveal-explication code { background:var(--panel-2); border:1px solid var(--border);
+        border-radius:4px; padding:1px 6px; }
+    .reveal-btn { margin-top:20px; background:var(--panel-2); border:1px solid var(--border);
+        color:var(--text); padding:10px 16px; border-radius:6px; cursor:pointer; font-size:0.9em; }
+    .reveal-btn:hover { border-color:var(--accent); }
+
+    .correction-box { margin-top:22px; border:1px solid var(--trap); border-radius:8px; overflow:hidden; text-align:left; }
+    .correction-toggle { width:100%; text-align:left; background:rgba(60,203,127,0.08); border:none;
+        color:var(--trap); padding:14px 16px; font-size:0.95em; font-weight:600; cursor:pointer;
+        display:flex; justify-content:space-between; align-items:center; }
+    .correction-content { display:none; padding:16px 18px 20px 18px; font-size:0.88em;
+        line-height:1.6; border-top:1px solid var(--border); }
+    .correction-content h3 { font-size:0.95em; margin:16px 0 6px 0; color:var(--text); }
+    .correction-content h3:first-child { margin-top:0; }
+    .correction-content ul, .correction-content ol { padding-left:20px; margin:6px 0; }
+    .correction-content code { background:var(--panel-2); border:1px solid var(--border);
+        border-radius:4px; padding:1px 6px; }
+    .code-compare { display:grid; grid-template-columns:1fr; gap:10px; margin:8px 0 14px 0; }
+    .code-block { background:var(--panel-2); border:1px solid var(--border); border-radius:6px;
+        padding:10px 12px; font-family:'Consolas',monospace; font-size:0.85em;
+        white-space:pre-wrap; word-break:break-word; }
+    .code-block.bad { border-left:3px solid #e0554c; }
+    .code-block.good { border-left:3px solid var(--trap); }
+    .code-label { font-size:0.78em; color:var(--muted); margin-bottom:4px;
+        text-transform:uppercase; letter-spacing:0.03em; }
+
+    footer { text-align:center; padding:14px; font-size:0.78em; color:var(--muted);
+        border-top:1px solid var(--border); background:var(--panel); }
+    footer a { color:var(--muted); text-decoration:underline; cursor:pointer; }
+    footer a:hover { color:var(--text); }
+    .footer-flag { display:block; margin-bottom:4px; color:var(--warn); font-weight:600; letter-spacing:0.02em; }
+
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7);
+        align-items:center; justify-content:center; padding:20px; z-index:100; }
+    .modal-box { background:var(--panel); border:1px solid var(--border); border-radius:10px;
+        padding:26px; max-width:480px; font-size:0.9em; line-height:1.6; }
+    .modal-box h2 { margin-top:0; font-size:1.1em; }
+    .modal-close { margin-top:16px; background:var(--accent); border:none; color:#fff;
+        padding:9px 16px; border-radius:6px; cursor:pointer; }
+
+
+    .barre-adresse { background:#2a2a2a; border:1px solid var(--border); border-radius:20px;
+        padding:10px 16px; margin-bottom:18px; display:flex; align-items:center; gap:8px; font-size:0.9em; }
+    .barre-adresse .cadenas { color:var(--muted); }
+    .barre-adresse .url-tape { font-family:'Consolas',monospace; }
+    .alerte-navigateur { display:none; background:#3a1414; border:2px solid var(--danger); border-radius:8px;
+        padding:16px 18px; margin-bottom:16px; text-align:center; }
+    .alerte-navigateur .titre { font-weight:800; color:var(--danger); margin-bottom:8px; }
+    .schema-dns { display:flex; align-items:center; justify-content:center; gap:10px; margin:16px 0;
+        font-family:'Consolas',monospace; font-size:0.82em; flex-wrap:wrap; }
+    .schema-dns .etape { background:var(--panel-2); border:1px solid var(--border); border-radius:6px;
+        padding:8px 12px; text-align:center; }
+    .schema-dns .etape.corrompu { border-color:var(--danger); color:var(--danger); }
+    .schema-dns .fleche { color:var(--muted); }
+
+</style>
+</head>
+<body>
+
+<header>🧭 Démo : l'empoisonnement DNS</header>
+
+<main>
+
+    <div id="login-screen" class="card">
+        <h1>🧭 Tu tapes toi-même la bonne adresse... et pourtant</h1>
+        <div class="sous-texte">Sur un réseau dont "l'annuaire" (DNS) a été corrompu par un attaquant, même taper l'adresse exacte à la main ne garantit plus d'arriver au bon endroit.</div>
+
+        <div class="barre-adresse">
+            <span class="cadenas">🔓</span>
+            <span class="url-tape">https://www.ma-banque-officielle.ch</span>
+        </div>
+
+        <div class="schema-dns">
+            <div class="etape">Toi tapes<br>ma-banque-officielle.ch</div>
+            <span class="fleche">→</span>
+            <div class="etape corrompu">Annuaire DNS<br>corrompu</div>
+            <span class="fleche">→</span>
+            <div class="etape corrompu">Faux serveur<br>de l'attaquant</div>
+        </div>
+
+        <button type="button" class="submit" id="btn-continuer">Continuer vers le site malgré tout</button>
+        <button type="button" class="secondaire" id="btn-verifier">🔍 Vérifier le cadenas et le certificat avant de continuer</button>
+    </div>
+
+    <div id="reveal-screen" class="reveal-card">
+        <div class="reveal-title" id="reveal-titre"></div>
+        <div class="reveal-sub" id="reveal-sub"></div>
+        <div class="reveal-explication" id="reveal-texte"></div>
+
+        <div class="alerte-navigateur" id="alerte-navigateur">
+            <div class="titre">⚠️ Votre connexion n'est pas privée</div>
+            <div style="font-size:0.85em;">Le certificat de sécurité de ce site ne correspond pas à l'adresse visitée. Un attaquant pourrait essayer de voler vos informations.</div>
+        </div>
+
+        <div class="correction-box">
+            <button type="button" class="correction-toggle" id="btn-toggle-correction">
+                <span>🔧 Comment ça marche, et comment se protéger ?</span>
+                <span id="correction-chevron">▾</span>
+            </button>
+            <div class="correction-content" id="correction-content">
+                <h3>Le principe</h3>
+                Le DNS fonctionne comme un "annuaire téléphonique" du web : il traduit un nom de domaine
+                (facile à retenir) en adresse technique réelle du serveur. Si cet annuaire est corrompu — sur
+                un routeur piraté, un Wi-Fi malveillant, ou par un logiciel malveillant sur l'appareil — même
+                taper la bonne adresse à la main peut rediriger vers un faux serveur, sans que rien ne le
+                montre dans la barre d'adresse elle-même.
+
+                <h3>Ce qui te sauve quand même : le certificat HTTPS</h3>
+                Le vrai site possède un certificat de sécurité valide, lié à son vrai domaine. Un faux serveur
+                ne peut pas le reproduire — le navigateur détecte l'incohérence et affiche un avertissement
+                explicite. C'est exactement ce que tu viens de voir en cliquant sur "vérifier".
+
+                <h3>Les règles à retenir</h3>
+                1. Ne jamais ignorer un avertissement de certificat invalide, même si l'adresse tapée semblait correcte.<br>
+                2. Vérifier la présence du cadenas HTTPS avant toute saisie sensible.<br>
+                3. Utiliser un serveur DNS de confiance (souvent configurable sur routeur ou appareil) réduit ce risque.
+            </div>
+        </div>
+
+        <button type="button" class="reveal-btn" id="btn-reset">↺ Recommencer</button>
+    </div>
+
+</main>
+
+<footer>
+    <span class="footer-flag">🔒 Page pédagogique — cours de cybersécurité</span>
+    Scénario fictif, aucune vraie résolution DNS. <a id="lien-mentions">Mentions légales</a>
+</footer>
+
+<div class="modal-overlay" id="modal-overlay">
+    <div class="modal-box">
+        <h2>Mentions légales</h2>
+        <p>Cette page est une <strong>reconstitution fictive</strong> créée dans le cadre d'un cours de
+cybersécurité, à des fins pédagogiques uniquement. Aucune vraie résolution DNS ni vérification de certificat
+n'a lieu — tout est scénarisé.</p>
+<p>Aucune donnée n'est envoyée, transmise, collectée ou conservée par cette page.</p>
+        <button class="modal-close" id="btn-close-modal">Fermer</button>
+    </div>
+</div>
+
+<script>
+
+    // Page 100% statique : aucune vraie resolution DNS, aucun vrai certificat verifie.
+
+    function afficherRevelation(titre, sousTitre, texte, succes, avecAlerte) {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('reveal-screen').style.display = 'block';
+        document.getElementById('reveal-titre').innerText = titre;
+        document.getElementById('reveal-titre').style.color = succes ? 'var(--trap)' : 'var(--danger)';
+        document.getElementById('reveal-screen').style.borderColor = succes ? 'var(--trap)' : 'var(--danger)';
+        document.getElementById('reveal-sub').innerText = sousTitre;
+        document.getElementById('reveal-texte').innerHTML = texte;
+        document.getElementById('alerte-navigateur').style.display = avecAlerte ? 'block' : 'none';
+    }
+
+    document.getElementById('btn-continuer').addEventListener('click', function() {
+        afficherRevelation('🎣 Te voilà piégé·e !', "C'était un empoisonnement DNS.",
+            "Même en tapant la bonne adresse, tu as atterri sur le faux serveur de l'attaquant sans t'en rendre " +
+            "compte — c'est justement ce qui rend cette attaque redoutable : impossible de la repérer par la seule " +
+            "adresse tapée.", false, false);
+    });
+
+    document.getElementById('btn-verifier').addEventListener('click', function() {
+        afficherRevelation('✅ Bon réflexe !', 'Le certificat invalide a démasqué le piège.',
+            "En vérifiant, le navigateur affiche un avertissement clair : le certificat de sécurité ne correspond " +
+            "pas au vrai site. C'est le signal qui permet de détecter un empoisonnement DNS, même quand l'adresse " +
+            "tapée était parfaitement correcte.", true, true);
+    });
+
+    document.getElementById('btn-reset').addEventListener('click', function() {
+        document.getElementById('reveal-screen').style.display = 'none';
+        document.getElementById('login-screen').style.display = 'block';
+        document.getElementById('correction-content').style.display = 'none';
+        document.getElementById('correction-chevron').innerText = '▾';
+        document.getElementById('alerte-navigateur').style.display = 'none';
+    });
+
+
+    document.getElementById('btn-toggle-correction').addEventListener('click', function() {
+        const contenu = document.getElementById('correction-content');
+        const ouvert = contenu.style.display === 'block';
+        contenu.style.display = ouvert ? 'none' : 'block';
+        document.getElementById('correction-chevron').innerText = ouvert ? '▾' : '▴';
+    });
+    document.getElementById('lien-mentions').addEventListener('click', function() {
+        document.getElementById('modal-overlay').style.display = 'flex';
+    });
+    document.getElementById('btn-close-modal').addEventListener('click', function() {
+        document.getElementById('modal-overlay').style.display = 'none';
+    });
+    document.getElementById('modal-overlay').addEventListener('click', function(e) {
+        if (e.target === this) this.style.display = 'none';
+    });
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Borne de recharge</title>
+<style>
+
+    :root {
+        --bg: #14161a; --panel: #1c1f25; --panel-2: #22262d; --border: #2e333b;
+        --text: #e7e9ec; --muted: #9aa2ad; --accent: #2f6fed; --accent-hover: #4c84f0;
+        --warn: #e0a63c; --trap: #3ccb7f; --danger: #e0554c;
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; background:var(--bg); color:var(--text);
+        font-family:'Segoe UI','Inter',Arial,sans-serif; display:flex; flex-direction:column; }
+    header { background:var(--panel); border-bottom:1px solid var(--border); padding:14px 20px;
+        font-size:0.95em; letter-spacing:0.03em; color:var(--muted); text-transform:uppercase; text-align:center; }
+    main { flex:1; display:flex; align-items:center; justify-content:center; padding:24px; }
+    .card { background:var(--panel); border:1px solid var(--border); border-radius:10px;
+        padding:30px; width:100%; max-width:540px; }
+    h1 { font-size:1.2em; margin:0 0 8px 0; font-weight:700; }
+    .sous-texte { color:var(--muted); font-size:0.87em; margin-bottom:20px; line-height:1.5; }
+    label { display:block; font-size:0.85em; color:var(--muted); margin-bottom:6px; }
+    input[type="text"], input[type="password"], textarea, select { width:100%; background:var(--panel-2);
+        border:1px solid var(--border); color:var(--text); padding:11px 13px; border-radius:6px;
+        font-size:0.95em; font-family:inherit; outline:none; margin-bottom:14px; }
+    textarea { font-family:'Consolas',monospace; min-height:70px; resize:vertical; }
+    input:focus, textarea:focus, select:focus { border-color:var(--accent); }
+    button { font-family:inherit; }
+    button.submit { width:100%; background:var(--accent); color:#fff; border:none; padding:13px;
+        border-radius:6px; font-size:1em; font-weight:600; cursor:pointer; margin-bottom:8px; }
+    button.submit:hover { background:var(--accent-hover); }
+    button.secondaire { width:100%; background:none; border:1px solid var(--border); color:var(--muted);
+        padding:10px; border-radius:6px; font-size:0.85em; cursor:pointer; }
+    button.secondaire:hover { color:var(--text); border-color:var(--accent); }
+    .hint { margin-top:14px; font-size:0.8em; color:var(--muted); line-height:1.5;
+        background:var(--panel-2); border:1px solid var(--border); border-radius:6px; padding:10px 12px; }
+
+    #reveal-screen { display:none; }
+    .reveal-card { background:var(--panel); border:1px solid var(--trap); border-radius:10px;
+        padding:32px; width:100%; max-width:560px; }
+    .reveal-title { font-size:1.35em; font-weight:700; margin:0 0 6px 0; color:var(--trap); }
+    .reveal-sub { color:var(--muted); margin-bottom:20px; }
+    .reveal-explication { font-size:0.92em; line-height:1.6; color:var(--text); }
+    .reveal-explication code { background:var(--panel-2); border:1px solid var(--border);
+        border-radius:4px; padding:1px 6px; }
+    .reveal-btn { margin-top:20px; background:var(--panel-2); border:1px solid var(--border);
+        color:var(--text); padding:10px 16px; border-radius:6px; cursor:pointer; font-size:0.9em; }
+    .reveal-btn:hover { border-color:var(--accent); }
+
+    .correction-box { margin-top:22px; border:1px solid var(--trap); border-radius:8px; overflow:hidden; text-align:left; }
+    .correction-toggle { width:100%; text-align:left; background:rgba(60,203,127,0.08); border:none;
+        color:var(--trap); padding:14px 16px; font-size:0.95em; font-weight:600; cursor:pointer;
+        display:flex; justify-content:space-between; align-items:center; }
+    .correction-content { display:none; padding:16px 18px 20px 18px; font-size:0.88em;
+        line-height:1.6; border-top:1px solid var(--border); }
+    .correction-content h3 { font-size:0.95em; margin:16px 0 6px 0; color:var(--text); }
+    .correction-content h3:first-child { margin-top:0; }
+    .correction-content ul, .correction-content ol { padding-left:20px; margin:6px 0; }
+    .correction-content code { background:var(--panel-2); border:1px solid var(--border);
+        border-radius:4px; padding:1px 6px; }
+    .code-compare { display:grid; grid-template-columns:1fr; gap:10px; margin:8px 0 14px 0; }
+    .code-block { background:var(--panel-2); border:1px solid var(--border); border-radius:6px;
+        padding:10px 12px; font-family:'Consolas',monospace; font-size:0.85em;
+        white-space:pre-wrap; word-break:break-word; }
+    .code-block.bad { border-left:3px solid #e0554c; }
+    .code-block.good { border-left:3px solid var(--trap); }
+    .code-label { font-size:0.78em; color:var(--muted); margin-bottom:4px;
+        text-transform:uppercase; letter-spacing:0.03em; }
+
+    footer { text-align:center; padding:14px; font-size:0.78em; color:var(--muted);
+        border-top:1px solid var(--border); background:var(--panel); }
+    footer a { color:var(--muted); text-decoration:underline; cursor:pointer; }
+    footer a:hover { color:var(--text); }
+    .footer-flag { display:block; margin-bottom:4px; color:var(--warn); font-weight:600; letter-spacing:0.02em; }
+
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7);
+        align-items:center; justify-content:center; padding:20px; z-index:100; }
+    .modal-box { background:var(--panel); border:1px solid var(--border); border-radius:10px;
+        padding:26px; max-width:480px; font-size:0.9em; line-height:1.6; }
+    .modal-box h2 { margin-top:0; font-size:1.1em; }
+    .modal-close { margin-top:16px; background:var(--accent); border:none; color:#fff;
+        padding:9px 16px; border-radius:6px; cursor:pointer; }
+
+
+    .borne { background:linear-gradient(160deg,#2a2f38,#181b20); border:1px solid var(--border);
+        border-radius:10px; padding:24px; margin-bottom:18px; text-align:center; }
+    .borne .titre { font-weight:800; font-size:1.15em; margin-bottom:6px; }
+    .borne .sous { color:var(--muted); font-size:0.85em; margin-bottom:16px; }
+    .cable-icone { font-size:3em; margin-bottom:6px; }
+    .toggle-bloqueur { display:flex; align-items:center; gap:10px; background:var(--panel-2);
+        border:1px solid var(--border); border-radius:8px; padding:12px 14px; margin-bottom:16px;
+        font-size:0.85em; cursor:pointer; user-select:none; text-align:left; }
+    .toggle-bloqueur input { width:16px; height:16px; flex-shrink:0; }
+    .schema-cable { display:flex; justify-content:center; gap:6px; margin:14px 0; font-family:'Consolas',monospace; font-size:0.78em; }
+    .broche { background:var(--panel-2); border:1px solid var(--border); border-radius:4px; padding:8px 6px; text-align:center; min-width:60px; }
+    .broche.active { border-color:var(--trap); color:var(--trap); }
+    .broche.bloquee { border-color:var(--muted); color:var(--muted); text-decoration:line-through; opacity:0.5; }
+    .progression-scan { display:none; text-align:center; padding:16px 0; color:var(--muted); font-size:0.9em; }
+    .spinner { display:inline-block; width:22px; height:22px; border:3px solid var(--border);
+        border-top-color:var(--accent); border-radius:50%; animation:tourner 0.8s linear infinite; margin-bottom:10px; }
+    @keyframes tourner { to { transform:rotate(360deg); } }
+
+</style>
+</head>
+<body>
+
+<header>🔋 Démo : le chargeur USB piégé (juice jacking)</header>
+
+<main>
+
+    <div id="login-screen" class="card">
+        <div class="borne">
+            <div class="cable-icone">🔌</div>
+            <div class="titre">Borne de recharge gratuite</div>
+            <div class="sous">Aéroport — Zone d'embarquement</div>
+        </div>
+
+        <label class="toggle-bloqueur" id="toggle-wrap">
+            <input type="checkbox" id="toggle-bloqueur">
+            <span>🛡️ Utiliser un bloqueur de données USB (« protection USB ») avant de brancher</span>
+        </label>
+
+        <div class="schema-cable" id="schema-cable">
+            <div class="broche" id="broche-alim">⚡ Alimentation</div>
+            <div class="broche" id="broche-d1">📊 Données D+</div>
+            <div class="broche" id="broche-d2">📊 Données D-</div>
+        </div>
+
+        <button type="button" class="submit" id="btn-brancher">🔌 Brancher mon téléphone</button>
+
+        <div class="progression-scan" id="scan">
+            <div class="spinner"></div>
+            <div>Connexion établie, échange de données...</div>
+        </div>
+
+        <div class="hint">
+            ⚠️ Rien ici n'accède réellement à un appareil. Un vrai câble ou une vraie borne piégée le peut.
+        </div>
+    </div>
+
+    <div id="reveal-screen" class="reveal-card">
+        <div class="reveal-title" id="reveal-titre"></div>
+        <div class="reveal-sub" id="reveal-sub"></div>
+        <div class="reveal-explication" id="reveal-texte"></div>
+
+        <div class="correction-box">
+            <button type="button" class="correction-toggle" id="btn-toggle-correction">
+                <span>🔧 Comment se protéger, pour de vrai ?</span>
+                <span id="correction-chevron">▾</span>
+            </button>
+            <div class="correction-content" id="correction-content">
+                <h3>Le problème</h3>
+                Un câble/port USB standard transporte à la fois l'alimentation électrique <strong>et</strong>
+                des données. Une borne ou un câble piégé peut exploiter les broches de données pendant la
+                recharge pour extraire des informations ou installer un logiciel malveillant, sans que rien ne
+                paraisse anormal à l'écran.
+
+                <h3>Les règles à retenir</h3>
+                1. Privilégier son propre chargeur branché sur une vraie prise électrique plutôt qu'un port USB public.<br>
+                2. Utiliser une batterie externe personnelle en déplacement.<br>
+                3. Un bloqueur de données USB (peu coûteux) neutralise physiquement les broches de données — seule l'alimentation passe.<br>
+                4. Si un téléphone demande "faire confiance à cet ordinateur ?" en se rechargeant sur une borne publique, toujours refuser.
+            </div>
+        </div>
+
+        <button type="button" class="reveal-btn" id="btn-reset">↺ Recommencer</button>
+    </div>
+
+</main>
+
+<footer>
+    <span class="footer-flag">🔒 Page pédagogique — cours de cybersécurité</span>
+    Simulation fictive, aucun appareil réel connecté. <a id="lien-mentions">Mentions légales</a>
+</footer>
+
+<div class="modal-overlay" id="modal-overlay">
+    <div class="modal-box">
+        <h2>Mentions légales</h2>
+        <p>Cette page est une <strong>reconstitution fictive</strong> créée dans le cadre d'un cours de
+cybersécurité, à des fins pédagogiques uniquement. Aucun appareil n'est réellement connecté ni analysé.</p>
+<p>Aucune donnée n'est envoyée, transmise, collectée ou conservée par cette page.</p>
+        <button class="modal-close" id="btn-close-modal">Fermer</button>
+    </div>
+</div>
+
+<script>
+
+    // Page 100% statique : aucun appareil réel n'est connecté, rien n'est extrait.
+
+    document.getElementById('toggle-bloqueur').addEventListener('change', function() {
+        document.getElementById('broche-d1').classList.toggle('bloquee', this.checked);
+        document.getElementById('broche-d2').classList.toggle('bloquee', this.checked);
+        document.getElementById('broche-d1').classList.toggle('active', !this.checked);
+        document.getElementById('broche-d2').classList.toggle('active', !this.checked);
+        document.getElementById('broche-alim').classList.add('active');
+    });
+
+    document.getElementById('btn-brancher').addEventListener('click', function() {
+        this.disabled = true;
+        document.getElementById('toggle-bloqueur').disabled = true;
+        const avecBloqueur = document.getElementById('toggle-bloqueur').checked;
+        document.getElementById('scan').style.display = 'block';
+
+        setTimeout(() => {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('reveal-screen').style.display = 'block';
+            if (avecBloqueur) {
+                document.getElementById('reveal-titre').innerText = '✅ Protégé !';
+                document.getElementById('reveal-titre').style.color = 'var(--trap)';
+                document.getElementById('reveal-screen').style.borderColor = 'var(--trap)';
+                document.getElementById('reveal-sub').innerText = 'Le bloqueur de données a fait son travail.';
+                document.getElementById('reveal-texte').innerHTML =
+                    "Avec le bloqueur, seules les broches d'alimentation restent connectées : le téléphone se recharge " +
+                    "normalement, mais aucune donnée ne peut circuler dans un sens ou dans l'autre. Même une borne " +
+                    "totalement piégée n'aurait rien pu faire.";
+            } else {
+                document.getElementById('reveal-titre').innerText = '🎣 Te voilà piégé·e !';
+                document.getElementById('reveal-titre').style.color = 'var(--danger)';
+                document.getElementById('reveal-screen').style.borderColor = 'var(--danger)';
+                document.getElementById('reveal-sub').innerText = "C'était une démo de juice jacking (piratage par recharge USB).";
+                document.getElementById('reveal-texte').innerHTML =
+                    "En branchant directement sans protection, les broches de données restent actives en même temps que " +
+                    "la recharge. Une vraie borne piégée pourrait en profiter pour extraire des données ou installer un " +
+                    "logiciel malveillant, pendant que le téléphone se recharge normalement — sans que rien ne paraisse " +
+                    "suspect à l'écran.";
+            }
+        }, 1300);
+    });
+
+    document.getElementById('btn-reset').addEventListener('click', function() {
+        document.getElementById('reveal-screen').style.display = 'none';
+        document.getElementById('login-screen').style.display = 'block';
+        document.getElementById('correction-content').style.display = 'none';
+        document.getElementById('correction-chevron').innerText = '▾';
+        document.getElementById('scan').style.display = 'none';
+        document.getElementById('btn-brancher').disabled = false;
+        document.getElementById('toggle-bloqueur').disabled = false;
+        document.getElementById('toggle-bloqueur').checked = false;
+        document.getElementById('broche-d1').classList.remove('bloquee','active');
+        document.getElementById('broche-d2').classList.remove('bloquee','active');
+        document.getElementById('broche-alim').classList.remove('active');
+    });
+
+
+    document.getElementById('btn-toggle-correction').addEventListener('click', function() {
+        const contenu = document.getElementById('correction-content');
+        const ouvert = contenu.style.display === 'block';
+        contenu.style.display = ouvert ? 'none' : 'block';
+        document.getElementById('correction-chevron').innerText = ouvert ? '▾' : '▴';
+    });
+    document.getElementById('lien-mentions').addEventListener('click', function() {
+        document.getElementById('modal-overlay').style.display = 'flex';
+    });
+    document.getElementById('btn-close-modal').addEventListener('click', function() {
+        document.getElementById('modal-overlay').style.display = 'none';
+    });
+    document.getElementById('modal-overlay').addEventListener('click', function(e) {
+        if (e.target === this) this.style.display = 'none';
+    });
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Démo : injection SQL</title>
+<style>
+    :root {
+        --bg: #14161a; --panel: #1c1f25; --panel-2: #22262d; --border: #2e333b;
+        --text: #e7e9ec; --muted: #9aa2ad; --accent: #2f6fed; --accent-hover: #4c84f0;
+        --warn: #e0a63c; --trap: #3ccb7f; --danger: #e0554c;
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; background:var(--bg); color:var(--text);
+        font-family:'Segoe UI','Inter',Arial,sans-serif; display:flex; flex-direction:column; }
+    header { background:var(--panel); border-bottom:1px solid var(--border); padding:14px 20px;
+        font-size:0.95em; letter-spacing:0.03em; color:var(--muted); text-transform:uppercase; }
+    main { flex:1; display:flex; align-items:center; justify-content:center; padding:24px; }
+    .card { background:var(--panel); border:1px solid var(--border); border-radius:10px;
+        padding:32px; width:100%; max-width:520px; }
+    h1 { font-size:1.15em; margin:0 0 6px 0; font-weight:700; }
+    .sous-texte { color:var(--muted); font-size:0.86em; margin-bottom:22px; line-height:1.5; }
+
+    .field { margin-bottom:16px; }
+    label { display:block; font-size:0.85em; color:var(--muted); margin-bottom:6px; }
+    input[type="text"], input[type="password"] { width:100%; background:var(--panel-2);
+        border:1px solid var(--border); color:var(--text); padding:11px 13px; border-radius:6px;
+        font-size:0.95em; font-family:'Consolas',monospace; outline:none; }
+    input:focus { border-color:var(--accent); }
+    button.submit { width:100%; background:var(--accent); color:#fff; border:none; padding:13px;
+        border-radius:6px; font-size:1em; font-weight:600; cursor:pointer; margin-top:6px; }
+    button.submit:hover { background:var(--accent-hover); }
+
+    .requete-box { margin-top:18px; background:#0d0e11; border:1px solid var(--border); border-radius:8px;
+        padding:14px; font-family:'Consolas',monospace; font-size:0.82em; line-height:1.6; display:none; }
+    .requete-box .label { color:var(--muted); font-size:0.78em; text-transform:uppercase; margin-bottom:4px; }
+    .requete-box .sql { color:#7ee787; word-break:break-all; }
+    .requete-box .sql .injecte { color:var(--danger); font-weight:700; }
+    .mode-toggle { display:flex; align-items:center; gap:10px; background:var(--panel-2);
+        border:1px solid var(--border); border-radius:8px; padding:12px 14px; margin-bottom:18px;
+        font-size:0.85em; cursor:pointer; user-select:none; }
+    .mode-toggle input { width:16px; height:16px; }
+    .mode-toggle .badge-mode { font-weight:700; }
+    .mode-toggle.securise { border-color:var(--trap); }
+    .mode-toggle.securise .badge-mode { color:var(--trap); }
+    .requete-box.securise { border-color:var(--trap); }
+    .requete-box .param { color:var(--accent); }
+
+    .resultat-connexion { display:none; margin-top:16px; padding:14px 16px; border-radius:8px; font-size:0.9em; }
+    .resultat-connexion.succes { background:rgba(60,203,127,0.1); border:1px solid var(--trap); color:var(--trap); }
+    .resultat-connexion.echec { background:rgba(224,85,76,0.1); border:1px solid var(--danger); color:var(--danger); }
+
+    .hint { margin-top:16px; font-size:0.8em; color:var(--muted); line-height:1.5;
+        background:var(--panel-2); border:1px solid var(--border); border-radius:6px; padding:10px 12px; }
+
+    footer { text-align:center; padding:14px; font-size:0.78em; color:var(--muted);
+        border-top:1px solid var(--border); background:var(--panel); }
+    footer a { color:var(--muted); text-decoration:underline; cursor:pointer; }
+    footer a:hover { color:var(--text); }
+    .footer-flag { display:block; margin-bottom:4px; color:var(--warn); font-weight:600; letter-spacing:0.02em; }
+
+    .correction-box { margin-top:20px; border:1px solid var(--trap); border-radius:8px; overflow:hidden; }
+    .correction-toggle { width:100%; text-align:left; background:rgba(60,203,127,0.08); border:none;
+        color:var(--trap); padding:14px 16px; font-size:0.95em; font-weight:600; cursor:pointer;
+        display:flex; justify-content:space-between; align-items:center; }
+    .correction-content { display:none; padding:16px 18px 20px 18px; font-size:0.88em;
+        line-height:1.6; border-top:1px solid var(--border); }
+    .correction-content h3 { font-size:0.95em; margin:16px 0 6px 0; color:var(--text); }
+    .correction-content h3:first-child { margin-top:0; }
+    .code-compare { display:grid; grid-template-columns:1fr; gap:10px; margin:8px 0 14px 0; }
+    .code-block { background:var(--panel-2); border:1px solid var(--border); border-radius:6px;
+        padding:10px 12px; font-family:'Consolas',monospace; font-size:0.85em;
+        white-space:pre-wrap; word-break:break-word; }
+    .code-block.bad { border-left:3px solid #e0554c; }
+    .code-block.good { border-left:3px solid var(--trap); }
+    .code-label { font-size:0.78em; color:var(--muted); margin-bottom:4px;
+        text-transform:uppercase; letter-spacing:0.03em; }
+
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7);
+        align-items:center; justify-content:center; padding:20px; z-index:100; }
+    .modal-box { background:var(--panel); border:1px solid var(--border); border-radius:10px;
+        padding:26px; max-width:480px; font-size:0.9em; line-height:1.6; }
+    .modal-box h2 { margin-top:0; font-size:1.1em; }
+    .modal-close { margin-top:16px; background:var(--accent); border:none; color:#fff;
+        padding:9px 16px; border-radius:6px; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<header>🗄️ Démo : injection SQL</header>
+
+<main>
+    <div class="card">
+        <h1>Connexion — Espace Administration (démo)</h1>
+        <div class="sous-texte">Ce formulaire simule (sans vraie base de données) un site mal protégé contre les injections SQL. Essaie de te connecter normalement, puis essaie l'astuce indiquée en bas.</div>
+
+        <label class="mode-toggle" id="mode-toggle">
+            <input type="checkbox" id="mode-securise">
+            <span>🔒 Utiliser une <span class="badge-mode" id="badge-mode">requête préparée (sécurisée)</span> — essaie de rejouer la même astuce !</span>
+        </label>
+
+        <form id="login-form" autocomplete="off">
+            <div class="field">
+                <label for="identifiant">Identifiant</label>
+                <input type="text" id="identifiant" placeholder="ex : admin">
+            </div>
+            <div class="field">
+                <label for="motdepasse">Mot de passe</label>
+                <input type="text" id="motdepasse" placeholder="ex : n'importe quoi">
+            </div>
+            <button type="submit" class="submit">Se connecter</button>
+        </form>
+
+        <div class="requete-box" id="requete-box">
+            <div class="label" id="requete-label">Requête envoyée à la base de données (simulée) :</div>
+            <div class="sql" id="requete-sql"></div>
+        </div>
+
+        <div class="resultat-connexion" id="resultat"></div>
+
+        <div class="hint">
+            💡 À essayer dans le champ <strong>mot de passe</strong> : <code>' OR '1'='1</code>
+        </div>
+
+        <div class="correction-box">
+            <button type="button" class="correction-toggle" id="btn-toggle-correction">
+                <span>🔧 Comment on corrige ça, pour de vrai ?</span>
+                <span id="correction-chevron">▾</span>
+            </button>
+            <div class="correction-content" id="correction-content">
+                <h3>Le problème</h3>
+                Ce formulaire fabrique la requête en collant directement ce que tu tapes dans le texte de la
+                commande envoyée à la base de données. Si tu tapes du code SQL au lieu d'un mot de passe normal,
+                ce code SQL est exécuté tel quel.
+
+                <h3>Comparaison</h3>
+                <div class="code-compare">
+                    <div>
+                        <div class="code-label">❌ Ce que fait cette démo (vulnérable)</div>
+                        <div class="code-block bad">requete = "SELECT * FROM users WHERE
+  user='" + identifiant + "' AND pass='"
+  + motdepasse + "'"
+// Si motdepasse = ' OR '1'='1
+// -> ... AND pass='' OR '1'='1'
+// '1'='1' est TOUJOURS vrai : accès accordé
+// à n'importe qui, sans connaître le mot
+// de passe !</div>
+                    </div>
+                    <div>
+                        <div class="code-label">✅ Ce que fait un vrai site bien codé</div>
+                        <div class="code-block good">requete = "SELECT * FROM users WHERE
+  user=? AND pass=?"
+executer(requete, [identifiant, motdepasse])
+// Les valeurs saisies sont toujours traitées
+// comme de simples DONNÉES, jamais comme
+// du code — impossible d'en sortir avec
+// une apostrophe.</div>
+                    </div>
+                </div>
+
+                <h3>Les règles à retenir</h3>
+                1. Ne jamais construire une requête en collant directement le texte saisi par l'utilisateur.<br>
+                2. Utiliser des "requêtes préparées" (paramétrées) — la méthode standard depuis des décennies.<br>
+                3. Ce principe dépasse le SQL : ne jamais faire confiance à une entrée utilisateur, nulle part.<br>
+                4. Ce genre de faille a permis de vraies fuites massives de données dans le monde réel — ce n'est pas juste théorique.
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer>
+    <span class="footer-flag">🔒 Page pédagogique — cours de cybersécurité</span>
+    Aucune vraie base de données, tout est simulé en JavaScript local. <a id="lien-mentions">Mentions légales</a>
+</footer>
+
+<div class="modal-overlay" id="modal-overlay">
+    <div class="modal-box">
+        <h2>Mentions légales</h2>
+        <p>Cette page est une <strong>simulation pédagogique</strong> créée dans le cadre d'un cours de
+        cybersécurité. La "base de données" est un tableau JavaScript en dur dans la page — il n'y a aucun
+        serveur, aucune vraie base de données, aucune requête réseau.</p>
+        <p>Aucune donnée saisie n'est envoyée, transmise, collectée ou conservée.</p>
+        <button class="modal-close" id="btn-close-modal">Fermer</button>
+    </div>
+</div>
+
+<script>
+    // Base de données 100% fictive, en mémoire JS locale. Aucune vraie requête SQL n'est jamais exécutée
+    // (le "moteur" ci-dessous ne fait qu'imiter le comportement d'une injection, sur des données bidon).
+    const UTILISATEURS = [
+        { user: 'admin', pass: 'S3cr3t-Demo-2026' },
+        { user: 'prof', pass: 'Cours-Cyber-42' }
+    ];
+
+    function simulerRequete(identifiant, motdepasse, modeSecurise) {
+        if (modeSecurise) {
+            // VERSION SÉCURISÉE : requête préparée. Les valeurs saisies sont toujours comparées comme de
+            // simples chaînes de caractères, jamais collées dans le texte de la commande — une injection
+            // SQL n'a ici tout simplement aucun sens à exécuter, elle est juste une chaîne de plus.
+            const requeteAffichee = `SELECT * FROM users WHERE user=? AND pass=?\n→ paramètres : [${JSON.stringify(identifiant)}, ${JSON.stringify(motdepasse)}]`;
+            const utilisateurTrouve = UTILISATEURS.find(u => u.user === identifiant && u.pass === motdepasse) || null;
+            return { requeteAffichee, injectionDetectee: false, utilisateurTrouve, modeSecurise: true };
+        }
+
+        // On construit le texte de la requête EXACTEMENT comme le ferait un site vulnérable,
+        // pour montrer où l'injection s'insère visuellement.
+        const requeteAffichee = `SELECT * FROM users WHERE user='${identifiant}' AND pass='${motdepasse}'`;
+
+        // Simulation du comportement d'une vraie injection : si la partie "pass" contient une
+        // construction du type ' OR '1'='1 (ou similaire), la condition devient toujours vraie.
+        const injectionDetectee = /'\s*or\s*'?1'?\s*=\s*'?1/i.test(motdepasse) || /--/.test(motdepasse);
+
+        let utilisateurTrouve = null;
+        if (injectionDetectee) {
+            utilisateurTrouve = UTILISATEURS[0]; // "la condition est toujours vraie" -> premier compte retourné
+        } else {
+            utilisateurTrouve = UTILISATEURS.find(u => u.user === identifiant && u.pass === motdepasse) || null;
+        }
+
+        return { requeteAffichee, injectionDetectee, utilisateurTrouve, modeSecurise: false };
+    }
+
+    document.getElementById('mode-securise').addEventListener('change', function() {
+        const actif = this.checked;
+        document.getElementById('mode-toggle').classList.toggle('securise', actif);
+        document.getElementById('badge-mode').innerText = actif ? 'requête préparée (sécurisée) — ACTIVÉE' : 'requête préparée (sécurisée)';
+        document.getElementById('requete-box').style.display = 'none';
+        document.getElementById('resultat').style.display = 'none';
+    });
+
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const identifiant = document.getElementById('identifiant').value;
+        const motdepasse = document.getElementById('motdepasse').value;
+        const modeSecurise = document.getElementById('mode-securise').checked;
+
+        const { requeteAffichee, injectionDetectee, utilisateurTrouve } = simulerRequete(identifiant, motdepasse, modeSecurise);
+
+        const requeteBox = document.getElementById('requete-box');
+        requeteBox.classList.toggle('securise', modeSecurise);
+        document.getElementById('requete-label').innerText = modeSecurise
+            ? '✅ Requête préparée envoyée (les valeurs restent de simples données) :'
+            : 'Requête envoyée à la base de données (simulée) :';
+
+        const sqlSpan = document.getElementById('requete-sql');
+        if (injectionDetectee) {
+            sqlSpan.innerHTML = `SELECT * FROM users WHERE user='${identifiant}' AND pass='<span class="injecte">${motdepasse}</span>'`;
+        } else {
+            sqlSpan.innerText = requeteAffichee;
+        }
+        requeteBox.style.display = 'block';
+
+        const resultat = document.getElementById('resultat');
+        resultat.style.display = 'block';
+        if (utilisateurTrouve) {
+            resultat.className = 'resultat-connexion succes';
+            resultat.innerText = injectionDetectee
+                ? `🎣 Connecté·e en tant que "${utilisateurTrouve.user}" — SANS connaître son mot de passe ! C'est l'injection SQL qui vient de contourner la vérification.`
+                : `✅ Connecté·e en tant que "${utilisateurTrouve.user}".`;
+        } else {
+            resultat.className = 'resultat-connexion echec';
+            resultat.innerText = modeSecurise
+                ? `❌ Identifiant ou mot de passe incorrect. Remarque : même ton astuce d'injection SQL est traitée ici comme un simple mot de passe (faux) — ça ne fonctionne plus du tout !`
+                : '❌ Identifiant ou mot de passe incorrect.';
+        }
+    });
+
+    document.getElementById('btn-toggle-correction').addEventListener('click', function() {
+        const contenu = document.getElementById('correction-content');
+        const ouvert = contenu.style.display === 'block';
+        contenu.style.display = ouvert ? 'none' : 'block';
+        document.getElementById('correction-chevron').innerText = ouvert ? '▾' : '▴';
+    });
+
+    document.getElementById('lien-mentions').addEventListener('click', function() {
+        document.getElementById('modal-overlay').style.display = 'flex';
+    });
+    document.getElementById('btn-close-modal').addEventListener('click', function() {
+        document.getElementById('modal-overlay').style.display = 'none';
+    });
+    document.getElementById('modal-overlay').addEventListener('click', function(e) {
+        if (e.target === this) this.style.display = 'none';
+    });
+</script>
+
+</body>
+</html>

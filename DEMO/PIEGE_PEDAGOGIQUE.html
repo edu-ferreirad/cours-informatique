@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portail Formation — Espace Élève</title>
+<style>
+    :root {
+        --bg: #14161a;
+        --panel: #1c1f25;
+        --panel-2: #22262d;
+        --border: #2e333b;
+        --text: #e7e9ec;
+        --muted: #9aa2ad;
+        --accent: #2f6fed;
+        --accent-hover: #4c84f0;
+        --warn: #e0a63c;
+        --trap: #3ccB7f;
+    }
+    * { box-sizing: border-box; }
+    body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--text);
+        font-family: 'Segoe UI', 'Inter', Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+    }
+    header {
+        background: var(--panel);
+        border-bottom: 1px solid var(--border);
+        padding: 14px 20px;
+        font-size: 0.95em;
+        letter-spacing: 0.03em;
+        color: var(--muted);
+        text-transform: uppercase;
+    }
+    main {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+    }
+    .card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 36px;
+        width: 100%;
+        max-width: 420px;
+    }
+    .badge {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: linear-gradient(135deg, #2c3038, #1a1d22);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 14px 18px;
+        margin-bottom: 28px;
+    }
+    .badge-icon {
+        width: 34px; height: 34px;
+        border-radius: 50%;
+        background: var(--accent);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.1em;
+        flex-shrink: 0;
+    }
+    .badge-text { line-height: 1.25; }
+    .badge-text b { display: block; font-size: 1.02em; }
+    .badge-text span { color: var(--muted); font-size: 0.82em; }
+
+    h1 {
+        font-size: 1.25em;
+        margin: 0 0 22px 0;
+        font-weight: 600;
+        line-height: 1.4;
+    }
+    label {
+        display: block;
+        font-size: 0.85em;
+        color: var(--muted);
+        margin-bottom: 6px;
+    }
+    .field { margin-bottom: 18px; position: relative; }
+    input[type="text"], input[type="password"] {
+        width: 100%;
+        background: var(--panel-2);
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 12px 14px;
+        border-radius: 6px;
+        font-size: 1em;
+        outline: none;
+    }
+    input[type="password"] { padding-right: 42px; }
+    input:focus { border-color: var(--accent); }
+    .toggle-eye {
+        position: absolute;
+        right: 10px;
+        top: 34px;
+        background: none;
+        border: none;
+        color: var(--muted);
+        cursor: pointer;
+        font-size: 1.1em;
+        padding: 4px;
+        line-height: 1;
+    }
+    .toggle-eye:hover { color: var(--text); }
+    button.submit {
+        width: 100%;
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        padding: 13px;
+        border-radius: 6px;
+        font-size: 1.02em;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 6px;
+    }
+    button.submit:hover { background: var(--accent-hover); }
+    .hint {
+        margin-top: 16px;
+        font-size: 0.8em;
+        color: var(--muted);
+        line-height: 1.5;
+        background: var(--panel-2);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 10px 12px;
+    }
+
+    footer {
+        text-align: center;
+        padding: 14px;
+        font-size: 0.78em;
+        color: var(--muted);
+        border-top: 1px solid var(--border);
+        background: var(--panel);
+    }
+    footer a { color: var(--muted); text-decoration: underline; cursor: pointer; }
+    footer a:hover { color: var(--text); }
+    .footer-flag {
+        display: block;
+        margin-bottom: 4px;
+        color: var(--warn);
+        font-weight: 600;
+        letter-spacing: 0.02em;
+    }
+
+    /* --- Écran révélation (piège) --- */
+    #reveal-screen { display: none; }
+    .reveal-card {
+        background: var(--panel);
+        border: 1px solid var(--trap);
+        border-radius: 10px;
+        padding: 36px;
+        width: 100%;
+        max-width: 480px;
+    }
+    .reveal-title {
+        font-size: 1.4em;
+        font-weight: 700;
+        margin: 0 0 6px 0;
+        color: var(--trap);
+    }
+    .reveal-sub { color: var(--muted); margin-bottom: 24px; }
+    .reveal-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--panel-2);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 12px 14px;
+        margin-bottom: 10px;
+        font-family: 'Consolas', monospace;
+    }
+    .reveal-row span.k { color: var(--muted); font-family: inherit; }
+    .reveal-row span.v { display:flex; align-items:center; gap:8px; }
+    .champ-protege {
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+    }
+    .reveal-explication {
+        margin-top: 22px;
+        font-size: 0.92em;
+        line-height: 1.6;
+        color: var(--text);
+    }
+    .reveal-explication code {
+        background: var(--panel-2);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 1px 6px;
+    }
+    .reveal-btn {
+        margin-top: 22px;
+        background: var(--panel-2);
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 10px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.9em;
+    }
+    .reveal-btn:hover { border-color: var(--accent); }
+
+    /* --- Section correction --- */
+    .correction-box {
+        margin-top: 24px;
+        border: 1px solid var(--trap);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .correction-toggle {
+        width: 100%;
+        text-align: left;
+        background: rgba(60,203,127,0.08);
+        border: none;
+        color: var(--trap);
+        padding: 14px 16px;
+        font-size: 0.95em;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .correction-content {
+        display: none;
+        padding: 16px 18px 20px 18px;
+        font-size: 0.88em;
+        line-height: 1.6;
+        border-top: 1px solid var(--border);
+    }
+    .correction-content h3 {
+        font-size: 0.95em;
+        margin: 16px 0 6px 0;
+        color: var(--text);
+    }
+    .correction-content h3:first-child { margin-top: 0; }
+    .code-compare {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin: 8px 0 14px 0;
+    }
+    .code-block {
+        background: var(--panel-2);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 10px 12px;
+        font-family: 'Consolas', monospace;
+        font-size: 0.85em;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+    .code-block.bad { border-left: 3px solid #e0554c; }
+    .code-block.good { border-left: 3px solid var(--trap); }
+    .code-label {
+        font-size: 0.78em;
+        color: var(--muted);
+        margin-bottom: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+    .crypto-demo { margin-top: 16px; }
+    .crypto-demo input {
+        width: 100%; background: var(--panel-2); border: 1px solid var(--border); color: var(--text);
+        padding: 10px 12px; border-radius: 6px; font-size: 0.95em; font-family: 'Consolas', monospace;
+        margin-bottom: 8px; outline: none;
+    }
+    .crypto-demo input:focus { border-color: var(--trap); }
+    .crypto-demo button {
+        background: var(--trap); border: none; color: #08130d; padding: 9px 14px; border-radius: 6px;
+        font-size: 0.88em; font-weight: 700; cursor: pointer; margin-bottom: 14px;
+    }
+    .crypto-demo button:hover { opacity: 0.9; }
+    .crypto-resultats .code-block { margin-bottom: 10px; }
+
+    /* --- Modale mentions légales --- */
+    .modal-overlay {
+        display: none;
+        position: fixed; inset: 0;
+        background: rgba(0,0,0,0.7);
+        align-items: center; justify-content: center;
+        padding: 20px;
+        z-index: 100;
+    }
+    .modal-box {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 26px;
+        max-width: 480px;
+        font-size: 0.9em;
+        line-height: 1.6;
+    }
+    .modal-box h2 { margin-top: 0; font-size: 1.1em; }
+    .modal-close {
+        margin-top: 16px;
+        background: var(--accent);
+        border: none;
+        color: #fff;
+        padding: 9px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+</style>
+</head>
+<body>
+
+<header>Portail Formation — Espace Élève (environnement de démonstration)</header>
+
+<main>
+    <!-- ========== ÉCRAN 1 : FAUX LOGIN ========== -->
+    <div id="login-screen" class="card">
+        <div class="badge">
+            <div class="badge-icon">🎓</div>
+            <div class="badge-text">
+                <b>Identification</b>
+                <span>Espace élève en ligne</span>
+            </div>
+        </div>
+
+        <h1>Veuillez saisir un identifiant et un mot de passe :</h1>
+
+        <form id="login-form" autocomplete="off">
+            <div class="field">
+                <label for="identifiant">Identifiant</label>
+                <input type="text" id="identifiant" name="identifiant" autocomplete="off" placeholder="ex : robot.demo">
+            </div>
+            <div class="field">
+                <label for="motdepasse">Mot de passe</label>
+                <input type="password" id="motdepasse" name="motdepasse" autocomplete="new-password" placeholder="••••••••">
+                <button type="button" class="toggle-eye" id="btn-eye-login" title="Afficher / masquer">👁</button>
+            </div>
+            <button type="submit" class="submit">Se connecter</button>
+        </form>
+
+        <div class="hint">
+            ⚠️ N'utilisez jamais un identifiant ou un mot de passe que vous utilisez réellement ailleurs. Inventez-les.
+        </div>
+    </div>
+
+    <!-- ========== ÉCRAN 2 : RÉVÉLATION DU PIÈGE ========== -->
+    <div id="reveal-screen" class="reveal-card">
+        <div class="reveal-title">🎣 Te voilà piégé·e !</div>
+        <div class="reveal-sub" id="reveal-greeting"></div>
+
+        <div class="reveal-row">
+            <span class="k">Identifiant</span>
+            <span class="v"><span id="reveal-id" class="champ-protege"></span></span>
+        </div>
+        <div class="reveal-row">
+            <span class="k">Mot de passe</span>
+            <span class="v">
+                <span id="reveal-pass" class="champ-protege">••••••••</span>
+                <button type="button" class="toggle-eye" id="btn-eye-reveal" title="Afficher / masquer" style="position:static;">👁</button>
+            </span>
+        </div>
+
+        <div class="reveal-explication">
+            Cette page ne vérifie rien : elle accepte n'importe quel identifiant. Elle n'a rien envoyé nulle part —
+            tout est resté dans ton navigateur.
+            <br><br>
+            Mais regarde bien : ce que tu viens de taper est maintenant visible directement dans la page elle-même.
+            Clique-droit → <code>Inspecter</code> (pas « Afficher le code source », qui ne montre que la page
+            d'origine) et cherche <code>reveal-id</code> / <code>data-mdp</code> : ton identifiant et ton mot de
+            passe y apparaissent en clair, lisibles par n'importe qui a accès à ton écran ou à l'appareil.
+            <br><br>
+            C'est exactement le genre de faille qu'un site mal conçu — ou un vrai site de phishing — exploite :
+            jamais confiance au "client", jamais de mot de passe réel sur une page dont tu n'es pas sûr·e.
+            <br><br>
+            🔒 Petit détail amusant : essaie de sélectionner ou copier ce mot de passe ci-dessus — la page te
+            l'interdit. Mais ce blocage est lui-même trivial à contourner avec l'inspecteur, ce qui prouve le
+            point : une protection posée seulement côté client ne protège jamais vraiment rien.
+        </div>
+
+        <div class="correction-box">
+            <button type="button" class="correction-toggle" id="btn-toggle-correction">
+                <span>🔧 Comment corrige-t-on cette faille, pour de vrai ?</span>
+                <span id="correction-chevron">▾</span>
+            </button>
+            <div class="correction-content" id="correction-content">
+                <h3>Le problème dans cette démo</h3>
+                Le mot de passe est manipulé et affiché entièrement <strong>côté client</strong> (dans le
+                navigateur, en JavaScript) : n'importe qui ouvre l'inspecteur et le lit en clair, qu'il ait été
+                "masqué" à l'écran ou non.
+
+                <h3>Ce qu'on ferait sur un vrai site</h3>
+                <div class="code-compare">
+                    <div>
+                        <div class="code-label">❌ Ce que fait cette démo (jamais en vrai)</div>
+                        <div class="code-block bad">// Le mot de passe reste en clair dans le navigateur
+const motDePasse = document.getElementById('motdepasse').value;
+afficherDansLaPage(motDePasse); // visible par l'inspecteur</div>
+                    </div>
+                    <div>
+                        <div class="code-label">✅ Ce que fait un vrai système</div>
+                        <div class="code-block good">// Le mot de passe part chiffré (HTTPS) vers un serveur,
+// qui ne le stocke JAMAIS en clair
+POST /connexion (via HTTPS)
+   → serveur : compare un hash (bcrypt/argon2) du mot de passe
+     saisi avec le hash stocké en base — le mot de passe
+     "en clair" n'existe jamais après cet instant, ni dans le
+     navigateur, ni sur le disque du serveur.</div>
+                    </div>
+                </div>
+
+                <h3>Les 4 règles qui en découlent</h3>
+                1. Ne jamais faire confiance à ce qui se passe côté client (navigateur) pour une vérification de sécurité — tout y est lisible et modifiable.<br>
+                2. Un mot de passe ne doit jamais transiter ni être stocké "en clair" — on stocke un hash salé (bcrypt, argon2), jamais le mot de passe lui-même.<br>
+                3. Toute donnée sensible doit voyager via HTTPS (chiffré), jamais en clair sur le réseau.<br>
+                4. Un identifiant/mot de passe compromis (même de démo) devrait toujours pouvoir être changé — c'est pour ça qu'on ne réutilise jamais le même mot de passe partout.
+
+                <h3>🔬 Essaie la vraie protection, en direct</h3>
+                Tape un mot de passe inventé ci-dessous : ce qui se passe ensuite est du <strong>vrai</strong>
+                calcul cryptographique (SHA-256 et un chiffrement à clé), exécuté ici même dans ton navigateur —
+                pas une simulation.
+                <div class="crypto-demo">
+                    <input type="text" id="crypto-input" placeholder="tape un mot de passe inventé...">
+                    <button type="button" id="btn-crypto">🔐 Hacher et chiffrer ce mot de passe</button>
+                    <div class="crypto-resultats" id="crypto-resultats" style="display:none;">
+                        <div class="code-label">🔒 Haché avec SHA-256 — irréversible, c'est ce qu'un vrai serveur stocke à la place du mot de passe</div>
+                        <div class="code-block good" id="hash-output"></div>
+                        <div class="code-label">🔐 Chiffré avec une clé secrète aléatoire — illisible sans la clé, c'est ce qui protège la donnée pendant son trajet (comme HTTPS)</div>
+                        <div class="code-block good" id="encrypted-output"></div>
+                        <div class="code-label">🔓 Et avec la bonne clé, on peut le déchiffrer — c'est la différence avec un hachage :</div>
+                        <div class="code-block good" id="decrypted-output"></div>
+                    </div>
+                </div>
+                <p style="font-size:0.85em; color:var(--muted);">
+                    Remarque : sur un vrai site, le hachage utilise en plus des algorithmes plus lents et "salés"
+                    (bcrypt, argon2) pour ralentir les attaques, et le chiffrement en transit utilise AES via
+                    HTTPS — plus complexes mathématiquement, mais avec exactement les mêmes principes que ce que
+                    tu viens de voir : irréversible pour le hachage, réversible seulement avec la clé pour le
+                    chiffrement.
+                </p>
+            </div>
+        </div>
+
+        <button type="button" class="reveal-btn" id="btn-reset">↺ Recommencer avec d'autres identifiants</button>
+    </div>
+</main>
+
+<footer>
+    <span class="footer-flag">🔒 Page pédagogique — cours de cybersécurité</span>
+    Ceci n'est pas un vrai site. <a id="lien-mentions">Mentions légales</a>
+</footer>
+
+<div class="modal-overlay" id="modal-overlay">
+    <div class="modal-box">
+        <h2>Mentions légales</h2>
+        <p>
+            Cette page est une <strong>reconstitution fictive</strong> créée dans le cadre d'un cours de
+            cybersécurité, à des fins pédagogiques uniquement. Elle n'appartient à, n'est affiliée à, ni
+            n'usurpe l'identité d'aucun service, établissement ou administration réel.
+        </p>
+        <p>
+            Aucune donnée saisie sur cette page n'est envoyée, transmise, collectée ou conservée : tout reste
+            localement dans votre navigateur et disparaît à la fermeture de la page. N'y saisissez jamais un
+            identifiant ou un mot de passe que vous utilisez réellement.
+        </p>
+        <button class="modal-close" id="btn-close-modal">Fermer</button>
+    </div>
+</div>
+
+<script>
+    // Aucune requête réseau, aucun localStorage, aucune transmission : tout reste en mémoire JS le temps de la page.
+
+    document.getElementById('btn-eye-login').addEventListener('click', function() {
+        const champ = document.getElementById('motdepasse');
+        champ.type = (champ.type === 'password') ? 'text' : 'password';
+    });
+
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const id = document.getElementById('identifiant').value.trim() || "(vide)";
+        const mdp = document.getElementById('motdepasse').value || "(vide)";
+
+        document.getElementById('reveal-greeting').innerText = `Salut ${id}, bienvenue dans la démonstration.`;
+
+        const spanId = document.getElementById('reveal-id');
+        spanId.innerText = id;
+        spanId.id = 'reveal-id'; // reste inspectable tel quel
+
+        const spanPass = document.getElementById('reveal-pass');
+        spanPass.dataset.mdp = mdp; // volontairement visible via l'inspecteur (data-mdp="...")
+        spanPass.dataset.masque = "true";
+        spanPass.innerText = "•".repeat(Math.max(mdp.length, 6));
+
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('reveal-screen').style.display = 'block';
+    });
+
+    document.getElementById('btn-eye-reveal').addEventListener('click', function() {
+        const spanPass = document.getElementById('reveal-pass');
+        const masque = spanPass.dataset.masque !== "false";
+        spanPass.innerText = masque ? spanPass.dataset.mdp : "•".repeat(Math.max(spanPass.dataset.mdp.length, 6));
+        spanPass.dataset.masque = masque ? "false" : "true";
+    });
+
+    document.getElementById('btn-reset').addEventListener('click', function() {
+        document.getElementById('login-form').reset();
+        document.getElementById('reveal-screen').style.display = 'none';
+        document.getElementById('login-screen').style.display = 'block';
+        document.getElementById('correction-content').style.display = 'none';
+        document.getElementById('correction-chevron').innerText = '▾';
+    });
+
+    document.getElementById('btn-toggle-correction').addEventListener('click', function() {
+        const contenu = document.getElementById('correction-content');
+        const ouvert = contenu.style.display === 'block';
+        contenu.style.display = ouvert ? 'none' : 'block';
+        document.getElementById('correction-chevron').innerText = ouvert ? '▾' : '▴';
+    });
+
+    // --- Vraie démonstration cryptographique (JS pur, fonctionne aussi en file:// depuis une clé USB,
+    // contrairement à l'API crypto.subtle du navigateur qui exige un "contexte sécurisé" HTTPS) ---
+    function sha256(message) {
+        function rightRotate(value, amount) { return (value >>> amount) | (value << (32 - amount)); }
+        const K = [
+            0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+            0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+            0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+            0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+            0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+            0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+            0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+            0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2
+        ];
+        let H = [0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+        const utf8 = unescape(encodeURIComponent(message));
+        const bytes = [];
+        for (let i = 0; i < utf8.length; i++) bytes.push(utf8.charCodeAt(i));
+        const bitLen = bytes.length * 8;
+        bytes.push(0x80);
+        while (bytes.length % 64 !== 56) bytes.push(0);
+        for (let i = 7; i >= 0; i--) bytes.push((bitLen / Math.pow(2, i * 8)) & 0xff);
+        for (let chunkStart = 0; chunkStart < bytes.length; chunkStart += 64) {
+            const w = new Array(64).fill(0);
+            for (let i = 0; i < 16; i++) {
+                w[i] = (bytes[chunkStart + i*4] << 24) | (bytes[chunkStart + i*4+1] << 16) |
+                       (bytes[chunkStart + i*4+2] << 8) | (bytes[chunkStart + i*4+3]);
+            }
+            for (let i = 16; i < 64; i++) {
+                const s0 = rightRotate(w[i-15], 7) ^ rightRotate(w[i-15], 18) ^ (w[i-15] >>> 3);
+                const s1 = rightRotate(w[i-2], 17) ^ rightRotate(w[i-2], 19) ^ (w[i-2] >>> 10);
+                w[i] = (w[i-16] + s0 + w[i-7] + s1) | 0;
+            }
+            let [a,b,c,d,e,f,g,h] = H;
+            for (let i = 0; i < 64; i++) {
+                const S1 = rightRotate(e,6) ^ rightRotate(e,11) ^ rightRotate(e,25);
+                const ch = (e & f) ^ (~e & g);
+                const temp1 = (h + S1 + ch + K[i] + w[i]) | 0;
+                const S0 = rightRotate(a,2) ^ rightRotate(a,13) ^ rightRotate(a,22);
+                const maj = (a & b) ^ (a & c) ^ (b & c);
+                const temp2 = (S0 + maj) | 0;
+                h=g; g=f; f=e; e=(d+temp1)|0; d=c; c=b; b=a; a=(temp1+temp2)|0;
+            }
+            H = [H[0]+a, H[1]+b, H[2]+c, H[3]+d, H[4]+e, H[5]+f, H[6]+g, H[7]+h].map(x => x|0);
+        }
+        return H.map(x => (x >>> 0).toString(16).padStart(8, '0')).join('');
+    }
+
+    function genererCleAleatoire(longueur) {
+        const cle = new Uint8Array(longueur);
+        crypto.getRandomValues(cle); // fonctionne aussi en file://, contrairement à crypto.subtle
+        return cle;
+    }
+    function xor(octets, cle) {
+        return octets.map((o, i) => o ^ cle[i % cle.length]);
+    }
+    function octetsVersHex(octets) {
+        return Array.from(octets).map(o => o.toString(16).padStart(2, '0')).join(' ');
+    }
+
+    document.getElementById('btn-crypto').addEventListener('click', function() {
+        const texte = document.getElementById('crypto-input').value;
+        if (!texte) return;
+
+        const hash = sha256(texte);
+
+        // Chiffrement par masque jetable (XOR avec une clé aléatoire de la même longueur que le message) :
+        // c'est un vrai algorithme de chiffrement, prouvé mathématiquement incassable quand la clé est
+        // aussi longue que le message, totalement aléatoire, et utilisée une seule fois.
+        const octetsMessage = Array.from(new TextEncoder().encode(texte));
+        const cle = genererCleAleatoire(octetsMessage.length);
+        const octetsChiffres = xor(octetsMessage, cle);
+        const octetsDechiffres = xor(octetsChiffres, cle);
+        const texteDechiffre = new TextDecoder().decode(new Uint8Array(octetsDechiffres));
+
+        document.getElementById('hash-output').innerText = hash;
+        document.getElementById('encrypted-output').innerText = octetsVersHex(octetsChiffres) + '  (illisible sans la clé)';
+        document.getElementById('decrypted-output').innerText = texteDechiffre;
+        document.getElementById('crypto-resultats').style.display = 'block';
+    });
+
+
+    // --- Garde-fou pédagogique : empêche le copier-coller trivial des champs sensibles révélés ---
+    // (Ceci n'est PAS une vraie protection — un clic-droit "Inspecter" contourne ça en 2 secondes.
+    // C'est justement la démonstration : une protection posée uniquement côté client ne protège rien.)
+    document.querySelectorAll('.champ-protege').forEach(function(champ) {
+        champ.addEventListener('copy', function(e) {
+            e.preventDefault();
+            if (e.clipboardData) {
+                e.clipboardData.setData('text/plain', "🔒 Copie bloquée — mais regarde, c'est justement contournable via l'inspecteur !");
+            }
+        });
+        champ.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+        champ.addEventListener('selectstart', function(e) { e.preventDefault(); });
+        champ.addEventListener('dragstart', function(e) { e.preventDefault(); });
+    });
+
+    document.getElementById('lien-mentions').addEventListener('click', function() {
+        document.getElementById('modal-overlay').style.display = 'flex';
+    });
+    document.getElementById('btn-close-modal').addEventListener('click', function() {
+        document.getElementById('modal-overlay').style.display = 'none';
+    });
+    document.getElementById('modal-overlay').addEventListener('click', function(e) {
+        if (e.target === this) this.style.display = 'none';
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Démo : attaque de l'homme du milieu</title>
+<style>
+    :root {
+        --bg: #14161a; --panel: #1c1f25; --panel-2: #22262d; --border: #2e333b;
+        --text: #e7e9ec; --muted: #9aa2ad; --accent: #2f6fed; --accent-hover: #4c84f0;
+        --warn: #e0a63c; --trap: #3ccb7f; --danger: #e0554c;
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; background:var(--bg); color:var(--text);
+        font-family:'Segoe UI','Inter',Arial,sans-serif; display:flex; flex-direction:column; }
+    header { background:var(--panel); border-bottom:1px solid var(--border); padding:14px 20px;
+        font-size:0.95em; letter-spacing:0.03em; color:var(--muted); text-transform:uppercase; text-align:center; }
+    main { flex:1; display:flex; align-items:center; justify-content:center; padding:24px; }
+    .card { background:var(--panel); border:1px solid var(--border); border-radius:10px;
+        padding:28px; width:100%; max-width:640px; }
+    h1 { font-size:1.15em; margin:0 0 6px 0; font-weight:700; text-align:center; }
+    .sous-texte { color:var(--muted); font-size:0.85em; margin-bottom:22px; line-height:1.5; text-align:center; }
+
+    .scene { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:18px; }
+    .colonne { background:var(--panel-2); border:1px solid var(--border); border-radius:8px; padding:14px; }
+    .colonne-titre { font-size:0.8em; color:var(--muted); text-transform:uppercase; letter-spacing:0.03em;
+        margin-bottom:10px; text-align:center; }
+    .bulle { background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:10px 12px;
+        margin-bottom:8px; font-size:0.9em; min-height:20px; }
+    .bulle.toi { border-left:3px solid var(--accent); }
+    .bulle.pote { border-left:3px solid var(--trap); }
+    .fleche-attaque { text-align:center; color:var(--danger); font-size:0.8em; margin:10px 0; display:none; }
+    .mode-toggle { display:flex; align-items:center; gap:10px; background:var(--panel-2);
+        border:1px solid var(--border); border-radius:8px; padding:12px 14px; margin-bottom:16px;
+        font-size:0.85em; cursor:pointer; user-select:none; text-align:left; }
+    .mode-toggle input { width:16px; height:16px; flex-shrink:0; }
+    .mode-toggle.securise { border-color:var(--trap); }
+    .mode-toggle .badge-mode { font-weight:700; }
+    .mode-toggle.securise .badge-mode { color:var(--trap); }
+
+    .attaquant-box { display:none; background:rgba(224,85,76,0.08); border:1px solid var(--danger);
+        border-radius:8px; padding:14px; margin-bottom:18px; }
+    .attaquant-box .colonne-titre { color:var(--danger); }
+    .attaquant-box .bulle { border-left:3px solid var(--danger); }
+    .modif { text-decoration: line-through; color: var(--muted); }
+    .modif-nouveau { color: var(--danger); font-weight:700; }
+
+    .controles { text-align:center; }
+    button.action { background:var(--accent); color:#fff; border:none; padding:12px 22px;
+        border-radius:6px; font-size:0.95em; font-weight:600; cursor:pointer; }
+    button.action:hover { background:var(--accent-hover); }
+    button.action:disabled { opacity:0.4; cursor:default; }
+
+    .hint { margin-top:18px; font-size:0.8em; color:var(--muted); line-height:1.5;
+        background:var(--panel-2); border:1px solid var(--border); border-radius:6px; padding:10px 12px; text-align:center; }
+
+    footer { text-align:center; padding:14px; font-size:0.78em; color:var(--muted);
+        border-top:1px solid var(--border); background:var(--panel); }
+    footer a { color:var(--muted); text-decoration:underline; cursor:pointer; }
+    footer a:hover { color:var(--text); }
+    .footer-flag { display:block; margin-bottom:4px; color:var(--warn); font-weight:600; letter-spacing:0.02em; }
+
+    .correction-box { margin-top:22px; border:1px solid var(--trap); border-radius:8px; overflow:hidden; text-align:left; }
+    .correction-toggle { width:100%; text-align:left; background:rgba(60,203,127,0.08); border:none;
+        color:var(--trap); padding:14px 16px; font-size:0.95em; font-weight:600; cursor:pointer;
+        display:flex; justify-content:space-between; align-items:center; }
+    .correction-content { display:none; padding:16px 18px 20px 18px; font-size:0.88em;
+        line-height:1.6; border-top:1px solid var(--border); }
+    .correction-content h3 { font-size:0.95em; margin:16px 0 6px 0; color:var(--text); }
+    .correction-content h3:first-child { margin-top:0; }
+    .correction-content code { background:var(--panel-2); border:1px solid var(--border);
+        border-radius:4px; padding:1px 6px; }
+
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7);
+        align-items:center; justify-content:center; padding:20px; z-index:100; }
+    .modal-box { background:var(--panel); border:1px solid var(--border); border-radius:10px;
+        padding:26px; max-width:480px; font-size:0.9em; line-height:1.6; }
+    .modal-box h2 { margin-top:0; font-size:1.1em; }
+    .modal-close { margin-top:16px; background:var(--accent); border:none; color:#fff;
+        padding:9px 16px; border-radius:6px; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<header>🕵️ Démo : l'attaque de l'homme du milieu (Man-in-the-Middle)</header>
+
+<main>
+    <div class="card">
+        <h1>Toi et ton pote discutez sur un Wi-Fi public</h1>
+        <div class="sous-texte">Clique sur "Envoyer les messages" pour voir la conversation se dérouler — étape par étape.</div>
+
+        <div class="scene">
+            <div class="colonne">
+                <div class="colonne-titre">💻 Toi</div>
+                <div id="col-toi"></div>
+            </div>
+            <div class="colonne">
+                <div class="colonne-titre">📱 Ton pote</div>
+                <div id="col-pote"></div>
+            </div>
+        </div>
+
+        <div class="attaquant-box" id="attaquant-box">
+            <div class="colonne-titre">🕵️ Ce que voit — et modifie — un attaquant sur le même réseau</div>
+            <div id="col-attaquant"></div>
+        </div>
+
+        <label class="mode-toggle" id="mode-toggle">
+            <input type="checkbox" id="mode-securise">
+            <span>🔒 Activer le <span class="badge-mode" id="badge-mode">chiffrement (comme HTTPS)</span> — rejoue la même interception, chiffrée cette fois</span>
+        </label>
+
+        <div class="controles">
+            <button type="button" class="action" id="btn-jouer">▶ Envoyer les messages</button>
+            <button type="button" class="action" id="btn-rejouer" style="background:var(--panel-2); border:1px solid var(--border); color:var(--text); display:none;">↺ Rejouer</button>
+        </div>
+
+        <div class="hint" id="hint-final" style="display:none;">
+            ⚠️ Ton pote a reçu un message que tu n'as jamais envoyé — et il n'a aucun moyen de le savoir. C'est
+            ça, une attaque de l'homme du milieu.
+        </div>
+
+        <div class="correction-box">
+            <button type="button" class="correction-toggle" id="btn-toggle-correction">
+                <span>🔧 Comment se protéger, pour de vrai ?</span>
+                <span id="correction-chevron">▾</span>
+            </button>
+            <div class="correction-content" id="correction-content">
+                <h3>Le problème</h3>
+                Sur un réseau non chiffré (Wi-Fi public sans protection, ou un site en <code>http://</code> au
+                lieu de <code>https://</code>), les données circulent en clair. Un attaquant positionné entre
+                toi et le serveur — "au milieu" — peut les lire, et même les modifier avant de les transmettre,
+                sans que ni toi ni ton correspondant ne le remarquiez.
+
+                <h3>Ce qui empêche ça sur un vrai site</h3>
+                Le <code>https://</code> (le petit cadenas dans la barre d'adresse) chiffre la connexion de
+                bout en bout : même si l'attaquant intercepte les paquets, il ne voit que du charabia illisible
+                — et surtout, il ne peut pas les modifier sans que ça se voie (le chiffrement inclut une
+                vérification d'intégrité).
+
+                <h3>Les règles à retenir</h3>
+                1. Toujours vérifier le <code>https://</code> et le cadenas avant de faire confiance à un site, surtout sur un réseau public.<br>
+                2. Une messagerie chiffrée de bout en bout (Signal, WhatsApp) protège même si le réseau est compromis.<br>
+                3. Un VPN chiffre tout ton trafic, utile sur un Wi-Fi public non maîtrisé.<br>
+                4. Si un site affiche un avertissement "connexion non sécurisée" ou "certificat invalide", c'est un signal à prendre très au sérieux — ne pas continuer.
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer>
+    <span class="footer-flag">🔒 Page pédagogique — cours de cybersécurité</span>
+    Conversation scénarisée, personne n'est réellement intercepté. <a id="lien-mentions">Mentions légales</a>
+</footer>
+
+<div class="modal-overlay" id="modal-overlay">
+    <div class="modal-box">
+        <h2>Mentions légales</h2>
+        <p>Cette page est une <strong>reconstitution fictive et scénarisée</strong> créée dans le cadre d'un
+        cours de cybersécurité, à des fins pédagogiques uniquement. Aucun message réel n'est envoyé, intercepté
+        ou modifié — toute la conversation est pré-écrite et rejouée localement.</p>
+        <p>Aucune donnée n'est envoyée, transmise, collectée ou conservée par cette page.</p>
+        <button class="modal-close" id="btn-close-modal">Fermer</button>
+    </div>
+</div>
+
+<script>
+    // Toute la "conversation" est pré-écrite en local. Aucune requête réseau, aucun vrai message échangé.
+    // Le "chiffrement" utilisé ci-dessous est du vrai code (SHA-256 + XOR à clé aléatoire), pas une simulation.
+
+    function sha256(message) {
+        function rightRotate(value, amount) { return (value >>> amount) | (value << (32 - amount)); }
+        const K = [
+            0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+            0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+            0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+            0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+            0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+            0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+            0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+            0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2
+        ];
+        let H = [0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+        const utf8 = unescape(encodeURIComponent(message));
+        const bytes = [];
+        for (let i = 0; i < utf8.length; i++) bytes.push(utf8.charCodeAt(i));
+        const bitLen = bytes.length * 8;
+        bytes.push(0x80);
+        while (bytes.length % 64 !== 56) bytes.push(0);
+        for (let i = 7; i >= 0; i--) bytes.push((bitLen / Math.pow(2, i * 8)) & 0xff);
+        for (let chunkStart = 0; chunkStart < bytes.length; chunkStart += 64) {
+            const w = new Array(64).fill(0);
+            for (let i = 0; i < 16; i++) {
+                w[i] = (bytes[chunkStart + i*4] << 24) | (bytes[chunkStart + i*4+1] << 16) |
+                       (bytes[chunkStart + i*4+2] << 8) | (bytes[chunkStart + i*4+3]);
+            }
+            for (let i = 16; i < 64; i++) {
+                const s0 = rightRotate(w[i-15], 7) ^ rightRotate(w[i-15], 18) ^ (w[i-15] >>> 3);
+                const s1 = rightRotate(w[i-2], 17) ^ rightRotate(w[i-2], 19) ^ (w[i-2] >>> 10);
+                w[i] = (w[i-16] + s0 + w[i-7] + s1) | 0;
+            }
+            let [a,b,c,d,e,f,g,h] = H;
+            for (let i = 0; i < 64; i++) {
+                const S1 = rightRotate(e,6) ^ rightRotate(e,11) ^ rightRotate(e,25);
+                const ch = (e & f) ^ (~e & g);
+                const temp1 = (h + S1 + ch + K[i] + w[i]) | 0;
+                const S0 = rightRotate(a,2) ^ rightRotate(a,13) ^ rightRotate(a,22);
+                const maj = (a & b) ^ (a & c) ^ (b & c);
+                const temp2 = (S0 + maj) | 0;
+                h=g; g=f; f=e; e=(d+temp1)|0; d=c; c=b; b=a; a=(temp1+temp2)|0;
+            }
+            H = [H[0]+a, H[1]+b, H[2]+c, H[3]+d, H[4]+e, H[5]+f, H[6]+g, H[7]+h].map(x => x|0);
+        }
+        return H.map(x => (x >>> 0).toString(16).padStart(8, '0')).join('');
+    }
+    function genererCleAleatoire(longueur) {
+        const cle = new Uint8Array(longueur);
+        crypto.getRandomValues(cle);
+        return cle;
+    }
+    function xor(octets, cle) { return octets.map((o, i) => o ^ cle[i % cle.length]); }
+    function octetsVersHex(octets) { return Array.from(octets).map(o => o.toString(16).padStart(2, '0')).join(' '); }
+
+    const SEQUENCE = [
+        { de: 'toi', texte: "Salut, on se retrouve où pour réviser ?" },
+        { de: 'pote', texte: "À la bibliothèque, 14h ça te va ?" },
+        {
+            de: 'toi', texte: "Ok parfait, à 14h !",
+            interception: { original: "Ok parfait, à 14h !", modifie: "Ok parfait, à 16h !" }
+        }
+    ];
+
+    let etape = 0;
+    let enCours = false;
+
+    function ajouterBulle(colonneId, classe, texte) {
+        const div = document.createElement('div');
+        div.className = 'bulle ' + classe;
+        div.innerText = texte;
+        document.getElementById(colonneId).appendChild(div);
+    }
+
+    function jouerEtapeChiffree(msg) {
+        document.getElementById('attaquant-box').style.display = 'block';
+
+        // Chiffrement réel du message avec une clé aléatoire (comme une session TLS) + empreinte d'intégrité
+        const octetsMessage = Array.from(new TextEncoder().encode(msg.texte));
+        const cle = genererCleAleatoire(octetsMessage.length);
+        const octetsChiffres = xor(octetsMessage, cle);
+        const empreinteOriginale = sha256(msg.texte);
+
+        const divAttaquant = document.createElement('div');
+        divAttaquant.className = 'bulle';
+        divAttaquant.innerHTML = `🔒 <span style="word-break:break-all;">${octetsVersHex(octetsChiffres)}</span><br><span style="color:var(--muted); font-size:0.85em;">(illisible sans la clé — l'attaquant modifie des octets au hasard)</span>`;
+        document.getElementById('col-attaquant').appendChild(divAttaquant);
+
+        ajouterBulle('col-toi', 'toi', msg.texte);
+
+        setTimeout(() => {
+            // L'attaquant ne peut pas lire le message : il modifie des octets du chiffré à l'aveugle.
+            const octetsAlteres = octetsChiffres.slice();
+            octetsAlteres[0] = octetsAlteres[0] ^ 0xff;
+            octetsAlteres[Math.floor(octetsAlteres.length / 2)] ^= 0xff;
+
+            // Ton pote déchiffre avec la vraie clé, puis vérifie l'empreinte d'intégrité.
+            const octetsDechiffres = xor(octetsAlteres, cle);
+            let texteDechiffre;
+            try { texteDechiffre = new TextDecoder('utf-8', { fatal: true }).decode(new Uint8Array(octetsDechiffres)); }
+            catch (e) { texteDechiffre = null; }
+            const empreinteObtenue = texteDechiffre !== null ? sha256(texteDechiffre) : null;
+            const integriteOk = (empreinteObtenue === empreinteOriginale);
+
+            if (integriteOk) {
+                // (n'arrive normalement jamais avec une vraie modification, gardé par sécurité)
+                ajouterBulle('col-pote', 'toi', texteDechiffre);
+            } else {
+                const div = document.createElement('div');
+                div.className = 'bulle';
+                div.style.borderLeftColor = 'var(--trap)';
+                div.innerHTML = `⚠️ <strong>Message rejeté</strong> — intégrité invalide détectée, la falsification a été bloquée automatiquement.`;
+                document.getElementById('col-pote').appendChild(div);
+            }
+            etape++;
+            setTimeout(jouerEtape, 900);
+        }, 900);
+    }
+
+    function jouerEtape() {
+        if (etape >= SEQUENCE.length) {
+            document.getElementById('hint-final').style.display = 'block';
+            document.getElementById('hint-final').innerText = document.getElementById('mode-securise').checked
+                ? "✅ Cette fois, l'attaquant n'a rien pu lire ni modifier sans être détecté : c'est exactement ce que fait le chiffrement HTTPS."
+                : "⚠️ Ton pote a reçu un message que tu n'as jamais envoyé — et il n'a aucun moyen de le savoir. C'est ça, une attaque de l'homme du milieu.";
+            document.getElementById('btn-jouer').style.display = 'none';
+            document.getElementById('btn-rejouer').style.display = 'inline-block';
+            enCours = false;
+            return;
+        }
+        const msg = SEQUENCE[etape];
+        const modeSecurise = document.getElementById('mode-securise').checked;
+
+        if (msg.interception && modeSecurise) {
+            jouerEtapeChiffree(msg);
+        } else if (msg.interception) {
+            document.getElementById('attaquant-box').style.display = 'block';
+            const div = document.createElement('div');
+            div.className = 'bulle';
+            div.innerHTML = `<span class="modif">${msg.interception.original}</span><br><span class="modif-nouveau">→ ${msg.interception.modifie}</span>`;
+            document.getElementById('col-attaquant').appendChild(div);
+
+            // Toi vois ce que tu as vraiment envoyé...
+            ajouterBulle('col-toi', 'toi', msg.texte);
+            // ...mais ton pote reçoit la version modifiée par l'attaquant
+            setTimeout(() => {
+                ajouterBulle('col-pote', 'toi', msg.interception.modifie + ' 🚩');
+                etape++;
+                setTimeout(jouerEtape, 900);
+            }, 700);
+        } else if (msg.de === 'toi') {
+            ajouterBulle('col-toi', 'toi', msg.texte);
+            setTimeout(() => { ajouterBulle('col-pote', 'toi', msg.texte); etape++; setTimeout(jouerEtape, 900); }, 500);
+        } else {
+            ajouterBulle('col-pote', 'pote', msg.texte);
+            setTimeout(() => { ajouterBulle('col-toi', 'pote', msg.texte); etape++; setTimeout(jouerEtape, 900); }, 500);
+        }
+    }
+
+    document.getElementById('mode-securise').addEventListener('change', function() {
+        document.getElementById('mode-toggle').classList.toggle('securise', this.checked);
+        document.getElementById('badge-mode').innerText = this.checked ? 'chiffrement (comme HTTPS) — ACTIVÉ' : 'chiffrement (comme HTTPS)';
+    });
+
+    document.getElementById('btn-jouer').addEventListener('click', function() {
+        if (enCours) return;
+        enCours = true;
+        this.disabled = true;
+        document.getElementById('mode-securise').disabled = true;
+        jouerEtape();
+    });
+
+    document.getElementById('btn-rejouer').addEventListener('click', function() {
+        etape = 0;
+        enCours = false;
+        document.getElementById('col-toi').innerHTML = '';
+        document.getElementById('col-pote').innerHTML = '';
+        document.getElementById('col-attaquant').innerHTML = '';
+        document.getElementById('attaquant-box').style.display = 'none';
+        document.getElementById('hint-final').style.display = 'none';
+        document.getElementById('btn-jouer').disabled = false;
+        document.getElementById('btn-jouer').style.display = 'inline-block';
+        document.getElementById('btn-rejouer').style.display = 'none';
+        document.getElementById('mode-securise').disabled = false;
+    });
+
+    document.getElementById('btn-toggle-correction').addEventListener('click', function() {
+        const contenu = document.getElementById('correction-content');
+        const ouvert = contenu.style.display === 'block';
+        contenu.style.display = ouvert ? 'none' : 'block';
+        document.getElementById('correction-chevron').innerText = ouvert ? '▾' : '▴';
+    });
+
+    document.getElementById('lien-mentions').addEventListener('click', function() {
+        document.getElementById('modal-overlay').style.display = 'flex';
+    });
+    document.getElementById('btn-close-modal').addEventListener('click', function() {
+        document.getElementById('modal-overlay').style.display = 'none';
+    });
+    document.getElementById('modal-overlay').addEventListener('click', function(e) {
+        if (e.target === this) this.style.display = 'none';
+    });
+</script>
+
+</body>
+</html>
