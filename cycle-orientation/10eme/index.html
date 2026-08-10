@@ -4,27 +4,59 @@
     <meta charset="UTF-8">
     <title>10ème - Cycle d'Orientation</title>
     <style>
+        /* STYLE DE BASE - NE PAS MODIFIER */
         body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; background-color: #f4f4f9; }
         .hidden { display: none; }
-        .btn { display: inline-block; padding: 15px 30px; margin: 15px; background-color: #28a745; color: white; text-decoration: none; border-radius: 5px; font-size: 18px; }
+        .btn { display: inline-block; padding: 15px 30px; margin: 15px; background-color: #28a745; color: white; text-decoration: none; border-radius: 5px; font-size: 18px; position: relative; z-index: 10; }
         .btn:hover { background-color: #218838; }
-        #login-box { margin-top: 100px; }
+        #login-box { margin-top: 100px; position: relative; z-index: 10; }
         input { padding: 10px; font-size: 16px; }
         button { padding: 10px 20px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+
+        /* NOUVEAU STYLE POUR L'ANIMATION MATRIX */
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background-color: black;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        #login-box h2, #content h1, #content p {
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        #content {
+            position: relative;
+            z-index: 10;
+        }
     </style>
 </head>
 <body>
+
+    <!-- Animation Matrix -->
+    <canvas id="matrixCanvas"></canvas>
 
     <!-- BOITE DE CONNEXION PAR MOT DE PASSE -->
     <div id="login-box">
         <h2>Espace 10ème - Entrez le mot de passe</h2>
         <input type="password" id="password" placeholder="Mot de passe...">
         <button onclick="verifierMotDePasse()">Valider</button>
-        <p id="erreur" style="color: red;"></p>
+        <p id="erreur" style="color: #ff6b6b;"></p>
     </div>
 
     <!-- CONTENU DU NIVEAU (Masqué par défaut) -->
-    <div id="content" class="hidden">
+    <div id="content" class="hidden" style="margin-top: 50px;">
         <h1>Espace Élèves - 10ème</h1>
         <p>Choisissez votre ressource :</p>
         
@@ -34,12 +66,55 @@
             <a class="btn" href="classeur.html">Classeur</a>
             <a class="btn" href="jeux.html">Jeux</a>
         </div>
-        <p style="margin-top: 50px;"><a href="../../index.html">⬅ Retour à l'accueil général</a></p>
+        <p style="margin-top: 50px;"><a href="../../index.html" style="color: #007bff;">⬅ Retour à l'accueil général</a></p>
     </div>
 
+    <!-- Script pour l'animation Matrix en Bleu Normal -->
     <script>
+        const canvas = document.getElementById('matrixCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        const katakana = 'アァカサタナハマヤラワガザダバパイィキシチニヒミリヲギジヂビピウゥクスツヌフムユルグズブプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨロヲゴゾドボポヴッン';
+        const latin = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        const nums = '0123456789';
+        const alphabet = katakana + nums;
+
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+
+        const drops = [];
+        for (let x = 0; x < columns; x++) {
+            drops[x] = 1;
+        }
+
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#007bff'; // Bleu normal
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(draw, 30);
+
         function verifierMotDePasse() {
-            // METTEZ LE MOT DE PASSE DE LA 10ÈME ICI :
             var mdpCorrect = "motdepasse10"; 
             
             var saisi = document.getElementById("password").value;
