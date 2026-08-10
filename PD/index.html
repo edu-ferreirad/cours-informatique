@@ -44,6 +44,32 @@
             color: #ffffff;
             text-shadow: 0 0 8px #ff5500, 0 0 15px #ff5500;
         }
+        .btn-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .btn-jdr {
+            display: inline-block;
+            background: rgba(255, 85, 0, 0.15);
+            color: #ffaa00;
+            border: 1px solid #ff5500;
+            padding: 12px 25px;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            font-size: 1.1em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(255, 85, 0, 0.2);
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-jdr:hover {
+            background: #ff5500;
+            color: #090500;
+            box-shadow: 0 0 15px #ff5500, 0 0 25px #ff3300;
+            text-shadow: none;
+        }
     </style>
 </head>
 <body>
@@ -52,9 +78,13 @@
         <h1>// ACCÈS INDEX</h1>
         
         <ul>
-            <li>📄 <a href="Brochure conseils avec sources-VF4neutre.pdf">Premier_Fichier.ext</a></li>
-            <li>📄 <a href="Présentation_à_faire pour_formation_en_ligne.pdf">Second_Fichier.ext</a></li>
+            <li>📄 <a href="Brochure conseils avec sources-VF4neutre.pdf">Brochure de conseils (Neutre)</a></li>
+            <li>📄 <a href="Présentation_à_faire pour_formation_en_ligne.pdf">Présentation formation en ligne</a></li>
         </ul>
+
+        <div class="btn-container">
+            <a href="chemin/vers/jeu_de_role.html" class="btn-jdr">Lancer le Jeu de Rôle &gt;</a>
+        </div>
     </div>
 
 </body>
