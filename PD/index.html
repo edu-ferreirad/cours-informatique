@@ -10,6 +10,16 @@
             font-family: 'Courier New', Courier, monospace;
             padding: 40px;
             margin: 0;
+            overflow-x: hidden;
+        }
+        /* Canvas pour la pluie Matrix orange */
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
         }
         h1 {
             text-align: center;
@@ -26,6 +36,8 @@
             box-shadow: 0 0 20px rgba(255, 85, 0, 0.3);
             padding: 30px;
             border-radius: 4px;
+            position: relative;
+            z-index: 1;
         }
         ul {
             list-style-type: none;
@@ -74,6 +86,8 @@
 </head>
 <body>
 
+    <canvas id="matrix"></canvas>
+
     <div class="container">
         <h1>// ACCÈS INDEX</h1>
         
@@ -87,5 +101,45 @@
         </div>
     </div>
 
+    <script>
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const characters = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ<>/\\{}[]*&é"\'(-)=+';
+        const fontSize = 16;
+        let columns = canvas.width / fontSize;
+        let drops = [];
+
+        for (let i = 0; i < columns; i++) {
+            drops[i] = 1;
+        }
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(9, 5, 0, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#ff7700';
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = characters.charAt(Math.floor(Math.random() * characters.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawMatrix, 50);
+    </script>
 </body>
 </html>
