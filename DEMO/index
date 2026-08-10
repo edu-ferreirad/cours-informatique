@@ -1,1 +1,189 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Démonstrations en cybersécurité</title>
+    <style>
+        /* STYLE DE BASE */
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; background-color: #f4f4f9; }
+        .hidden { display: none; }
+        
+        /* Style des boutons de démonstration (flex pour une belle grille alignée) */
+        .grid-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            max-width: 1200px;
+            margin: 30px auto;
+            position: relative;
+            z-index: 10;
+        }
+        .btn { 
+            display: inline-block; 
+            padding: 12px 20px; 
+            background-color: #ff1493; /* Rose vif */
+            color: white; 
+            text-decoration: none; 
+            border-radius: 5px; 
+            font-size: 16px; 
+            position: relative; 
+            z-index: 10; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: background-color 0.2s;
+        }
+        .btn:hover { background-color: #d1107a; } /* Rose un peu plus foncé au survol */
+        
+        #login-box { margin-top: 100px; position: relative; z-index: 10; }
+        input { padding: 10px; font-size: 16px; }
+        button { padding: 10px 20px; font-size: 16px; background-color: #ff1493; color: white; border: none; border-radius: 5px; cursor: pointer; }
 
+        /* NOUVEAU STYLE POUR L'ANIMATION MATRIX EN ROSE */
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background-color: black;
+            overflow-x: hidden;
+        }
+
+        canvas {
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        #login-box h2, #content h1, #content p {
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            position: relative;
+            z-index: 10;
+        }
+        #content {
+            position: relative;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Animation Matrix -->
+    <canvas id="matrixCanvas"></canvas>
+
+    <!-- BOITE DE CONNEXION PAR MOT DE PASSE (Optionnel, modifiable si besoin) -->
+    <div id="login-box">
+        <h2>Démonstrations en cybersécurité - Entrez le mot de passe</h2>
+        <input type="password" id="password" placeholder="Mot de passe...">
+        <button onclick="verifierMotDePasse()">Valider</button>
+        <p id="erreur" style="color: #ff6b6b; position: relative; z-index: 10;"></p>
+    </div>
+
+    <!-- CONTENU DU NIVEAU (Masqué par défaut derrière le mot de passe) -->
+    <div id="content" class="hidden" style="margin-top: 30px;">
+        <h1>Démonstrations en cybersécurité</h1>
+        <p>Sélectionnez une démonstration ou un piège à tester :</p>
+        
+        <div class="grid-container">
+            <a class="btn" href="DEMO_2FA.html">DEMO 2FA</a>
+            <a class="btn" href="DEMO_ATTAQUE_DICTIONNAIRE.html">Attaque Dictionnaire</a>
+            <a class="btn" href="DEMO_CLE_USB_TROUVEE.html">Clé USB Trouvée</a>
+            <a class="btn" href="DEMO_CLICKFIX.html">Clickfix</a>
+            <a class="btn" href="DEMO_DNS_EMPOISONNE.html">DNS Empoisonné</a>
+            <a class="btn" href="DEMO_EXTENSION_MALVEILLANTE.html">Extension Malveillante</a>
+            <a class="btn" href="DEMO_FAUSSE_APP.html">Fausse App</a>
+            <a class="btn" href="DEMO_FAUSSE_MAJ.html">Fausse MAJ</a>
+            <a class="btn" href="DEMO_FAUSSE_OFFRE_EMPLOI.html">Fausse Offre d'Emploi</a>
+            <a class="btn" href="DEMO_FAUX_SONDAGE.html">Faux Sondage</a>
+            <a class="btn" href="DEMO_FORCE_BRUTE.html">Force Brute</a>
+            <a class="btn" href="DEMO_FRAUDE_RIB.html">Fraude RIB</a>
+            <a class="btn" href="DEMO_HOMOGLYPHES.html">Homoglyphes</a>
+            <a class="btn" href="DEMO_INGENIERIE_SOCIALE.html">Ingénierie Sociale</a>
+            <a class="btn" href="DEMO_INJECTION_SQL.html">Injection SQL</a>
+            <a class="btn" href="DEMO_JUICE_JACKING.html">Juice Jacking</a>
+            <a class="btn" href="DEMO_MALVERTISING.html">Malvertising</a>
+            <a class="btn" href="DEMO_MAN_IN_THE_MIDDLE.html">Man in the Middle</a>
+            <a class="btn" href="DEMO_METADONNEES_EXIF.html">Métadonnées EXIF</a>
+            <a class="btn" href="DEMO_PHOTO_RETOUCHEE.html">Photo Retouchée</a>
+            <a class="btn" href="DEMO_QR_PIEGE.html">QR Piège</a>
+            <a class="btn" href="DEMO_RANSOMWARE.html">Ransomware</a>
+            <a class="btn" href="DEMO_ROOTKIT.html">Rootkit</a>
+            <a class="btn" href="DEMO_SPOOFING_EMAIL.html">Spoofing Email</a>
+            <a class="btn" href="DEMO_SUPPLY_CHAIN.html">Supply Chain</a>
+            <a class="btn" href="DEMO_SURPARTAGE_RESEAUX.html">Surpartage Réseaux</a>
+            <a class="btn" href="DEMO_VOIX_CLONEE.html">Voix Clonée</a>
+            <a class="btn" href="DEMO_WARDRIVING.html">Wardriving</a>
+            <a class="btn" href="JEU_REPERE_URL.html">Jeu Repère URL</a>
+            <a class="btn" href="LIEN_DEMASQUE.html">Lien Démasqué</a>
+            <a class="btn" href="PIEGE_CONSOLE_XSS.html">Piège Console XSS</a>
+            <a class="btn" href="PIEGE_FAUX_ANTIVIRUS.html">Faux Antivirus</a>
+            <a class="btn" href="PIEGE_PEDAGOGIQUE.html">Piège Pédagogique</a>
+            <a class="btn" href="PIEGE_WIFI_CAPTIF.html">Piège Wifi Captif</a>
+            <a class="btn" href="TESTEUR_MOT_DE_PASSE.html">Testeur Mot de Passe</a>
+        </div>
+
+        <p style="margin: 40px 0;"><a href="../../index.html" style="color: #ff69b4;">⬅ Retour à l'accueil général</a></p>
+    </div>
+
+    <!-- Script pour l'animation Matrix en Rose -->
+    <script>
+        const canvas = document.getElementById('matrixCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        const katakana = 'アァカサタナハマヤラワガザダバパイィキシチニヒミリヲギジヂビピウゥクスツヌフムユルグズブプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨロヲゴゾドボポヴッン';
+        const latin = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        const nums = '0123456789';
+        const alphabet = katakana + nums;
+
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+
+        const drops = [];
+        for (let x = 0; x < columns; x++) {
+            drops[x] = 1;
+        }
+
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#ff1493'; // Rose Matrix
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(draw, 30);
+
+        function verifierMotDePasse() {
+            var mdpCorrect = "cyber"; // Modifie le mot de passe ici si tu en veux un
+            
+            var saisi = document.getElementById("password").value;
+            if (saisi === mdpCorrect) {
+                document.getElementById("login-box").style.display = "none";
+                document.getElementById("content").classList.remove("hidden");
+            } else {
+                document.getElementById("erreur").innerText = "Mot de passe incorrect !";
+            }
+        }
+    </script>
+</body>
+</html>
