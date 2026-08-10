@@ -1,1 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>10ème - Cycle d'Orientation</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; background-color: #f4f4f9; }
+        .hidden { display: none; }
+        .btn { display: inline-block; padding: 15px 30px; margin: 15px; background-color: #28a745; color: white; text-decoration: none; border-radius: 5px; font-size: 18px; }
+        .btn:hover { background-color: #218838; }
+        #login-box { margin-top: 100px; }
+        input { padding: 10px; font-size: 16px; }
+        button { padding: 10px 20px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
 
+    <!-- BOITE DE CONNEXION PAR MOT DE PASSE -->
+    <div id="login-box">
+        <h2>Espace 10ème - Entrez le mot de passe</h2>
+        <input type="password" id="password" placeholder="Mot de passe...">
+        <button onclick="verifierMotDePasse()">Valider</button>
+        <p id="erreur" style="color: red;"></p>
+    </div>
+
+    <!-- CONTENU DU NIVEAU (Masqué par défaut) -->
+    <div id="content" class="hidden">
+        <h1>Espace Élèves - 10ème</h1>
+        <p>Choisissez votre ressource :</p>
+        
+        <div>
+            <a class="btn" href="cours.html">Cours</a>
+            <a class="btn" href="examens.html">Examens</a>
+            <a class="btn" href="classeur.html">Classeur</a>
+            <a class="btn" href="jeux.html">Jeux</a>
+        </div>
+        <p style="margin-top: 50px;"><a href="../../index.html">⬅ Retour à l'accueil général</a></p>
+    </div>
+
+    <script>
+        function verifierMotDePasse() {
+            // METTEZ LE MOT DE PASSE DE LA 10ÈME ICI :
+            var mdpCorrect = "motdepasse10"; 
+            
+            var saisi = document.getElementById("password").value;
+            if (saisi === mdpCorrect) {
+                document.getElementById("login-box").style.display = "none";
+                document.getElementById("content").classList.remove("hidden");
+            } else {
+                document.getElementById("erreur").innerText = "Mot de passe incorrect !";
+            }
+        }
+    </script>
+</body>
+</html>
