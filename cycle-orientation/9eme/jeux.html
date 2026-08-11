@@ -27,19 +27,49 @@
             color: #ffffff;
             text-shadow: 0 0 10px #00bfff, 0 0 20px #0044ff;
         }
-        .game-link {
-            display: block;
-            margin: 15px auto;
-            color: #00ffff;
-            text-decoration: underline;
-            font-size: 16px;
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
             position: relative;
             z-index: 10;
+            padding-bottom: 50px;
+        }
+        .game-card {
+            background: rgba(5, 15, 35, 0.85);
+            border: 1px solid #00ffff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+            border-radius: 8px;
+            margin: 25px auto;
+            padding: 20px;
+            width: 90%;
+        }
+        .game-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #00ffff;
+            margin-bottom: 15px;
             text-shadow: 0 0 5px #00bfff;
         }
-        .game-link:hover {
+        .game-title a {
+            color: #00ffff;
+            text-decoration: none;
+        }
+        .game-title a:hover {
             color: #ffffff;
-            text-shadow: 0 0 8px #00ffff, 0 0 15px #00ffff;
+            text-decoration: underline;
+        }
+        .iframe-container {
+            width: 100%;
+            height: 450px;
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1px solid #0044ff;
+            background: #000;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
         }
         .back-btn {
             display: inline-block;
@@ -56,17 +86,52 @@
 <body>
     <canvas id="matrix"></canvas>
 
-    <h1>Espace Jeux - 9ème</h1>
-    <p><a class="back-btn" href="index.html">⬅ Retour au menu 9ème</a></p>
+    <div class="container">
+        <h1>Espace Jeux - 9ème</h1>
+        <p><a class="back-btn" href="index.html">⬅ Retour au menu 9ème</a></p>
 
-    <p>Cliquez sur l'activité de votre choix :</p>
+        <p>Prévisualisation des activités :</p>
 
-    <!-- Remplacez les liens par les adresses de vos choix -->
-    <a class="game-link" href="https://learningapps.org/watch?v=pde90hqct25" target="_blank">Mes jeux</a>
-    <a class="game-link" href="https://www.educlasse.ch/cycle-3/9e" target="_blank">Educlasse</a>
-    <a class="game-link" href="https://opendata.geneve.ch/www/medias/chasse_aux_oeufs_virtuelle/" target="_blank">Chasse aux oeufs</a>
-    <a class="game-link" href="https://www.dactylocours.com/test.php" target="_blank">Dactylo</a>
-    <a class="game-link" href="https://studio.code.org/fr/courses/courseb-2025/units/1/lessons/4/levels/2?lang=fr-FR" target="_blank">Studio.org</a>
+        <!-- 1. Mes jeux -->
+        <div class="game-card">
+            <div class="game-title">🎮 <a href="https://learningapps.org/watch?v=pde90hqct25" target="_blank">Mes jeux (LearningApps)</a></div>
+            <div class="iframe-container">
+                <iframe src="https://learningapps.org/watch?v=pde90hqct25"></iframe>
+            </div>
+        </div>
+
+        <!-- 2. Educlasse -->
+        <div class="game-card">
+            <div class="game-title">🕹️ <a href="https://www.educlasse.ch/cycle-3/9e" target="_blank">Educlasse</a></div>
+            <div class="iframe-container">
+                <iframe src="https://www.educlasse.ch/cycle-3/9e"></iframe>
+            </div>
+        </div>
+
+        <!-- 3. Chasse aux oeufs -->
+        <div class="game-card">
+            <div class="game-title">🥚 <a href="https://opendata.geneve.ch/www/medias/chasse_aux_oeufs_virtuelle/" target="_blank">Chasse aux oeufs</a></div>
+            <div class="iframe-container">
+                <iframe src="https://opendata.geneve.ch/www/medias/chasse_aux_oeufs_virtuelle/"></iframe>
+            </div>
+        </div>
+
+        <!-- 4. Dactylo -->
+        <div class="game-card">
+            <div class="game-title">⌨️ <a href="https://www.dactylocours.com/test.php" target="_blank">Dactylo</a></div>
+            <div class="iframe-container">
+                <iframe src="https://www.dactylocours.com/test.php"></iframe>
+            </div>
+        </div>
+
+        <!-- 5. Studio.org -->
+        <div class="game-card">
+            <div class="game-title">💻 <a href="https://studio.code.org/fr/courses/courseb-2025/units/1/lessons/4/levels/2?lang=fr-FR" target="_blank">Studio.org</a></div>
+            <div class="iframe-container">
+                <iframe src="https://studio.code.org/fr/courses/courseb-2025/units/1/lessons/4/levels/2?lang=fr-FR"></iframe>
+            </div>
+        </div>
+    </div>
 
     <script>
         const canvas = document.getElementById('matrix');
