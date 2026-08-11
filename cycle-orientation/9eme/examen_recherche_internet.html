@@ -1,1 +1,341 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Examen - Recherche Internet</title>
+    <style>
+        body {
+            background-color: #050914;
+            color: #00ffff;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding-top: 30px;
+            overflow-x: hidden;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        .container {
+            max-width: 650px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+            background: rgba(5, 15, 35, 0.85);
+            border: 1px solid #00ffff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 30px;
+        }
+        h1, p, label, h2 {
+            color: #ffffff;
+            text-shadow: 0 0 10px #00bfff, 0 0 20px #0044ff;
+        }
+        input[type="text"], input[type="password"] {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            background: #000;
+            border: 1px solid #00ffff;
+            color: #00ffff;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 1em;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 15px;
+            box-shadow: 0 0 10px #007bff;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .hidden {
+            display: none;
+        }
+        .question-box {
+            text-align: left;
+            margin-top: 20px;
+        }
+        .score-box {
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+        
+        /* Style d'impression (PDF) */
+        @media print {
+            body {
+                background: white !important;
+                color: black !important;
+                padding: 0;
+            }
+            canvas, .btn, #matrix {
+                display: none !important;
+            }
+            .container {
+                background: white !important;
+                border: none !important;
+                box-shadow: none !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 0;
+            }
+            h1, p, label, h2, span {
+                color: black !important;
+                text-shadow: none !important;
+            }
+            .print-report {
+                text-align: left;
+                font-size: 0.95em;
+                margin-top: 20px;
+            }
+            .print-item {
+                margin-bottom: 15px;
+                padding-bottom: 10px;
+                border-bottom: 1px solid #ccc;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix"></canvas>
 
+    <div class="container" id="app-container">
+        <h1>Examen - Recherche Internet</h1>
+
+        <!-- ÉTAPE 1 : Identification et Mot de passe -->
+        <div id="step-login">
+            <p>Veuillez entrer vos informations pour commencer :</p>
+            <input type="password" id="exam-password" placeholder="Mot de passe professeur"><br>
+            <input type="text" id="student-nom" placeholder="Nom"><br>
+            <input type="text" id="student-prenom" placeholder="Prénom"><br>
+            <input type="text" id="student-classe" placeholder="Classe"><br><br>
+            <button class="btn" onclick="startExam()">Commencer l'examen</button>
+            <p id="login-error" style="color: #ff4444;"></p>
+        </div>
+
+        <!-- ÉTAPE 2 : Questionnaire (Une question à la fois) -->
+        <div id="step-quiz" class="hidden">
+            <p id="progress-indicator" style="font-size: 0.9em; color: #00bfff;"></p>
+            <div class="question-box">
+                <p id="question-text" style="font-weight: bold; font-size: 1.1em;"></p>
+                <input type="text" id="student-answer" placeholder="Votre réponse..." style="width: 100%;">
+            </div>
+            <button class="btn" onclick="nextQuestion()">Valider et continuer</button>
+        </div>
+
+        <!-- ÉTAPE 3 : Résultat -->
+        <div id="step-result" class="hidden">
+            <h2>Examen terminé !</h2>
+            <p>Merci <strong><span id="res-prenom"></span> <span id="res-nom"></span></strong> (<span id="res-classe"></span>).</p>
+            <div class="score-box">
+                <span>Note : </span>
+                <span id="hidden-score" class="hidden" style="color: #00ff00; font-weight: bold; font-size: 1.3em;"></span>
+                <button class="btn" id="eye-btn" onclick="toggleScore()">👁️ Afficher la note</button>
+            </div>
+            <br><br>
+            <button class="btn" onclick="window.print()" style="background-color: #28a745;">🖨️ Imprimer / Sauvegarder en PDF</button>
+            <br><br>
+            <a class="btn" href="examens.html" style="background-color: #6c757d;">⬅ Retour aux examens</a>
+
+            <!-- Rapport détaillé caché pour l'affichage écran normal, visible à l'impression -->
+            <div id="print-report" class="print-report hidden"></div>
+        </div>
+    </div>
+
+    <script>
+        const allQuestions = [
+            { q: "Nom de famille de Molière?", a: "Poquelin" },
+            { q: "Qui a inventé les cartons jaunes et rouges au football? (prénom et nom)", a: "Ken Aston" },
+            { q: "Si le nombre d'Or s'écrit 1,618 à 3 décimales, trouve le nombre e à 3 décimales également:", a: "2,718" },
+            { q: "Quel est le véritable nom de famille de Madonna?", a: "Ciccone" },
+            { q: "Quel est le nom de famille du 3e homme qui a posé le pied sur la lune?", a: "Conrad" },
+            { q: "En quelle année a débuté la construction de la Tour Eiffel?", a: "1887" },
+            { q: "Quelle est la signification du verbe gelukwensen en Néerlandais?", a: "féliciter" },
+            { q: "Comment se nomme la fontaine située devant le musée jurassien ?", a: "La fontaine du...sauvage" },
+            { q: "Mais que diable allait-il faire dans cette galère? est une phrase célèbre d'une pièce de théâtre du XVIIe. Qui en est l'auteur?", a: "Molière" },
+            { q: "En quelle année eut lieu l exposition universelle au cours de laquelle l Atomium fut le monument majeur?", a: "1958" },
+            { q: "En quelle année s'est terminée la construction de la Tour Eiffel?", a: "1889" },
+            { q: "La famille Bernoulli est une famille de mathématiciens: quel est le prénom (en français) de l'auteur de la Lemniscate.", a: "Jacques" },
+            { q: "Quel est le véritable nom de famille de Mylène Farmer ?", a: "Gautier" },
+            { q: "En code morse, quel est le code de la lettre f?", a: "..-." },
+            { q: "Combien y a-t-il de pays en Amérique du Sud actuellement?", a: "12" },
+            { q: "Quelle est l'altitude en mètres du Cervin?", a: "4478" },
+            { q: "Combien de faces a un icosaèdre?", a: "20" },
+            { q: "Quel est le nom du hautbois breton ?", a: "bombarde" },
+            { q: "Quelle est la plus haute capitale du monde?", a: "La Paz" },
+            { q: "A quel embranchement appartient l'hydre?", a: "cnidaires" },
+            { q: "Quel est le nom du plus haut sommet d'Afrique?", a: "Kilimandjaro" },
+            { q: "Quelle montagne est appelée en anglais la \"pyramide suisse\"?", a: "Niesen" },
+            { q: "Les tiques sont des invertébrés de la classe des ...", a: "arachnides" },
+            { q: "La famille Bernoulli est une famille de mathématiciens: quel est le prénom du spécialiste en hydrodynamique et qui travailla longtemps avec Euler.", a: "Daniel" },
+            { q: "Etat américain qui comporte 4 lettres A. Entre chaque A, il y a toujours une seule autre lettre.", a: "Alabama" },
+            { q: "Quel est le nom du fleuve que Jules César a franchi en prononçant une phrase célèbre? César savait en franchissant ce fleuve qu'il ne pourrait pas faire marche arrière.", a: "Rubicon" },
+            { q: "A quelle date de notre calendrier correspond le 11 vendémiaire de l'an II?", a: "02/10/1793" },
+            { q: "Comment dit-on écrire en Néerlandais?", a: "schrijven" },
+            { q: "Quel est le nom de l'île sur laquelle Gulliver débarque, et qui est occupée par des petits personnages de 15 cm de haut.", a: "Lilliput" },
+            { q: "En 1826, les frères Quiquerez, Olivier Seuret et un quatrième personnage prêtent serment dans les ruines d'un château. Comment s'appelle le 4e personnage? (prénom nom)", a: "Xavier Stockmar" },
+            { q: "Comment se nommait le 4e président des USA?", a: "James Madison" }
+        ];
+
+        let selectedQuestions = [];
+        let currentIndex = 0;
+        let scoreNote = 6.0;
+        let studentData = {};
+        let examResults = []; // Stockage des réponses de l'élève
+
+        function startExam() {
+            const pwd = document.getElementById('exam-password').value;
+            const nom = document.getElementById('student-nom').value.trim();
+            const prenom = document.getElementById('student-prenom').value.trim();
+            const classe = document.getElementById('student-classe').value.trim();
+
+            if (pwd !== "prof123") {
+                document.getElementById('login-error').innerText = "Mot de passe incorrect.";
+                return;
+            }
+            if (!nom || !prenom || !classe) {
+                document.getElementById('login-error').innerText = "Veuillez remplir tous les champs.";
+                return;
+            }
+
+            studentData = { nom, prenom, classe };
+
+            let shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
+            selectedQuestions = shuffled.slice(0, 10);
+
+            document.getElementById('step-login').classList.add('hidden');
+            document.getElementById('step-quiz').classList.remove('hidden');
+
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            document.getElementById('progress-indicator').innerText = `Question ${currentIndex + 1} / 10`;
+            document.getElementById('question-text').innerText = selectedQuestions[currentIndex].q;
+            document.getElementById('student-answer').value = "";
+        }
+
+        function nextQuestion() {
+            const userAnswer = document.getElementById('student-answer').value.trim();
+            const correctAnswer = selectedQuestions[currentIndex].a.trim();
+
+            // Enregistrement de la réponse
+            examResults.push({
+                question: selectedQuestions[currentIndex].q,
+                userAnswer: userAnswer || "(Aucune réponse)",
+                correctAnswer: correctAnswer,
+                isCorrect: userAnswer.toLowerCase() === correctAnswer.toLowerCase()
+            });
+
+            if (userAnswer.toLowerCase() !== correctAnswer.toLowerCase()) {
+                scoreNote -= 0.5;
+                if (scoreNote < 1.0) scoreNote = 1.0;
+            }
+
+            currentIndex++;
+
+            if (currentIndex < 10) {
+                loadQuestion();
+            } else {
+                finishExam();
+            }
+        }
+
+        function finishExam() {
+            document.getElementById('step-quiz').classList.add('hidden');
+            document.getElementById('step-result').classList.remove('hidden');
+
+            document.getElementById('res-nom').innerText = studentData.nom;
+            document.getElementById('res-prenom').innerText = studentData.prenom;
+            document.getElementById('res-classe').innerText = studentData.classe;
+            document.getElementById('hidden-score').innerText = scoreNote.toFixed(1);
+
+            // Génération du rapport détaillé pour l'impression PDF
+            let reportHTML = `<h3>Rapport d'Examen - ${studentData.prenom} ${studentData.nom} (${studentData.classe})</h3>`;
+            reportHTML += `<p><strong>Note finale : ${scoreNote.toFixed(1)} / 6</strong></p><hr>`;
+            
+            examResults.forEach((item, index) => {
+                reportHTML += `
+                    <div class="print-item">
+                        <p><strong>Q${index + 1}: ${item.question}</strong></p>
+                        <p>Réponse élève : <span style="color: ${item.isCorrect ? 'green' : 'red'};">${item.userAnswer}</span></p>
+                        <p>Réponse attendue : <em>${item.correctAnswer}</em></p>
+                    </div>
+                `;
+            });
+
+            document.getElementById('print-report').innerHTML = reportHTML;
+        }
+
+        function toggleScore() {
+            const scoreSpan = document.getElementById('hidden-score');
+            const btn = document.getElementById('eye-btn');
+            if (scoreSpan.classList.contains('hidden')) {
+                scoreSpan.classList.remove('hidden');
+                btn.innerText = "🙈 Masquer la note";
+            } else {
+                scoreSpan.classList.add('hidden');
+                btn.innerText = "👁️ Afficher la note";
+            }
+        }
+
+        history.pushState(null, null, location.href);
+        window.onpopstate = function () {
+            history.go(1);
+        };
+
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const characters = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ<>/\\{}[]*&é"\'(-)=+';
+        const fontSize = 16;
+        let columns = canvas.width / fontSize;
+        let drops = [];
+
+        for (let i = 0; i < columns; i++) {
+            drops[i] = 1;
+        }
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(5, 9, 20, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#00ffff';
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = characters.charAt(Math.floor(Math.random() * characters.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawMatrix, 50);
+    </script>
+</body>
+</html>
