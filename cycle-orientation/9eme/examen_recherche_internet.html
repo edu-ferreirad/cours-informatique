@@ -64,7 +64,7 @@
             background-color: #0056b3;
         }
         .hidden {
-            display: none;
+            display: none !important;
         }
         .question-box {
             text-align: left;
@@ -82,7 +82,7 @@
                 color: black !important;
                 padding: 0;
             }
-            canvas, .btn, #matrix {
+            canvas, .btn, #matrix, #step-result > h2, #step-result > p, .score-box, a {
                 display: none !important;
             }
             .container {
@@ -92,15 +92,18 @@
                 width: 100% !important;
                 max-width: 100% !important;
                 padding: 0;
-            }
-            h1, p, label, h2, span {
-                color: black !important;
-                text-shadow: none !important;
+                margin: 0;
             }
             .print-report {
+                display: block !important;
                 text-align: left;
                 font-size: 0.95em;
-                margin-top: 20px;
+                margin-top: 0;
+                color: black !important;
+            }
+            .print-report h3, .print-report p, .print-report strong, .print-report span, .print-report em {
+                color: black !important;
+                text-shadow: none !important;
             }
             .print-item {
                 margin-bottom: 15px;
@@ -151,8 +154,8 @@
             <br><br>
             <a class="btn" href="examens.html" style="background-color: #6c757d;">⬅ Retour aux examens</a>
 
-            <!-- Rapport détaillé caché pour l'affichage écran normal, visible à l'impression -->
-            <div id="print-report" class="print-report hidden"></div>
+            <!-- Rapport détaillé pour l'affichage et l'impression -->
+            <div id="print-report" class="print-report hidden" style="margin-top: 30px; text-align: left;"></div>
         </div>
     </div>
 
@@ -195,7 +198,7 @@
         let currentIndex = 0;
         let scoreNote = 6.0;
         let studentData = {};
-        let examResults = []; // Stockage des réponses de l'élève
+        let examResults = [];
 
         function startExam() {
             const pwd = document.getElementById('exam-password').value;
@@ -230,18 +233,20 @@
         }
 
         function nextQuestion() {
-            const userAnswer = document.getElementById('student-answer').value.trim();
-            const correctAnswer = selectedQuestions[currentIndex].a.trim();
+            const rawUserAnswer = document.getElementById('student-answer').value;
+            const userAnswer = rawUserAnswer.trim().toLowerCase();
+            const correctAnswer = selectedQuestions[currentIndex].a.trim().toLowerCase();
 
-            // Enregistrement de la réponse
+            const isCorrect = (userAnswer === correctAnswer);
+
             examResults.push({
                 question: selectedQuestions[currentIndex].q,
-                userAnswer: userAnswer || "(Aucune réponse)",
-                correctAnswer: correctAnswer,
-                isCorrect: userAnswer.toLowerCase() === correctAnswer.toLowerCase()
+                userAnswer: rawUserAnswer.trim() || "(Aucune réponse)",
+                correctAnswer: selectedQuestions[currentIndex].a.trim(),
+                isCorrect: isCorrect
             });
 
-            if (userAnswer.toLowerCase() !== correctAnswer.toLowerCase()) {
+            if (!isCorrect) {
                 scoreNote -= 0.5;
                 if (scoreNote < 1.0) scoreNote = 1.0;
             }
@@ -264,7 +269,6 @@
             document.getElementById('res-classe').innerText = studentData.classe;
             document.getElementById('hidden-score').innerText = scoreNote.toFixed(1);
 
-            // Génération du rapport détaillé pour l'impression PDF
             let reportHTML = `<h3>Rapport d'Examen - ${studentData.prenom} ${studentData.nom} (${studentData.classe})</h3>`;
             reportHTML += `<p><strong>Note finale : ${scoreNote.toFixed(1)} / 6</strong></p><hr>`;
             
@@ -272,13 +276,15 @@
                 reportHTML += `
                     <div class="print-item">
                         <p><strong>Q${index + 1}: ${item.question}</strong></p>
-                        <p>Réponse élève : <span style="color: ${item.isCorrect ? 'green' : 'red'};">${item.userAnswer}</span></p>
+                        <p>Réponse élève : <span style="color: ${item.isCorrect ? '#28a745' : '#dc3545'}; font-weight: bold;">${item.userAnswer}</span></p>
                         <p>Réponse attendue : <em>${item.correctAnswer}</em></p>
                     </div>
                 `;
             });
 
-            document.getElementById('print-report').innerHTML = reportHTML;
+            const reportContainer = document.getElementById('print-report');
+            reportContainer.innerHTML = reportHTML;
+            reportContainer.classList.remove('hidden');
         }
 
         function toggleScore() {
