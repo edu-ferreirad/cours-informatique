@@ -155,7 +155,7 @@
             <a class="btn" href="examens.html" style="background-color: #6c757d;">⬅ Retour aux examens</a>
 
             <!-- Rapport détaillé pour l'affichage et l'impression -->
-            <div id="print-report" class="print-report hidden" style="margin-top: 30px; text-align: left;"></div>
+            <div id="print-report" class="print-report" style="margin-top: 30px; text-align: left;"></div>
         </div>
     </div>
 
@@ -282,9 +282,7 @@
                 `;
             });
 
-            const reportContainer = document.getElementById('print-report');
-            reportContainer.innerHTML = reportHTML;
-            reportContainer.classList.remove('hidden');
+            document.getElementById('print-report').innerHTML = reportHTML;
         }
 
         function toggleScore() {
