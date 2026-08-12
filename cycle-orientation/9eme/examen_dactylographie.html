@@ -1,1 +1,544 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Examen - Dactylographie Informatique</title>
+    <style>
+        body {
+            background-color: #050914;
+            color: #00ffff;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding-top: 30px;
+            overflow-x: hidden;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+            background: rgba(5, 15, 35, 0.9);
+            border: 1px solid #00ffff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 30px;
+        }
+        h1, p, label, h2 {
+            color: #ffffff;
+            text-shadow: 0 0 10px #00bfff, 0 0 20px #0044ff;
+        }
+        input[type="text"], input[type="password"] {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            background: #000;
+            border: 1px solid #00ffff;
+            color: #00ffff;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 1em;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 15px;
+            box-shadow: 0 0 10px #007bff;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .score-box {
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+        
+        /* Zone de texte dactylographie avec défilement */
+        .typing-display {
+            background: rgba(0, 20, 40, 0.95);
+            border: 1px solid #00ffff;
+            padding: 20px;
+            border-radius: 6px;
+            font-size: 1.05em;
+            text-align: left;
+            margin: 20px 0;
+            line-height: 1.6;
+            font-family: monospace;
+            height: 250px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .char-correct {
+            color: #28a745;
+            background: rgba(40, 167, 69, 0.2);
+        }
+        .char-incorrect {
+            color: #dc3545;
+            background: rgba(220, 53, 69, 0.2);
+            text-decoration: underline;
+        }
+        .char-pending {
+            color: #88aacc;
+        }
+        textarea.typing-input {
+            width: 100%;
+            height: 120px;
+            background: #000;
+            color: #00ffff;
+            border: 1px solid #00ffff;
+            border-radius: 4px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 1.05em;
+            resize: none;
+            box-sizing: border-box;
+        }
 
+        /* Style d'impression (PDF) */
+        @media print {
+            body {
+                background: white !important;
+                color: black !important;
+                padding: 0;
+            }
+            canvas, .btn, #matrix, #step-result > h2, #step-result > p, .score-box, a {
+                display: none !important;
+            }
+            .container {
+                background: white !important;
+                border: none !important;
+                box-shadow: none !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 0;
+                margin: 0;
+            }
+            .print-report {
+                display: block !important;
+                text-align: left;
+                font-size: 0.95em;
+                margin-top: 0;
+                color: black !important;
+            }
+            .print-report h3, .print-report p, .print-report strong, .print-report span, .print-report em {
+                color: black !important;
+                text-shadow: none !important;
+            }
+            .print-item {
+                margin-bottom: 15px;
+                padding-bottom: 10px;
+                border-bottom: 1px solid #ccc;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix"></canvas>
+
+    <div class="container" id="app-container">
+        <h1>Examen - Dactylographie Informatique</h1>
+
+        <!-- ÉTAPE 1 : Identification et Mot de passe -->
+        <div id="step-login">
+            <p>Veuillez entrer vos informations pour commencer :</p>
+            <input type="password" id="exam-password" placeholder="Mot de passe professeur"><br>
+            <input type="text" id="student-nom" placeholder="Nom"><br>
+            <input type="text" id="student-prenom" placeholder="Prénom"><br>
+            <input type="text" id="student-classe" placeholder="Classe"><br><br>
+            <button class="btn" onclick="startExam()">Commencer l'examen</button>
+            <p id="login-error" style="color: #ff4444;"></p>
+        </div>
+
+        <!-- ÉTAPE 2 : Exercice de Dactylographie -->
+        <div id="step-quiz" class="hidden">
+            <p>Recopiez le texte informatique long ci-dessous le plus rapidement et précisément possible :</p>
+            <div id="target-text-display" class="typing-display"></div>
+            <textarea id="typing-input" class="typing-input" placeholder="Commencez à taper ici..." oninput="handleTyping()" onpaste="return false;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+            <div style="margin-top: 15px; display: flex; justify-content: space-between; font-size: 0.95em;">
+                <span>⏱️ Temps : <strong id="timer-display">0</strong>s</span>
+                <span>⚡ Vitesse : <strong id="wpm-display">0</strong> MPM</span>
+                <span>❌ Fautes : <strong id="errors-display">0</strong></span>
+            </div>
+            <button class="btn" id="finish-btn" onclick="submitExam()" style="margin-top: 20px;" disabled>Valider l'examen</button>
+        </div>
+
+        <!-- ÉTAPE 3 : Résultat -->
+        <div id="step-result" class="hidden">
+            <h2>Examen terminé !</h2>
+            <p>Merci <strong><span id="res-prenom"></span> <span id="res-nom"></span></strong> (<span id="res-classe"></span>).</p>
+            <div class="score-box">
+                <span>Note : </span>
+                <span id="hidden-score" class="hidden" style="color: #00ff00; font-weight: bold; font-size: 1.3em;"></span>
+                <button class="btn" id="eye-btn" onclick="toggleScore()">👁️ Afficher la note</button>
+            </div>
+            <p style="font-size: 0.85em; color: #ffeb3b; margin-top: 10px; text-shadow: 0 0 5px rgba(255, 235, 59, 0.5);">* C'est une note indicative avant validation par l'enseignant</p>
+            <br><br>
+            <button class="btn" onclick="window.print()" style="background-color: #28a745;">🖨️ Imprimer / Sauvegarder en PDF</button>
+            <br><br>
+            <a class="btn" href="examens.html" style="background-color: #6c757d;">⬅ Retour aux examens</a>
+
+            <!-- Rapport détaillé pour l'affichage et l'impression -->
+            <div id="print-report" class="print-report" style="margin-top: 30px; text-align: left;"></div>
+        </div>
+    </div>
+
+    <script>
+        const computerTexts = [
+            `L'unite centrale d'un ordinateur constitue le noyau de traitement et de coordination de toutes les instructions transmises par les logiciels installes.
+Au cœur de cette architecture materielle se trouve le microprocesseur, charge d'executer les calculs arithmetiques et logiques a une frequence elevee.
+Il est directement associe a la memoire vive, ou RAM, qui stocke de maniere volatile et temporaire les donnees en cours d'utilisation par le systeme.
+Contrairement a la RAM, les supports de stockage permanents tels que les disques SSD ou les disques durs traditionnels conservent les fichiers meme hors tension.
+La carte mere relie l'ensemble de ces composants grace a un reseau de pistes electriques et de bus de donnees garantissant la rapidite des echanges.
+Les systemes d'exploitation modernes gerent dynamiquement l'allocation des ressources pour eviter les conflits et optimiser les performances globales de la machine.
+L'utilisation de memoires cache multiniveaux permet de reduire les temps d'attente du processeur en anticipant les acces aux instructions les plus frequentes.
+Par ailleurs, le refroidissement du boitier est assure par des ventilateurs ou des systemes a liquide pour dissiper la chaleur emise par les composants actifs.
+Les entrees et sorties du systeme sont controlees par des chipsets dedies quigerent les connexions USB, les ecrans ainsi que les interfaces reseau filaires ou sans fil.
+Ainsi, chaque element de l'unite centrale joue un role synergique indispensable au bon fonctionnement de l'infrastructure informatique globale de l'utilisateur.`,
+
+            `Le developpement web contemporain repose sur l'utilisation conjointe de trois langages fondamentaux qui structurent, stylisent et dynamisent les pages.
+En premier lieu, le langage HTML permet de definir l'ossature semantique d'un site en organisant les balises textuelles, les images et les liens hypertextes.
+Ensuite, les feuilles de style en cascade, ou CSS, interviennent pour habiller l'interface en gérant les couleurs, les polices, les marges et la mise en page responsive.
+Enfin, le langage de programmation JavaScript insuffle de l'interactivite en modifiant dynamiquement le contenu du document sans necessiter de rechargement complet.
+Les developpeurs s'appuient egalement sur des frameworks avances pour accelerer la conception d'applications web robustes, modulaires et maintenables dans le temps.
+L'accessibilite et l'ergonomie des interfaces utilisateur sont devenues des priorites majeures pour garantir une navigation fluide sur ordinateurs, tablettes et smartphones.
+Les protocoles de communication HTTP et HTTPS assurent quant a eux la transmission securisee des donnees entre le navigateur client et le serveur distant hebergeant le site.
+Les techniques d'optimisation du code, telles que la minification des scripts et la compression des images, permettent d'ameliorer considerablement les temps de chargement.
+De plus, la gestion rigoureuse du stockage local et des sessions utilisateur contribue a offrir une experience fluide et personnalisee sur les plateformes interactives.
+En somme, maitriser ces technologies fondamentales est indispensable pour concevoir des environnements numeriques performants et adaptes aux exigences du web actuel.`,
+
+            `La securite des systemes d'information est un enjeu strategique majeur pour proteger les donnees sensibles des entreprises et des particuliers contre les menaces.
+Les cyberattaques se multiplient sous des formes variees, allant des logiciels malveillants aux tentatives d'hameçonnage ciblees sur les utilisateurs imprudents.
+Pour contrer ces risques, la mise en place de pare-feux et de systemes de detection d'intrusion constitue une premiere ligne de defense reseau indispensable.
+Le chiffrement des donnees, qu'il s'agisse de leur stockage sur disque ou de leur transit sur Internet, garantit leur confidentialite en cas d'interception illicite.
+L'authentification multifacteur renforce considerablement le niveau de protection des comptes en exigeant plusieurs preuves d'identite avant d'autoriser l'acces.
+Les administrateurs systeme doivent egalement appliquer regulierement les mises a jour de securite pour combler les failles logicielles exploitees par les pirates.
+La sensibilisation continue des collaborateurs aux bonnes pratiques numeriques reste l'un des remparts les plus efficaces contre les erreurs humaines et la piraterie.
+Les strategies de sauvegarde reguliere et externalisee permettent de garantir la recuperation rapide des activites en cas d'attaque par ransomware ou de panne majeure.
+L'analyse forensique post-incident aide a comprendre les vecteurs d'intrusion utilises afin d'adapter les politiques de defense et d'eviter de nouvelles compromissions.
+Proteger un systeme informatique demande ainsi une vigilance de tous les instants, combinant des solutions technologiques avancees et des procedures rigoureuses.`,
+
+            `Les reseaux informatiques modernes permettent l'echange rapide et securise d'informations entre des millions d'appareils repartis a travers le monde entier.
+Au cœur de cette architecture globale, le modele TCP/IP definit les normes de communication et le routage des paquets de donnees a travers les differents routeurs.
+Chaque machine connectee dispose d'une adresse IP unique, qu'elle soit statique ou attribuee dynamiquement par un serveur DHCP lors de la connexion au reseau.
+Les commutateurs ou switchs gèrent la circulation du trafic au sein des reseaux locaux, tandis que les routeurs orientent les messages vers les reseaux externes.
+Le protocole DNS joue un role crucial en traduisant les noms de domaine lisibles en adresses IP numeriques comprensibles par les equipements du reseau mondial.
+La bande passante et la latence sont deux indicateurs essentiels pour evaluer la qualite et la vitesse de transmission des donnees sur une infrastructure donnee.
+Les technologies de fibre optique ont largement remplace les cables en cuivre traditionnels pour offrir des debits ultra-rapides sur de tres longues distances.
+En parallele, les reseaux sans fil et les technologies cellulaires de nouvelle generation facilitent la mobilite constante des utilisateurs et des objets connectes.
+La virtualisation des fonctions reseau et l'utilisation du cloud computing apportent une flexibilité sans precedent dans le deploiement des services en ligne.
+Ainsi, la maîtrise des concepts reseaux fondamentaux permet de concevoir et de administrer des infrastructures robustes, evolutives et hautement disponibles.`,
+
+            `Les bases de donnees relationnelles constituent le pilier de stockage central de la majorite des applications logicielles et des services web actuels.
+Elles organisent les informations sous forme de tables composees de lignes et de colonnes, ou chaque enregistrement possede des attributs et une cle primaire.
+Le langage SQL est l'outil standard universellement utilise pour interroger, mettre a jour et administrer ces structures complexes de maniere efficace.
+L'intégrité des donnees est garantie par des contraintes strictes qui empechent l'insertion d'informations incohérentes ou orphelines dans les tables liees.
+L'indexation des champs frequemment recherches permet d'accelerer considerablement l'execution des requetes sur des volumes massifs d'informations.
+La normalisation des tables evite les redondances inutiles et assure une structure logique optimisee pour la maintenance et la evolution des donnees.
+En parallele, les bases de donnees NoSQL se sont developpees pour repondre aux besoins de flexibilité et de passage a l'echelle sur des donnees non structurees.
+Les transactions ACID assurent la fiabilite des operations critiques, garantissant qu'une serie d'actions s'execute integralement ou est annulee en cas d'erreur.
+Les administrateurs de bases de donnees planifient des strategies de sauvegarde periodiques pour prevenir toute perte de donnees liee a un incident materiel.
+La securisation des acces aux serveurs de donnees est imperatif pour empecher le vol d'informations confidentielles et respecter les legislations en vigueur.`,
+
+            `L'algorithmique et la programmation informatique forment la base indispensable de la conception de tout logiciel destine a resoudre des problemes complexes.
+Un algorithme se definit comme une suite finie et non ambigue d'instructions elementaires permettant d'obtenir un resultat a partir de donnees en entree.
+Les structures de controle conditionnelles et les boucles iteratives permettent d'adapter le comportement du programme selon l'evolution des parametres traites.
+Les langages orientes objet introduisent les concepts de classes et d'instances, favorisant la modularité et la reutilisation du code informatique developpe.
+Le debogage rigoureux est une etape essentielle pour identifier et corriger les erreurs de logique ou de syntaxe qui perturbent le bon fonctionnement du logiciel.
+L'optimisation des algorithmes en termes de complexite temporelle et spatiale garantit des performances elevees, meme lors du traitement de donnees massives.
+Le versionnage du code avec des outils comme Git facilite le travail collaboratif entre developpeurs et l'historisation des modifications apportees au projet.
+La documentation technique du code source reste indispensable pour assurer sa comprension, sa maintenance et son evolution par d'autres equipes de travail.
+Les tests unitaires et fonctionnels automatisés permettent de verifier la non-regression du code lors de l'ajout de nouvelles fonctionnalites applicatives.
+Ainsi, l'art de programmer exige de la rigueur, de la logique et une methodologie structuree pour concevoir des applications fiables et performantes.`,
+
+            `Le codage binaire et la representation numerique de l'information sont a la base de tous les calculs effectues par les processeurs electroniques actuels.
+Tous les types de donnees, qu'il s'agisse de texte, d'images, de sons ou de videos, sont convertis en sequences de chiffres zero et un dans la machine.
+L'unite fondamentale est le bit, qui represente un etat electrique ouvert ou ferme, tandis que l'octet regroupe huit bits consecutifs pour coder un caractere.
+Les systemes de numeration hexadecimal et octal sont couramment utilises par les ingenieurs pour simplifier la lecture des adresses memoire et des codes machine.
+Les circuits logiques combinatoires et sequentiels realisent les operations booleennes elementaires telles que les fonctions ET, OU et NON au niveau materiel.
+La precision des calculs en virgule flottante depend du nombre de bits reserves pour stocker la mantisse et l'exposant selon les normes internationales.
+La compression de donnees, qu'elle soit avec ou sans perte, permet de reduire l'espace de stockage necessaire pour archiver ou transmettre les fichiers numeriques.
+Les codes de detection et de correction d'erreurs garantissent la fiabilite des transmissions de donnees face aux perturbations electromagnetiques des canaux.
+La miniaturisation continue des transistors sur les plaques de silicium a permis d'accroitre considerablement la puissance de calcul des microprocesseurs modernes.
+Comprendre ces principes physiques et logiques permet d'apprehender le fonctionnement intime de la matiere informatique qui compose nos appareils quotidiens.`,
+
+            `Les systemes d'exploitation jouent un role d'intermédiaire indispensable entre les applications logicielles de l'utilisateur et les composants materiels.
+Ils gèrent la memoire centrale, ordonnancent l'execution des processus par le processeur et controlent l'acces aux peripheriques d'entree et de sortie.
+Le noyau du systeme d'exploitation possede les privileges les plus eleves pour garantir la stabilite globale de la machine et isoler les programmes entre eux.
+Les systemes multitaches modernes permettent l'execution simultanee de plusieurs applications en repartissant habilement le temps de calcul du processeur.
+La gestion des systemes de fichiers organise l'arborescence des repertoires et des documents sur les differents supports de stockage connectes au systeme.
+Les pilotes de peripheriques fournissent l'interface logicielle necessaire pour que le systeme puisse communiquer correctement avec le materiel connecte.
+Les interfaces graphiques utilisateur offrent un environnement visuel intuitif compose de fenetres, de menus et d'icones pour faciliter la navigation quotidienne.
+Les fonctionnalites reseau integrees permettent au systeme de se connecter facilement a des domaines d'entreprise ou a des espaces de stockage distants.
+La maintenance preventive, incluant la defragmentation et le nettoyage des fichiers temporaires, contribue a preserver la rapidite d'execution de la machine.
+En fournissant un environnement stable et securise, le systeme d'exploitation permet aux developpeurs de concevoir des logiciels independants du materiel.`,
+
+            `Le developpement des applications mobiles necessite de prendre en compte des contraintes ergonomiques et techniques specifiques aux petits ecrans tactiles.
+Les developpeurs doivent optimiser la consommation energetique pour preserver l'autonomie de la batterie des smartphones et des tablettes connectees.
+L'utilisation de frameworks multiplateformes permet de mutualiser une grande partie du code source pour le déployer simultanément sur iOS et sur Android.
+Les capteurs integres, tels que le GPS, l'accelerometre et le gyroscope, offrent de nouvelles opportunites pour creer des experiences interactives immersives.
+La gestion de la connectivité mobile, souvent instable ou changeante, impose de concevoir des applications capables de fonctionner partiellement en mode hors ligne.
+L'ergonomie des interfaces tactiles exige des zones d'interaction suffisamment grandes et une disposition intuitive des elements visuels pour l'utilisateur.
+Les politiques de securite et de confidentialite des magasins d'applications imposent des controles stricts sur l'utilisation des donnees personnelles collectees.
+La mise en cache locale des donnees et l'optimisation des requetes reseau garantissent une fluidité d'affichage optimale en toutes circonstances d'utilisation.
+Les notifications push permettent de maintenir l'engagement des utilisateurs en leur envoyant des alertes contextuelles pertinentes en temps reel.
+Ainsi, la creation d'applications mobiles performantes combine des competences avancees en design d'interface et en architecture logicielle embarquee.`,
+
+            `L'intelligence artificielle et l'apprentissage automatique transforment profoundement les methodes de traitement de l'information et d'automatisation des taches.
+Les reseaux de neurones artificiels s'inspirent du fonctionnement du cerveau humain pour reconnaitre des motifs complexes dans des volumes massifs de donnees.
+L'entrainement de ces modeles statistiques requiert des puissances de calcul considerables souvent fournies par des fermes de serveurs munies de processeurs graphiques.
+Le traitement automatique du langage naturel permet aux ordinateurs de comprendre, d'analyser et de generer du texte dans de multiples langues humaines.
+La vision par ordinateur offre aux systemes la capacite d'interpreter le contenu visuel d'images ou de videos pour identifier des objets ou des visages.
+Cependant, l'utilisation de ces technologies souleve d'importantes questions ethiques concernant la confidentialite, les biais algorithmiques et la responsabilite.
+L'explicabilité des modeles d'intelligence artificielle devient un defi crucial pour garantir la transparence des decisions prises de maniere automatisee.
+Les applications pratiques touchent de nombreux secteurs d'activite, allant de la medecine diagnostique aux vehicules autonomes et aux assistants virtuels.
+La recherche continue dans ce domaine vise a developper des architectures plus sobres en energie et plus performantes avec moins de donnees d'entrainement.
+Maitriser ces concepts d'avenir est devenu indispensable pour anticiper les evolutions technologiques qui façonneront la societe numerique de demain.`
+        ];
+
+        let selectedText = "";
+        let studentData = {};
+        let startTime = null;
+        let timerInterval = null;
+        let isStarted = false;
+        let finalWpm = 0;
+        let finalPrecision = 100;
+        let finalErrors = 0;
+        let scoreNote = 1.0;
+
+        function startExam() {
+            const pwd = document.getElementById('exam-password').value;
+            const nom = document.getElementById('student-nom').value.trim();
+            const prenom = document.getElementById('student-prenom').value.trim();
+            const classe = document.getElementById('student-classe').value.trim();
+
+            if (pwd !== "prof123") {
+                document.getElementById('login-error').innerText = "Mot de passe incorrect.";
+                return;
+            }
+            if (!nom || !prenom || !classe) {
+                document.getElementById('login-error').innerText = "Veuillez remplir tous les champs.";
+                return;
+            }
+
+            studentData = { nom, prenom, classe };
+
+            // Sélection aléatoire d'un des 10 textes longs (10 lignes ou plus / blocs de 10 phrases)
+            selectedText = computerTexts[Math.floor(Math.random() * computerTexts.length)];
+
+            document.getElementById('step-login').classList.add('hidden');
+            document.getElementById('step-quiz').classList.remove('hidden');
+
+            renderTargetText("");
+        }
+
+        function renderTargetText(userInput) {
+            let html = "";
+            for (let i = 0; i < selectedText.length; i++) {
+                let char = selectedText[i];
+                if (i < userInput.length) {
+                    if (userInput[i] === char) {
+                        html += `<span class="char-correct">${char}</span>`;
+                    } else {
+                        html += `<span class="char-incorrect">${char === ' ' ? '_' : (char === '\n' ? '↵\n' : char)}</span>`;
+                    }
+                } else {
+                    html += `<span class="char-pending">${char}</span>`;
+                }
+            }
+            const displayDiv = document.getElementById('target-text-display');
+            displayDiv.innerHTML = html;
+
+            // Auto-scroll pour suivre la frappe de l'élève dans le texte long
+            if (userInput.length > 0) {
+                const correctSpans = displayDiv.getElementsByClassName('char-correct');
+                if (correctSpans.length > 0) {
+                    const lastSpan = correctSpans[correctSpans.length - 1];
+                    displayDiv.scrollTop = lastSpan.offsetTop - displayDiv.clientHeight / 2;
+                }
+            }
+        }
+
+        function handleTyping() {
+            const inputVal = document.getElementById('typing-input').value;
+
+            if (!isStarted && inputVal.length > 0) {
+                isStarted = true;
+                startTime = new Date().getTime();
+                timerInterval = setInterval(updateTimer, 1000);
+            }
+
+            renderTargetText(inputVal);
+
+            // Calculs en temps réel
+            const currentTime = new Date().getTime();
+            const elapsedTimeMinutes = (currentTime - startTime) / 60000;
+
+            let errors = 0;
+            for (let i = 0; i < inputVal.length; i++) {
+                if (i < selectedText.length && inputVal[i] !== selectedText[i]) {
+                    errors++;
+                } else if (i >= selectedText.length) {
+                    errors++;
+                }
+            }
+
+            let wordsTyped = inputVal.trim() === "" ? 0 : inputVal.trim().split(/\s+/).length;
+            let wpm = elapsedTimeMinutes > 0 ? Math.round(wordsTyped / elapsedTimeMinutes) : 0;
+            if (wpm < 0) wpm = 0;
+
+            let precision = inputVal.length > 0 ? Math.max(0, Math.round(((inputVal.length - errors) / inputVal.length) * 100)) : 100;
+
+            document.getElementById('wpm-display').innerText = wpm;
+            document.getElementById('errors-display').innerText = errors;
+
+            // Activer le bouton de validation dès que l'élève a fini de taper tout le texte ou plus
+            if (inputVal.length >= selectedText.length) {
+                document.getElementById('finish-btn').removeAttribute('disabled');
+            } else {
+                document.getElementById('finish-btn').setAttribute('disabled', 'true');
+            }
+        }
+
+        function updateTimer() {
+            const currentTime = new Date().getTime();
+            const seconds = Math.floor((currentTime - startTime) / 1000);
+            document.getElementById('timer-display').innerText = seconds;
+        }
+
+        function submitExam() {
+            if (timerInterval) clearInterval(timerInterval);
+
+            const inputVal = document.getElementById('typing-input').value;
+            const currentTime = new Date().getTime();
+            const elapsedTimeMinutes = (currentTime - startTime) / 60000;
+
+            let errors = 0;
+            for (let i = 0; i < inputVal.length; i++) {
+                if (i < selectedText.length && inputVal[i] !== selectedText[i]) {
+                    errors++;
+                } else if (i >= selectedText.length) {
+                    errors++;
+                }
+            }
+
+            let wordsTyped = inputVal.trim().split(/\s+/).length;
+            finalWpm = elapsedTimeMinutes > 0 ? Math.round(wordsTyped / elapsedTimeMinutes) : 0;
+            finalErrors = errors;
+            finalPrecision = inputVal.length > 0 ? Math.max(0, Math.round(((inputVal.length - errors) / inputVal.length) * 100)) : 100;
+
+            // Application exacte du modèle de grille d'évaluation Excel (barème sur 8 points transformé en note sur 5 + 1 = note sur 6)
+            let pts = 0;
+            if (finalWpm >= 20) pts += 1;
+            if (finalWpm >= 30) pts += 1;
+            if (finalWpm >= 40) pts += 1;
+            if (finalWpm >= 50) pts += 1;
+            if (finalWpm >= 60) pts += 1;
+            if (finalWpm >= 70) pts += 1;
+            
+            let errorRate = 100 - finalPrecision;
+            if (errorRate <= 10) pts += 1;
+            if (errorRate <= 5) pts += 1;
+
+            scoreNote = (pts / 8.0) * 5.0 + 1.0;
+            if (scoreNote < 1.0) scoreNote = 1.0;
+            if (scoreNote > 6.0) scoreNote = 6.0;
+
+            finishExam();
+        }
+
+        function finishExam() {
+            document.getElementById('step-quiz').classList.add('hidden');
+            document.getElementById('step-result').classList.remove('hidden');
+
+            document.getElementById('res-nom').innerText = studentData.nom;
+            document.getElementById('res-prenom').innerText = studentData.prenom;
+            document.getElementById('res-classe').innerText = studentData.classe;
+            document.getElementById('hidden-score').innerText = scoreNote.toFixed(2);
+
+            let reportHTML = `<h3>Rapport d'Examen Dactylographie - ${studentData.prenom} ${studentData.nom} (${studentData.classe})</h3>`;
+            reportHTML += `<p><strong>Note finale (indicative) : ${scoreNote.toFixed(2)} / 6</strong></p>`;
+            reportHTML += `<p><strong>Vitesse :</strong> ${finalWpm} Mots par minute (MPM)</p>`;
+            reportHTML += `<p><strong>Précision :</strong> ${finalPrecision}% (${finalErrors} faute(s))</p>`;
+            reportHTML += `<p style="font-size: 0.9em; font-style: italic;">* C'est une note indicative calculée selon le barème officiel avant validation par l'enseignant</p><hr>`;
+            reportHTML += `<p><strong>Texte de référence (Long) :</strong><br><em>${selectedText.replace(/\n/g, '<br>')}</em></p>`;
+
+            document.getElementById('print-report').innerHTML = reportHTML;
+        }
+
+        function toggleScore() {
+            const scoreSpan = document.getElementById('hidden-score');
+            const btn = document.getElementById('eye-btn');
+            if (scoreSpan.classList.contains('hidden')) {
+                scoreSpan.classList.remove('hidden');
+                btn.innerText = "🙈 Masquer la note";
+            } else {
+                scoreSpan.classList.add('hidden');
+                btn.innerText = "👁️ Afficher la note";
+            }
+        }
+
+        history.pushState(null, null, location.href);
+        window.onpopstate = function () {
+            history.go(1);
+        };
+
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const characters = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ<>/\\{}[]*&é"\'(-)=+';
+        const fontSize = 16;
+        let columns = canvas.width / fontSize;
+        let drops = [];
+
+        for (let i = 0; i < columns; i++) {
+            drops[i] = 1;
+        }
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(5, 9, 20, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#00ffff';
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = characters.charAt(Math.floor(Math.random() * characters.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawMatrix, 50);
+    </script>
+</body>
+</html>
