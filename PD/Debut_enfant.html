@@ -1,69 +1,75 @@
-
-<html>
+<!DOCTYPE html>
+<html lang="fr">
 <head>
-  <link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
-  />
 <meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Protection des données</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 <style>
+* {
+    box-sizing: border-box;
+}
 body {
-  background-image: url("jeu_enfant/intro.jpg");
-  background-repeat: no-repeat;
-  background-size: 60% 60%;
-  background-position: center;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-image: url("jeu_enfant/intro.jpg");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    background-color: #050914; /* Couleur de fond de secours pour les écrans étroits */
 }
 
-.button{
-  display: inline-block;
-  border-radius: 4px;
-  background-color: #1ac0a7;
-  border: none;
-  color: #FFFFFF;
-  text-align: center;
-  font-size: 28px;
-  padding: 20px;
-  width: 200px;
-  transition: all 0.5s;
-  cursor: pointer;
-  margin: 450px;
+.button {
+    display: inline-block;
+    border-radius: 4px;
+    background-color: #1ac0a7;
+    border: none;
+    color: #FFFFFF;
+    text-align: center;
+    font-size: clamp(18px, 4vw, 28px);
+    padding: clamp(12px, 3vw, 20px) clamp(20px, 4vw, 40px);
+    width: min(80vw, 250px);
+    transition: all 0.5s;
+    cursor: pointer;
+    margin: 0;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    text-decoration: none;
 }
-.button span{
-  cursor: pointer;
-  display: inline-block;
-  position: relative;
-  transition: 0.5s;
+
+.button span {
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    transition: 0.5s;
 }
+
 .button span:after {
-  content: '\00bb';
-  position: absolute;
-  opacity: 0;
-  top: 0;
-  right: -20px;
-  transition: 0.5s;
+    content: '\00bb';
+    position: absolute;
+    opacity: 0;
+    top: 0;
+    right: -20px;
+    transition: 0.5s;
 }
 
 .button:hover span {
-  padding-right: 25px;
+    padding-right: 25px;
 }
 
 .button:hover span:after {
-  opacity: 1;
-  right: 0;
+    opacity: 1;
+    right: 0;
 }
-
 </style>
 <script src="title-scroll.js" data-start="5000" data-speed="250"></script>
-
 </head>
 
 <body>
-  
-  <div style="text-align: center;"
-
-  <h3></h3>
-  <a href="jeu_enfant/jeu.html" class="button" style="vertical-align:middle"><span>Jouer</span></a>
-
+    <a href="jeu_enfant/jeu.html" class="button animate__animated animate__pulse animate__infinite"><span>Jouer</span></a>
 </body>
 </html>
