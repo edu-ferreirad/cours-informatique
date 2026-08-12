@@ -29,7 +29,7 @@
             letter-spacing: 2px;
         }
         .container {
-            max-width: 600px;
+            max-width: 900px;
             margin: 40px auto;
             background: rgba(20, 10, 0, 0.85);
             border: 1px solid #ff5500;
@@ -38,14 +38,6 @@
             border-radius: 4px;
             position: relative;
             z-index: 10;
-        }
-        ul {
-            list-style-type: none;
-            padding-left: 0;
-            margin-top: 20px;
-        }
-        li {
-            margin: 12px 0;
         }
         a {
             color: #ff7700;
@@ -87,9 +79,43 @@
             border-color: #ffffff;
             box-shadow: 0 0 20px #ffffff, 0 0 30px #ff5500;
         }
+
+        /* Nouveaux styles pour les PDF adaptés au thème orange */
+        .cours-card {
+            background: rgba(25, 12, 0, 0.9);
+            border: 1px solid #ff5500;
+            box-shadow: 0 0 15px rgba(255, 85, 0, 0.2);
+            border-radius: 8px;
+            margin: 25px auto;
+            padding: 20px;
+            width: 90%;
+            text-align: left;
+        }
+        .cours-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #ffaa00;
+            margin-bottom: 15px;
+            text-shadow: 0 0 5px #ff5500;
+            word-break: break-all;
+        }
+        .pdf-container {
+            width: 100%;
+            height: 500px;
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1px solid #ff5500;
+            background: #000;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
         .back-link {
             text-align: center;
-            margin-top: 30px;
+            margin-top: 50px;
             position: relative;
             z-index: 10;
         }
@@ -111,12 +137,6 @@
     <canvas id="matrix"></canvas>
 
     <div class="container">
-        <h1>// Protection des données</h1>
-        
-        <ul>
-            <li>📄 <a href="Brochure conseils avec sources-VF4neutre.pdf">Brochure de conseils (Neutre)</a></li>
-            <li>📄 <a href="Présentation_à_faire pour_formation_en_ligne.pdf">Présentation formation en ligne</a></li>
-        </ul>
         
         <h1>// Jeux de rôles</h1>
         
@@ -125,8 +145,66 @@
             <a href="Debut_parent.html" class="btn-jdr">▶ Version Parent</a>
         </div>
 
+        <h1 style="margin-top: 60px;">// Brochures utiles</h1>
+        
+        <!-- PDF 1 -->
+        <div class="cours-card">
+            <div class="cours-title">📄 Brochure de conseils (Neutre)</div>
+            <div class="pdf-container">
+                <iframe src="Brochure conseils avec sources-VF4neutre.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- PDF 2 -->
+        <div class="cours-card">
+            <div class="cours-title">📄 Présentation formation en ligne</div>
+            <div class="pdf-container">
+                <iframe src="Présentation_à_faire pour_formation_en_ligne.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- PDF 3 -->
+        <div class="cours-card">
+            <div class="cours-title">📄 318_852_F_Broschuere_Medienkompetenz_im_Schulalltag_FR_MDL_WEB_d09f0eb63f.pdf</div>
+            <div class="pdf-container">
+                <iframe src="318_852_F_Broschuere_Medienkompetenz_im_Schulalltag_FR_MDL_WEB_d09f0eb63f.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- PDF 4 -->
+        <div class="cours-card">
+            <div class="cours-title">📄 Jeunes_et_medias_Brochure_Competences_numeriques_ZHAW_2024_415639a0ee.pdf</div>
+            <div class="pdf-container">
+                <iframe src="Jeunes_et_medias_Brochure_Competences_numeriques_ZHAW_2024_415639a0ee.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- PDF 5 -->
+        <div class="cours-card">
+            <div class="cours-title">📄 Ju_M_Flyer_12_18_FR_3fc825d5bc.pdf</div>
+            <div class="pdf-container">
+                <iframe src="Ju_M_Flyer_12_18_FR_3fc825d5bc.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- PDF 6 -->
+        <div class="cours-card">
+            <div class="cours-title">📄 Ju_M_Flyer_Bildrecht_Eltern_A5_FR_UA_020891a40e.pdf</div>
+            <div class="pdf-container">
+                <iframe src="Ju_M_Flyer_Bildrecht_Eltern_A5_FR_UA_020891a40e.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- PDF 7 -->
+        <div class="cours-card">
+            <div class="cours-title">📄 Ju_M_Flyer_Bildrecht_Jugendliche_A5_FR_UA_dff8929f4b.pdf</div>
+            <div class="pdf-container">
+                <iframe src="Ju_M_Flyer_Bildrecht_Jugendliche_A5_FR_UA_dff8929f4b.pdf"></iframe>
+            </div>
+        </div>
+
         <div class="back-link">
-            <p style="margin: 20px 0 0 0;"><a href="../index.html">⬅ Retour à l'accueil général</a></p>
+            <p><a href="../index.html">⬅ Retour à l'accueil général</a></p>
         </div>
     </div>
 
