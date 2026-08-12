@@ -93,8 +93,13 @@
         }
         .char-incorrect {
             color: #dc3545;
-            background: rgba(220, 53, 69, 0.2);
+            background: rgba(220, 53, 69, 0.3);
             text-decoration: underline;
+        }
+        .char-current {
+            color: #ffc107;
+            background: rgba(255, 193, 7, 0.3);
+            border-bottom: 2px solid #ffc107;
         }
         .char-pending {
             color: #88aacc;
@@ -165,9 +170,9 @@
 
         <!-- ÉTAPE 2 : Exercice de Dactylographie -->
         <div id="step-quiz" class="hidden">
-            <p>Recopiez le texte informatique long ci-dessous (Interdiction d'effacer / Touche Backspace bloquée) :</p>
+            <p>Recopiez le texte informatique ci-dessous (L'écriture s'arrête en cas d'erreur jusqu'à correction) :</p>
             <div id="target-text-display" class="typing-display"></div>
-            <textarea id="typing-input" class="typing-input" placeholder="Commencez à taper ici..." onkeydown="handleKeyDown(event)" oninput="handleTyping()" onpaste="return false;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+            <textarea id="typing-input" class="typing-input" placeholder="Commencez à taper ici..." onkeydown="handleKeyDown(event)" onpaste="return false;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
             <div style="margin-top: 15px; display: flex; justify-content: space-between; font-size: 0.95em;">
                 <span>⏱️ Temps : <strong id="timer-display">0</strong>s</span>
                 <span>⚡ Vitesse : <strong id="wpm-display">0</strong> MPM</span>
@@ -341,7 +346,11 @@ Maitriser ces concepts d'avenir est devenu indispensable pour anticiper les evol
         let finalPrecision = 100;
         let finalErrors = 0;
         let scoreNote = 1.0;
-        let lastInputLength = 0;
+
+        // Variables de suivi façon Dactylocours
+        let currentIndex = 0;
+        let errorCount = 0;
+        let hasErrorOnCurrent = false;
 
         function startExam() {
             const pwd = document.getElementById('exam-password').value;
@@ -364,18 +373,23 @@ Maitriser ces concepts d'avenir est devenu indispensable pour anticiper les evol
             document.getElementById('step-login').classList.add('hidden');
             document.getElementById('step-quiz').classList.remove('hidden');
 
-            renderTargetText("");
+            currentIndex = 0;
+            errorCount = 0;
+            hasErrorOnCurrent = false;
+            renderTargetText();
         }
 
-        function renderTargetText(userInput) {
+        function renderTargetText() {
             let html = "";
             for (let i = 0; i < selectedText.length; i++) {
                 let char = selectedText[i];
-                if (i < userInput.length) {
-                    if (userInput[i] === char) {
-                        html += `<span class="char-correct">${char}</span>`;
-                    } else {
+                if (i < currentIndex) {
+                    html += `<span class="char-correct">${char}</span>`;
+                } else if (i === currentIndex) {
+                    if (hasErrorOnCurrent) {
                         html += `<span class="char-incorrect">${char === ' ' ? '_' : (char === '\n' ? '↵\n' : char)}</span>`;
+                    } else {
+                        html += `<span class="char-current">${char === ' ' ? '␣' : (char === '\n' ? '↵' : char)}</span>`;
                     }
                 } else {
                     html += `<span class="char-pending">${char}</span>`;
@@ -384,94 +398,85 @@ Maitriser ces concepts d'avenir est devenu indispensable pour anticiper les evol
             const displayDiv = document.getElementById('target-text-display');
             displayDiv.innerHTML = html;
 
-            if (userInput.length > 0) {
-                const correctSpans = displayDiv.getElementsByClassName('char-correct');
-                if (correctSpans.length > 0) {
-                    const lastSpan = correctSpans[correctSpans.length - 1];
-                    displayDiv.scrollTop = lastSpan.offsetTop - displayDiv.clientHeight / 2;
-                }
+            // Faire défiler vers le caractère courant
+            const currentSpan = displayDiv.getElementsByClassName('char-current')[0] || displayDiv.getElementsByClassName('char-incorrect')[0];
+            if (currentSpan) {
+                displayDiv.scrollTop = currentSpan.offsetTop - displayDiv.clientHeight / 2;
             }
         }
 
-        // Empêcher l'utilisation de Backspace / effacement
+        // Empêcher l'utilisation de Backspace / Delete
         function handleKeyDown(event) {
             if (event.key === "Backspace" || event.key === "Delete") {
-                event.preventDefault(); // Bloque l'effacement net
+                event.preventDefault();
+                return;
+            }
+
+            // Gestion de la frappe au clavier en mode Dactylocours strict
+            if (event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
+                event.preventDefault(); // Empêche d'écrire n'importe où dans le textarea
+
+                if (currentIndex >= selectedText.length) return;
+
+                if (!isStarted) {
+                    isStarted = true;
+                    startTime = new Date().getTime();
+                    timerInterval = setInterval(updateTimer, 1000);
+                }
+
+                const expectedChar = selectedText[currentIndex];
+
+                if (event.key === expectedChar) {
+                    // Bonne touche
+                    currentIndex++;
+                    hasErrorOnCurrent = false;
+                } else {
+                    // Mauvaise touche
+                    errorCount++;
+                    hasErrorOnCurrent = true;
+                }
+
+                renderTargetText();
+                updateStats();
+
+                if (currentIndex >= selectedText.length) {
+                    document.getElementById('finish-btn').removeAttribute('disabled');
+                }
             }
         }
 
-        function handleTyping() {
-            const inputField = document.getElementById('typing-input');
-            let inputVal = inputField.value;
-
-            // Sécurité supplémentaire : si l'élève a réussi à réduire le texte (ex: raccourci clavier ou autre), on force le blocage à la longueur maximale déjà atteinte
-            if (inputVal.length < lastInputLength) {
-                inputField.value = selectedText.substring(0, lastInputLength);
-                return;
-            }
-            lastInputLength = inputVal.length;
-
-            if (!isStarted && inputVal.length > 0) {
-                isStarted = true;
-                startTime = new Date().getTime();
-                timerInterval = setInterval(updateTimer, 1000);
-            }
-
-            renderTargetText(inputVal);
-
-            // Calculs en temps réel
+        function updateStats() {
             const currentTime = new Date().getTime();
-            const elapsedTimeMinutes = (currentTime - startTime) / 60000;
+            const elapsedTimeMinutes = startTime ? (currentTime - startTime) / 60000 : 0;
 
-            let errors = 0;
-            for (let i = 0; i < inputVal.length; i++) {
-                if (i < selectedText.length && inputVal[i] !== selectedText[i]) {
-                    errors++;
-                } else if (i >= selectedText.length) {
-                    errors++;
-                }
-            }
-
-            let wordsTyped = inputVal.trim() === "" ? 0 : inputVal.trim().split(/\s+/).length;
+            let wordsTyped = currentIndex / 5; // Estimation standard des mots (5 caractères = 1 mot)
             let wpm = elapsedTimeMinutes > 0 ? Math.round(wordsTyped / elapsedTimeMinutes) : 0;
             if (wpm < 0) wpm = 0;
 
             document.getElementById('wpm-display').innerText = wpm;
-            document.getElementById('errors-display').innerText = errors;
-
-            if (inputVal.length >= selectedText.length) {
-                document.getElementById('finish-btn').removeAttribute('disabled');
-            } else {
-                document.getElementById('finish-btn').setAttribute('disabled', 'true');
-            }
+            document.getElementById('errors-display').innerText = errorCount;
         }
 
         function updateTimer() {
             const currentTime = new Date().getTime();
             const seconds = Math.floor((currentTime - startTime) / 1000);
             document.getElementById('timer-display').innerText = seconds;
+            updateStats();
         }
 
         function submitExam() {
             if (timerInterval) clearInterval(timerInterval);
 
-            const inputVal = document.getElementById('typing-input').value;
             const currentTime = new Date().getTime();
             const elapsedTimeMinutes = (currentTime - startTime) / 60000;
 
-            let errors = 0;
-            for (let i = 0; i < inputVal.length; i++) {
-                if (i < selectedText.length && inputVal[i] !== selectedText[i]) {
-                    errors++;
-                } else if (i >= selectedText.length) {
-                    errors++;
-                }
-            }
-
-            let wordsTyped = inputVal.trim().split(/\s+/).length;
+            let wordsTyped = currentIndex / 5;
             finalWpm = elapsedTimeMinutes > 0 ? Math.round(wordsTyped / elapsedTimeMinutes) : 0;
-            finalErrors = errors;
-            finalPrecision = inputVal.length > 0 ? Math.max(0, Math.round(((inputVal.length - errors) / inputVal.length) * 100)) : 100;
+            finalErrors = errorCount;
+            
+            // Précision basée sur le nombre total de tentatives
+            let totalAttempts = currentIndex + finalErrors;
+            finalPrecision = totalAttempts > 0 ? Math.max(0, Math.round((currentIndex / totalAttempts) * 100)) : 100;
 
             let pts = 0;
             if (finalWpm >= 20) pts += 1;
@@ -499,28 +504,24 @@ Maitriser ces concepts d'avenir est devenu indispensable pour anticiper les evol
             document.getElementById('res-nom').innerText = studentData.nom;
             document.getElementById('res-prenom').innerText = studentData.prenom;
             document.getElementById('res-classe').innerText = studentData.classe;
-            document.getElementById('hidden-score').innerText = scoreNote.toFixed(2);
 
-            let reportHTML = `<h3>Rapport d'Examen Dactylographie - ${studentData.prenom} ${studentData.nom} (${studentData.classe})</h3>`;
-            reportHTML += `<p><strong>Note finale (indicative) : ${scoreNote.toFixed(2)} / 6</strong></p>`;
-            reportHTML += `<p><strong>Vitesse :</strong> ${finalWpm} Mots par minute (MPM)</p>`;
-            reportHTML += `<p><strong>Précision :</strong> ${finalPrecision}% (${finalErrors} faute(s))</p>`;
-            reportHTML += `<p style="font-size: 0.9em; font-style: italic;">* C'est une note indicative calculée selon le barème officiel avant validation par l'enseignant</p><hr>`;
-            reportHTML += `<p><strong>Texte de référence (Long) :</strong><br><em>${selectedText.replace(/\n/g, '<br>')}</em></p>`;
-
-            document.getElementById('print-report').innerHTML = reportHTML;
+            const reportHtml = `
+                <h3>Rapport d'examen - Dactylographie</h3>
+                <p><strong>Élève :</strong> ${studentData.prenom} ${studentData.nom} (${studentData.classe})</p>
+                <p><strong>Vitesse :</strong> ${finalWpm} MPM (Mots par minute)</p>
+                <p><strong>Précision :</strong> ${finalPrecision}%</p>
+                <p><strong>Fautes commises :</strong> ${finalErrors}</p>
+                <p><strong>Note indicative :</strong> ${scoreNote.toFixed(1)} / 6</p>
+            `;
+            document.getElementById('print-report').innerHTML = reportHtml;
         }
 
         function toggleScore() {
             const scoreSpan = document.getElementById('hidden-score');
-            const btn = document.getElementById('eye-btn');
-            if (scoreSpan.classList.contains('hidden')) {
-                scoreSpan.classList.remove('hidden');
-                btn.innerText = "👁️ Masquer la note";
-            } else {
-                scoreSpan.classList.add('hidden');
-                btn.innerText = "👁️ Afficher la note";
-            }
+            const eyeBtn = document.getElementById('eye-btn');
+            scoreSpan.innerText = scoreNote.toFixed(1) + " / 6";
+            scoreSpan.classList.toggle('hidden');
+            eyeBtn.innerText = scoreSpan.classList.contains('hidden') ? "👁️ Afficher la note" : "🙈 Cacher la note";
         }
     </script>
 </body>
