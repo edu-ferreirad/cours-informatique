@@ -1,1 +1,433 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Examen - Dessin d'Ordinateur</title>
+    <style>
+        body {
+            background-color: #050914;
+            color: #00ffff;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding-top: 30px;
+            overflow-x: hidden;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+            background: rgba(5, 15, 35, 0.85);
+            border: 1px solid #00ffff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 30px;
+        }
+        h1, p, label, h2 {
+            color: #ffffff;
+            text-shadow: 0 0 10px #00bfff, 0 0 20px #0044ff;
+        }
+        input[type="text"], input[type="password"] {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            background: #000;
+            border: 1px solid #00ffff;
+            color: #00ffff;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 1em;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 15px;
+            box-shadow: 0 0 10px #007bff;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .score-box {
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+        
+        /* Schéma interactif de l'ordinateur */
+        .computer-schema {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            height: 400px;
+            margin: 20px auto;
+            border: 2px dashed #00ffff;
+            border-radius: 8px;
+            background: rgba(0, 10, 25, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .schema-element {
+            position: absolute;
+            background: rgba(0, 40, 80, 0.9);
+            border: 1px solid #00ffff;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+        .schema-element select {
+            background: #000;
+            color: #00ffff;
+            border: 1px solid #00ffff;
+            padding: 5px;
+            border-radius: 4px;
+            margin-top: 5px;
+            font-size: 0.9em;
+        }
+        /* Positions approximatives des éléments dans le schéma */
+        #pos-ecran { top: 30px; left: 35%; }
+        #pos-clavier { bottom: 30px; left: 30%; }
+        #pos-souris { bottom: 30px; right: 10%; }
+        #pos-usb { top: 40%; right: 15%; }
 
+        /* Style d'impression (PDF) */
+        @media print {
+            body {
+                background: white !important;
+                color: black !important;
+                padding: 0;
+            }
+            canvas, .btn, #matrix, #step-result > h2, #step-result > p, .score-box, a {
+                display: none !important;
+            }
+            .container {
+                background: white !important;
+                border: none !important;
+                box-shadow: none !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 0;
+                margin: 0;
+            }
+            .print-report {
+                display: block !important;
+                text-align: left;
+                font-size: 0.95em;
+                margin-top: 0;
+                color: black !important;
+            }
+            .print-report h3, .print-report p, .print-report strong, .print-report span, .print-report em {
+                color: black !important;
+                text-shadow: none !important;
+            }
+            .print-item {
+                margin-bottom: 15px;
+                padding-bottom: 10px;
+                border-bottom: 1px solid #ccc;
+            }
+            .computer-schema {
+                border: 1px solid #999;
+                background: white !important;
+                color: black !important;
+                height: auto;
+            }
+            .schema-element {
+                position: static !important;
+                background: none !important;
+                border: none !important;
+                box-shadow: none !important;
+                color: black !important;
+                margin: 10px 0;
+            }
+            .schema-element select {
+                border: none;
+                background: none;
+                color: black;
+                font-weight: bold;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix"></canvas>
+
+    <div class="container" id="app-container">
+        <h1>Examen - Périphériques de l'Ordinateur</h1>
+
+        <!-- ÉTAPE 1 : Identification et Mot de passe -->
+        <div id="step-login">
+            <p>Veuillez entrer vos informations pour commencer :</p>
+            <input type="password" id="exam-password" placeholder="Mot de passe professeur"><br>
+            <input type="text" id="student-nom" placeholder="Nom"><br>
+            <input type="text" id="student-prenom" placeholder="Prénom"><br>
+            <input type="text" id="student-classe" placeholder="Classe"><br><br>
+            <button class="btn" onclick="startExam()">Commencer l'examen</button>
+            <p id="login-error" style="color: #ff4444;"></p>
+        </div>
+
+        <!-- ÉTAPE 2 : Schéma interactif -->
+        <div id="step-quiz" class="hidden">
+            <p>Indiquez pour chaque élément s'il s'agit d'un périphérique d'<strong>entrée</strong>, de <strong>sortie</strong>, des <strong>deux</strong>, ou <strong>rien</strong> :</p>
+            
+            <div class="computer-schema">
+                <div style="position: absolute; top: 10px; left: 10px; font-size: 0.85em; color: #00bfff;">🖥️ Schéma : Tour, Écran, Clavier, Souris, Clé USB</div>
+                
+                <!-- Écran -->
+                <div class="schema-element" id="pos-ecran">
+                    <label>🖥️ Écran :</label><br>
+                    <select id="ans-ecran">
+                        <option value="">-- Choisissez --</option>
+                        <option value="Rien">Rien</option>
+                        <option value="Entrée">Entrée</option>
+                        <option value="Sortie">Sortie</option>
+                        <option value="Les deux">Les deux</option>
+                    </select>
+                </div>
+
+                <!-- Clavier -->
+                <div class="schema-element" id="pos-clavier">
+                    <label>⌨️ Clavier :</label><br>
+                    <select id="ans-clavier">
+                        <option value="">-- Choisissez --</option>
+                        <option value="Rien">Rien</option>
+                        <option value="Entrée">Entrée</option>
+                        <option value="Sortie">Sortie</option>
+                        <option value="Les deux">Les deux</option>
+                    </select>
+                </div>
+
+                <!-- Souris -->
+                <div class="schema-element" id="pos-souris">
+                    <label>🖱️ Souris :</label><br>
+                    <select id="ans-souris">
+                        <option value="">-- Choisissez --</option>
+                        <option value="Rien">Rien</option>
+                        <option value="Entrée">Entrée</option>
+                        <option value="Sortie">Sortie</option>
+                        <option value="Les deux">Les deux</option>
+                    </select>
+                </div>
+
+                <!-- Clé USB -->
+                <div class="schema-element" id="pos-usb">
+                    <label>💾 Clé USB (sur la tour) :</label><br>
+                    <select id="ans-usb">
+                        <option value="">-- Choisissez --</option>
+                        <option value="Rien">Rien</option>
+                        <option value="Entrée">Entrée</option>
+                        <option value="Sortie">Sortie</option>
+                        <option value="Les deux">Les deux</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="btn" onclick="submitExam()">Valider l'examen</button>
+            <p id="quiz-error" style="color: #ff4444;"></p>
+        </div>
+
+        <!-- ÉTAPE 3 : Résultat -->
+        <div id="step-result" class="hidden">
+            <h2>Examen terminé !</h2>
+            <p>Merci <strong><span id="res-prenom"></span> <span id="res-nom"></span></strong> (<span id="res-classe"></span>).</p>
+            <div class="score-box">
+                <span>Note : </span>
+                <span id="hidden-score" class="hidden" style="color: #00ff00; font-weight: bold; font-size: 1.3em;"></span>
+                <button class="btn" id="eye-btn" onclick="toggleScore()">👁️ Afficher la note</button>
+            </div>
+            <p style="font-size: 0.85em; color: #ffeb3b; margin-top: 10px; text-shadow: 0 0 5px rgba(255, 235, 59, 0.5);">* C'est une note indicative avant validation par l'enseignant</p>
+            <br><br>
+            <button class="btn" onclick="window.print()" style="background-color: #28a745;">🖨️ Imprimer / Sauvegarder en PDF</button>
+            <br><br>
+            <a class="btn" href="examens.html" style="background-color: #6c757d;">⬅ Retour aux examens</a>
+
+            <!-- Rapport détaillé pour l'affichage et l'impression -->
+            <div id="print-report" class="print-report" style="margin-top: 30px; text-align: left;"></div>
+        </div>
+    </div>
+
+    <script>
+        let studentData = {};
+        let scoreNote = 6.0;
+        let examResults = [];
+
+        const correctAnswers = {
+            ecran: "Sortie",
+            clavier: "Entrée",
+            souris: "Entrée",
+            usb: "Les deux"
+        };
+
+        function startExam() {
+            const pwd = document.getElementById('exam-password').value;
+            const nom = document.getElementById('student-nom').value.trim();
+            const prenom = document.getElementById('student-prenom').value.trim();
+            const classe = document.getElementById('student-classe').value.trim();
+
+            if (pwd !== "prof123") {
+                document.getElementById('login-error').innerText = "Mot de passe incorrect.";
+                return;
+            }
+            if (!nom || !prenom || !classe) {
+                document.getElementById('login-error').innerText = "Veuillez remplir tous les champs.";
+                return;
+            }
+
+            studentData = { nom, prenom, classe };
+
+            document.getElementById('step-login').classList.add('hidden');
+            document.getElementById('step-quiz').classList.remove('hidden');
+        }
+
+        function submitExam() {
+            const ansEcran = document.getElementById('ans-ecran').value;
+            const ansClavier = document.getElementById('ans-clavier').value;
+            const ansSouris = document.getElementById('ans-souris').value;
+            const ansUsb = document.getElementById('ans-usb').value;
+
+            if (!ansEcran || !ansClavier || !ansSouris || !ansUsb) {
+                document.getElementById('quiz-error').innerText = "Veuillez répondre à tous les éléments du schéma.";
+                return;
+            }
+
+            let items = [
+                { label: "Écran", user: ansEcran, correct: correctAnswers.ecran },
+                { label: "Clavier", user: ansClavier, correct: correctAnswers.clavier },
+                { label: "Souris", user: ansSouris, correct: correctAnswers.souris },
+                { label: "Clé USB", user: ansUsb, correct: correctAnswers.usb }
+            ];
+
+            scoreNote = 6.0;
+            examResults = [];
+
+            items.forEach(item => {
+                let isCorrect = (item.user === item.correct);
+                let isPartial = false;
+
+                if (!isCorrect) {
+                    // Règle spécifique pour la clé USB : si l'élève met entrée ou sortie, il ne perd que 0.5 au lieu de 1
+                    if (item.label === "Clé USB" && (item.user === "Entrée" || item.user === "Sortie")) {
+                        scoreNote -= 0.5;
+                        isPartial = true;
+                    } else {
+                        scoreNote -= 1.0;
+                    }
+                }
+
+                examResults.push({
+                    label: item.label,
+                    userAnswer: item.user,
+                    correctAnswer: item.correct,
+                    isCorrect: isCorrect,
+                    isPartial: isPartial
+                });
+            });
+
+            if (scoreNote < 1.0) scoreNote = 1.0;
+
+            finishExam();
+        }
+
+        function finishExam() {
+            document.getElementById('step-quiz').classList.add('hidden');
+            document.getElementById('step-result').classList.remove('hidden');
+
+            document.getElementById('res-nom').innerText = studentData.nom;
+            document.getElementById('res-prenom').innerText = studentData.prenom;
+            document.getElementById('res-classe').innerText = studentData.classe;
+            document.getElementById('hidden-score').innerText = scoreNote.toFixed(1);
+
+            let reportHTML = `<h3>Rapport d'Examen - ${studentData.prenom} ${studentData.nom} (${studentData.classe})</h3>`;
+            reportHTML += `<p><strong>Note finale (indicative) : ${scoreNote.toFixed(1)} / 6</strong></p>`;
+            reportHTML += `<p style="font-size: 0.9em; font-style: italic;">* C'est une note indicative avant validation par l'enseignant</p><hr>`;
+            
+            examResults.forEach((item) => {
+                let colorStyle = item.isCorrect ? '#28a745' : (item.isPartial ? '#ffc107' : '#dc3545');
+                reportHTML += `
+                    <div class="print-item">
+                        <p><strong>Élément : ${item.label}</strong></p>
+                        <p>Réponse élève : <span style="color: ${colorStyle}; font-weight: bold;">${item.userAnswer}</span></p>
+                        <p>Réponse attendue : <em>${item.correctAnswer}</em></p>
+                    </div>
+                `;
+            });
+
+            document.getElementById('print-report').innerHTML = reportHTML;
+        }
+
+        function toggleScore() {
+            const scoreSpan = document.getElementById('hidden-score');
+            const btn = document.getElementById('eye-btn');
+            if (scoreSpan.classList.contains('hidden')) {
+                scoreSpan.classList.remove('hidden');
+                btn.innerText = "🙈 Masquer la note";
+            } else {
+                scoreSpan.classList.add('hidden');
+                btn.innerText = "👁️ Afficher la note";
+            }
+        }
+
+        history.pushState(null, null, location.href);
+        window.onpopstate = function () {
+            history.go(1);
+        };
+
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const characters = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ<>/\\{}[]*&é"\'(-)=+';
+        const fontSize = 16;
+        let columns = canvas.width / fontSize;
+        let drops = [];
+
+        for (let i = 0; i < columns; i++) {
+            drops[i] = 1;
+        }
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(5, 9, 20, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#00ffff';
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = characters.charAt(Math.floor(Math.random() * characters.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawMatrix, 50);
+    </script>
+</body>
+</html>
