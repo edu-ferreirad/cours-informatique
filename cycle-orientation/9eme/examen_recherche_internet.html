@@ -149,6 +149,7 @@
                 <span id="hidden-score" class="hidden" style="color: #00ff00; font-weight: bold; font-size: 1.3em;"></span>
                 <button class="btn" id="eye-btn" onclick="toggleScore()">👁️ Afficher la note</button>
             </div>
+            <p style="font-size: 0.85em; color: #ffeb3b; margin-top: 10px; text-shadow: 0 0 5px rgba(255, 235, 59, 0.5);">* C'est une note indicative avant validation par l'enseignant</p>
             <br><br>
             <button class="btn" onclick="window.print()" style="background-color: #28a745;">🖨️ Imprimer / Sauvegarder en PDF</button>
             <br><br>
@@ -270,7 +271,8 @@
             document.getElementById('hidden-score').innerText = scoreNote.toFixed(1);
 
             let reportHTML = `<h3>Rapport d'Examen - ${studentData.prenom} ${studentData.nom} (${studentData.classe})</h3>`;
-            reportHTML += `<p><strong>Note finale : ${scoreNote.toFixed(1)} / 6</strong></p><hr>`;
+            reportHTML += `<p><strong>Note finale (indicative) : ${scoreNote.toFixed(1)} / 6</strong></p>`;
+            reportHTML += `<p style="font-size: 0.9em; font-style: italic;">* C'est une note indicative avant validation par l'enseignant</p><hr>`;
             
             examResults.forEach((item, index) => {
                 reportHTML += `
