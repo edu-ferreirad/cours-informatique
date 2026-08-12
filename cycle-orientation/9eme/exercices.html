@@ -1,1 +1,213 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Espace Exercices - 9ème</title>
+    <style>
+        body {
+            background-color: #050914;
+            color: #00ffff; /* Couleur principale par défaut */
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding-top: 30px;
+            overflow-x: hidden;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        h1, p {
+            position: relative;
+            z-index: 10;
+            color: #ffffff;
+            text-shadow: 0 0 10px #00bfff, 0 0 20px #0044ff;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+            padding-bottom: 50px;
+        }
+        .exercise-list {
+            list-style-type: none;
+            padding: 0;
+            margin-top: 40px;
+        }
+        .exercise-item {
+            background: rgba(5, 15, 35, 0.85);
+            border: 1px solid #00ffff; /* Bordure bleue par défaut */
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+            border-radius: 8px;
+            margin: 20px auto;
+            padding: 25px;
+            width: 90%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .file-info {
+            text-align: left;
+        }
+        .file-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 5px;
+            text-shadow: 0 0 5px #00bfff;
+        }
+        .file-type {
+            font-size: 0.9em;
+            color: #00ffff; /* Couleur type fichier */
+        }
+        .download-btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #007bff; /* Fond bouton par défaut */
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: background-color 0.3s, box-shadow 0.3s;
+            box-shadow: 0 0 10px #007bff;
+        }
+        .download-btn:hover {
+            background-color: #0056b3;
+            box-shadow: 0 0 15px #0056b3;
+        }
+        .back-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #6c757d; /* Gris */
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            position: relative;
+            z-index: 10;
+            margin-bottom: 20px;
+        }
+        .back-btn:hover {
+            background-color: #5a6268;
+        }
 
+        /* --- APPLICATION DU THÈME BLEU CLAIR SUR TOUS LES ÉLÉMENTS --- */
+        
+        /* Canvas (pluie) */
+        /* Note: dans le script JS ci-dessous, je vais changer ctx.fillStyle = '#00ffff' en #00e5ff */
+
+        /* Titres et texte */
+        h1, p, .file-type, .file-name {
+            color: #ffffff;
+            text-shadow: 0 0 10px #00e5ff, 0 0 20px #00b2ff; /* Reflets bleu clair */
+        }
+        .file-name {
+            text-shadow: 0 0 8px #00e5ff;
+        }
+
+        /* Cartes d'exercice */
+        .exercise-item {
+            border: 1px solid #00e5ff; /* Bordure bleu clair */
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.3); /* Halo bleu clair */
+        }
+
+        /* Bouton de téléchargement */
+        .download-btn {
+            background-color: #00b2ff; /* Fond bleu moyen */
+            box-shadow: 0 0 12px #00b2ff;
+        }
+        .download-btn:hover {
+            background-color: #007acc; /* Bleu foncé au survol */
+            box-shadow: 0 0 20px #007acc;
+        }
+
+    </style>
+</head>
+<body>
+    <canvas id="matrix"></canvas>
+
+    <div class="container">
+        <h1>Espace Exercices - 9ème</h1>
+        <p><a class="back-btn" href="index.html">⬅ Retour au menu 9ème</a></p>
+        
+        <p>Cliquez sur les boutons pour télécharger les fichiers.</p>
+
+        <ul class="exercise-list">
+            <!-- Exercice 1 : Feuille de calcul (ODS) -->
+            <li class="exercise-item">
+                <div class="file-info">
+                    <div class="file-name">achatsNoel.ods</div>
+                    <div class="file-type">Fichier LibreOffice Calc / Excel</div>
+                </div>
+                <a href="achatsNoel.ods" class="download-btn" download>⬇️ Télécharger</a>
+            </li>
+
+            <!-- Exercice 2 : Dossier compressé 1 (ZIP) -->
+            <li class="exercise-item">
+                <div class="file-info">
+                    <div class="file-name">Animaux fantastiques.zip</div>
+                    <div class="file-type">Dossier compressé (images/textes)</div>
+                </div>
+                <a href="Animaux fantastiques.zip" class="download-btn" download>⬇️ Télécharger</a>
+            </li>
+
+            <!-- Exercice 3 : Dossier compressé 2 (ZIP) -->
+            <li class="exercise-item">
+                <div class="file-info">
+                    <div class="file-name">CONSTRUIRE SA MAISON.zip</div>
+                    <div class="file-type">Dossier compressé (images/plans)</div>
+                </div>
+                <a href="CONSTRUIRE SA MAISON.zip" class="download-btn" download>⬇️ Télécharger</a>
+            </li>
+        </ul>
+
+    </div>
+
+    <script>
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const characters = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ<>/\\{}[]*&é"\'(-)=+';
+        const fontSize = 16;
+        let columns = canvas.width / fontSize;
+        let drops = [];
+
+        for (let i = 0; i < columns; i++) {
+            drops[i] = 1;
+        }
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(5, 9, 20, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // --- COULEUR MODIFIÉE ICI POUR LE BLEU CLAIR ---
+            ctx.fillStyle = '#00e5ff'; 
+            // -----------------------------------------------
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = characters.charAt(Math.floor(Math.random() * characters.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawMatrix, 50);
+    </script>
+</body>
+</html>
