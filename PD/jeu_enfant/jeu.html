@@ -1,20 +1,38 @@
 <!DOCTYPE html>
-<html lang ="fr">
-
+<html lang="fr">
 <head>
-	<title>Protection des données</title>
-  	<meta charset="UTF-8">
-  	<meta name="author" content="Ferreira">
-
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Ferreira">
+    <title>Protection des données</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: #050914;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+    </style>
 </head>
-
 <body>
     <canvas id="dessin" width="2000" height="1000">
-        Your browser does not support the HTML canvas tag.</canvas>
+        Your browser does not support the HTML canvas tag.
+    </canvas>
 
     <script src="jeu.js"></script>
-
-
 </body>
 </html>
