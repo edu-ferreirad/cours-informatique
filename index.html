@@ -4,40 +4,67 @@
     <meta charset="UTF-8">
     <title>Portail Pédagogique</title>
     <style>
-        /* STYLE DE BASE - NE PAS MODIFIER */
-        body { font-family: Arial, sans-serif; text-align: center; margin: 50px auto 0 auto; } /* Ajout de auto sur les côtés pour centrer si le body change de largeur */
-        h1 { color: #333; }
-        .btn { display: inline-block; padding: 15px 30px; margin: 15px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; font-size: 18px; position: relative; z-index: 10; } /* z-index pour que les boutons soient au-dessus de l'animation */
+        /* STYLE DE BASE */
+        body { font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 0; height: 100vh; background-color: black; overflow-x: hidden; }
+        h1 { color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        p { color: #f0f0f0; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); position: relative; z-index: 10; }
+        .btn { display: inline-block; padding: 15px 30px; margin: 15px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; font-size: 18px; position: relative; z-index: 10; box-shadow: 0 0 10px #007bff; }
         .btn:hover { background-color: #0056b3; }
-        p { position: relative; z-index: 10; }
-
-        /* NOUVEAU STYLE POUR L'ANIMATION MATRIX */
-        body {
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            background-color: black;
-            overflow: hidden; /* Empêche les barres de défilement dues à l'animation */
-        }
 
         canvas {
             display: block;
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 1; /* L'animation est derrière le texte */
+            z-index: 1;
         }
 
-        /* Pour que le contenu reste visible sur fond noir (titre qui était noir) */
-        h1 {
-            color: white;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5); /* Ajout d'une ombre pour la lisibilité */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+            padding-bottom: 50px;
         }
-        p {
-            color: #f0f0f0; /* Légèrement gris pour le contraste */
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+
+        .section-title {
+            font-size: 1.8em;
+            margin-top: 50px;
+            color: #00ffff;
+            text-shadow: 0 0 10px #00bfff, 0 0 20px #0044ff;
+        }
+
+        .cours-card {
+            background: rgba(5, 15, 35, 0.85);
+            border: 1px solid #00ffff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+            border-radius: 8px;
+            margin: 25px auto;
+            padding: 20px;
+            width: 90%;
+            text-align: left;
+        }
+        .cours-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #00ffff;
+            margin-bottom: 15px;
+            text-shadow: 0 0 5px #00bfff;
+        }
+        .pdf-container {
+            width: 100%;
+            height: 450px;
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1px solid #0044ff;
+            background: #000;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
         }
     </style>
 </head>
@@ -46,16 +73,62 @@
     <!-- Animation Matrix -->
     <canvas id="matrixCanvas"></canvas>
 
-    <!-- Contenu de votre page -->
-    <h1 style="margin-top: 100px;">Bienvenue sur le Portail Pédagogique</h1> <!-- Petite marge pour le descendre un peu -->
-    <p>Sélectionnez votre cursus :</p>
-    
-    <div style="margin-top: 50px;">
-        <a class="btn" href="cycle-orientation/">Cycle d'Orientation</a>
-        <a class="btn" href="college/">Collège</a>
-        <a class="btn" href="ECG/">ECG</a>
-        <a class="btn" href="DEMO/">Démonstrations en cybersécurité</a>
-        <a class="btn" href="PD/">Protection des données</a>
+    <div class="container">
+        <!-- Contenu de votre page -->
+        <h1 style="margin-top: 60px;">Bienvenue sur le Portail Pédagogique</h1>
+        <p>Sélectionnez votre cursus :</p>
+        
+        <div style="margin-top: 30px;">
+            <a class="btn" href="cycle-orientation/">Cycle d'Orientation</a>
+            <a class="btn" href="college/">Collège</a>
+            <a class="btn" href="ECG/">ECG</a>
+            <a class="btn" href="DEMO/">Démonstrations en cybersécurité</a>
+            <a class="btn" href="PD/">Protection des données</a>
+        </div>
+
+        <!-- Section Brochures utiles -->
+        <h2 class="section-title">Brochures utiles</h2>
+        <p>Prévisualisation des documents et brochures :</p>
+
+        <!-- 1 -->
+        <div class="cours-card">
+            <div class="cours-title">📄 318_852_F_Broschuere_Medienkompetenz_im_Schulalltag_FR_MDL_WEB_d09f0eb63f.pdf</div>
+            <div class="pdf-container">
+                <iframe src="318_852_F_Broschuere_Medienkompetenz_im_Schulalltag_FR_MDL_WEB_d09f0eb63f.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- 2 -->
+        <div class="cours-card">
+            <div class="cours-title">📄 Jeunes_et_medias_Brochure_Competences_numeriques_ZHAW_2024_415639a0ee.pdf</div>
+            <div class="pdf-container">
+                <iframe src="Jeunes_et_medias_Brochure_Competences_numeriques_ZHAW_2024_415639a0ee.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- 3 -->
+        <div class="cours-card">
+            <div class="cours-title">📄 Ju_M_Flyer_12_18_FR_3fc825d5bc.pdf</div>
+            <div class="pdf-container">
+                <iframe src="Ju_M_Flyer_12_18_FR_3fc825d5bc.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- 4 -->
+        <div class="cours-card">
+            <div class="cours-title">📄 Ju_M_Flyer_Bildrecht_Eltern_A5_FR_UA_020891a40e.pdf</div>
+            <div class="pdf-container">
+                <iframe src="Ju_M_Flyer_Bildrecht_Eltern_A5_FR_UA_020891a40e.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- 5 -->
+        <div class="cours-card">
+            <div class="cours-title">📄 Ju_M_Flyer_Bildrecht_Jugendliche_A5_FR_UA_dff8929f4b.pdf</div>
+            <div class="pdf-container">
+                <iframe src="Ju_M_Flyer_Bildrecht_Jugendliche_A5_FR_UA_dff8929f4b.pdf"></iframe>
+            </div>
+        </div>
     </div>
 
     <!-- Script pour l'animation Matrix -->
@@ -63,7 +136,6 @@
         const canvas = document.getElementById('matrixCanvas');
         const ctx = canvas.getContext('2d');
 
-        // Réinitialise la taille du canvas quand la fenêtre change de taille
         function resize() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
@@ -72,12 +144,11 @@
         resize();
 
         const katakana = 'アァカサタナハマヤラワガザダバパイィキシチニヒミリヲギジヂビピウゥクスツヌフムユルグズブプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨロヲゴゾドボポヴッン';
-        const latin = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         const nums = '0123456789';
         const alphabet = katakana + nums;
 
         const fontSize = 16;
-        const columns = canvas.width / fontSize;
+        let columns = canvas.width / fontSize;
 
         const drops = [];
         for (let x = 0; x < columns; x++) {
@@ -85,11 +156,10 @@
         }
 
         function draw() {
-            // Fond noir semi-transparent pour créer l'effet de traînée
             ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            ctx.fillStyle = '#FFFFFF'; // Couleur blanche pour les caractères
+            ctx.fillStyle = '#FFFFFF';
             ctx.font = fontSize + 'px monospace';
 
             for (let i = 0; i < drops.length; i++) {
