@@ -21,7 +21,8 @@ body {
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
-    background-color: #050914; /* Couleur de fond de secours pour les écrans étroits */
+    background-color: #050914;
+    font-family: Arial, sans-serif;
 }
 
 .button {
@@ -65,11 +66,167 @@ body {
     opacity: 1;
     right: 0;
 }
+
+/* Bouton pour ouvrir la pop-up des consignes */
+.info-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: rgba(5, 15, 35, 0.8);
+    color: #1ac0a7;
+    border: 2px solid #1ac0a7;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    font-size: 22px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+    transition: all 0.3s;
+    z-index: 10;
+}
+
+.info-btn:hover {
+    background-color: #1ac0a7;
+    color: #fff;
+    transform: scale(1.1);
+}
+
+/* Lien discret en bas à droite (Sources & Création) */
+.credits-link {
+    position: fixed;
+    bottom: 15px;
+    right: 20px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.8em;
+    text-decoration: none;
+    z-index: 10;
+    transition: color 0.3s;
+}
+
+.credits-link:hover {
+    color: #1ac0a7;
+    text-decoration: underline;
+}
+
+/* Styles de la Pop-up (Modale) */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background: rgba(5, 15, 35, 0.95);
+    border: 2px solid #1ac0a7;
+    padding: 30px;
+    width: min(90vw, 650px);
+    border-radius: 10px;
+    box-shadow: 0 0 25px rgba(26, 192, 167, 0.4);
+    color: #ffffff;
+    position: relative;
+    text-align: left;
+    line-height: 1.6;
+}
+
+.modal-content h2 {
+    color: #1ac0a7;
+    margin-top: 0;
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.close-btn:hover {
+    color: #fff;
+}
+
+.highlight-warning {
+    color: #ff4d4d;
+    font-weight: bold;
+}
 </style>
 <script src="title-scroll.js" data-start="5000" data-speed="250"></script>
 </head>
 
 <body>
+
+    <!-- Bouton pour afficher les consignes -->
+    <button class="info-btn" onclick="openModal('introModal')" title="Consignes du jeu">?</button>
+
+    <!-- Bouton principal du jeu -->
     <a href="jeu_enfant/jeu.html" class="button animate__animated animate__pulse animate__infinite"><span>Jouer</span></a>
+
+    <!-- Lien discret en bas à droite pour les sources et créations -->
+    <a href="javascript:void(0);" class="credits-link" onclick="openModal('creditsModal')">Sources & Création</a>
+
+    <!-- Pop-up des consignes (texte de l'image) -->
+    <div id="introModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('introModal')">&times;</span>
+            <h2>Consignes de l'aventure</h2>
+            <p>Vous êtes un adolescent de 12 ans et vous venez de recevoir votre premier smartphone. Super content vous allez pouvoir profiter des joies du web, mais vos parents veillent au grain....</p>
+            <p>Il s’agit d’un jeu à la première personne. Vous aurez des choix à faire. Ecrivez « o » pour oui et « n » pour non.</p>
+            <p class="highlight-warning">/!\ Une erreur peut sonner la fin de votre aventure !</p>
+            <p><strong>Bon jeu ;)</strong></p>
+            <br>
+            <button class="button" style="width: 100%; font-size: 1.1em; padding: 12px;" onclick="closeModal('introModal')">C'est parti !</button>
+        </div>
+    </div>
+
+    <!-- Pop-up Sources & Création -->
+    <div id="creditsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('creditsModal')">&times;</span>
+            <h2>Sources & Création</h2>
+            <p><strong>Créé par :</strong> David Ferreira (CO Driez / SEM Lab)</p>
+            <p><strong>Sources :</strong></p>
+            <ul>
+                <li>Personnages : <a href="https://www.freepng.fr" target="_blank" style="color: #1ac0a7;">https://www.freepng.fr</a></li>
+                <li>Arrières-plans : <a href="https://pixabay.com" target="_blank" style="color: #1ac0a7;">https://pixabay.com</a>, <a href="https://fr.freepik.com" target="_blank" style="color: #1ac0a7;">https://fr.freepik.com</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = "flex";
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = "none";
+        }
+
+        // Fermer la modale si on clique en dehors de la boîte de contenu
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = "none";
+            }
+        }
+
+        // Ouvrir automatiquement la modale des consignes dès le chargement de la page
+        window.onload = function() {
+            openModal('introModal');
+        }
+    </script>
 </body>
 </html>
