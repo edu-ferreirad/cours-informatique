@@ -63,6 +63,22 @@
             height: 100%;
             border: none;
         }
+        .img-container {
+            width: 100%;
+            max-height: 550px;
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1px solid #0044ff;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .img-container img {
+            max-width: 100%;
+            max-height: 550px;
+            object-fit: contain;
+        }
         .back-btn {
             display: inline-block;
             padding: 10px 20px;
@@ -201,6 +217,30 @@
             <div class="cours-title">📄 14.1 Cours d'introduction à la programmation</div>
             <div class="pdf-container">
                 <iframe src="14.1 Cours d'introduction à la programmation.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- TUTO SCRATCH 2 -->
+        <div class="cours-card">
+            <div class="cours-title">🖼️ TUTO SCRATCH 2</div>
+            <div class="img-container">
+                <img src="TUTO SCRATCH2.png" alt="TUTO SCRATCH 2">
+            </div>
+        </div>
+
+        <!-- Parcours I -->
+        <div class="cours-card">
+            <div class="cours-title">📄 Parcours I</div>
+            <div class="pdf-container">
+                <iframe src="Parcours I.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- TUTO SCRATCH 1 -->
+        <div class="cours-card">
+            <div class="cours-title">🖼️ TUTO SCRATCH 1</div>
+            <div class="img-container">
+                <img src="TUTO SCRATCH1.png" alt="TUTO SCRATCH 1">
             </div>
         </div>
     </div>
