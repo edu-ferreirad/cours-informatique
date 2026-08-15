@@ -4,7 +4,7 @@ var b;
 var c;
 var de;
 
-// Redimensionnement automatique pour s'adapter à l'écran
+// Redimensionnement automatique du canvas et de l'affichage
 function resizeCanvas() {
     moncanvas.width = window.innerWidth;
     moncanvas.height = window.innerHeight;
@@ -12,66 +12,128 @@ function resizeCanvas() {
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
-// Configuration CSS commune pour les scènes
-function setBackground(url) {
-    document.body.style.backgroundImage = "url('" + url + "')";
+// Fonction pour ajouter les boutons de fin de partie
+function addNavigationButtons() {
+    // Supprime d'abord les boutons s'ils existent déjà pour éviter les doublons
+    var existingContainer = document.getElementById("end-buttons-container");
+    if (existingContainer) {
+        existingContainer.remove();
+    }
+
+    // Création du conteneur des boutons
+    var container = document.createElement("div");
+    container.id = "end-buttons-container";
+    container.style.position = "fixed";
+    container.style.bottom = "10%";
+    container.style.left = "50%";
+    container.style.transform = "translateX(-50%)";
+    container.style.zIndex = "1000";
+    container.style.textAlign = "center";
+
+    // Style commun des boutons
+    var buttonStyle = "padding: 12px 24px; margin: 0 10px; font-size: 16px; font-weight: bold; cursor: pointer; border: none; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: background 0.2s;";
+
+    // Bouton Recommencer
+    var btnRestart = document.createElement("button");
+    btnRestart.innerText = "Recommencer";
+    btnRestart.style.cssText = buttonStyle + " background-color: #4CAF50; color: white;";
+    btnRestart.onclick = function() {
+        window.location.href = "PD/Debut_enfant.html";
+    };
+
+    // Bouton Accueil / Index
+    var btnIndex = document.createElement("button");
+    btnIndex.innerText = "Accueil";
+    btnIndex.style.cssText = buttonStyle + " background-color: #2196F3; color: white;";
+    btnIndex.onclick = function() {
+        window.location.href = "PD/index.html";
+    };
+
+    container.appendChild(btnRestart);
+    container.appendChild(btnIndex);
+    document.body.appendChild(container);
+}
+
+// Fin négative 1 -> perdu1.jpg
+function scene_M1(){
+    document.body.style.backgroundImage = "url('perdu1.jpg')";
     document.body.style.backgroundRepeat = "no-repeat";
     document.body.style.backgroundSize = "cover";
     document.body.style.backgroundPosition = "center";
+    window.alert("Afin d'éviter tout conflit, ne prends pas d'initiative dans le dos de tes parents. Privilégie toujours le dialogue. Pour plus de conseils, regarde la brochure avec tes parents.");
+    addNavigationButtons();
 }
 
-// Fins négatives
-function scene_M1(){
-    setBackground("perdu1.jpg");
-    window.alert("Afin d'éviter tout conflit, ne prenez pas d'initiative dans le dos de votre enfant. Privilégiez toujours le dialogue. Pour plus de conseils, référez-vous à la brochure !\n\n);
-}
+// Fin négative 2 -> perdu2.jpg
 function scene_M2(){
-    setBackground("perdu2.jpg");
-    window.alert("Il ne s'agit ici pas d'une erreur, surtout si vous n'avez pas les moyens de payer un abonnement. Cependant, votre adolescent arrivera toujours à trouver une connexion (Wifi de la ville, partage d'un ami, ...). Avec un abonnement, vous pourrez donc au moins garder un certain contrôle. Afin d'avoir plus de conseils, référez-vous à la brochure !\n\n);
-}
-function scene_M3(){
-    setBackground("perdu3.jpg");
-    window.alert("N'ayant pas anticipé, vous avez laissé le hasard décider à votre place, ce qui comporte certains risques (harcèlement, addiction, ...). Afin de pouvoir anticiper un éventuel problème, référez-vous à la brochure !\n\n);
+    document.body.style.backgroundImage = "url('perdu2.jpg')";
+    document.body.style.backgroundRepeat = "no-repeat";
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center";
+    window.alert("Il ne s'agit ici pas d'une erreur en tant que telle, car tu peux avoir ton jardin secret. Néanmoins, un dialogue sincère est toujours préférable à des cachotteries. Pour plus de conseils, regarde la brochure et refais le jeu avec tes parents !");
+    addNavigationButtons();
 }
 
-// Scène du début
+// Fin négative 3 -> perdu3.jpg
+function scene_M3(){
+    document.body.style.backgroundImage = "url('perdu3.jpg')";
+    document.body.style.backgroundRepeat = "no-repeat";
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center";
+    window.alert("Comme tu t'es connecté au réseau d'un inconnu, tu as laissé le hasard décider à ta place, ce qui comporte certains risques (par exemple, de donner des informations personnelles à des personnes malveillantes...). Un dialogue sincère est toujours préférable à des cachotteries. Pour plus de conseils, regarde la brochure et refais le jeu avec tes parents !");
+    addNavigationButtons();
+}
+
+// Scène du début 
 function scene_1(){
-    setBackground("smartphone1.jpg");
+    document.body.style.backgroundImage = "url('maison1.jpg')";
+    document.body.style.backgroundRepeat = "no-repeat";
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center";
+    
     setTimeout(function(){
         do{
-            b = window.prompt("Vous êtes dans le magasin de smartphones et le vendeur vous informe que vous pouvez mettre un logiciel d'écoute sur le téléphone de votre fils si cela peut vous rassurer.\n\nAcceptez-vous? (o/n)");
+            b = window.prompt("Tu viens de recevoir ton smartphone, mais tu n'as pas accès à internet. Toi, tu souhaites la connexion pour pouvoir t'inscrire sur les réseaux. Tu décides de demander un abonnement 5G à tes parents. Est-ce que tu leur donnes les vraies raisons?\n\nDis-tu la vérité ? (o/n)");
             if (b !== null) b = b.trim().toLowerCase();
             
-            if (b === "o"){
+            if (b === "n"){
                 scene_M1();
-            } else if (b === "n"){
+            } else if (b === "o"){
                 scene_2();
             }
-        } while(b !== "o" && b !== "n");
+        }while(b !== "o" && b !== "n");
     }, 3000);
 }
 
 function scene_2(){
-    setBackground("maison1.jpg");
+    document.body.style.backgroundImage = "url('chambre.jpg')";
+    document.body.style.backgroundRepeat = "no-repeat";
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center";
+    
     setTimeout(function(){
         do{
-            c = window.prompt("Une fois rentré à la maison, vous donnez le smartphone à votre enfant qui vous supplie de lui acheter un abonnement 5G, pour que vous puissiez mieux le contacter, dit-il!\n\nAcceptez-vous de conclure cet abonnement ? (o/n)");
+            c = window.prompt("Une fois ton abonnement conclu, tu décides de t'inscrire sur les réseaux et de suivre tes copains. L'un d'entre eux te dit que, pour être tranquille avec tes parents, tu devrais créer un autre compte où rien ne se passe.\n\nSuis-tu le conseil de ton ami ? (o/n)");
             if (c !== null) c = c.trim().toLowerCase();
             
-            if (c === "o"){
+            if (c === "n"){
                 scene_3();
-            } else if(c === "n"){
+            } else if(c === "o"){
                 scene_M2();
             }
-        } while(c !== "o" && c !== "n");
+        }while(c !== "o" && c !== "n");
     }, 3000);
 }
 
 function scene_3(){
-    setBackground("maison2.jpg");
+    document.body.style.backgroundImage = "url('maison2.jpg')";
+    document.body.style.backgroundRepeat = "no-repeat";
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center";
+    
     setTimeout(function(){
         do{
-            c = window.prompt("Après des semaines d'utilisation, vous constatez que la fréquence des notifications est importante. Vous constatez aussi que vous avez omis de mettre un contrôle parental. Vous ne maîtrisez donc pas les événements. Même si cela est un peu tardif, décidez-vous de l'installer, dans la hâte?\n\nConfigurez-vous le contrôle parental dans la hâte? (o/n)");
+            c = window.prompt("Après des semaines d'utilisation, la fréquence des notifications sur ton smartphone devient de plus en plus importante. Tes parents décident dans la hâte de mettre un contrôle parental. Énervé, tu décides de scanner le réseau et tu constates qu'il y a un WiFi gratuit. Ne sachant pas à qui il appartient, tu ne maîtrises donc pas les événements.\n\nEst-ce que tu te connectes? (o/n)");
             if (c !== null) c = c.trim().toLowerCase();
             
             if (c === "o"){
@@ -79,23 +141,33 @@ function scene_3(){
             } else if(c === "n"){
                 De_fuite();
             }
-        } while(c !== "o" && c !== "n");
+        }while(c !== "o" && c !== "n");
     }, 3000);
 }
 
+// Victoire 1 -> victoire_1.jpg
 function scene_4(){
-    setBackground("victoire_1.jpg");
+    document.body.style.backgroundImage = "url('victoire_1.jpg')";
+    document.body.style.backgroundRepeat = "no-repeat";
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center";
+    
     setTimeout(function(){
-        window.alert("Bien que vous ayez laissé le hasard intervenir, vous avez su prendre les bonnes décisions, au bon moment. Anticipez, dialoguez et n'oubliez pas que vous êtes le modèle. Pour plus de conseils, référez-vous à la brochure !\n\n);
-        setBackground("the_end.jpg");
+        window.alert("Bien que tu aies laissé le hasard intervenir, tu as eu de la chance que le Wifi auquel t'es connecté ne soit pas malveillant. N'oublie pas que tes parents sont là pour t'accompagner quoi qu'il arrive; n'hésite donc pas à parler avec eux. Pour plus de conseils, regarde la brochure et refais le jeu avec tes parents !");
+        document.body.style.backgroundImage = "url('the_end.jpg')";
+        addNavigationButtons();
     }, 3000);
 }
 
 function scene_5(){
-    setBackground("maison3.jpg");
+    document.body.style.backgroundImage = "url('maison3.jpg')";
+    document.body.style.backgroundRepeat = "no-repeat";
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center";
+    
     setTimeout(function(){
         do{
-            c = window.prompt("Vous avez donc décidé de ne pas installer de contrôle parental. Vous laissez le temps passer, mais vous constatez que votre enfant est de plus en plus irritable. Malgré une longue journée de travail, souhaitez-vous entamer le dialogue?\n\nEntamez-vous le dialogue, malgré la fatigue ? (o/n)");
+            c = window.prompt("Tu as donc décidé de ne pas te connecter. Tu laisses le temps passer mais tu constates que tes parents ne cèdent pas. Tu es donc de plus en plus irritable. Malgré ta colère, souhaites-tu entamer le dialogue afin de défendre ton point de vue ?\n\nEntames-tu le dialogue, malgré ta colère ? (o/n)");
             if (c !== null) c = c.trim().toLowerCase();
             
             if (c === "o"){
@@ -103,44 +175,75 @@ function scene_5(){
             } else if(c === "n"){
                 scene_cachot();
             }
-        } while(c !== "o" && c !== "n");
+        }while(c !== "o" && c !== "n");
     }, 3000);
 }
 
+// Perdu 4 -> perdu4.jpg
 function scene_cachot(){
-    setBackground("perdu4.jpg"); 
+    document.body.style.backgroundImage = "url('perdu4.jpg')"; 
+    document.body.style.backgroundRepeat = "no-repeat";
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center";
+    
     setTimeout(function(){
-        window.alert("Le dialogue est fondamental pour accompagner votre enfant : s'il ne peut pas se confier à vous, il risque de le faire sur les réseaux... Afin d'avoir plus de conseils, référez-vous à la brochure !\n\n);
+        window.alert("Le dialogue est fondamental. Tes parents sont là pour t'accompagner quoi qu'il arrive, n'hésite donc pas à parler avec eux. Pour plus de conseils, regarde la brochure et refais le jeu avec tes parents !");
+        addNavigationButtons();
     }, 3000);
 }
 
+// Perdu 5 -> perdu5.jpg
 function scene_cachot1(){
-    setBackground("perdu5.jpg"); 
+    document.body.style.backgroundImage = "url('perdu5.jpg')"; 
+    document.body.style.backgroundRepeat = "no-repeat";
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center";
+    
     setTimeout(function(){
-        window.alert("Bien que le dialogue, fondamental pour accompagner votre enfant, ait été entamé, votre fatigue a fait que vous vous êtes emporté. La communication étant rompue, votre enfant pourrait ne plus se confier à vous et le faire sur les réseaux. Votre intention était bonne, mais lorsque vous souhaitez instaurer un dialogue, prenez bien votre temps. Afin d'avoir plus de conseils, référez-vous à la brochure !\n\n);
+        window.alert("Bien que le dialogue soit fondamental, ta colère a fait que t'es emporté et la communication est rompue. Ton intention était bonne, mais lorsque tu souhaites instaurer un dialogue, prends bien ton temps, regarde la brochure et refais le jeu avec tes parents !");
+        addNavigationButtons();
     }, 3000);
 }
 
+// Victoire 2 -> victoire_2.jpg
 function scene_7(){
-    setBackground("victoire_2.jpg"); 
+    document.body.style.backgroundImage = "url('victoire_2.jpg')"; 
+    document.body.style.backgroundRepeat = "no-repeat";
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center";
+    
     setTimeout(function(){
-        window.alert("Bravo, malgré la fatigue, votre capacité de dialogue a permis de désamorcer la situation tendue. Anticipez, dialoguez et n'oubliez pas que vous êtes le modèle. Pour plus de conseils, référez-vous à la brochure !\n\n); 
+        window.alert("Bravo ! Malgré ta colère, ta capacité de dialogue a permis de désamorcer une situation tendue. N'oublie pas que tes parents sont là pour t'accompagner quoi qu'il arrive, n'hésite donc pas à parler avec eux. Pour plus de conseils, regarde la brochure et refais le jeu avec tes parents !"); 
+        addNavigationButtons();
     }, 3000);
 }
 
-// Logique des dés
 function De_attaque(){
     de = Math.floor(Math.random()*6+1);
-    if(de < 5){ scene_4(); } else { scene_M3(); }
-}
-function De_fuite(){
-    de = Math.floor(Math.random()*6+1);
-    if(de < 5){ scene_5(); } else { scene_M3(); }
-}
-function De_combat_roi(){
-    de = Math.floor(Math.random()*6+1);
-    if(de < 6){ scene_cachot1(); } else { scene_7(); }
+    if(de < 5){
+        scene_4();
+    } else {
+        scene_M3();
+    }
 }
 
-// Démarrage
+function De_fuite(){
+    de = Math.floor(Math.random()*6+1);
+    if(de < 5){
+        scene_5();
+    } else {
+        scene_M3();
+    }
+}
+
+function De_combat_roi(){
+    de = Math.floor(Math.random()*6+1);
+    if(de < 6){
+        scene_cachot1();
+    } else {
+        scene_7();
+    }
+}
+
+// Lancement du jeu
 scene_1();
