@@ -158,9 +158,8 @@
             <p id="progress-indicator" style="font-size: 0.9em; color: #00bfff;"></p>
             <div class="question-box">
                 <p id="question-text" style="font-weight: bold; font-size: 1.1em;"></p>
-                <div class="options-container">
-                    <button class="option-btn" id="btn-A" onclick="selectAnswer('A')"></button>
-                    <button class="option-btn" id="btn-B" onclick="selectAnswer('B')"></button>
+                <div class="options-container" id="options-wrapper">
+                    <!-- Les boutons A et B seront injectés dynamiquement de manière aléatoire -->
                 </div>
             </div>
         </div>
@@ -189,35 +188,31 @@
         const allQuestions = [
             { 
                 q: "Vous recevez un e-mail pour créer une chaîne de solidarité qui aidera une petite fille à guérir d'une leucémie...", 
-                options: { 
-                    A: "Vous le faites suivre à vos contacts.", 
-                    B: "Vous vérifiez sur Internet si c'est fiable." 
-                }, 
-                a: "B" 
+                options: [
+                    { text: "Vous le faites suivre à vos contacts.", isCorrect: false },
+                    { text: "Vous vérifiez sur Internet si c'est fiable.", isCorrect: true }
+                ]
             },
             { 
                 q: "Un blog...", 
-                options: { 
-                    A: "Ce n'est ni plus ni moins qu'un site facile à éditer et à consulter.", 
-                    B: "C'est un site où l'on peut tout dire de soi et raconter n'importe quoi." 
-                }, 
-                a: "A" 
+                options: [
+                    { text: "Ce n'est ni plus ni moins qu'un site facile à éditer et à consulter.", isCorrect: true },
+                    { text: "C'est un site où l'on peut tout dire de soi et raconter n'importe quoi.", isCorrect: false }
+                ]
             },
             { 
                 q: "La meilleure façon de se débarrasser des spams...", 
-                options: { 
-                    A: "C'est de ne pas les ouvrir et de les supprimer immédiatement.", 
-                    B: "C'est de répondre à leur expéditeur en lui demandant de ne plus vous importer." 
-                }, 
-                a: "A" 
+                options: [
+                    { text: "C'est de ne pas les ouvrir et de les supprimer immédiatement.", isCorrect: true },
+                    { text: "C'est de répondre à leur expéditeur en lui demandant de ne plus vous importer.", isCorrect: false }
+                ]
             },
             { 
                 q: "Si vous tombez sur un site dont le contenu vous choque...", 
-                options: { 
-                    A: "Il peut être signalé à des services compétents qui verront si ce site est hors-la-loi ou pas.", 
-                    B: "Il n'y a rien d'autre à faire que de le refermer et de l'oublier." 
-                }, 
-                a: "A" 
+                options: [
+                    { text: "Il peut être signalé à des services compétents qui verront si ce site est hors-la-loi ou pas.", isCorrect: true },
+                    { text: "Il n'y a rien d'autre à faire que de le refermer et de l'oublier.", isCorrect: false }
+                ]
             }
         ];
 
@@ -226,6 +221,7 @@
         let scoreNote = 6.0;
         let studentData = {};
         let examResults = [];
+        let currentShuffledOptions = [];
 
         function startExam() {
             const pwd = document.getElementById('exam-password').value;
@@ -244,7 +240,7 @@
 
             studentData = { nom, prenom, classe };
 
-            // Ordre aléatoire des 4 questions
+            // 1. Mélanger l'ordre des 4 questions pour chaque élève
             selectedQuestions = [...allQuestions].sort(() => 0.5 - Math.random());
 
             document.getElementById('step-login').classList.add('hidden');
@@ -257,19 +253,37 @@
             const currentQ = selectedQuestions[currentIndex];
             document.getElementById('progress-indicator').innerText = `Question ${currentIndex + 1} / ${selectedQuestions.length}`;
             document.getElementById('question-text').innerText = currentQ.q;
-            document.getElementById('btn-A').innerText = "A. " + currentQ.options.A;
-            document.getElementById('btn-B').innerText = "B. " + currentQ.options.B;
+
+            // 2. Mélanger l'ordre des options (A et B inversées aléatoirement)
+            currentShuffledOptions = [...currentQ.options].sort(() => 0.5 - Math.random());
+
+            const optionsWrapper = document.getElementById('options-wrapper');
+            optionsWrapper.innerHTML = '';
+
+            const letters = ['A', 'B'];
+            currentShuffledOptions.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = letters[idx] + ". " + opt.text;
+                // On passe l'index de l'option mélangée au clic
+                btn.onclick = () => selectAnswer(idx);
+                optionsWrapper.appendChild(btn);
+            });
         }
 
-        function selectAnswer(userAnswer) {
-            const currentQ = selectedQuestions[currentIndex];
-            const correctAnswer = currentQ.a;
-            const isCorrect = (userAnswer === correctAnswer);
+        function selectAnswer(optionIndex) {
+            const chosenOption = currentShuffledOptions[optionIndex];
+            const isCorrect = chosenOption.isCorrect;
+
+            // Retrouver le texte de la bonne réponse pour le rapport
+            const correctOptObj = currentShuffledOptions.find(o => o.isCorrect);
+            const userOptLetter = ['A', 'B'][optionIndex];
+            const correctOptLetter = ['A', 'B'][currentShuffledOptions.indexOf(correctOptObj)];
 
             examResults.push({
-                question: currentQ.q,
-                userAnswer: userAnswer + ". " + currentQ.options[userAnswer],
-                correctAnswer: correctAnswer + ". " + currentQ.options[correctAnswer],
+                question: selectedQuestions[currentIndex].q,
+                userAnswer: userOptLetter + ". " + chosenOption.text,
+                correctAnswer: correctOptLetter + ". " + correctOptObj.text,
                 isCorrect: isCorrect
             });
 
