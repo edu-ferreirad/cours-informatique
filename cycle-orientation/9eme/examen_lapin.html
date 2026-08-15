@@ -1,1 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Examen 9ème - Classement du Lapin</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Examen Informatique - 9ème CO</h1>
+        <p>Glisse chaque morceau du lapin dans le dossier de destination correspondant à son extension pour valider le travail.</p>
+    </header>
 
+    <main class="container">
+        <!-- Zone de départ (fichiers en désordre) -->
+        <section id="source-zone">
+            <h2>Fichiers à classer</h2>
+            <div id="images-container">
+                <div class="draggable-item" draggable="true" data-ext="png" data-file="centre.png">centre.png</div>
+                <div class="draggable-item" draggable="true" data-ext="jpg" data-file="centrebas.jpg">centrebas.jpg</div>
+                <div class="draggable-item" draggable="true" data-ext="jpg" data-file="centreFond.jpg">centreFond.jpg</div>
+                <div class="draggable-item" draggable="true" data-ext="png" data-file="droitehaut.png">droitehaut.png</div>
+                <div class="draggable-item" draggable="true" data-ext="gif" data-file="droitemihaut.gif">droitemihaut.gif</div>
+                <div class="draggable-item" draggable="true" data-ext="gif" data-file="droitemilieu.gif">droitemilieu.gif</div>
+                <div class="draggable-item" draggable="true" data-ext="jpg" data-file="gaucheBas.jpg">gaucheBas.jpg</div>
+                <div class="draggable-item" draggable="true" data-ext="gif" data-file="gaucheMilieu.gif">gaucheMilieu.gif</div>
+                <div class="draggable-item" draggable="true" data-ext="jpg" data-file="herbe.jpg">herbe.jpg</div>
+                <div class="draggable-item" draggable="true" data-ext="png" data-file="mileuHaut.png">mileuHaut.png</div>
+                <div class="draggable-item" draggable="true" data-ext="jpg" data-file="patte.jpg">patte.jpg</div>
+            </div>
+        </section>
+
+        <!-- Zones de destination (Dossiers virtuels) -->
+        <section id="target-zones">
+            <h2>Dossiers de destination</h2>
+            
+            <div class="drop-zone" data-folder="png">
+                <h3>📁 images/png/</h3>
+                <div class="folder-content"></div>
+            </div>
+
+            <div class="drop-zone" data-folder="jpg">
+                <h3>📁 images/jpg/</h3>
+                <div class="folder-content"></div>
+            </div>
+
+            <div class="drop-zone" data-folder="gif">
+                <h3>📁 images/gif/</h3>
+                <div class="folder-content"></div>
+            </div>
+        </section>
+    </main>
+
+    <div class="actions">
+        <button id="check-btn">Vérifier le classement</button>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
