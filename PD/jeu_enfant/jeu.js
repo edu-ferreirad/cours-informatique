@@ -12,30 +12,34 @@ function resizeCanvas() {
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
-//fin négatives
+// Fin négative 1 -> perdu1.jpg
 function scene_M1(){
     document.body.style.backgroundImage = "url('perdu1.jpg')";
     document.body.style.backgroundRepeat = "no-repeat";
     document.body.style.backgroundSize = "cover";
     document.body.style.backgroundPosition = "center";
-    window.alert("FIN: réessaie pour trouver les autres fins");
+    window.alert("Afin d'éviter tout conflit, ne prends pas d'initiative dans le dos de tes parents. Privilégie toujours le dialogue. Pour plus de conseils, regarde la brochure avec tes parents.\n\nPour donner ton avis, scanne le QR code ci-dessous:");
 }
+
+// Fin négative 2 -> perdu2.jpg
 function scene_M2(){
     document.body.style.backgroundImage = "url('perdu2.jpg')";
     document.body.style.backgroundRepeat = "no-repeat";
     document.body.style.backgroundSize = "cover";
     document.body.style.backgroundPosition = "center";
-    window.alert("FIN: réessaie pour trouver les autres fins");
+    window.alert("Il ne s'agit ici pas d'une erreur en tant que telle, car tu peux avoir ton jardin secret. Néanmoins, un dialogue sincère est toujours préférable à des cachotteries. Pour plus de conseils, regarde la brochure et refais le jeu avec tes parents !\n\nPour donner ton avis, scanne le QR code ci-dessous:");
 }
+
+// Fin négative 3 -> perdu3.jpg
 function scene_M3(){
     document.body.style.backgroundImage = "url('perdu3.jpg')";
     document.body.style.backgroundRepeat = "no-repeat";
     document.body.style.backgroundSize = "cover";
     document.body.style.backgroundPosition = "center";
-    window.alert("FIN: réessaie pour trouver les autres fins");
+    window.alert("Comme tu t'es connecté au réseau d'un inconnu, tu as laissé le hasard décider à ta place, ce qui comporte certains risques (par exemple, de donner des informations personnelles à des personnes malveillantes...). Un dialogue sincère est toujours préférable à des cachotteries. Pour plus de conseils, regarde la brochure et refais le jeu avec tes parents !\n\nPour donner ton avis, scanne le QR code ci-dessous:");
 }
 
-//scene du debut 
+// Scène du début 
 function scene_1(){
     document.body.style.backgroundImage = "url('maison1.jpg')";
     document.body.style.backgroundRepeat = "no-repeat";
@@ -96,6 +100,7 @@ function scene_3(){
     }, 3000);
 }
 
+// Victoire 1 -> victoire_1.jpg
 function scene_4(){
     document.body.style.backgroundImage = "url('victoire_1.jpg')";
     document.body.style.backgroundRepeat = "no-repeat";
@@ -103,7 +108,7 @@ function scene_4(){
     document.body.style.backgroundPosition = "center";
     
     setTimeout(function(){
-        window.alert("FIN: réessaie pour trouver les autres fins");
+        window.alert("Bien que tu aies laissé le hasard intervenir, tu as eu de la chance que le Wifi auquel t'es connecté ne soit pas malveillant. N'oublie pas que tes parents sont là pour t'accompagner quoi qu'il arrive; n'hésite donc pas à parler avec eux. Pour plus de conseils, regarde la brochure et refais le jeu avec tes parents !\n\nPour donner ton avis, scanne le QR code ci-dessous:");
         document.body.style.backgroundImage = "url('the_end.jpg')";
     }, 3000);
 }
@@ -128,6 +133,7 @@ function scene_5(){
     }, 3000);
 }
 
+// Perdu 4 -> perdu4.jpg
 function scene_cachot(){
     document.body.style.backgroundImage = "url('perdu4.jpg')"; 
     document.body.style.backgroundRepeat = "no-repeat";
@@ -135,10 +141,11 @@ function scene_cachot(){
     document.body.style.backgroundPosition = "center";
     
     setTimeout(function(){
-        window.alert("FIN: réessaie pour trouver les autres fins");
+        window.alert("Le dialogue est fondamental. Tes parents sont là pour t'accompagner quoi qu'il arrive, n'hésite donc pas à parler avec eux. Pour plus de conseils, regarde la brochure et refais le jeu avec tes parents !\n\nPour donner ton avis, scanne le QR code ci-dessous:");
     }, 3000);
 }
 
+// Perdu 5 -> perdu5.jpg
 function scene_cachot1(){
     document.body.style.backgroundImage = "url('perdu5.jpg')"; 
     document.body.style.backgroundRepeat = "no-repeat";
@@ -146,10 +153,11 @@ function scene_cachot1(){
     document.body.style.backgroundPosition = "center";
     
     setTimeout(function(){
-        window.alert("FIN: réessaie pour trouver les autres fins");
+        window.alert("Bien que le dialogue soit fondamental, ta colère a fait que t'es emporté et la communication est rompue. Ton intention était bonne, mais lorsque tu souhaites instaurer un dialogue, prends bien ton temps, regarde la brochure et refais le jeu avec tes parents !\n\nPour donner ton avis, scanne le QR code ci-dessous:");
     }, 3000);
 }
 
+// Victoire 2 -> victoire_2.jpg
 function scene_7(){
     document.body.style.backgroundImage = "url('victoire_2.jpg')"; 
     document.body.style.backgroundRepeat = "no-repeat";
@@ -157,7 +165,7 @@ function scene_7(){
     document.body.style.backgroundPosition = "center";
     
     setTimeout(function(){
-        window.alert("FIN: réessaie pour trouver les autres fins"); 
+        window.alert("Bravo ! Malgré ta colère, ta capacité de dialogue a permis de désamorcer une situation tendue. N'oublie pas que tes parents sont là pour t'accompagner quoi qu'il arrive, n'hésite donc pas à parler avec eux. Pour plus de conseils, regarde la brochure et refais le jeu avec tes parents !\n\nPour donner ton avis, scanne le QR code ci-dessous"); 
     }, 3000);
 }
 
