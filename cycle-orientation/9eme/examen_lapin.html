@@ -142,7 +142,7 @@
                 color: black !important;
                 padding: 0;
             }
-            canvas, .btn, #step-login, #step-quiz, #step-result > h2, #step-result > p:not(.print-keep), .score-box, a {
+            canvas, .btn, #step-login, #step-quiz, #step-result > h2, #step-result > p:not(.print-keep), .score-box, a, #rabbit-display-container {
                 display: none !important;
             }
             .container {
@@ -246,6 +246,14 @@
                 <span id="hidden-score" class="hidden" style="color: #00ff00; font-weight: bold; font-size: 1.3em;"></span>
                 <button class="btn" id="eye-btn" onclick="toggleScore()">👁️ Afficher la note</button>
             </div>
+
+            <!-- Affichage visuel du Lapin -->
+            <div id="rabbit-display-container" style="margin: 25px auto; padding: 15px; background: rgba(0, 0, 0, 0.4); border: 1px solid #00ffff; border-radius: 8px; max-width: 500px;">
+                <h3 style="margin-top:0; font-size: 1.1em; color: #38bdf8;">État de reconstitution du Lapin :</h3>
+                <div id="rabbit-status-text" style="font-weight: bold; margin-bottom: 12px;"></div>
+                <div id="rabbit-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; font-size: 0.85em;"></div>
+            </div>
+
             <p style="font-size: 0.85em; color: #ffeb3b; margin-top: 10px; text-shadow: 0 0 5px rgba(255, 235, 59, 0.5);">* C'est une note indicative avant validation par l'enseignant</p>
             <br><br>
             <button class="btn" onclick="window.print()" style="background-color: #28a745;">🖨️ Imprimer / Sauvegarder en PDF</button>
@@ -325,11 +333,9 @@
         }
 
         function finishExam() {
-            // Vérification de la position de chaque élément
             scoreNote = 6.0;
             examDetails = [];
 
-            // S'il reste des éléments dans la zone source, ils sont considérés comme non classés (fautes)
             const remainingItems = sourceContainer.querySelectorAll('.draggable-item');
             remainingItems.forEach(item => {
                 examDetails.push({
@@ -361,7 +367,6 @@
 
             if (scoreNote < 1.0) scoreNote = 1.0;
 
-            // Affichage de l'étape de résultat
             document.getElementById('step-quiz').classList.add('hidden');
             document.getElementById('step-result').classList.remove('hidden');
 
@@ -370,11 +375,37 @@
             document.getElementById('res-classe').innerText = studentData.classe;
             document.getElementById('hidden-score').innerText = scoreNote.toFixed(1);
 
+            // Génération de l'affichage visuel du lapin
+            let correctCount = examDetails.filter(d => d.isCorrect).length;
+            let totalCount = examDetails.length;
+            let rabbitText = document.getElementById('rabbit-status-text');
+            let rabbitGrid = document.getElementById('rabbit-grid');
+
+            if (correctCount === totalCount) {
+                rabbitText.innerHTML = "🐰 <span style='color: #00ff00;'>Lapin complet et parfaitement reconstitué !</span>";
+            } else {
+                rabbitText.innerHTML = `⚠️ <span style='color: #ff4444;'>Lapin incomplet (${correctCount}/${totalCount} bons fichiers)</span>`;
+            }
+
+            let gridHtml = '';
+            examDetails.forEach(item => {
+                let bgColor = item.isCorrect ? 'rgba(40, 167, 69, 0.3)' : 'rgba(220, 53, 69, 0.3)';
+                let borderColor = item.isCorrect ? '#28a745' : '#dc3545';
+                let icon = item.isCorrect ? '✅' : '❌';
+                gridHtml += `
+                    <div style="background: ${bgColor}; border: 1px solid ${borderColor}; padding: 6px; border-radius: 4px; text-align: center;">
+                        <div>${icon}</div>
+                        <div style="font-size: 0.75em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${item.file}">${item.file}</div>
+                    </div>
+                `;
+            });
+            rabbitGrid.innerHTML = gridHtml;
+
             let reportHTML = `<h3>Rapport d'Examen - ${studentData.prenom} ${studentData.nom} (${studentData.classe})</h3>`;
             reportHTML += `<p><strong>Note finale (indicative) : ${scoreNote.toFixed(1)} / 6</strong></p>`;
             reportHTML += `<p style="font-size: 0.9em; font-style: italic;">* C'est une note indicative avant validation par l'enseignant</p><hr>`;
             
-            examDetails.forEach((item, index) => {
+            examDetails.forEach((item) => {
                 reportHTML += `
                     <div class="print-item">
                         <p><strong>Fichier : ${item.file}</strong></p>
