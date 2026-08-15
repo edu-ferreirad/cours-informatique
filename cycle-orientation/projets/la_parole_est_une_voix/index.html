@@ -50,6 +50,19 @@
             margin-bottom: 15px;
             text-shadow: 0 0 5px #00bfff;
         }
+        .pdf-container {
+            width: 100%;
+            height: 450px;
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1px solid #0044ff;
+            background: #000;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
         .doc-link {
             display: inline-block;
             padding: 12px 25px;
@@ -60,7 +73,6 @@
             font-weight: bold;
             box-shadow: 0 0 10px #007bff;
             transition: background-color 0.2s, box-shadow 0.2s;
-            margin-top: 10px;
         }
         .doc-link:hover {
             background-color: #0056b3;
@@ -81,13 +93,6 @@
             background-color: #0056b3;
             box-shadow: 0 0 15px #00ffff;
         }
-        iframe {
-            border: 1px solid #0044ff;
-            border-radius: 5px;
-            background: #ffffff;
-            margin-top: 10px;
-        }
-        /* Password Overlay */
         #password-overlay {
             position: fixed;
             top: 0;
@@ -133,10 +138,6 @@
             display: block;
             width: 100%;
         }
-        .login-box button:hover {
-            background-color: #0056b3;
-            box-shadow: 0 0 15px #00ffff;
-        }
         #error-msg {
             color: #ff4444;
             margin-top: 10px;
@@ -146,7 +147,6 @@
     </style>
 </head>
 <body>
-    <!-- Password Prompt Overlay -->
     <div id="password-overlay">
         <div class="login-box">
             <h2>Accès Protégé</h2>
@@ -163,133 +163,56 @@
         <h1>La parole est une voie</h1>
         <p><a class="back-btn" href="projets.html">⬅ Retour aux projets</a></p>
 
-        <p style="font-size: 1.2em; font-weight: bold; margin-top: 30px;">📄 Prévisualisations des documents (Annexes) :</p>
+        <p>Documents et ressources :</p>
 
-        <!-- 1. Critères de correction -->
+        <!-- Liste des documents -->
+        <div class="cours-card"><div class="cours-title">📄 Critères de correction-pour autres élèves.pdf</div><div class="pdf-container"><iframe src="Critères de correction-pour autres élèves.pdf"></iframe></div></div>
+        <div class="cours-card"><div class="cours-title">📄 Formulaire_evenements_scolaires_2024.pdf</div><div class="pdf-container"><iframe src="Formulaire_evenements_scolaires_2024.pdf"></iframe></div></div>
+        <div class="cours-card"><div class="cours-title">📄 Slam sur 1 seule feuille.pdf</div><div class="pdf-container"><iframe src="Slam sur 1 seule feuille.pdf"></iframe></div></div>
+        <div class="cours-card"><div class="cours-title">📄 films art oratoire.pdf</div><div class="pdf-container"><iframe src="films art oratoire.pdf"></iframe></div></div>
+        <div class="cours-card"><div class="cours-title">📊 01 - Cours A.pptx</div><div class="pdf-container"><iframe src="01 - Cours A.pptx"></iframe></div></div>
+        <div class="cours-card"><div class="cours-title">📈 04 - Plan de durée.xlsx</div><div class="pdf-container"><iframe src="04 - Plan de durée.xlsx"></iframe></div></div>
+        <div class="cours-card"><div class="cours-title">📝 03 - Notes de cours.docx</div><div class="pdf-container"><iframe src="03 - Notes de cours.docx"></iframe></div></div>
+        <div class="cours-card"><div class="cours-title">📊 02 - Cours B.pptx</div><div class="pdf-container"><iframe src="02 - Cours B.pptx"></iframe></div></div>
+
+        <p>Liens externes :</p>
         <div class="cours-card">
-            <div class="cours-title">📄 Critères de correction - pour autres élèves.pdf</div>
-            <iframe src="https://docs.google.com/viewer?url=URL_DE_VOTRE_SITE/Crit%C3%A8res%20de%20correction-pour%20autres%20%C3%A9l%C3%A8ves.pdf&embedded=true" width="100%" height="400px"></iframe>
+            <div class="cours-title">Site officiel</div>
+            <p><a class="doc-link" href="https://edu.ge.ch/enseignement/francais/ressource/11ct-la-parole-est-une-voie-2415" target="_blank">Accéder au site</a></p>
         </div>
-
-        <!-- 2. Formulaire événements scolaires -->
         <div class="cours-card">
-            <div class="cours-title">📄 Formulaire_evenements_scolaires_2024.pdf</div>
-            <iframe src="https://docs.google.com/viewer?url=URL_DE_VOTRE_SITE/Formulaire_evenements_scolaires_2024.pdf&embedded=true" width="100%" height="400px"></iframe>
-        </div>
-
-        <!-- 3. Slam sur 1 seule feuille -->
-        <div class="cours-card">
-            <div class="cours-title">📄 Slam sur 1 seule feuille.pdf</div>
-            <iframe src="https://docs.google.com/viewer?url=URL_DE_VOTRE_SITE/Slam%20sur%201%20seule%20feuille.pdf&embedded=true" width="100%" height="400px"></iframe>
-        </div>
-
-        <!-- 4. Films art oratoire -->
-        <div class="cours-card">
-            <div class="cours-title">📄 films art oratoire.pdf</div>
-            <iframe src="https://docs.google.com/viewer?url=URL_DE_VOTRE_SITE/films%20art%20oratoire.pdf&embedded=true" width="100%" height="400px"></iframe>
-        </div>
-
-        <!-- 5. 01 - Cours A -->
-        <div class="cours-card">
-            <div class="cours-title">📊 01 - Cours A.pptx</div>
-            <iframe src="https://view.officeapps.live.com/op/embed.aspx?src=URL_DE_VOTRE_SITE/01%20-%20Cours%20A.pptx" width="100%" height="400px" frameborder="0"></iframe>
-        </div>
-
-        <!-- 6. 04 - Plan de durée -->
-        <div class="cours-card">
-            <div class="cours-title">📈 04 - Plan de durée.xlsx</div>
-            <iframe src="https://view.officeapps.live.com/op/embed.aspx?src=URL_DE_VOTRE_SITE/04%20-%20Plan%20de%20dur%C3%A9e.xlsx" width="100%" height="400px" frameborder="0"></iframe>
-        </div>
-
-        <!-- 7. 03 - Notes de cours -->
-        <div class="cours-card">
-            <div class="cours-title">📝 03 - Notes de cours.docx</div>
-            <iframe src="https://view.officeapps.live.com/op/embed.aspx?src=URL_DE_VOTRE_SITE/03%20-%20Notes%20de%20cours.docx" width="100%" height="400px" frameborder="0"></iframe>
-        </div>
-
-        <!-- 8. 02 - Cours B -->
-        <div class="cours-card">
-            <div class="cours-title">📊 02 - Cours B.pptx</div>
-            <iframe src="https://view.officeapps.live.com/op/embed.aspx?src=URL_DE_VOTRE_SITE/02%20-%20Cours%20B.pptx" width="100%" height="400px" frameborder="0"></iframe>
-        </div>
-
-        <p style="font-size: 1.2em; font-weight: bold; margin-top: 40px;">🔗 Liens utiles :</p>
-
-        <div class="cours-card">
-            <div class="cours-title">Site officiel - La parole est une voie</div>
-            <a class="doc-link" href="https://edu.ge.ch/enseignement/francais/ressource/11ct-la-parole-est-une-voie-2415" target="_blank">Accéder au site</a>
-        </div>
-
-        <div class="cours-card">
-            <div class="cours-title">Vidéo - Art oratoire</div>
-            <a class="doc-link" href="https://www.youtube.com/watch?v=6r8I0Co6IIw" target="_blank">Regarder la vidéo</a>
+            <div class="cours-title">Vidéo Art oratoire</div>
+            <p><a class="doc-link" href="https://www.youtube.com/watch?v=6r8I0Co6IIw" target="_blank">Regarder la vidéo</a></p>
         </div>
     </div>
 
     <script>
         function checkPassword() {
-            const pwd = document.getElementById('password-input').value;
-            if (pwd === 'lpeuv26') {
+            if (document.getElementById('password-input').value === 'lpeuv26') {
                 document.getElementById('password-overlay').style.display = 'none';
                 document.getElementById('main-content').style.display = 'block';
             } else {
                 document.getElementById('error-msg').style.display = 'block';
             }
         }
-
-        const passwordInput = document.getElementById('password-input');
-        if (passwordInput) {
-            passwordInput.addEventListener('keypress', function (e) {
-                if (e.key === 'Enter') {
-                    checkPassword();
-                }
-            });
-        }
-
+        
+        // Effet Matrix
         const canvas = document.getElementById('matrix');
-        if (canvas) {
-            const ctx = canvas.getContext('2d');
-
-            function resizeCanvas() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            }
-            resizeCanvas();
-            window.addEventListener('resize', resizeCanvas);
-
-            const characters = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ<>/\\{}[]*&é"\'(-)=+';
-            const fontSize = 16;
-            let columns = Math.floor(canvas.width / fontSize);
-            let drops = [];
-
-            for (let i = 0; i < columns; i++) {
-                drops[i] = 1;
-            }
-
-            function drawMatrix() {
-                ctx.fillStyle = 'rgba(5, 9, 20, 0.08)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.font = fontSize + 'px monospace';
-
-                for (let i = 0; i < drops.length; i++) {
-                    const text = characters.charAt(Math.floor(Math.random() * characters.length));
-                    const randShade = Math.random();
-                    if (randShade < 0.33) {
-                        ctx.fillStyle = '#00ffff';
-                    } else if (randShade < 0.66) {
-                        ctx.fillStyle = '#00bfff';
-                    } else {
-                        ctx.fillStyle = '#0044ff';
-                    }
-                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-                        drops[i] = 0;
-                    }
-                    drops[i]++;
-                }
-            }
-            setInterval(drawMatrix, 50);
-        }
+        const ctx = canvas.getContext('2d');
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize); resize();
+        const chars = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ';
+        const fontSize = 16;
+        let drops = Array(Math.floor(canvas.width / fontSize)).fill(1);
+        setInterval(() => {
+            ctx.fillStyle = 'rgba(5, 9, 20, 0.08)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#00ffff'; ctx.font = fontSize + 'px monospace';
+            drops.forEach((d, i) => {
+                ctx.fillText(chars[Math.floor(Math.random() * chars.length)], i * fontSize, d * fontSize);
+                if (d * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            });
+        }, 50);
     </script>
 </body>
 </html>
