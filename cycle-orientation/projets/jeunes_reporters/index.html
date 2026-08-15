@@ -1,1 +1,350 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Jeunes Reporters pour l'Environnement</title>
+    <style>
+        body {
+            background-color: #050914;
+            color: #00ffff;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding-top: 30px;
+            overflow-x: hidden;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        h1, p {
+            position: relative;
+            z-index: 10;
+            color: #ffffff;
+            text-shadow: 0 0 10px #00bfff, 0 0 20px #0044ff;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+            padding-bottom: 50px;
+        }
+        .cours-card {
+            background: rgba(5, 15, 35, 0.85);
+            border: 1px solid #00ffff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+            border-radius: 8px;
+            margin: 25px auto;
+            padding: 20px;
+            width: 90%;
+        }
+        .cours-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #00ffff;
+            margin-bottom: 15px;
+            text-shadow: 0 0 5px #00bfff;
+        }
+        .pdf-container {
+            width: 100%;
+            height: 450px;
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1px solid #0044ff;
+            background: #000;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .doc-link {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            box-shadow: 0 0 10px #007bff;
+            transition: background-color 0.2s, box-shadow 0.2s;
+        }
+        .doc-link:hover {
+            background-color: #0056b3;
+            box-shadow: 0 0 15px #00ffff;
+        }
+        .back-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 0 10px #007bff;
+        }
+        .back-btn:hover {
+            background-color: #0056b3;
+            box-shadow: 0 0 15px #00ffff;
+        }
+        /* Password Overlay */
+        #password-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 9, 20, 0.95);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .login-box {
+            background: rgba(5, 15, 35, 0.95);
+            border: 1px solid #00ffff;
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.4);
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .login-box input {
+            padding: 10px;
+            font-size: 1em;
+            background: #000;
+            border: 1px solid #0044ff;
+            color: #00ffff;
+            border-radius: 5px;
+            margin-top: 15px;
+            outline: none;
+            text-align: center;
+        }
+        .login-box button {
+            padding: 10px 20px;
+            margin-top: 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 10px #007bff;
+            display: block;
+            width: 100%;
+        }
+        .login-box button:hover {
+            background-color: #0056b3;
+            box-shadow: 0 0 15px #00ffff;
+        }
+        #error-msg {
+            color: #ff4444;
+            margin-top: 10px;
+            font-size: 0.9em;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Password Prompt Overlay -->
+    <div id="password-overlay">
+        <div class="login-box">
+            <h2>Accès Protégé</h2>
+            <p>Veuillez entrer le mot de passe :</p>
+            <input type="password" id="password-input" placeholder="Mot de passe">
+            <button onclick="checkPassword()">Valider</button>
+            <div id="error-msg">Mot de passe incorrect</div>
+        </div>
+    </div>
 
+    <canvas id="matrix"></canvas>
+
+    <div class="container" id="main-content" style="display: none;">
+        <h1>Jeunes Reporters pour l'Environnement</h1>
+        <p><a class="back-btn" href="projets.html">⬅ Retour aux projets</a></p>
+
+        <p>Documents et ressources :</p>
+
+        <!-- 1. 2025_FR_FlyerJRE_WEB-1.pdf -->
+        <div class="cours-card">
+            <div class="cours-title">📄 2025_FR_FlyerJRE_WEB-1.pdf</div>
+            <div class="pdf-container">
+                <iframe src="2025_FR_FlyerJRE_WEB-1.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- 2. 20240613_JRE_SR_Reglement_Concours_2425.pdf -->
+        <div class="cours-card">
+            <div class="cours-title">📄 20240613_JRE_SR_Reglement_Concours_2425.pdf</div>
+            <div class="pdf-container">
+                <iframe src="20240613_JRE_SR_Reglement_Concours_2425.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- 3. Article_1214_1_Faons.pdf -->
+        <div class="cours-card">
+            <div class="cours-title">📄 Article_1214_1_Faons.pdf</div>
+            <div class="pdf-container">
+                <iframe src="Article_1214_1_Faons.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- 4. Article_1214_LaFarce_LAUREAT_ROMAND.pdf -->
+        <div class="cours-card">
+            <div class="cours-title">📄 Article_1214_LaFarce_LAUREAT_ROMAND.pdf</div>
+            <div class="pdf-container">
+                <iframe src="Article_1214_LaFarce_LAUREAT_ROMAND.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- 5. Article_1518_7_ParcsAlpins.pdf -->
+        <div class="cours-card">
+            <div class="cours-title">📄 Article_1518_7_ParcsAlpins.pdf</div>
+            <div class="pdf-container">
+                <iframe src="Article_1518_7_ParcsAlpins.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- 6. Article_1518_Moustiques_LAUREAT_ROMAND.pdf -->
+        <div class="cours-card">
+            <div class="cours-title">📄 Article_1518_Moustiques_LAUREAT_ROMAND.pdf</div>
+            <div class="pdf-container">
+                <iframe src="Article_1518_Moustiques_LAUREAT_ROMAND.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- 7. Formulaire_evenements_scolaires_2024.pdf -->
+        <div class="cours-card">
+            <div class="cours-title">📄 Formulaire_evenements_scolaires_2024.pdf</div>
+            <div class="pdf-container">
+                <iframe src="Formulaire_evenements_scolaires_2024.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- 8. JRE_24-25_Manuel_Eleve_Sec_I.pdf -->
+        <div class="cours-card">
+            <div class="cours-title">📄 JRE_24-25_Manuel_Eleve_Sec_I.pdf</div>
+            <div class="pdf-container">
+                <iframe src="JRE_24-25_Manuel_Eleve_Sec_I.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- 9. JRE_24-25_Manuel_Enseignant_Sec_I.pdf -->
+        <div class="cours-card">
+            <div class="cours-title">📄 JRE_24-25_Manuel_Enseignant_Sec_I.pdf</div>
+            <div class="pdf-container">
+                <iframe src="JRE_24-25_Manuel_Enseignant_Sec_I.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- 10. LAUREAT_Article_1518_5_Patyna16_Florian15_Luca14_Geneveeteintlexcesnumerique.pdf -->
+        <div class="cours-card">
+            <div class="cours-title">📄 LAUREAT_Article_1518_5_Patyna16_Florian15_Luca14_Geneveeteintlexcesnumerique.pdf</div>
+            <div class="pdf-container">
+                <iframe src="LAUREAT_Article_1518_5_Patyna16_Florian15_Luca14_Geneveeteintlexcesnumerique.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- 11. LAUREAT_NATIONAL_Article_1214_2_Lisa14_Sophie14_Yatildesnuages.pdf -->
+        <div class="cours-card">
+            <div class="cours-title">📄 LAUREAT_NATIONAL_Article_1214_2_Lisa14_Sophie14_Yatildesnuages.pdf</div>
+            <div class="pdf-container">
+                <iframe src="LAUREAT_NATIONAL_Article_1214_2_Lisa14_Sophie14_Yatildesnuages.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- 12. modèle 1.docx -->
+        <div class="cours-card">
+            <div class="cours-title">📝 modèle 1.docx</div>
+            <p><a class="doc-link" href="modèle 1.docx" download>Télécharger le modèle 1</a></p>
+        </div>
+
+        <!-- 13. modèle 2.docx -->
+        <div class="cours-card">
+            <div class="cours-title">📝 modèle 2.docx</div>
+            <p><a class="doc-link" href="modèle 2.docx" download>Télécharger le modèle 2</a></p>
+        </div>
+
+        <!-- 14. modèle 3.docx -->
+        <div class="cours-card">
+            <div class="cours-title">📝 modèle 3.docx</div>
+            <p><a class="doc-link" href="modèle 3.docx" download>Télécharger le modèle 3</a></p>
+        </div>
+    </div>
+
+    <script>
+        function checkPassword() {
+            const pwd = document.getElementById('password-input').value;
+            if (pwd === 'jrple26') {
+                document.getElementById('password-overlay').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+            } else {
+                document.getElementById('error-msg').style.display = 'block';
+            }
+        }
+
+        // Allow pressing Enter in password field
+        document.getElementById('password-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
+        });
+
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const characters = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ<>/\\{}[]*&é"\'(-)=+';
+        const fontSize = 16;
+        let columns = canvas.width / fontSize;
+        let drops = [];
+
+        for (let i = 0; i < columns; i++) {
+            drops[i] = 1;
+        }
+
+        function drawMatrix() {
+            // Dark blue background tint with fading trail for blue shades effect
+            ctx.fillStyle = 'rgba(5, 9, 20, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = characters.charAt(Math.floor(Math.random() * characters.length));
+                
+                // Multi-shade blue effect: assigning different blue shades to characters randomly
+                const randShade = Math.random();
+                if (randShade < 0.33) {
+                    ctx.fillStyle = '#00ffff'; // Light cyan/bright blue
+                } else if (randShade < 0.66) {
+                    ctx.fillStyle = '#00bfff'; // Sky blue / medium light blue
+                } else {
+                    ctx.fillStyle = '#0044ff'; // Deep blue
+                }
+
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawMatrix, 50);
+    </script>
+</body>
+</html>
