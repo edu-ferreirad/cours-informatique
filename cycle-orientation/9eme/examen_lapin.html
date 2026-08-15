@@ -142,7 +142,7 @@
                 color: black !important;
                 padding: 0;
             }
-            canvas, .btn, #step-login, #step-quiz, #step-result > h2, #step-result > p:not(.print-keep), .score-box, a, #rabbit-display-container {
+            canvas, .btn, #step-login, #step-quiz, #step-result > h2, #step-result > p:not(.print-keep), .score-box, a, #rabbit-visual-box {
                 display: none !important;
             }
             .container {
@@ -247,11 +247,16 @@
                 <button class="btn" id="eye-btn" onclick="toggleScore()">👁️ Afficher la note</button>
             </div>
 
-            <!-- Affichage visuel du Lapin -->
-            <div id="rabbit-display-container" style="margin: 25px auto; padding: 15px; background: rgba(0, 0, 0, 0.4); border: 1px solid #00ffff; border-radius: 8px; max-width: 500px;">
-                <h3 style="margin-top:0; font-size: 1.1em; color: #38bdf8;">État de reconstitution du Lapin :</h3>
-                <div id="rabbit-status-text" style="font-weight: bold; margin-bottom: 12px;"></div>
-                <div id="rabbit-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; font-size: 0.85em;"></div>
+            <!-- 🐰 Visuel graphique du Lapin reconstitué -->
+            <div id="rabbit-visual-box" style="margin: 20px auto; padding: 15px; background: rgba(0, 0, 0, 0.6); border: 2px solid #00ffff; border-radius: 10px; max-width: 320px; text-align: center;">
+                <h3 id="rabbit-title" style="margin-top:0; font-size: 1.1em; color: #38bdf8;">Reconstitution du Lapin</h3>
+                
+                <!-- Conteneur visuel simulant le lapin avec ses morceaux -->
+                <div id="rabbit-puzzle-preview" style="position: relative; width: 200px; height: 220px; margin: 0 auto; background: #020617; border: 1px dashed #00ffff; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden;">
+                    <!-- Les morceaux s'afficheront ici dynamiquement -->
+                </div>
+                
+                <p id="rabbit-subtitle" style="font-size: 0.9em; margin-top: 10px; font-weight: bold;"></p>
             </div>
 
             <p style="font-size: 0.85em; color: #ffeb3b; margin-top: 10px; text-shadow: 0 0 5px rgba(255, 235, 59, 0.5);">* C'est une note indicative avant validation par l'enseignant</p>
@@ -375,31 +380,30 @@
             document.getElementById('res-classe').innerText = studentData.classe;
             document.getElementById('hidden-score').innerText = scoreNote.toFixed(1);
 
-            // Génération de l'affichage visuel du lapin
+            // Génération du visuel graphique du lapin
             let correctCount = examDetails.filter(d => d.isCorrect).length;
             let totalCount = examDetails.length;
-            let rabbitText = document.getElementById('rabbit-status-text');
-            let rabbitGrid = document.getElementById('rabbit-grid');
+            let rabbitPreview = document.getElementById('rabbit-puzzle-preview');
+            let rabbitSubtitle = document.getElementById('rabbit-subtitle');
 
             if (correctCount === totalCount) {
-                rabbitText.innerHTML = "🐰 <span style='color: #00ff00;'>Lapin complet et parfaitement reconstitué !</span>";
-            } else {
-                rabbitText.innerHTML = `⚠️ <span style='color: #ff4444;'>Lapin incomplet (${correctCount}/${totalCount} bons fichiers)</span>`;
-            }
-
-            let gridHtml = '';
-            examDetails.forEach(item => {
-                let bgColor = item.isCorrect ? 'rgba(40, 167, 69, 0.3)' : 'rgba(220, 53, 69, 0.3)';
-                let borderColor = item.isCorrect ? '#28a745' : '#dc3545';
-                let icon = item.isCorrect ? '✅' : '❌';
-                gridHtml += `
-                    <div style="background: ${bgColor}; border: 1px solid ${borderColor}; padding: 6px; border-radius: 4px; text-align: center;">
-                        <div>${icon}</div>
-                        <div style="font-size: 0.75em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${item.file}">${item.file}</div>
-                    </div>
+                rabbitSubtitle.innerHTML = "🐰 <span style='color: #00ff00;'>Lapin Complet !</span>";
+                rabbitPreview.style.borderColor = "#00ff00";
+                rabbitPreview.style.boxShadow = "0 0 15px rgba(0, 255, 0, 0.4)";
+                rabbitPreview.innerHTML = `
+                    <div style="font-size: 3.5em;">🐇</div>
+                    <div style="color: #00ff00; font-size: 0.85em; margin-top: 5px;">100% assemblé</div>
                 `;
-            });
-            rabbitGrid.innerHTML = gridHtml;
+            } else {
+                let percent = Math.round((correctCount / totalCount) * 100);
+                rabbitSubtitle.innerHTML = `⚠️ <span style='color: #ff4444;'>Lapin Incomplet (${correctCount}/${totalCount})</span>`;
+                rabbitPreview.style.borderColor = "#ff4444";
+                rabbitPreview.style.boxShadow = "0 0 15px rgba(255, 68, 68, 0.4)";
+                rabbitPreview.innerHTML = `
+                    <div style="font-size: 3.5em; filter: grayscale(80%) opacity(0.6);">🐇💥</div>
+                    <div style="color: #ff4444; font-size: 0.85em; margin-top: 5px;">Il manque des morceaux ! (${percent}%)</div>
+                `;
+            }
 
             let reportHTML = `<h3>Rapport d'Examen - ${studentData.prenom} ${studentData.nom} (${studentData.classe})</h3>`;
             reportHTML += `<p><strong>Note finale (indicative) : ${scoreNote.toFixed(1)} / 6</strong></p>`;
