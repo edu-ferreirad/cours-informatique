@@ -33,20 +33,20 @@ function addNavigationButtons() {
     // Style commun des boutons
     var buttonStyle = "padding: 12px 24px; margin: 0 10px; font-size: 16px; font-weight: bold; cursor: pointer; border: none; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: background 0.2s;";
 
-    // Bouton Recommencer
+    // Bouton Recommencer (pointe vers Debut_parent.html situé un dossier au-dessus)
     var btnRestart = document.createElement("button");
     btnRestart.innerText = "Recommencer";
     btnRestart.style.cssText = buttonStyle + " background-color: #4CAF50; color: white;";
     btnRestart.onclick = function() {
-        window.location.href = "PD/Debut_enfant.html";
+        window.location.href = "../Debut_parent.html";
     };
 
-    // Bouton Accueil / Index
+    // Bouton Accueil / Index (pointe vers l'index de protection des données situé un dossier au-dessus)
     var btnIndex = document.createElement("button");
     btnIndex.innerText = "Accueil";
     btnIndex.style.cssText = buttonStyle + " background-color: #2196F3; color: white;";
     btnIndex.onclick = function() {
-        window.location.href = "PD/index.html";
+        window.location.href = "../index.html";
     };
 
     container.appendChild(btnRestart);
@@ -60,7 +60,7 @@ function scene_M1(){
     document.body.style.backgroundRepeat = "no-repeat";
     document.body.style.backgroundSize = "cover";
     document.body.style.backgroundPosition = "center";
-    window.alert("Afin d'éviter tout conflit, ne prends pas d'initiative dans le dos de tes parents. Privilégie toujours le dialogue. Pour plus de conseils, regarde la brochure avec tes parents.\n\n");
+    window.alert("Afin d'éviter tout conflit, ne prends pas d'initiative dans le dos de tes parents. Privilégie toujours le dialogue. Pour plus de conseils, regarde la brochure avec tes parents.");
     addNavigationButtons();
 }
 
