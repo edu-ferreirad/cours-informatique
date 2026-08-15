@@ -56,28 +56,12 @@
             border-radius: 5px;
             overflow: hidden;
             border: 1px solid #0044ff;
-            background: #ffffff;
+            background: #000;
         }
         iframe {
             width: 100%;
             height: 100%;
             border: none;
-        }
-        .download-btn {
-            display: inline-block;
-            padding: 12px 25px;
-            background-color: #00ffcc;
-            color: #050914;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-            text-transform: uppercase;
-            box-shadow: 0 0 10px #00ffcc;
-            transition: 0.3s;
-        }
-        .download-btn:hover {
-            background-color: #ffffff;
-            box-shadow: 0 0 20px #ffffff;
         }
         .doc-link {
             display: inline-block;
@@ -88,24 +72,9 @@
             border-radius: 5px;
             font-weight: bold;
             box-shadow: 0 0 10px #007bff;
-            transition: 0.2s;
+            transition: background-color 0.2s, box-shadow 0.2s;
         }
         .doc-link:hover {
-            background-color: #0056b3;
-            box-shadow: 0 0 15px #00ffff;
-        }
-        .back-btn {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            position: relative;
-            z-index: 10;
-            box-shadow: 0 0 10px #007bff;
-        }
-        .back-btn:hover {
             background-color: #0056b3;
             box-shadow: 0 0 15px #00ffff;
         }
@@ -154,19 +123,13 @@
             display: block;
             width: 100%;
         }
-        #error-msg {
-            color: #ff4444;
-            margin-top: 10px;
-            font-size: 0.9em;
-            display: none;
-        }
+        #error-msg { color: #ff4444; margin-top: 10px; font-size: 0.9em; display: none; }
     </style>
 </head>
 <body>
     <div id="password-overlay">
         <div class="login-box">
             <h2>Accès Protégé</h2>
-            <p>Veuillez entrer le mot de passe :</p>
             <input type="password" id="password-input" placeholder="Mot de passe">
             <button onclick="checkPassword()">Valider</button>
             <div id="error-msg">Mot de passe incorrect</div>
@@ -177,111 +140,82 @@
 
     <div class="container" id="main-content" style="display: none;">
         <h1>La parole est une voie</h1>
-        <p><a class="back-btn" href="projets.html">⬅ Retour aux projets</a></p>
 
-        <p>Documents et ressources :</p>
-
-        <!-- 1. PDF : Prévisualisation -->
+        <!-- PDF Section -->
         <div class="cours-card">
             <div class="cours-title">📄 Critères de correction-pour autres élèves.pdf</div>
-            <div class="pdf-container">
-                <iframe src="Critères de correction-pour autres élèves.pdf"></iframe>
-            </div>
+            <div class="pdf-container"><iframe src="Critères de correction-pour autres élèves.pdf"></iframe></div>
         </div>
-
-        <!-- 2. PDF : Prévisualisation -->
         <div class="cours-card">
             <div class="cours-title">📄 Formulaire_evenements_scolaires_2024.pdf</div>
-            <div class="pdf-container">
-                <iframe src="Formulaire_evenements_scolaires_2024.pdf"></iframe>
-            </div>
+            <div class="pdf-container"><iframe src="Formulaire_evenements_scolaires_2024.pdf"></iframe></div>
         </div>
-
-        <!-- 3. PDF : Prévisualisation -->
         <div class="cours-card">
             <div class="cours-title">📄 Slam sur 1 seule feuille.pdf</div>
-            <div class="pdf-container">
-                <iframe src="Slam sur 1 seule feuille.pdf"></iframe>
-            </div>
+            <div class="pdf-container"><iframe src="Slam sur 1 seule feuille.pdf"></iframe></div>
         </div>
-
-        <!-- 4. PDF : Prévisualisation -->
         <div class="cours-card">
             <div class="cours-title">📄 films art oratoire.pdf</div>
-            <div class="pdf-container">
-                <iframe src="films art oratoire.pdf"></iframe>
-            </div>
+            <div class="pdf-container"><iframe src="films art oratoire.pdf"></iframe></div>
         </div>
 
-        <!-- 5. PPTX : Bouton de téléchargement -->
+        <!-- Non-PDF Files (Buttons) -->
         <div class="cours-card">
             <div class="cours-title">📊 01 - Cours A.pptx</div>
-            <a href="01 - Cours A.pptx" class="download-btn" download>📥 Télécharger le fichier</a>
+            <p><a class="doc-link" href="01 - Cours A.pptx" download>Télécharger 01 - Cours A.pptx</a></p>
         </div>
-
-        <!-- 6. XLSX : Bouton de téléchargement -->
         <div class="cours-card">
-            <div class="cours-title">📈 04 - Plan de durée.xlsx</div>
-            <a href="04 - Plan de durée.xlsx" class="download-btn" download>📥 Télécharger le fichier</a>
+            <div class="cours-title">📊 04 - Plan de durée.xlsx</div>
+            <p><a class="doc-link" href="04 - Plan de durée.xlsx" download>Télécharger 04 - Plan de durée.xlsx</a></p>
         </div>
-
-        <!-- 7. DOCX : Bouton de téléchargement -->
         <div class="cours-card">
             <div class="cours-title">📝 03 - Notes de cours.docx</div>
-            <a href="03 - Notes de cours.docx" class="download-btn" download>📥 Télécharger le fichier</a>
+            <p><a class="doc-link" href="03 - Notes de cours.docx" download>Télécharger 03 - Notes de cours.docx</a></p>
         </div>
-
-        <!-- 8. PPTX : Bouton de téléchargement -->
         <div class="cours-card">
             <div class="cours-title">📊 02 - Cours B.pptx</div>
-            <a href="02 - Cours B.pptx" class="download-btn" download>📥 Télécharger le fichier</a>
+            <p><a class="doc-link" href="02 - Cours B.pptx" download>Télécharger 02 - Cours B.pptx</a></p>
         </div>
 
-        <p>Liens externes :</p>
+        <!-- External Links -->
         <div class="cours-card">
-            <div class="cours-title">Site officiel</div>
-            <p><a class="doc-link" href="https://edu.ge.ch/enseignement/francais/ressource/11ct-la-parole-est-une-voie-2415" target="_blank">Accéder au site</a></p>
-        </div>
-        <div class="cours-card">
-            <div class="cours-title">Vidéo Art oratoire</div>
-            <p><a class="doc-link" href="https://www.youtube.com/watch?v=6r8I0Co6IIw" target="_blank">Regarder la vidéo</a></p>
+            <div class="cours-title">🌐 Liens utiles</div>
+            <p><a class="doc-link" href="https://edu.ge.ch/enseignement/francais/ressource/11ct-la-parole-est-une-voie-2415" target="_blank">Site Officiel</a></p>
+            <p><a class="doc-link" href="https://www.youtube.com/watch?v=6r8I0Co6IIw" target="_blank">Vidéo Art Oratoire</a></p>
         </div>
     </div>
 
     <script>
         function checkPassword() {
-            if (document.getElementById('password-input').value === 'lpeuv26') {
+            if (document.getElementById('password-input').value === 'jrple26') {
                 document.getElementById('password-overlay').style.display = 'none';
                 document.getElementById('main-content').style.display = 'block';
             } else {
                 document.getElementById('error-msg').style.display = 'block';
             }
         }
-
-        // Permettre la validation avec la touche Entrée
-        document.getElementById('password-input').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                checkPassword();
-            }
-        });
         
-        // Effet Matrix
+        // Matrix effect
         const canvas = document.getElementById('matrix');
         const ctx = canvas.getContext('2d');
-        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-        window.addEventListener('resize', resize); resize();
-        const chars = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ';
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        const chars = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ<>/\\{}[]*&é"\'(-)=+';
         const fontSize = 16;
         let drops = Array(Math.floor(canvas.width / fontSize)).fill(1);
-        setInterval(() => {
-            ctx.fillStyle = 'rgba(5, 9, 20, 0.08)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#00ffff'; ctx.font = fontSize + 'px monospace';
-            drops.forEach((d, i) => {
-                ctx.fillText(chars[Math.floor(Math.random() * chars.length)], i * fontSize, d * fontSize);
-                if (d * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+        function draw() {
+            ctx.fillStyle = 'rgba(5, 9, 20, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.font = fontSize + 'px monospace';
+            drops.forEach((drop, i) => {
+                ctx.fillStyle = ['#00ffff', '#00bfff', '#0044ff'][Math.floor(Math.random()*3)];
+                ctx.fillText(chars.charAt(Math.floor(Math.random() * chars.length)), i * fontSize, drop * fontSize);
+                if (drop * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
                 drops[i]++;
             });
-        }, 50);
+        }
+        setInterval(draw, 50);
     </script>
 </body>
 </html>
