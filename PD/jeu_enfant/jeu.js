@@ -33,12 +33,12 @@ function addNavigationButtons() {
     // Style commun des boutons
     var buttonStyle = "padding: 12px 24px; margin: 0 10px; font-size: 16px; font-weight: bold; cursor: pointer; border: none; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: background 0.2s;";
 
-    // Bouton Recommencer (pointe vers Debut_parent.html situé un dossier au-dessus)
+    // Bouton Recommencer (pointe vers Debut_enfant.html situé un dossier au-dessus)
     var btnRestart = document.createElement("button");
     btnRestart.innerText = "Recommencer";
     btnRestart.style.cssText = buttonStyle + " background-color: #4CAF50; color: white;";
     btnRestart.onclick = function() {
-        window.location.href = "../Debut_parent.html";
+        window.location.href = "../Debut_enfant.html";
     };
 
     // Bouton Accueil / Index (pointe vers l'index de protection des données situé un dossier au-dessus)
