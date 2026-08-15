@@ -22,61 +22,9 @@ body {
     color: #ffffff;
 }
 
-/* Écran de verrouillage / Mot de passe */
-#auth-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(5, 9, 20, 0.95);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    backdrop-filter: blur(8px);
-}
-
-.auth-box {
-    background: rgba(10, 25, 50, 0.9);
-    border: 2px solid #1ac0a7;
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: 0 0 30px rgba(26, 192, 167, 0.4);
-    text-align: center;
-    width: min(90vw, 400px);
-}
-
-.auth-box h2 {
-    color: #1ac0a7;
-    margin-top: 0;
-    font-size: 1.5em;
-    text-shadow: 0 0 10px rgba(26, 192, 167, 0.5);
-}
-
-.auth-box input {
-    width: 100%;
-    padding: 12px;
-    margin: 20px 0;
-    background-color: #050914;
-    border: 1px solid #177062;
-    border-radius: 4px;
-    color: #80ffe5;
-    font-size: 1.1em;
-    text-align: center;
-    outline: none;
-    transition: border-color 0.3s;
-}
-
-.auth-box input:focus {
-    border-color: #1ac0a7;
-    box-shadow: 0 0 8px rgba(26, 192, 167, 0.4);
-}
-
-/* Conteneur principal des projets (masqué par défaut) */
+/* Conteneur principal des projets (affiché directement) */
 #main-content {
-    display: none;
+    display: flex;
     flex-direction: column;
     align-items: center;
     gap: 20px;
@@ -132,29 +80,11 @@ h1.portal-title {
     color: #1ac0a7;
     text-decoration: underline;
 }
-
-.error-msg {
-    color: #ff4d4d;
-    font-size: 0.9em;
-    margin-top: -10px;
-    display: none;
-}
 </style>
 <script src="title-scroll.js" data-start="5000" data-speed="250"></script>
 </head>
 
 <body>
-
-    <!-- Écran de connexion / Mot de passe -->
-    <div id="auth-overlay">
-        <div class="auth-box">
-            <h2>Accès Sécurisé</h2>
-            <p style="color: #a0c4df; font-size: 0.9em;">Veuillez entrer le mot de passe pour accéder au portail.</p>
-            <input type="password" id="password-input" placeholder="Mot de passe" onkeypress="checkEnter(event)">
-            <div id="error-msg" class="error-msg">Mot de passe incorrect</div>
-            <button class="button" style="width: 100%; padding: 10px; font-size: 1em;" onclick="verifyPassword()">Valider</button>
-        </div>
-    </div>
 
     <!-- Contenu principal du Hub -->
     <div id="main-content">
@@ -165,34 +95,11 @@ h1.portal-title {
         <a href="jeunes_reporters/index.html" class="button">Jeunes reporters pour l'environnement</a>
         <a href="la_parole_est_une_voix/index.html" class="button">La parole est une voie</a>
         <a href="hack_party/index.html" class="button">Hack Party</a>
-         <a href="reflex/index.html" class="button">Reflex</a>
+        <a href="reflex/index.html" class="button">Reflex</a>
     </div>
 
     <!-- Crédits discrets -->
     <a href="javascript:void(0);" class="credits-link">David Ferreira (CO Driez / SEM Lab)</a>
 
-    <script>
-        // Remplace "ton_mot_de_passe" par le mot de passe de ton choix
-        const PASSWORD_HASH = "motdepasse123"; 
-
-        function verifyPassword() {
-            const inputVal = document.getElementById("password-input").value;
-            const errorDiv = document.getElementById("error-msg");
-
-            if (inputVal === PASSWORD_HASH) {
-                document.getElementById("auth-overlay").style.display = "none";
-                document.getElementById("main-content").style.display = "flex";
-            } else {
-                errorDiv.style.display = "block";
-                document.getElementById("password-input").value = "";
-            }
-        }
-
-        function checkEnter(event) {
-            if (event.key === "Enter") {
-                verifyPassword();
-            }
-        }
-    </script>
 </body>
 </html>
