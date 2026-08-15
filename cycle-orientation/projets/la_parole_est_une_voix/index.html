@@ -58,23 +58,42 @@
             border: 1px solid #0044ff;
             background: #ffffff;
         }
-        iframe { width: 100%; height: 100%; border: none; }
-        
-        /* Bouton de téléchargement */
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
         .download-btn {
             display: inline-block;
-            padding: 15px 30px;
+            padding: 12px 25px;
             background-color: #00ffcc;
             color: #050914;
             text-decoration: none;
             border-radius: 5px;
             font-weight: bold;
             text-transform: uppercase;
-            box-shadow: 0 0 15px #00ffcc;
+            box-shadow: 0 0 10px #00ffcc;
             transition: 0.3s;
         }
-        .download-btn:hover { background-color: #ffffff; box-shadow: 0 0 20px #ffffff; }
-
+        .download-btn:hover {
+            background-color: #ffffff;
+            box-shadow: 0 0 20px #ffffff;
+        }
+        .doc-link {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            box-shadow: 0 0 10px #007bff;
+            transition: 0.2s;
+        }
+        .doc-link:hover {
+            background-color: #0056b3;
+            box-shadow: 0 0 15px #00ffff;
+        }
         .back-btn {
             display: inline-block;
             padding: 10px 20px;
@@ -82,27 +101,75 @@
             color: white;
             text-decoration: none;
             border-radius: 5px;
+            position: relative;
+            z-index: 10;
             box-shadow: 0 0 10px #007bff;
         }
+        .back-btn:hover {
+            background-color: #0056b3;
+            box-shadow: 0 0 15px #00ffff;
+        }
         #password-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(5, 9, 20, 0.95); z-index: 1000;
-            display: flex; justify-content: center; align-items: center; flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 9, 20, 0.95);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
         }
         .login-box {
-            background: rgba(5, 15, 35, 0.95); border: 1px solid #00ffff;
-            padding: 30px; border-radius: 10px; text-align: center;
+            background: rgba(5, 15, 35, 0.95);
+            border: 1px solid #00ffff;
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.4);
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
         }
-        .login-box input { padding: 10px; background: #000; border: 1px solid #0044ff; color: #00ffff; border-radius: 5px; margin-top: 15px; }
-        .login-box button { padding: 10px 20px; margin-top: 15px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .login-box input {
+            padding: 10px;
+            font-size: 1em;
+            background: #000;
+            border: 1px solid #0044ff;
+            color: #00ffff;
+            border-radius: 5px;
+            margin-top: 15px;
+            outline: none;
+            text-align: center;
+        }
+        .login-box button {
+            padding: 10px 20px;
+            margin-top: 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 10px #007bff;
+            display: block;
+            width: 100%;
+        }
+        #error-msg {
+            color: #ff4444;
+            margin-top: 10px;
+            font-size: 0.9em;
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div id="password-overlay">
         <div class="login-box">
             <h2>Accès Protégé</h2>
+            <p>Veuillez entrer le mot de passe :</p>
             <input type="password" id="password-input" placeholder="Mot de passe">
             <button onclick="checkPassword()">Valider</button>
+            <div id="error-msg">Mot de passe incorrect</div>
         </div>
     </div>
 
@@ -112,26 +179,72 @@
         <h1>La parole est une voie</h1>
         <p><a class="back-btn" href="projets.html">⬅ Retour aux projets</a></p>
 
-        <!-- PDF avec prévisualisation -->
+        <p>Documents et ressources :</p>
+
+        <!-- 1. PDF : Prévisualisation -->
         <div class="cours-card">
-            <div class="cours-title">📄 Critères de correction.pdf</div>
-            <div class="pdf-container"><iframe src="https://docs.google.com/gview?url=VOTRE_LIEN_ICI/Critères.pdf&embedded=true"></iframe></div>
+            <div class="cours-title">📄 Critères de correction-pour autres élèves.pdf</div>
+            <div class="pdf-container">
+                <iframe src="Critères de correction-pour autres élèves.pdf"></iframe>
+            </div>
         </div>
-        
-        <!-- Fichiers Office avec téléchargement direct -->
+
+        <!-- 2. PDF : Prévisualisation -->
+        <div class="cours-card">
+            <div class="cours-title">📄 Formulaire_evenements_scolaires_2024.pdf</div>
+            <div class="pdf-container">
+                <iframe src="Formulaire_evenements_scolaires_2024.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- 3. PDF : Prévisualisation -->
+        <div class="cours-card">
+            <div class="cours-title">📄 Slam sur 1 seule feuille.pdf</div>
+            <div class="pdf-container">
+                <iframe src="Slam sur 1 seule feuille.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- 4. PDF : Prévisualisation -->
+        <div class="cours-card">
+            <div class="cours-title">📄 films art oratoire.pdf</div>
+            <div class="pdf-container">
+                <iframe src="films art oratoire.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- 5. PPTX : Bouton de téléchargement -->
         <div class="cours-card">
             <div class="cours-title">📊 01 - Cours A.pptx</div>
             <a href="01 - Cours A.pptx" class="download-btn" download>📥 Télécharger le fichier</a>
         </div>
 
+        <!-- 6. XLSX : Bouton de téléchargement -->
         <div class="cours-card">
             <div class="cours-title">📈 04 - Plan de durée.xlsx</div>
             <a href="04 - Plan de durée.xlsx" class="download-btn" download>📥 Télécharger le fichier</a>
         </div>
 
+        <!-- 7. DOCX : Bouton de téléchargement -->
         <div class="cours-card">
             <div class="cours-title">📝 03 - Notes de cours.docx</div>
             <a href="03 - Notes de cours.docx" class="download-btn" download>📥 Télécharger le fichier</a>
+        </div>
+
+        <!-- 8. PPTX : Bouton de téléchargement -->
+        <div class="cours-card">
+            <div class="cours-title">📊 02 - Cours B.pptx</div>
+            <a href="02 - Cours B.pptx" class="download-btn" download>📥 Télécharger le fichier</a>
+        </div>
+
+        <p>Liens externes :</p>
+        <div class="cours-card">
+            <div class="cours-title">Site officiel</div>
+            <p><a class="doc-link" href="https://edu.ge.ch/enseignement/francais/ressource/11ct-la-parole-est-une-voie-2415" target="_blank">Accéder au site</a></p>
+        </div>
+        <div class="cours-card">
+            <div class="cours-title">Vidéo Art oratoire</div>
+            <p><a class="doc-link" href="https://www.youtube.com/watch?v=6r8I0Co6IIw" target="_blank">Regarder la vidéo</a></p>
         </div>
     </div>
 
@@ -140,9 +253,35 @@
             if (document.getElementById('password-input').value === 'lpeuv26') {
                 document.getElementById('password-overlay').style.display = 'none';
                 document.getElementById('main-content').style.display = 'block';
+            } else {
+                document.getElementById('error-msg').style.display = 'block';
             }
         }
-        // ... (Ajoutez ici le même code Matrix que précédemment)
+
+        // Permettre la validation avec la touche Entrée
+        document.getElementById('password-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
+        });
+        
+        // Effet Matrix
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize); resize();
+        const chars = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ';
+        const fontSize = 16;
+        let drops = Array(Math.floor(canvas.width / fontSize)).fill(1);
+        setInterval(() => {
+            ctx.fillStyle = 'rgba(5, 9, 20, 0.08)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#00ffff'; ctx.font = fontSize + 'px monospace';
+            drops.forEach((d, i) => {
+                ctx.fillText(chars[Math.floor(Math.random() * chars.length)], i * fontSize, d * fontSize);
+                if (d * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            });
+        }, 50);
     </script>
 </body>
 </html>
