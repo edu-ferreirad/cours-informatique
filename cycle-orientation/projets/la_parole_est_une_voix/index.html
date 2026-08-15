@@ -60,6 +60,7 @@
             font-weight: bold;
             box-shadow: 0 0 10px #007bff;
             transition: background-color 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
         }
         .doc-link:hover {
             background-color: #0056b3;
@@ -79,6 +80,12 @@
         .back-btn:hover {
             background-color: #0056b3;
             box-shadow: 0 0 15px #00ffff;
+        }
+        iframe {
+            border: 1px solid #0044ff;
+            border-radius: 5px;
+            background: #ffffff;
+            margin-top: 10px;
         }
         /* Password Overlay */
         #password-overlay {
@@ -156,16 +163,66 @@
         <h1>La parole est une voie</h1>
         <p><a class="back-btn" href="projets.html">⬅ Retour aux projets</a></p>
 
-        <p>Annexes :</p>
+        <p style="font-size: 1.2em; font-weight: bold; margin-top: 30px;">📄 Prévisualisations des documents (Annexes) :</p>
+
+        <!-- 1. Critères de correction -->
+        <div class="cours-card">
+            <div class="cours-title">📄 Critères de correction - pour autres élèves.pdf</div>
+            <iframe src="https://docs.google.com/viewer?url=URL_DE_VOTRE_SITE/Crit%C3%A8res%20de%20correction-pour%20autres%20%C3%A9l%C3%A8ves.pdf&embedded=true" width="100%" height="400px"></iframe>
+        </div>
+
+        <!-- 2. Formulaire événements scolaires -->
+        <div class="cours-card">
+            <div class="cours-title">📄 Formulaire_evenements_scolaires_2024.pdf</div>
+            <iframe src="https://docs.google.com/viewer?url=URL_DE_VOTRE_SITE/Formulaire_evenements_scolaires_2024.pdf&embedded=true" width="100%" height="400px"></iframe>
+        </div>
+
+        <!-- 3. Slam sur 1 seule feuille -->
+        <div class="cours-card">
+            <div class="cours-title">📄 Slam sur 1 seule feuille.pdf</div>
+            <iframe src="https://docs.google.com/viewer?url=URL_DE_VOTRE_SITE/Slam%20sur%201%20seule%20feuille.pdf&embedded=true" width="100%" height="400px"></iframe>
+        </div>
+
+        <!-- 4. Films art oratoire -->
+        <div class="cours-card">
+            <div class="cours-title">📄 films art oratoire.pdf</div>
+            <iframe src="https://docs.google.com/viewer?url=URL_DE_VOTRE_SITE/films%20art%20oratoire.pdf&embedded=true" width="100%" height="400px"></iframe>
+        </div>
+
+        <!-- 5. 01 - Cours A -->
+        <div class="cours-card">
+            <div class="cours-title">📊 01 - Cours A.pptx</div>
+            <iframe src="https://view.officeapps.live.com/op/embed.aspx?src=URL_DE_VOTRE_SITE/01%20-%20Cours%20A.pptx" width="100%" height="400px" frameborder="0"></iframe>
+        </div>
+
+        <!-- 6. 04 - Plan de durée -->
+        <div class="cours-card">
+            <div class="cours-title">📈 04 - Plan de durée.xlsx</div>
+            <iframe src="https://view.officeapps.live.com/op/embed.aspx?src=URL_DE_VOTRE_SITE/04%20-%20Plan%20de%20dur%C3%A9e.xlsx" width="100%" height="400px" frameborder="0"></iframe>
+        </div>
+
+        <!-- 7. 03 - Notes de cours -->
+        <div class="cours-card">
+            <div class="cours-title">📝 03 - Notes de cours.docx</div>
+            <iframe src="https://view.officeapps.live.com/op/embed.aspx?src=URL_DE_VOTRE_SITE/03%20-%20Notes%20de%20cours.docx" width="100%" height="400px" frameborder="0"></iframe>
+        </div>
+
+        <!-- 8. 02 - Cours B -->
+        <div class="cours-card">
+            <div class="cours-title">📊 02 - Cours B.pptx</div>
+            <iframe src="https://view.officeapps.live.com/op/embed.aspx?src=URL_DE_VOTRE_SITE/02%20-%20Cours%20B.pptx" width="100%" height="400px" frameborder="0"></iframe>
+        </div>
+
+        <p style="font-size: 1.2em; font-weight: bold; margin-top: 40px;">🔗 Liens utiles :</p>
 
         <div class="cours-card">
-            <div class="cours-title">🔗 Site officiel - La parole est une voie</div>
-            <p><a class="doc-link" href="https://edu.ge.ch/enseignement/francais/ressource/11ct-la-parole-est-une-voie-2415" target="_blank">Accéder au site</a></p>
+            <div class="cours-title">Site officiel - La parole est une voie</div>
+            <a class="doc-link" href="https://edu.ge.ch/enseignement/francais/ressource/11ct-la-parole-est-une-voie-2415" target="_blank">Accéder au site</a>
         </div>
 
         <div class="cours-card">
-            <div class="cours-title">🎥 Vidéo - Art oratoire</div>
-            <p><a class="doc-link" href="https://www.youtube.com/watch?v=6r8I0Co6IIw" target="_blank">Regarder la vidéo</a></p>
+            <div class="cours-title">Vidéo - Art oratoire</div>
+            <a class="doc-link" href="https://www.youtube.com/watch?v=6r8I0Co6IIw" target="_blank">Regarder la vidéo</a>
         </div>
     </div>
 
