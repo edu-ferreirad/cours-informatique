@@ -1,126 +1,123 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Jeunes Reporters pour l'Environnement</title>
-    <style>
-        body {
-            background-color: #050914;
-            color: #00ffff;
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 0;
-            padding-top: 30px;
-            overflow-x: hidden;
-        }
-        canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-        h1, p {
-            position: relative;
-            z-index: 10;
-            color: #ffffff;
-            text-shadow: 0 0 10px #00bfff, 0 0 20px #0044ff;
-        }
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 10;
-            padding-bottom: 50px;
-        }
-        .cours-card {
-            background: rgba(5, 15, 35, 0.85);
-            border: 1px solid #00ffff;
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
-            border-radius: 8px;
-            margin: 25px auto;
-            padding: 20px;
-            width: 90%;
-        }
-        .cours-title {
-            font-size: 1.1em;
-            font-weight: bold;
-            color: #00ffff;
-            margin-bottom: 15px;
-            text-shadow: 0 0 5px #00bfff;
-        }
-        .pdf-container {
-            width: 100%;
-            height: 450px;
-            border-radius: 5px;
-            overflow: hidden;
-            border: 1px solid #0044ff;
-            background: #000;
-        }
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-        .doc-link {
-            display: inline-block;
-            padding: 12px 25px;
-            background-color: #007bff;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-            box-shadow: 0 0 10px #007bff;
-            transition: background-color 0.2s, box-shadow 0.2s;
-        }
-        .doc-link:hover {
-            background-color: #0056b3;
-            box-shadow: 0 0 15px #00ffff;
-        }
-        .back-btn {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            position: relative;
-            z-index: 10;
-            box-shadow: 0 0 10px #007bff;
-        }
-        .back-btn:hover {
-            background-color: #0056b3;
-            box-shadow: 0 0 15px #00ffff;
-        }
-    </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portail des Projets</title>
+<style>
+* {
+    box-sizing: border-box;
+}
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #050914;
+    font-family: Arial, sans-serif;
+    color: #ffffff;
+    overflow-x: hidden;
+}
+
+/* Toile de fond Matrix */
+canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+/* Conteneur principal des projets */
+#main-content {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    padding: 20px;
+}
+
+h1.portal-title {
+    color: #00ffff;
+    font-size: clamp(22px, 4vw, 36px);
+    text-align: center;
+    margin-bottom: 20px;
+    text-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+}
+
+/* Boutons Matrix Bleu (clair, bleu, bleu foncé) */
+.button {
+    display: inline-block;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #0044ff 0%, #00bfff 50%, #00ffff 100%);
+    border: 1px solid #00ffff;
+    color: #000000;
+    text-align: center;
+    font-size: clamp(16px, 3vw, 20px);
+    padding: clamp(14px, 2.5vw, 18px) clamp(20px, 4vw, 30px);
+    width: min(90vw, 450px);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 68, 255, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.4);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.button:hover {
+    background: linear-gradient(135deg, #0056b3 0%, #00ffff 100%);
+    box-shadow: 0 6px 20px rgba(0, 255, 255, 0.6), inset 0 0 15px rgba(255, 255, 255, 0.6);
+    transform: translateY(-2px);
+    color: #050914;
+}
+
+/* Crédits discrets bas de page */
+.credits-link {
+    position: fixed;
+    bottom: 15px;
+    right: 20px;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8em;
+    text-decoration: none;
+    z-index: 10;
+    transition: color 0.3s;
+}
+
+.credits-link:hover {
+    color: #00ffff;
+    text-decoration: underline;
+}
+</style>
 </head>
+
 <body>
 
+    <!-- Effet Matrix en arrière-plan -->
     <canvas id="matrix"></canvas>
 
-    <div class="container" id="main-content">
-        <h1>Jeunes Reporters pour l'Environnement</h1>
-        <p><a class="back-btn" href="../index.html">⬅ Retour au portail</a></p>
+    <!-- Contenu principal du Hub -->
+    <div id="main-content">
+        <h1 class="portal-title">Portail des Projets</h1>
 
-        <p>Documents et ressources :</p>
-
-        <!-- 1. Slam - L’IA rend paresseux-CO Drize.pdf (Prévisualisation PDF) -->
-        <div class="cours-card">
-            <div class="cours-title">📄 Slam - L’IA rend paresseux-CO Drize.pdf</div>
-            <div class="pdf-container">
-                <iframe src="Slam - L’IA rend paresseux-CO Drize.pdf"></iframe>
-            </div>
-        </div>
-
-        <!-- 2. Fichier texte (.txt) en téléchargement -->
-        <div class="cours-card">
-            <div class="cours-title">📝 sujets_debats.txt</div>
-            <p><a class="doc-link" href="sujets_debats.txt" download>Télécharger le fichier texte</a></p>
-        </div>
+        <!-- Boutons pointant vers les dossiers exacts -->
+        <a href="escape_game/index.html" class="button">📁 escape_game</a>
+        <a href="hack_party/index.html" class="button">📁 hack_party</a>
+        <a href="jeunes_reporters/index.html" class="button">📁 jeunes_reporters</a>
+        <a href="la_parole_est_une_voie/index.html" class="button">📁 la_parole_est_une_voie</a>
+        <a href="reflex/index.html" class="button">📁 reflex</a>
     </div>
 
+    <!-- Crédits discrets -->
+    <a href="javascript:void(0);" class="credits-link">David Ferreira (CO Drize)</a>
+
     <script>
+        // Animation Matrix
         const canvas = document.getElementById('matrix');
         const ctx = canvas.getContext('2d');
 
@@ -151,11 +148,11 @@
                 
                 const randShade = Math.random();
                 if (randShade < 0.33) {
-                    ctx.fillStyle = '#00ffff';
+                    ctx.fillStyle = '#00ffff'; // Bleu clair
                 } else if (randShade < 0.66) {
-                    ctx.fillStyle = '#00bfff';
+                    ctx.fillStyle = '#00bfff'; // Bleu
                 } else {
-                    ctx.fillStyle = '#0044ff';
+                    ctx.fillStyle = '#0044ff'; // Bleu foncé
                 }
 
                 ctx.fillText(text, i * fontSize, drops[i] * fontSize);
