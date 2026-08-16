@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>S00E03 - FINAL - THE ARCHITECT</title>
+    <style>
+        :root {
+            --matrix-green: #00ff41;
+            --terminal-bg: #050a05;
+            --error-red: #ff3333;
+            --system-blue: #3498db;
+            --gold: #ffd700;
+            --legal-gold: #ffcc00;
+            --forensic-red: #ff3333;
+        }
+
+        #circuit-bg {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            opacity: 0.4;
+        }
+
+        body {
+            background-color: var(--terminal-bg);
+            color: var(--matrix-green);
+            font-family: 'Consolas', 'Lucida Console', monospace;
+            padding: 20px; margin: 0;
+            overflow-x: hidden;
+        }
+
+        .pwn-container {
+            border: 2px solid var(--gold);
+            max-width: 1000px; margin: 0 auto;
+            background: rgba(0, 5, 0, 0.98);
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.1);
+            position: relative;
+            z-index: 10;
+        }
+
+        #lock-screen {
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; height: 550px; text-align: center;
+            background: #000;
+            position: relative;
+        }
+
+        #pre-requisites, #main-content { display: none; }
+
+        .header {
+            background: var(--gold); color: #000;
+            padding: 8px 15px; font-weight: bold;
+            display: flex; justify-content: space-between;
+            text-transform: uppercase;
+        }
+
+        .content { padding: 30px; }
+
+        .evidence-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0;
+        }
+
+        .evidence-box {
+            background: #000; border: 1px solid #333;
+            padding: 15px; font-size: 0.85em; height: 250px; overflow-y: auto;
+        }
+
+        .chat-msg { margin-bottom: 10px; border-left: 2px solid #444; padding-left: 10px; }
+        .chat-author { color: var(--system-blue); font-weight: bold; }
+
+        .admin-console {
+            background: #000; border: 1px solid var(--gold);
+            padding: 20px; margin-top: 30px;
+        }
+
+        .input-line {
+            display: flex; align-items: center; margin-top: 10px;
+        }
+
+        input[type="text"] {
+            background: transparent; border: none; color: #fff;
+            width: 100%; font-family: inherit; outline: none; font-size: 1.1em;
+            margin-left: 10px;
+        }
+
+        .btn-final {
+            background: var(--gold); color: #000; border: none;
+            padding: 15px 30px; cursor: pointer; font-weight: bold;
+            width: 100%; margin-top: 20px;
+            transition: 0.3s;
+        }
+
+        .btn-final:hover { background: #fff; box-shadow: 0 0 20px var(--gold); }
+
+        .success-final {
+            display: none; border: 3px double var(--gold);
+            padding: 30px; margin-top: 25px;
+            background: rgba(255, 215, 0, 0.05);
+            line-height: 1.6;
+        }
+
+        .help-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .help-card {
+            background: rgba(0, 15, 0, 0.7);
+            border: 1px solid #222;
+            padding: 15px;
+            font-size: 0.85em;
+        }
+
+        .info-label { color: var(--system-blue); }
+        .legal-label { color: var(--legal-gold); }
+        .forensic-label { color: var(--forensic-red); }
+
+        .glow-text {
+            animation: pulseGold 2s infinite alternate;
+        }
+
+        @keyframes pulseGold {
+            from { text-shadow: 0 0 5px var(--gold); }
+            to { text-shadow: 0 0 20px var(--gold), 0 0 30px #ffa500; }
+        }
+
+        /* --- MODE SOBRE (accessibilité) --- */
+        body.mode-sobre, body.mode-sobre * { animation: none !important; transition: none !important; }
+        body.mode-sobre #circuit-bg { display: none !important; }
+        #toggle-sobre-btn {
+            position: fixed; top: 10px; right: 10px; z-index: 10001;
+            background: #000; color: var(--gold); border: 1px solid var(--gold);
+            padding: 6px 10px; font-size: 0.7em; cursor: pointer; font-family: inherit; border-radius: 3px;
+        }
+
+        .nav-root {
+            color: #000; text-decoration: none; border: 1px solid #000; padding: 0 5px; font-size: 0.8em;
+        }
+
+        .hint { color: #666; font-style: italic; font-size: 0.85em; margin-top: 8px; display: block; border-left: 2px solid #333; padding-left: 5px; }
+    </style>
+</head>
+<body onload="initLockScreen()">
+<button id="toggle-sobre-btn" onclick="basculerModeSobre()">🌓 Mode sobre</button>
+
+<div class="pwn-container">
+    <div class="header">
+        <span>UNIT: SWISS-SHIELD-GENESIS | S00E03 - FINAL</span>
+        <span><a href="../../MENU_PRINCIPAL.html" class="nav-root">RETOUR RACINE</a> STATUS: <span style="color:red">DECRYPTING</span></span>
+    </div>
+
+    <div id="lock-screen">
+        <canvas id="circuit-bg"></canvas>
+        <h2 class="glow-text" style="color: var(--gold); z-index: 1;">NOYAU DE l'ARCHITECTE</h2>
+        <div style="z-index: 1; background: rgba(0,0,0,0.8); padding: 20px; border-radius: 10px;">
+            <p style="color: #ccc; max-width: 500px; margin-bottom: 20px;">
+                <b>MISSION FINALE :</b> Cold Storage NCSC. <br>
+                Identifiez-vous pour clore l'enquête Swiss Shield.
+            </p>
+            <input type="text" id="unlock-key" placeholder="NETWORK-XXXX-XXX"
+                   style="background:#000; border:1px solid var(--gold); color:#fff; padding:12px; text-align:center; width: 80%;">
+            <button class="btn-final" style="width:250px" onclick="validateUnlock()">CHARGER L'ARCHIVE</button>
+        </div>
+    </div>
+
+    <div id="pre-requisites" class="content">
+        <h3 style="color:var(--gold)">VERROUILLAGE DE SÉCURITÉ SUPPLÉMENTAIRE</h3>
+        <p>Validez les derniers protocoles pour déverrouiller le terminal d'archive.</p>
+
+        <div class="evidence-grid">
+            <div class="evidence-box">
+                <div style="color:var(--legal-gold); border-bottom:1px solid #333; margin-bottom:10px;">[ TEST_JURIDIQUE ]</div>
+                <p>Quel article du <b>Code Pénal (CP)</b> suisse concerne la <b>soustraction de données personnelles</b> ?</p>
+                <input type="text" id="ans-1" placeholder="Ex: 179..." style="border:1px solid #333; background:#111; color:white; width:90%; padding:5px;" onchange="sauvegarderAutomatiquement()">
+                <span class="hint">Indice : Article suivant l'accès indu.</span>
+            </div>
+            <div class="evidence-box">
+                <div style="color:var(--system-blue); border-bottom:1px solid #333; margin-bottom:10px;">[ TEST_TECHNIQUE ]</div>
+                <p>Port de la connexion sécurisée (HTTPS) ?</p>
+                <input type="text" id="ans-2" placeholder="Numéro du port" style="border:1px solid #333; background:#111; color:white; width:90%; padding:5px;" onchange="sauvegarderAutomatiquement()">
+                <span class="hint">Indice : Port standard du Web sécurisé.</span>
+            </div>
+        </div>
+        <button class="btn-final" onclick="validatePreReqs()">VÉRIFIER LES ACCÈS</button>
+    </div>
+
+    <div id="main-content" class="content">
+        <div style="border-left: 4px solid var(--gold); padding-left: 15px; margin-bottom: 25px;">
+            <b style="color:var(--gold)">>> DOSSIER ARCHIVE : LA PREMIÈRE INTRUSION</b><br>
+            Neutralisez le complice interne pour terminer la simulation.
+        </div>
+
+        <div class="evidence-grid">
+            <div class="evidence-box">
+                <div style="color:var(--system-blue); border-bottom:1px solid #333; margin-bottom:10px;">[ ARCHIVE_CHAT.LOG ]</div>
+                <div class="chat-msg"><span class="chat-author">COTL_X:</span> "L'accès est prêt ?"</div>
+                <div class="chat-msg"><span class="chat-author">UNKNOWN:</span> "Oui. Mon ID finit par '9'. J'ai ouvert le port 443 à 09:44."</div>
+            </div>
+            <div class="evidence-box">
+                <div style="color:var(--system-blue); border-bottom:1px solid #333; margin-bottom:10px;">[ LOGIN_HISTORY ]</div>
+                <div>09:42 - USER: m_rossi [ID: 309] - LOGIN</div>
+                <div style="color:var(--gold)">09:44 - USER: m_rossi [ID: 309] - ESCALATION</div>
+            </div>
+        </div>
+
+        <div class="admin-console">
+            <div id="console-output" style="color:#888; font-size:0.9em;">
+                [SYS] SESSION D'ADMINISTRATION FINALE...<br>
+                [SYS] COMMANDE : usermod -L [nom_utilisateur]
+            </div>
+            <div class="input-line">
+                <span style="color:var(--gold)">admin@shield-archive:~$</span>
+                <input type="text" id="admin-input" onkeydown="handleFinal(event)">
+            </div>
+        </div>
+
+        <div id="success" class="success-final">
+            <h2 style="color:var(--gold); margin:0; text-align:center;">🎉 MISSION ACCOMPLIE</h2>
+            <hr style="border-color:var(--gold); margin: 15px 0;">
+            <p style="text-align: center; color: #fff;">
+                Félicitations, Analyste. Vous avez identifié <b>m_rossi</b> et sécurisé les archives nationales.<br>
+                La menace <b>COTL</b> a été neutralisée. Vous êtes maintenant membre à part entière de la <b>Swiss Shield</b>.
+            </p>
+            <div style="text-align:center; margin-top:20px;">
+                <a href="../../MENU_PRINCIPAL.html" class="btn-final" style="text-decoration:none; display:inline-block;">LOGOUT & FIN DU JEU</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div style="margin-top: 30px; border-top: 3px solid #d80000; padding: 20px; background: #fff; font-family: Arial, sans-serif; position: relative; z-index: 100; width: 90%; max-width: 1000px; margin-left:auto; margin-right:auto;">
+    <div id="hint-score-badge" style="background:#111;color:#3fb950;padding:8px 15px;font-weight:bold;text-align:center;">🏆 Score de cet épisode : <span id="hint-score-value">5</span> / 5 pts</div>
+    <div style="display:flex; gap:8px; margin:10px 0;">
+        <button id="hintBtn1" onclick="useHint(1)" style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;">💡 Indice 1 (-1 pt)</button>
+        <button id="hintBtn2" onclick="useHint(2)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🎯 Indice 2 (-2 pts)</button>
+        <button id="hintBtn3" onclick="useHint(3)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🆘 Solution (-3 pts)</button>
+    </div>
+
+    <div id="zoneAide" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; color: #333;">
+        <p id="hint-tier-1" style="display:none;"><strong>💡 INFO :</strong> Le premier verrou demande un article du Code pénal suisse et le numéro d'un port réseau standard. Le second demande de neutraliser un utilisateur repéré dans les logs.</p>
+        <p id="hint-tier-2" style="display:none;"><strong>🎯 PISTE :</strong> Pour ce terminal, la réponse attendue à la question juridique est <code>179novies</code> (soustraction de données personnelles), et le port est <code>443</code> (HTTPS). Dans le journal de connexion, l'ID se terminant par « 9 » correspond à l'utilisateur <code>m_rossi</code>.</p>
+        <p id="hint-tier-3" style="display:none;"><strong>🆘 SOLUTION :</strong> Pré-requis : 179novies / 443. Console finale : <code>usermod -L m_rossi</code></p>
+    </div>
+</div>
+
+<script>
+    const EP_ID = "S00E03";
+    const HINT_COST = {1:1, 2:2, 3:3};
+    let hintsUsed = {1:false, 2:false, 3:false};
+    let episodeScore = 5;
+    function useHint(level) {
+        if (hintsUsed[level] || (level > 1 && !hintsUsed[level - 1])) return;
+        hintsUsed[level] = true;
+        enregistrerIndiceUsage(level);
+        episodeScore -= HINT_COST[level];
+        document.getElementById('hint-score-value').textContent = episodeScore;
+        document.getElementById('hint-tier-' + level).style.display = 'block';
+        const btn = document.getElementById('hintBtn' + level);
+        btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5';
+        if (level < 3) {
+            const next = document.getElementById('hintBtn' + (level + 1));
+            if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+        }
+        sauvegarderAutomatiquement();
+    }
+    function recordEpisodeSuccess() {
+        let scores = {};
+        try { scores = JSON.parse(localStorage.getItem('swiss_shield_scores') || '{}'); } catch(e) {}
+        if (!(EP_ID in scores) || scores[EP_ID] < episodeScore) scores[EP_ID] = episodeScore;
+        localStorage.setItem('swiss_shield_scores', JSON.stringify(scores));
+        localStorage.removeItem('autosave_' + EP_ID);
+    }
+    let currentZone = 'lock-screen';
+    function sauvegarderAutomatiquement() {
+        try {
+            const inputs = {};
+            ['ans-1', 'ans-2'].forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) inputs[id] = el.value;
+            });
+            localStorage.setItem('autosave_' + EP_ID, JSON.stringify({
+                zone: currentZone,
+                inputs: inputs,
+                hintsUsed: hintsUsed,
+                episodeScore: episodeScore
+            }));
+        } catch(e) {}
+    }
+    function proposerRestaurationAutosave() {
+        let data;
+        try { data = JSON.parse(localStorage.getItem('autosave_' + EP_ID) || 'null'); } catch(e) { return; }
+        if (!data || !data.zone || data.zone === 'lock-screen') return;
+        document.getElementById('lock-screen').style.display = 'none';
+        if (data.zone === 'main-content') {
+            document.getElementById('pre-requisites').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+        } else if (data.zone === 'pre-requisites') {
+            document.getElementById('pre-requisites').style.display = 'block';
+        }
+        currentZone = data.zone;
+        if (data.inputs) {
+            Object.keys(data.inputs).forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) el.value = data.inputs[id];
+            });
+        }
+        hintsUsed = data.hintsUsed || hintsUsed;
+        episodeScore = (typeof data.episodeScore === 'number') ? data.episodeScore : episodeScore;
+        document.getElementById('hint-score-value').textContent = episodeScore;
+        [1, 2, 3].forEach(function(level) {
+            if (hintsUsed[level]) {
+                document.getElementById('hint-tier-' + level).style.display = 'block';
+                const btn = document.getElementById('hintBtn' + level);
+                if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+        });
+    }
+    function enregistrerIndiceUsage(niveau) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + niveau;
+            debrief.indices[cle] = (debrief.indices[cle] || 0) + 1;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+    function enregistrerErreur(phase, reponseEleve, reponseAttendue) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + phase;
+            if (typeof debrief.erreurs[cle] !== 'object' || debrief.erreurs[cle] === null) {
+                debrief.erreurs[cle] = { compte: (debrief.erreurs[cle] || 0), exemples: [] };
+            }
+            debrief.erreurs[cle].compte++;
+            if (reponseEleve !== undefined && debrief.erreurs[cle].exemples.length < 5) {
+                debrief.erreurs[cle].exemples.push({ reponseEleve: String(reponseEleve).slice(0,100), reponseAttendue: String(reponseAttendue||'').slice(0,100) });
+            }
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+    (function pollSuccess(){
+        const ids = ['success','success-msg','success-final','final-zone','victory-zone','victory-screen','final-step','final-badge'];
+        let recorded = false;
+        setInterval(function(){
+            if (recorded) return;
+            for (const id of ids) {
+                const el = document.getElementById(id);
+                if (el && el.style.display === 'block') { recordEpisodeSuccess(); recorded = true; return; }
+            }
+        }, 500);
+    })();
+</script>
+
+<script>
+    function initLockScreen() {
+        appliquerModeSobre();
+        const canvas = document.getElementById('circuit-bg');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const particles = [];
+        for(let i = 0; i < 60; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                speed: Math.random() * 2 + 1,
+                len: Math.random() * 50 + 20,
+                vertical: Math.random() > 0.5
+            });
+        }
+        function draw() {
+            ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = "#ffd700";
+            ctx.lineWidth = 1;
+            particles.forEach(p => {
+                ctx.beginPath();
+                if(p.vertical) {
+                    ctx.moveTo(p.x, p.y);
+                    ctx.lineTo(p.x, p.y + p.len);
+                    p.y += p.speed;
+                    if(p.y > canvas.height) p.y = -p.len;
+                } else {
+                    ctx.moveTo(p.x, p.y);
+                    ctx.lineTo(p.x + p.len, p.y);
+                    p.x += p.speed;
+                    if(p.x > canvas.width) p.x = -p.len;
+                }
+                ctx.stroke();
+            });
+            requestAnimationFrame(draw);
+        }
+        if (localStorage.getItem('swiss_shield_mode_sobre') !== '1') draw();
+        proposerRestaurationAutosave();
+    }
+
+    function appliquerModeSobre() {
+        const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+        document.body.classList.toggle('mode-sobre', actif);
+        const btn = document.getElementById('toggle-sobre-btn');
+        if (btn) btn.textContent = actif ? '🌓 Mode sobre : ON' : '🌓 Mode sobre';
+    }
+
+    function basculerModeSobre() {
+        const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+        localStorage.setItem('swiss_shield_mode_sobre', actif ? '0' : '1');
+        appliquerModeSobre();
+    }
+
+    function validateUnlock() {
+        const key = document.getElementById('unlock-key').value.trim().toUpperCase();
+        if (key === "SHIELD-NET-INTERCEPT-202" || key === "NETWORK-BLOCK-202") {
+            document.getElementById('lock-screen').style.display = 'none';
+            document.getElementById('pre-requisites').style.display = 'block';
+            currentZone = 'pre-requisites';
+            sauvegarderAutomatiquement();
+        } else { enregistrerErreur('entree', key, 'SHIELD-NET-INTERCEPT-202'); alert("CLÉ REQUISE."); }
+    }
+
+    function validatePreReqs() {
+        const a1 = document.getElementById('ans-1').value.trim().toLowerCase();
+        const a2 = document.getElementById('ans-2').value.trim();
+        if ((a1 === "179novies" || a1 === "179 novies" || a1 === "art 179novies" || a1 === "art. 179novies" || a1 === "art 179 novies") && a2 === "443") {
+            document.getElementById('pre-requisites').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+            currentZone = 'main-content';
+            sauvegarderAutomatiquement();
+        } else { enregistrerErreur('prerequis', 'art="' + a1 + '", port="' + a2 + '"', 'art="179novies", port="443"'); alert("ACCÈS REFUSÉ."); }
+    }
+
+    function handleFinal(e) {
+        if (e.key === 'Enter') {
+            const input = document.getElementById('admin-input');
+            const cmd = input.value.trim();
+            const output = document.getElementById('console-output');
+            output.innerHTML += `<br><span style="color:#fff">> ${cmd}</span>`;
+            if (cmd === "usermod -L m_rossi") {
+                output.innerHTML += `<br><span style="color:var(--matrix-green)">[OK] TRAITRE NEUTRALISÉ. SYSTÈME SÉCURISÉ.</span>`;
+                document.getElementById('success').style.display = 'block';
+                input.disabled = true;
+            } else {
+                enregistrerErreur('investigation', cmd, 'usermod -L m_rossi');
+                output.innerHTML += `<br><span style="color:var(--error-red)">[!] CIBLE INCORRECTE.</span>`;
+            }
+            input.value = '';
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>S04E33 - DATA PURGE : RIGHT TO BE FORGOTTEN</title>
+    <style>
+        /* --- NOUVEL EFFET VISUEL : VORTEX DE DESTRUCTION --- */
+        #purge-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle, #200 0%, #000 100%);
+        }
+
+        body { 
+            color: #2ecc71; 
+            font-family: 'Consolas', 'Courier New', monospace; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 40px; 
+            margin: 0; 
+            min-height: 100vh; 
+            overflow-y: auto;
+        }
+
+        .terminal { 
+            background: rgba(10, 10, 10, 0.9); 
+            border: 2px solid #2ecc71; 
+            padding: 25px; 
+            width: 95%; 
+            max-width: 900px; 
+            box-shadow: 0 0 40px rgba(255, 62, 62, 0.3); 
+            border-radius: 12px; 
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        .story-context {
+            background: rgba(255, 62, 62, 0.1);
+            border-left: 5px solid #ff3e3e;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+            font-size: 0.95em;
+            color: #fff;
+            line-height: 1.6;
+        }
+        .story-context b { color: #ff3e3e; text-transform: uppercase; }
+
+        .header-mission { border-bottom: 2px solid #2ecc71; margin-bottom: 20px; padding-bottom: 10px; color: #fff; font-weight: bold; text-transform: uppercase; display: flex; justify-content: space-between; }
+        
+        #lock-screen { text-align: center; padding: 10px; }
+        #pre-requis-screen { display: none; }
+        #mission-content { display: none; }
+        
+        .deletion-grid { display: flex; flex-direction: column; gap: 15px; margin: 25px 0; }
+        .data-trace { background: #1a1a1a; padding: 15px; border: 1px solid #333; border-radius: 8px; display: grid; grid-template-columns: 1.5fr 1.2fr 1.2fr 0.6fr; gap: 10px; align-items: center; transition: 0.3s; text-align: left; }
+        .data-trace span { color: #fff; font-size: 0.85em; font-weight: bold; }
+        
+        select, input { background: #000; border: 1px solid #2ecc71; color: #2ecc71; padding: 8px; border-radius: 4px; font-family: inherit; font-size: 0.8em; outline: none; box-sizing: border-box; }
+        input[type="password"], input[type="text"] { width: 100%; max-width: 350px; padding: 12px; font-size: 1.1em; text-align: center; margin-bottom: 15px; border-radius: 6px; }
+        
+        .btn-purge { background: #1a1a1a; color: #ff3e3e; border: 1px solid #ff3e3e; padding: 10px; border-radius: 4px; cursor: pointer; font-weight: bold; opacity: 0.2; pointer-events: none; text-transform: uppercase; font-size: 0.7em; }
+        .btn-purge.active { opacity: 1; pointer-events: auto; background: #ff3e3e; color: #000; box-shadow: 0 0 10px #ff3e3e; }
+
+        .main-btn { background: #2ecc71; color: #000; border: none; padding: 12px 30px; font-weight: bold; cursor: pointer; transition: 0.3s; border-radius: 6px; text-transform: uppercase; font-family: inherit; }
+        .main-btn:hover { background: #fff; box-shadow: 0 0 15px #2ecc71; }
+
+        .export-report { background: rgba(46, 204, 113, 0.1); padding: 15px; border: 1px solid #2ecc71; margin: 20px 0; font-size: 0.85em; color: #fff; text-align: left; }
+        
+        .btn-aide { background: #ff3e3e; color: #fff; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; width: 450px; margin-top: 40px; border-radius: 2px; text-transform: uppercase; box-shadow: 0 5px 15px rgba(255, 62, 62, 0.4); z-index: 10; font-family: inherit; }
+        
+        .aide-box { 
+            display: none; 
+            background: #fff; 
+            color: #000; 
+            padding: 25px; 
+            margin-top: 10px; 
+            margin-bottom: 50px; 
+            width: 450px; 
+            text-align: left; 
+            border-top: 5px solid #ff3e3e; 
+            font-family: sans-serif; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+            font-size: 0.9em; 
+            z-index: 10;
+        }
+        
+        .pillar { margin-bottom: 12px; border-left: 3px solid #ff3e3e; padding-left: 10px; }
+        .pillar b { color: #ff3e3e; text-transform: uppercase; font-size: 0.8em; display: block; }
+
+        .final-badge { margin-top: 25px; padding: 20px; background: #2ecc71; color: #000; border-radius: 8px; text-align: center; font-weight: bold; display: none; border: 2px solid #fff; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0.7; } }
+
+        /* AJOUTS DES CRITÈRES MANQUANTS */
+        .btn-nav-retour { position: absolute; top: 15px; left: 15px; background: #000; border: 1px solid #2ecc71; color: #2ecc71; padding: 5px 10px; text-decoration: none; font-size: 0.8em; font-weight: bold; border-radius: 4px; }
+        .btn-nav-retour:hover { background: #2ecc71; color: #000; }
+        .challenge-block { background: #0d0d0d; border: 1px dashed #ff3e3e; padding: 15px; margin: 15px 0; text-align: left; border-radius: 6px; }
+        .challenge-title { font-weight: bold; color: #ff3e3e; text-transform: uppercase; font-size: 0.85em; display: block; margin-bottom: 8px; }
+        .code-window { background: #000; border-left: 3px solid #2ecc71; padding: 12px; margin: 15px 0; color: #2ecc71; font-size: 0.85em; overflow-x: auto; white-space: pre; font-family: monospace; }
+
+        /* MODE SOBRE */
+        body.mode-sobre, body.mode-sobre * { animation: none !important; transition: none !important; }
+        body.mode-sobre #purge-canvas { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <canvas id="purge-canvas"></canvas>
+
+    <div class="terminal">
+        <a href="../../MENU_PRINCIPAL.html" class="btn-nav-retour">&lt; MENU PRINCIPAL</a>
+        <button id="toggle-sobre-btn" onclick="basculerModeSobre()" style="position:absolute;top:15px;right:15px;width:auto;z-index:10;background:#000;border:1px solid #2ecc71;color:#2ecc71;padding:5px 10px;font-size:0.8em;font-weight:bold;border-radius:4px;cursor:pointer;">🌓</button>
+
+        <div id="lock-screen" style="margin-top: 20px;">
+            <h2>[S04E33] - PROTOCOLE D'EFFACEMENT</h2>
+            
+            <div class="story-context">
+                <b>[ MISSION : DROIT À L'OUBLI - HÔPITAUX UNIVERSITAIRES DE GENÈVE ]</b><br>
+                Le calme revient après la neutralisation des mouvements latéraux réseau. Cependant, un patient des <b>HUG (Hôpitaux Universitaires de Genève)</b> exige l'application immédiate du droit à l'effacement de ses métadonnées non médicales de géolocalisation, conformément à l'<b>Art. 32 nLPD</b>.<br><br>
+                L'audit forensics reveals que des résidus de tables marketing de profilage automatique subsistent illicitement sur le nœud central sanitaire. Vous devez piloter l'effacement logique et physique définitif de ces traces avant l'analyse finale de conformité par le médecin cantonal.
+            </div>
+            <p>Injecter le jeton de transition S04-E32 :</p>
+            <input type="password" id="passkey" placeholder="CODE DE SESSION S04E32" autocomplete="off" onchange="sauvegarderAutomatiquement()">
+            <br><br>
+            <button class="main-btn" onclick="unlock()">INITIALISER LA PURGE</button>
+        </div>
+
+        <div id="pre-requis-screen" style="margin-top: 20px;">
+            <div class="header-mission">
+                <span>[CONTRÔLE] SÉCURITÉ ADMINISTRATIVE &amp; SYSTÈME</span>
+                <span style="color: #ff3e3e;">STATUT: BLOQUÉ</span>
+            </div>
+
+            <div class="challenge-block">
+                <span class="challenge-title">⚖️ Défi Juridique : Nouvelle Loi fédérale sur la protection des données (nLPD)</span>
+                <p>Si un analyste des HUG révèle intentionnellement à un tiers des données personnelles secrètes issues des tables marketing de profilage dont il a eu connaissance dans l'exercice de sa profession, quelle disposition pénale de la législation suisse réprime cette violation du devoir de discrétion ? (Indiquer la réponse sous la forme stricte : <b>Art. X nLPD</b>, ex: Art. 60 nLPD)</p>
+                <input type="text" id="law_ans" placeholder="Art. ___ nLPD" autocomplete="off" onchange="sauvegarderAutomatiquement()">
+            </div>
+
+            <div class="challenge-block">
+                <span class="challenge-title">🖥️ Défi Technique : Nettoyage Bas Niveau</span>
+                <p>Avant d'initier la destruction applicative, vous devez purger la mémoire tampon du stockage d'échange (swap) sous Linux. Quelle commande système, couplée à `swapoff`, réactive le partitionnement propre en rechargeant l'espace d'échange ? (Indiquer uniquement la commande racine en minuscules, ex: mkswap, fdisk, mount...)</p>
+                <input type="text" id="shell_ans" placeholder="Nom de l'utilitaire..." autocomplete="off" onchange="sauvegarderAutomatiquement()">
+            </div>
+
+            <center>
+                <button class="main-btn" onclick="verifyPreReq()">VÉRIFIER LES PRÉ-REQUIS</button>
+            </center>
+        </div>
+
+        <div id="mission-content" style="margin-top: 20px;">
+            <div class="header-mission">
+                <span>[LOGICIEL DE CONFORMITÉ Art. 32 nLPD]</span>
+                <span id="completion-stat">SESSIONS ACTIVES: 3</span>
+            </div>
+            <p>> Requête USER_404 : Droit à l'effacement définitif.<br>
+            > <span style="color: #f1c40f;">ATTENTION :</span> Toute erreur de procédure bloquera l'accès au rapport final.</p>
+
+            <div class="challenge-block">
+                <span class="challenge-title">🧩 Investigation Algorithmique : Déchiffrement du Registre d'Élagage</span>
+                <p>Pour activer l'effacement logique global, le système requiert la validation de l'index de purge généré par la routine Python de l'infrastructure des HUG ci-dessous. Déterminez la valeur entière finale renvoyée par `conformance_check()` :</p>
+                
+                <div class="code-window"># Script de conformité d'élagage - HUG / nLPD
+def conformance_check():
+    # Variables d'état des tables de données
+    logs_obsolets = 0b1011  # Valeur binaire initiale (11)
+    mask = 0b0101           # Masque de contrôle (5)
+    
+    # Étape 1 : Opération XOR logique de nettoyage
+    registre = logs_obsolets ^ mask
+    
+    # Étape 2 : Déplacement binaire restrictif (Bitwise Left Shift)
+    registre = registre << 1
+    
+    # Étape 3 : Soustraction de contrôle itérative
+    for i in range(2):
+        registre -= i
+        
+    return registre</div>
+
+                <p style="color: #888; font-size: 0.85em;">💡 <i>Indices d'analyse algorithmique :<br>
+                1. Calculez en binaire le résultat de `0b1011 ^ 0b0101`. Le XOR renvoie 1 si les bits sont différents.<br>
+                2. Convertissez ce résultat en valeur décimale brute.<br>
+                3. Effectuez le décalage à gauche `<< 1` (ce qui revient à multiplier la valeur entière par 2).<br>
+                4. Déroulez attentivement la boucle de soustraction pour i = 0 puis i = 1 sur la valeur obtenue. Entrez l'entier final.</i></p>
+
+                <p>Insérer la valeur de l'index de purge calculée :</p>
+                <input type="text" id="crypto_checksum" placeholder="Entier attendu..." autocomplete="off" onchange="sauvegarderAutomatiquement()">
+            </div>
+
+            <div class="deletion-grid">
+                <div class="data-trace" id="row1">
+                    <span>Logs Navigation (2019)</span>
+                    <select id="reason1" onchange="checkRow(1)">
+                        <option value="">-- BASE LÉGALE --</option>
+                        <option value="expire">Conservation échue</option>
+                        <option value="illegal">Traitement illicite</option>
+                    </select>
+                    <select id="tech1" onchange="checkRow(1)">
+                        <option value="">-- MÉTHODE TECH --</option>
+                        <option value="phys">Destruction Disque</option>
+                        <option value="erase">Érasure Logicielle</option>
+                    </select>
+                    <button class="btn-purge" id="btn1" onclick="purge(1)">Purger</button>
+                </div>
+                <div class="data-trace" id="row2">
+                    <span>Profil Marketing IA</span>
+                    <select id="reason2" onchange="checkRow(2)">
+                        <option value="">-- BASE LÉGALE --</option>
+                        <option value="consent">Retrait Consentement</option>
+                        <option value="contract">Fin de Contrat</option>
+                    </select>
+                    <select id="tech2" onchange="checkRow(2)">
+                        <option value="">-- MÉTHODE TECH --</option>
+                        <option value="anon">Anonymisation irréversible</option>
+                        <option value="lock">Verrouillage simple</option>
+                    </select>
+                    <button class="btn-purge" id="btn2" onclick="purge(2)">Purger</button>
+                </div>
+                <div class="data-trace" id="row3">
+                    <span>Backups Localisation</span>
+                    <select id="reason3" onchange="checkRow(3)">
+                        <option value="">-- BASE LÉGALE --</option>
+                        <option value="utility">Finalité atteinte</option>
+                        <option value="legal">Obligation Fiscale</option>
+                    </select>
+                    <select id="tech3" onchange="checkRow(3)">
+                        <option value="">-- MÉTHODE TECH --</option>
+                        <option value="crypto">Shredding Cryptographique</option>
+                        <option value="move">Déplacement Archive</option>
+                    </select>
+                    <button class="btn-purge" id="btn3" onclick="purge(3)">Purger</button>
+                </div>
+            </div>
+            <div class="export-report">
+                <b>📊 AUDIT LOG (purge_report.log) :</b><br>
+                Verification: Art. 32 nLPD compliance check.<br>
+                Status: <span id="status-csv" style="color: #f1c40f;">WAITING_FOR_CLEANUP</span>
+            </div>
+            <div id="final-badge" class="final-badge">
+                [PURGE SUCCESSFUL]<br>
+                TOKEN DE SORTIE : <span style="font-size: 1.5em; letter-spacing: 3px;">STRICT-PURGE-33-OK</span>
+            </div>
+            <div style="text-align: center; margin-top: 25px;">
+                <a href="../../MENU_PRINCIPAL.html" style="color: #2ecc71; text-decoration: none; font-size: 0.85em; border: 1px solid #2ecc71; padding: 8px 15px; border-radius: 4px;">[ TERMINER LA MISSION ]</a>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn-aide" onclick="toggleAide()">[ 📜 MANUEL DES TROIS PILIERS ]</button>
+    
+    <div id="zoneAide" class="aide-box">
+        <h3 style="margin-top:0; border-bottom: 2px solid #ff3e3e; padding-bottom: 5px;">Protocole d'effacement</h3>
+        <div class="pillar">
+            <b>⚖️ Juridique : nLPD, volet pénal</b>
+            L'Art. 32 nLPD n'est pas une suggestion : si le consentement est retiré ou la finalité atteinte, la donnée personnelle doit disparaître. Parallèlement, la nLPD comporte un volet pénal qui sanctionne de manière stricte la violation intentionnelle du secret professionnel ou du devoir de discrétion — retrouvez le numéro de cet article dans la loi.
+        </div>
+        <div class="pillar">
+            <b>⚙️ Informatique : Opérateurs Bitwise et Cycle de Vie</b>
+            L'évaluation des structures logiques bas niveau permet aux serveurs de générer des index d'intégrité non falsifiables. Une suppression logicielle standard ne détruit pas le bloc physique ; l'application de masques ou de passes d'écriture est indispensable pour valider la conformité d'une purge.
+        </div>
+        <div class="pillar">
+            <b>🔎 Forensics : Traces Résiduelles et Shredding</b>
+            L'analyse forensique post-effacement recherche les résidus dans les espaces d'échange (swap) et les blocs d'allocation. Le recours au shredding cryptographique (destruction des clés de chiffrement locales) garantit qu'aucune extraction n'est réalisable par reconstruction magnétique ou logique.
+        </div>
+    </div>
+
+    <div style="margin-top: 30px; border-top: 3px solid #d80000; padding: 20px; background: #fff; font-family: Arial, sans-serif; position: relative; z-index: 100; width: 450px;">
+        <div id="hint-score-badge" style="background:#111;color:#3fb950;padding:8px 15px;font-weight:bold;text-align:center;">🏆 Score de cet épisode : <span id="hint-score-value">5</span> / 5 pts</div>
+        <div style="display:flex; gap:8px; margin:10px 0;">
+            <button id="hintBtn1" onclick="useHint(1)" style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;">💡 Indice 1 (-1 pt)</button>
+            <button id="hintBtn2" onclick="useHint(2)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🎯 Indice 2 (-2 pts)</button>
+            <button id="hintBtn3" onclick="useHint(3)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🆘 Solution (-3 pts)</button>
+        </div>
+
+        <div id="zoneAideScore" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; color: #333;">
+            <p id="hint-tier-1" style="display:none;"><strong>💡 INFO :</strong> Pré-requis : le numéro d'article nLPD (« Art. 62 nLPD ») qui sanctionne la violation du devoir de discrétion, et la commande qui réactive le swap après <code>swapoff</code>. Ensuite, calculez l'algorithme Python (XOR, décalage, boucle de soustraction), puis associez chaque trace de données à sa bonne base légale et méthode technique.</p>
+            <p id="hint-tier-2" style="display:none;"><strong>🎯 PISTE :</strong> Article : Art. 62 nLPD. Commande : <code>swapon</code>. Calcul : 0b1011 XOR 0b0101 = 0b1110 (14), puis 14&lt;&lt;1 = 28, puis 28−0−1 = 27. Associations : Logs Navigation → Conservation échue / Érasure Logicielle ; Profil Marketing IA → Retrait Consentement / Anonymisation irréversible ; Backups Localisation → Finalité atteinte / Shredding Cryptographique.</p>
+            <p id="hint-tier-3" style="display:none;"><strong>🆘 SOLUTION :</strong> Pré-requis : Art. 62 nLPD / swapon. Index de purge : <code>27</code>. Associations : (expire/erase), (consent/anon), (utility/crypto)</p>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('purge-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function init() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 3 + 1;
+                this.speedX = (Math.random() - 0.5) * 2;
+                this.speedY = (Math.random() - 0.5) * 2;
+                this.color = Math.random() > 0.5 ? '#ff3e3e' : '#ff9f43';
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                let dx = canvas.width / 2 - this.x;
+                let dy = canvas.height / 2 - this.y;
+                this.speedX += dx * 0.0001;
+                this.speedY += dy * 0.0001;
+                if (this.size > 0.1) this.size -= 0.01;
+                if (this.size <= 0.1) {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * 3 + 1;
+                }
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 200; i++) particles.push(new Particle());
+
+        function animate() {
+            if (localStorage.getItem('swiss_shield_mode_sobre') === '1') { return; }
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', init);
+        init();
+        animate();
+
+        let purgedCount = 0;
+        let currentZone = 1;
+
+        function toggleAide() {
+            const x = document.getElementById("zoneAide");
+            if (x.style.display === "none" || x.style.display === "") {
+                x.style.display = "block";
+                x.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                x.style.display = "none";
+            }
+        }
+
+        function unlock() {
+            const code = document.getElementById('passkey').value.trim().toUpperCase();
+            if (code === 'IOT-VLAN-ISOLATED') {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('pre-requis-screen').style.display = 'block';
+                currentZone = 2;
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('entree', code, 'IOT-VLAN-ISOLATED');
+                alert("ACCESS DENIED: Certificat S04-E32 manquant ou corrompu.");
+            }
+        }
+
+        function verifyPreReq() {
+            const law = document.getElementById('law_ans').value.trim().toLowerCase();
+            const shell = document.getElementById('shell_ans').value.trim().toLowerCase();
+
+            // Vérification : Art. 62 nLPD
+            if (law === 'art. 62 nlpd' && shell === 'swapon') {
+                document.getElementById('pre-requis-screen').style.display = 'none';
+                document.getElementById('mission-content').style.display = 'block';
+                currentZone = 3;
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('prerequis', 'law:"' + law + '" / shell:"' + shell + '"', 'Art. 62 nLPD / swapon');
+                alert("CONTRÔLE ÉCHOUÉ : Références pénales ou commandes système incorrectes.");
+            }
+        }
+
+        function checkRow(id) {
+            const reason = document.getElementById('reason' + id).value;
+            const tech = document.getElementById('tech' + id).value;
+            const btn = document.getElementById('btn' + id);
+            const solutions = {
+                1: { r: 'expire', t: 'erase' },
+                2: { r: 'consent', t: 'anon' },
+                3: { r: 'utility', t: 'crypto' }
+            };
+            if (reason === solutions[id].r && tech === solutions[id].t) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+            sauvegarderAutomatiquement();
+        }
+
+        function purge(id) {
+            const cryptoAns = document.getElementById('crypto_checksum').value.trim();
+            
+            if (cryptoAns !== "27") {
+                enregistrerErreur('investigation', cryptoAns, '27');
+                alert("ERREUR LOGIQUE : L'index de purge fourni est invalide. Les bases SQL refusent la destruction.");
+                return;
+            }
+
+            const row = document.getElementById('row' + id);
+            row.style.border = "1px solid #ff3e3e";
+            row.style.background = "#1a0505";
+            row.style.opacity = "0.4";
+            row.style.pointerEvents = "none";
+            document.getElementById('btn' + id).innerText = "DELETED";
+            purgedCount++;
+            document.getElementById('completion-stat').innerText = "PURGES VALIDÉES: " + purgedCount + "/3";
+            sauvegarderAutomatiquement();
+            if (purgedCount === 3) {
+                document.getElementById('status-csv').innerText = "CLEAN_SUCCESS_100%";
+                document.getElementById('status-csv').style.color = "#2ecc71";
+                document.getElementById('final-badge').style.display = 'block';
+            }
+        }
+    </script>
+
+    <script>
+        const EP_ID = "S04E33";
+        const HINT_COST = {1:1, 2:2, 3:3};
+        let hintsUsed = {1:false, 2:false, 3:false};
+        let episodeScore = 5;
+        function useHint(level) {
+            if (hintsUsed[level] || (level > 1 && !hintsUsed[level - 1])) return;
+            hintsUsed[level] = true;
+            enregistrerIndiceUsage(level);
+            episodeScore -= HINT_COST[level];
+            document.getElementById('hint-score-value').textContent = episodeScore;
+            document.getElementById('hint-tier-' + level).style.display = 'block';
+            const btn = document.getElementById('hintBtn' + level);
+            btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5';
+            if (level < 3) {
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+            sauvegarderAutomatiquement();
+        }
+        function recordEpisodeSuccess() {
+            let scores = {};
+            try { scores = JSON.parse(localStorage.getItem('swiss_shield_scores') || '{}'); } catch(e) {}
+            if (!(EP_ID in scores) || scores[EP_ID] < episodeScore) scores[EP_ID] = episodeScore;
+            localStorage.setItem('swiss_shield_scores', JSON.stringify(scores));
+            localStorage.removeItem('autosave_' + EP_ID);
+        }
+        function enregistrerErreur(phase, reponseEleve, reponseAttendue) {
+            let debrief = {erreurs:{}, indices:{}};
+            try { debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}'); } catch(e) {}
+            const key = EP_ID + ':' + phase;
+            let entry = debrief.erreurs[key];
+            if (typeof entry === 'number') entry = {compte: entry, exemples: []};
+            if (!entry) entry = {compte: 0, exemples: []};
+            entry.compte++;
+            if (reponseEleve !== undefined && reponseAttendue !== undefined && entry.exemples.length < 5) {
+                entry.exemples.push({reponseEleve: String(reponseEleve), reponseAttendue: String(reponseAttendue)});
+            }
+            debrief.erreurs[key] = entry;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        }
+        function enregistrerIndiceUsage(niveau) {
+            let debrief = {erreurs:{}, indices:{}};
+            try { debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}'); } catch(e) {}
+            const key = EP_ID + ':' + niveau;
+            debrief.indices[key] = (debrief.indices[key] || 0) + 1;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        }
+        function basculerModeSobre() {
+            const actif = document.body.classList.toggle('mode-sobre');
+            localStorage.setItem('swiss_shield_mode_sobre', actif ? '1' : '0');
+            if (!actif) { animate(); }
+        }
+        if (localStorage.getItem('swiss_shield_mode_sobre') === '1') {
+            document.body.classList.add('mode-sobre');
+        }
+        (function pollSuccess(){
+            const ids = ['success','success-msg','success-final','final-zone','step_final','victory-zone','victory-screen','final-step','final-badge'];
+            let recorded = false;
+            setInterval(function(){
+                if (recorded) return;
+                for (const id of ids) {
+                    const el = document.getElementById(id);
+                    if (el && window.getComputedStyle(el).display === 'block') { recordEpisodeSuccess(); recorded = true; return; }
+                }
+            }, 500);
+        })();
+
+        function sauvegarderAutomatiquement() {
+            const purged = {};
+            [1,2,3].forEach(function(id){
+                const btn = document.getElementById('btn' + id);
+                if (btn && btn.innerText === 'DELETED') purged[id] = true;
+            });
+            const etat = {
+                zone: currentZone,
+                inputs: {
+                    passkey: (document.getElementById('passkey') || {}).value || '',
+                    law_ans: (document.getElementById('law_ans') || {}).value || '',
+                    shell_ans: (document.getElementById('shell_ans') || {}).value || '',
+                    crypto_checksum: (document.getElementById('crypto_checksum') || {}).value || '',
+                    reason1: (document.getElementById('reason1') || {}).value || '',
+                    tech1: (document.getElementById('tech1') || {}).value || '',
+                    reason2: (document.getElementById('reason2') || {}).value || '',
+                    tech2: (document.getElementById('tech2') || {}).value || '',
+                    reason3: (document.getElementById('reason3') || {}).value || '',
+                    tech3: (document.getElementById('tech3') || {}).value || ''
+                },
+                hintsUsed: hintsUsed,
+                episodeScore: episodeScore,
+                purgedCount: purgedCount,
+                purged: purged
+            };
+            localStorage.setItem('autosave_' + EP_ID, JSON.stringify(etat));
+        }
+
+        function proposerRestaurationAutosave() {
+            let etat;
+            try { etat = JSON.parse(localStorage.getItem('autosave_' + EP_ID)); } catch(e) { return; }
+            if (!etat) return;
+
+            if (etat.inputs) {
+                if (document.getElementById('passkey')) document.getElementById('passkey').value = etat.inputs.passkey || '';
+                if (document.getElementById('law_ans')) document.getElementById('law_ans').value = etat.inputs.law_ans || '';
+                if (document.getElementById('shell_ans')) document.getElementById('shell_ans').value = etat.inputs.shell_ans || '';
+                if (document.getElementById('crypto_checksum')) document.getElementById('crypto_checksum').value = etat.inputs.crypto_checksum || '';
+                [1,2,3].forEach(function(id){
+                    if (document.getElementById('reason' + id)) document.getElementById('reason' + id).value = etat.inputs['reason' + id] || '';
+                    if (document.getElementById('tech' + id)) document.getElementById('tech' + id).value = etat.inputs['tech' + id] || '';
+                });
+            }
+
+            if (etat.zone >= 2) {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('pre-requis-screen').style.display = 'block';
+                currentZone = 2;
+            }
+            if (etat.zone >= 3) {
+                document.getElementById('pre-requis-screen').style.display = 'none';
+                document.getElementById('mission-content').style.display = 'block';
+                currentZone = 3;
+
+                [1,2,3].forEach(function(id){ checkRow(id); });
+
+                if (etat.purged) {
+                    Object.keys(etat.purged).forEach(function(id){
+                        const row = document.getElementById('row' + id);
+                        const btn = document.getElementById('btn' + id);
+                        if (row && btn) {
+                            row.style.border = "1px solid #ff3e3e";
+                            row.style.background = "#1a0505";
+                            row.style.opacity = "0.4";
+                            row.style.pointerEvents = "none";
+                            btn.innerText = "DELETED";
+                        }
+                    });
+                }
+                if (typeof etat.purgedCount === 'number') {
+                    purgedCount = etat.purgedCount;
+                    document.getElementById('completion-stat').innerText = "PURGES VALIDÉES: " + purgedCount + "/3";
+                    if (purgedCount === 3) {
+                        document.getElementById('status-csv').innerText = "CLEAN_SUCCESS_100%";
+                        document.getElementById('status-csv').style.color = "#2ecc71";
+                        document.getElementById('final-badge').style.display = 'block';
+                    }
+                }
+            }
+
+            if (etat.hintsUsed) {
+                [1,2,3].forEach(function(level){
+                    if (etat.hintsUsed[level]) {
+                        hintsUsed[level] = true;
+                        document.getElementById('hint-tier-' + level).style.display = 'block';
+                        const btn = document.getElementById('hintBtn' + level);
+                        if (btn) { btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5'; }
+                        const next = document.getElementById('hintBtn' + (level + 1));
+                        if (next && level < 3) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+                    }
+                });
+            }
+            if (typeof etat.episodeScore === 'number') {
+                episodeScore = etat.episodeScore;
+                document.getElementById('hint-score-value').textContent = episodeScore;
+            }
+        }
+        proposerRestaurationAutosave();
+    </script>
+</body>
+</html>

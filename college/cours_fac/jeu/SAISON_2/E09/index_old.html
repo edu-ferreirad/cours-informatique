@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>S02E09 - EXFILTRATION nLPD</title>
+    <style>
+        /* --- DESIGN CYBER TERMINAL --- */
+        body {
+            background: radial-gradient(circle at center, #0a1a0f 0%, #000 100%);
+            color: #2ecc71;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::after {
+            content: "";
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(46, 204, 113, 0.1), transparent);
+            transform: skewX(-20deg);
+            animation: scan 4s infinite linear;
+            pointer-events: none;
+        }
+
+        @keyframes scan { 0% { left: -100%; } 100% { left: 150%; } }
+
+        /* --- MODE SOBRE (accessibilité) --- */
+        body.mode-sobre, body.mode-sobre * { animation: none !important; transition: none !important; }
+        body.mode-sobre::after { animation: none !important; }
+        #toggle-sobre-btn {
+            position: fixed; top: 10px; right: 10px; z-index: 10001;
+            background: #000; color: #2ecc71; border: 1px solid #2ecc71;
+            padding: 6px 10px; font-size: 0.7em; cursor: pointer; font-family: inherit; border-radius: 3px;
+        }
+
+        .terminal {
+            background: rgba(10, 10, 10, 0.95);
+            border: 2px solid #2ecc71;
+            padding: 30px;
+            width: 95%;
+            max-width: 900px;
+            box-shadow: 0 0 40px rgba(46, 204, 113, 0.2);
+            border-radius: 4px;
+            z-index: 10;
+        }
+
+        .header-mission {
+            border-bottom: 2px solid #2ecc71;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            color: #fff;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* --- ÉCRANS --- */
+        #lock-screen, #challenge-zone, #investigation-zone, #final-zone { display: none; }
+        #lock-screen.active, #challenge-zone.active, #investigation-zone.active, #final-zone.active { display: block; }
+
+        .story-context {
+            background: rgba(46, 204, 113, 0.05);
+            border-left: 4px solid #2ecc71;
+            padding: 15px;
+            margin: 20px 0;
+            color: #ecf0f1;
+            line-height: 1.6;
+        }
+
+        .mini-challenge {
+            background: #111;
+            border: 1px solid #333;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        input {
+            background: #000;
+            border: 1px solid #2ecc71;
+            color: #00ff41;
+            padding: 12px;
+            width: 320px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            text-align: center;
+            outline: none;
+        }
+
+        button {
+            background: #2ecc71;
+            color: #000;
+            border: none;
+            padding: 12px 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 15px;
+            text-transform: uppercase;
+        }
+
+        button:hover { background: #fff; box-shadow: 0 0 20px #2ecc71; }
+
+        .back-btn {
+            position: absolute;
+            top: 20px; left: 20px;
+            color: #2ecc71;
+            text-decoration: none;
+            font-size: 0.9em;
+            border: 1px solid #2ecc71;
+            padding: 5px 10px;
+        }
+
+        .piliers-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .pilier {
+            font-size: 0.8em;
+            padding: 10px;
+            border: 1px solid #1a5e3a;
+            background: rgba(0,255,65,0.02);
+            text-align: left;
+        }
+
+        .pilier h4 { color: #fff; margin: 0 0 10px 0; text-decoration: underline; }
+
+        .code-window {
+            background: #050505;
+            border: 1px solid #444;
+            padding: 15px;
+            font-family: monospace;
+            color: #888;
+            font-size: 0.85em;
+            margin: 15px 0;
+            overflow-x: auto;
+            text-align: left;
+        }
+
+        .glitch-text { animation: glitch 2s infinite; }
+        @keyframes glitch {
+            0% { text-shadow: 1px 0 #f00; }
+            50% { text-shadow: -1px 0 #00f; }
+            100% { text-shadow: 1px 0 #f00; }
+        }
+    </style>
+</head>
+<body>
+    <button id="toggle-sobre-btn" onclick="basculerModeSobre()">🌓 Mode sobre</button>
+
+    <a href="../../MENU_PRINCIPAL.html" class="back-btn">< RECULER : MENU_PRINCIPAL</a>
+
+    <div class="terminal">
+        <div id="lock-screen" class="active">
+            <div class="header-mission"><span>STATION-VERROU-S02</span><span>[SECURED]</span></div>
+            <div class="story-context">
+                <strong>ALERTE ADMINISTRATIVE :</strong> Bienvenue dans l'unité nLPD.
+                Un serveur de l'administration fédérale à Berne montre des signes d'exfiltration.
+                Le pare-feu a été contourné. Identifiez l'ampleur du désastre.
+            </div>
+            <p>Initialisation de la Saison 2 (Code de transition) :</p>
+            <input type="text" id="passkey" placeholder="CODE FINAL SAISON 1">
+            <br>
+            <button onclick="unlock()">AUTH_LOGIN_S02</button>
+        </div>
+
+        <div id="challenge-zone">
+            <div class="header-mission"><span>VÉRIFICATION DES COMPÉTENCES AGENT</span></div>
+
+            <div class="mini-challenge">
+                <p><span style="color: #fff;">[CODE PÉNAL 143 bis] :</span> Quiconque s'introduit sans droit dans un système informatique est passible d'une peine privative de liberté de combien d'années maximum ?</p>
+                <input type="text" id="ans1" placeholder="Nombre d'années (ex: 3)" onchange="sauvegarderAutomatiquement()">
+            </div>
+
+            <div class="mini-challenge">
+                <p><span style="color: #fff;">[TECH_LOGS] :</span> Quelle extension de fichier est typiquement utilisée pour les journaux d'événements système sous Linux ?</p>
+                <input type="text" id="ans2" placeholder=".xxx" onchange="sauvegarderAutomatiquement()">
+            </div>
+            <button onclick="checkChallenges()">ACCÉDER AUX LOGS CRITIQUES</button>
+        </div>
+
+        <div id="investigation-zone">
+            <div class="header-mission"><span>INVESTIGATION : TRAFFIC_ANALYSIS</span></div>
+            <div class="story-context">
+                <strong>MISSION :</strong> Les données ont été compressées avant l'envoi.
+                Le pirate a utilisé un script SQL pour extraire des fiches patients.
+                Calculez le volume total de la fuite pour la notification IFPDT.
+            </div>
+
+            <div class="code-window">
+                [DATABASE_DUMP_INFO]<br>
+                > TABLE: CH_FEDERAL_HEALTH_2026<br>
+                > ROWS_EXTRACTED: <span class="glitch-text" style="color:#fff">12500</span><br>
+                > ROW_SIZE_AVG: 512 bytes<br>
+                > COMPRESSION_RATIO: 1:1 (Aucune)<br>
+                > PACKET_LOSS_ADJUSTMENT: +0%<br>
+                <br>
+                // FORMULE : (Lignes * Taille_Moyenne) / 1024 / 1024 = Volume en Mo
+            </div>
+
+            <p>Certifiez le volume exfiltré en MegaOctets (Mo) :</p>
+            <input type="number" step="0.1" id="finalAns" placeholder="Résultat du calcul">
+            <br>
+            <button onclick="checkInvestigation()">CERTIFIER ET TRANSMETTRE</button>
+        </div>
+
+        <div id="final-zone">
+            <div class="header-mission"><span>S02E09 : DOSSIER CLOTURÉ</span></div>
+            <p>Volume de <strong>6.1 Mo</strong> (arrondi) certifié. Le rapport a été envoyé au Préposé Fédéral.</p>
+            <div class="story-context" style="border-color: #ffd700; color: #ffd700; text-align: center;">
+                CLÉ DE SORTIE : <span style="font-size: 1.5em; letter-spacing: 5px;">NOTIF-LPD-BERNE</span>
+            </div>
+            <p>Utilisez cette clé pour déverrouiller l'E10.</p>
+            <button onclick="location.href='../../MENU_PRINCIPAL.html'">RETOUR AU TERMINAL</button>
+        </div>
+
+        <div class="piliers-container">
+            <div class="pilier">
+                <h4>INFORMATIQUE</h4>
+                Le calcul d'un volume de données dépend du nombre d'unités (lignes) et de la taille de chaque unité. 1 Mo = 1024 Ko = 1'048'576 octets.
+            </div>
+            <div class="pilier">
+                <h4>JURIDIQUE</h4>
+                Art. 143 bis CP : L'accès indu à un système informatique est passible de 3 ans. nLPD : Les risques élevés doivent être notifiés.
+            </div>
+            <div class="pilier">
+                <h4>FORENSICS</h4>
+                L'analyse des journaux de base de données permet de compter précisément le nombre de requêtes 'SELECT' et les lignes renvoyées.
+            </div>
+        </div>
+
+        <div style="margin-top: 30px; border-top: 3px solid #d80000; padding: 20px; background: #fff; font-family: Arial, sans-serif; position: relative; z-index: 100;">
+            <div id="hint-score-badge" style="background:#111;color:#3fb950;padding:8px 15px;font-weight:bold;text-align:center;">🏆 Score de cet épisode : <span id="hint-score-value">5</span> / 5 pts</div>
+            <div style="display:flex; gap:8px; margin:10px 0;">
+                <button id="hintBtn1" onclick="useHint(1)" style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;">💡 Indice 1 (-1 pt)</button>
+                <button id="hintBtn2" onclick="useHint(2)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🎯 Indice 2 (-2 pts)</button>
+                <button id="hintBtn3" onclick="useHint(3)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🆘 Solution (-3 pts)</button>
+            </div>
+
+            <div id="zoneAideScore" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; color: #333;">
+                <p id="hint-tier-1" style="display:none;"><strong>💡 INFO :</strong> Pré-requis : la peine maximale (en années) pour l'accès indu selon l'Art. 143 bis CP, et l'extension typique des journaux d'événements Linux. Ensuite, appliquez la formule de volume donnée dans le dump.</p>
+                <p id="hint-tier-2" style="display:none;"><strong>🎯 PISTE :</strong> Peine : 3 ans. Extension : <code>.log</code>. Formule : (12500 lignes × 512 octets) / 1024 / 1024.</p>
+                <p id="hint-tier-3" style="display:none;"><strong>🆘 SOLUTION :</strong> Pré-requis : 3 / .log. Volume exfiltré : <code>≈ 6.1 Mo</code></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function appliquerModeSobre() {
+            const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+            document.body.classList.toggle('mode-sobre', actif);
+            const btn = document.getElementById('toggle-sobre-btn');
+            if (btn) btn.textContent = actif ? '🌓 Mode sobre : ON' : '🌓 Mode sobre';
+        }
+        function basculerModeSobre() {
+            const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+            localStorage.setItem('swiss_shield_mode_sobre', actif ? '0' : '1');
+            appliquerModeSobre();
+        }
+        appliquerModeSobre();
+
+        function showScreen(id) {
+            document.querySelectorAll('.terminal > div').forEach(div => {
+                if(div.id) div.classList.remove('active');
+            });
+            document.getElementById(id).classList.add('active');
+        }
+
+        // 1. Verrou de Session
+        function unlock() {
+            const code = document.getElementById('passkey').value.trim();
+            if (code === 'SHIELD-SEASON-2') {
+                showScreen('challenge-zone');
+                currentZone = 'challenge-zone';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('entree', code, 'SHIELD-SEASON-2');
+                alert("ACCÈS REFUSÉ : Clé S01 invalide.");
+            }
+        }
+
+        // 2. Double Verrou (Défis)
+        function checkChallenges() {
+            const a1 = document.getElementById('ans1').value.trim();
+            const a2 = document.getElementById('ans2').value.trim().toLowerCase();
+
+            // CP 143 bis = 3 ans | Log Linux = .log
+            if (a1 === "3" && (a2 === ".log" || a2 === "log")) {
+                showScreen('investigation-zone');
+                currentZone = 'investigation-zone';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('prerequis', 'années="' + a1 + '", extension="' + a2 + '"', 'années="3", extension=".log"');
+                alert("ERREUR : Réponses incorrectes. Consultez les piliers d'aide.");
+            }
+        }
+
+        // 3. Investigation (Calcul)
+        function checkInvestigation() {
+            const val = document.getElementById('finalAns').value;
+            // Calcul : (12500 * 512) / 1024 / 1024 = 6.1035...
+            if (parseFloat(val) >= 6.1 && parseFloat(val) <= 6.2) {
+                showScreen('final-zone');
+            } else {
+                enregistrerErreur('investigation', val, '≈6.1');
+                alert("ÉCHEC DE CERTIFICATION : Le volume calculé est erroné.");
+            }
+        }
+    </script>
+
+    <script>
+        const EP_ID = "S02E09";
+        const HINT_COST = {1:1, 2:2, 3:3};
+        let hintsUsed = {1:false, 2:false, 3:false};
+        let episodeScore = 5;
+        function useHint(level) {
+            if (hintsUsed[level] || (level > 1 && !hintsUsed[level - 1])) return;
+            hintsUsed[level] = true;
+        enregistrerIndiceUsage(level);
+            episodeScore -= HINT_COST[level];
+            document.getElementById('hint-score-value').textContent = episodeScore;
+            document.getElementById('hint-tier-' + level).style.display = 'block';
+            const btn = document.getElementById('hintBtn' + level);
+            btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5';
+            if (level < 3) {
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+            sauvegarderAutomatiquement();
+        }
+        function recordEpisodeSuccess() {
+            let scores = {};
+            try { scores = JSON.parse(localStorage.getItem('swiss_shield_scores') || '{}'); } catch(e) {}
+            if (!(EP_ID in scores) || scores[EP_ID] < episodeScore) scores[EP_ID] = episodeScore;
+            localStorage.setItem('swiss_shield_scores', JSON.stringify(scores));
+            localStorage.removeItem('autosave_' + EP_ID);
+        }
+    let currentZone = 'lock-screen';
+    function sauvegarderAutomatiquement() {
+        try {
+            const inputs = {};
+            ['ans1', 'ans2', 'finalAns'].forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) inputs[id] = el.value;
+            });
+            localStorage.setItem('autosave_' + EP_ID, JSON.stringify({
+                zone: currentZone,
+                inputs: inputs,
+                hintsUsed: hintsUsed,
+                episodeScore: episodeScore
+            }));
+        } catch(e) {}
+    }
+    function proposerRestaurationAutosave() {
+        let data;
+        try { data = JSON.parse(localStorage.getItem('autosave_' + EP_ID) || 'null'); } catch(e) { return; }
+        if (!data || !data.zone || data.zone === 'lock-screen') return;
+        showScreen(data.zone);
+        currentZone = data.zone;
+        if (data.inputs) {
+            Object.keys(data.inputs).forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) el.value = data.inputs[id];
+            });
+        }
+        hintsUsed = data.hintsUsed || hintsUsed;
+        episodeScore = (typeof data.episodeScore === 'number') ? data.episodeScore : episodeScore;
+        document.getElementById('hint-score-value').textContent = episodeScore;
+        [1, 2, 3].forEach(function(level) {
+            if (hintsUsed[level]) {
+                document.getElementById('hint-tier-' + level).style.display = 'block';
+                const btn = document.getElementById('hintBtn' + level);
+                if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+        });
+    }
+    function enregistrerIndiceUsage(niveau) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + niveau;
+            debrief.indices[cle] = (debrief.indices[cle] || 0) + 1;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+    function enregistrerErreur(phase, reponseEleve, reponseAttendue) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + phase;
+            if (typeof debrief.erreurs[cle] !== 'object' || debrief.erreurs[cle] === null) {
+                debrief.erreurs[cle] = { compte: (debrief.erreurs[cle] || 0), exemples: [] };
+            }
+            debrief.erreurs[cle].compte++;
+            if (reponseEleve !== undefined && debrief.erreurs[cle].exemples.length < 5) {
+                debrief.erreurs[cle].exemples.push({ reponseEleve: String(reponseEleve).slice(0,100), reponseAttendue: String(reponseAttendue||'').slice(0,100) });
+            }
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+        (function pollSuccess(){
+            // NOTE: cet épisode affiche/masque ses écrans via la classe CSS "active"
+            // (showScreen()), pas via el.style.display en inline. On utilise donc
+            // getComputedStyle pour détecter la visibilité réelle, peu importe la méthode.
+            const ids = ['success','success-msg','success-final','final-zone','victory-zone','victory-screen','final-step','final-badge'];
+            let recorded = false;
+            setInterval(function(){
+                if (recorded) return;
+                for (const id of ids) {
+                    const el = document.getElementById(id);
+                    if (el && window.getComputedStyle(el).display === 'block') { recordEpisodeSuccess(); recorded = true; return; }
+                }
+            }, 500);
+        })();
+        proposerRestaurationAutosave();
+    </script>
+</body>
+</html>

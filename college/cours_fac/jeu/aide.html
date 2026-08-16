@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>SWISS SHIELD - Manuel de Procédure Expert</title>
+    <style>
+        body { background: #e5e5e5; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; padding: 20px; color: #333; }
+        .paper { background: white; max-width: 900px; margin: auto; padding: 40px; box-shadow: 0 0 15px rgba(0,0,0,0.2); position: relative; border-radius: 2px; }
+        .swiss-header { border-bottom: 2px solid #d80000; margin-bottom: 30px; padding-bottom: 10px; font-weight: bold; font-size: 0.85em; text-transform: uppercase; }
+        h1 { color: #2c3e50; text-transform: uppercase; font-size: 1.4em; text-align: center; margin: 30px 0; border: 2px solid #2c3e50; padding: 15px; background: #f9f9f9; }
+        .season-section { background: #2c3e50; color: white; padding: 10px; margin-top: 30px; font-weight: bold; font-size: 1.05em; border-left: 5px solid #d80000; }
+        .mission-link { border-bottom: 1px solid #eee; padding: 12px 10px; cursor: pointer; transition: 0.2s; display: flex; justify-content: space-between; align-items: center; }
+        .mission-link:hover { background: #f1f1f1; color: #d80000; }
+        .protocol { display: none; background: #fcfcfc; padding: 20px; border: 1px solid #ddd; border-left: 5px solid #d80000; font-size: 0.95em; line-height: 1.6; }
+        .method-label { color: #d80000; font-weight: bold; text-transform: uppercase; font-size: 0.8em; display: block; margin-bottom: 8px; }
+        .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 6em; color: rgba(0,0,0,0.03); pointer-events: none; z-index: 0; font-weight: bold; text-transform: uppercase; }
+
+        #searchBarAide { width: 100%; padding: 14px; margin: 20px 0 10px; border: 2px solid #ddd; border-radius: 6px; font-size: 1em; box-sizing: border-box; outline: none; }
+        #searchBarAide:focus { border-color: #d80000; }
+
+        .btn-back {
+            display: block; width: 280px; margin: 40px auto 0; padding: 14px;
+            background: #d80000; color: white; text-align: center;
+            text-decoration: none; font-weight: bold; border-radius: 4px;
+            text-transform: uppercase; font-size: 0.9em; transition: 0.3s;
+            border: none; cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .btn-back:hover { background: #b30000; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+    <div class="watermark">CONFIDENTIEL</div>
+    <div class="paper">
+        <div class="swiss-header">
+            SWISS SHIELD AGENCY<br>Division Cyber-Sécurité &amp; Intelligence<br>Unité d'Intervention Spéciale - Manuel Officiel v2026.2
+        </div>
+
+        <h1>MANUEL DE PROCÉDURES DE L'EXPERT JUDICIAIRE</h1>
+
+        <p style="font-style: italic; text-align: center; color: #666;">39 épisodes couverts (Saisons 0 à 4) + 1 épisode bonus. Cliquez sur un intitulé pour déployer la méthodologie correspondante — ce manuel donne la <b>démarche</b>, pas la réponse finale : à vous de la calculer.</p>
+
+        <input type="text" id="searchBarAide" onkeyup="filterAide()" placeholder="Rechercher un épisode, une loi, une commande...">
+
+        <div class="season-section" style="background: #1a1a1a;">SAISON 0 : GENÈSE — INFILTRATION & PREMIERS RÉFLEXES (S00E00 → S00E03 + BONUS E04)</div>
+
+        <div class="mission-link" onclick="toggle('e00_00')"><span>🗝️ S00E00 : Infiltration — Swiss Shield Breach</span> <span>🗝️</span></div>
+        <div id="e00_00" class="protocol"><span class="method-label">Terminal & Droit Pénal</span>Le shell reste verrouillé tant qu'un article du Code pénal suisse (3 chiffres, sur la soustraction de données) n'est pas saisi. Une fois à l'intérieur, explorez le système avec <code>ls</code> puis <code>cat</code> sur les fichiers découverts : la clé finale se reconstitue en assemblant plusieurs fragments dissimulés dans le code et dans un fichier de dump mémoire.</div>
+
+        <div class="mission-link" onclick="toggle('e00_01')"><span>🐞 S00E01 : Zero-Day Exploit</span> <span>🗝️</span></div>
+        <div id="e00_01" class="protocol"><span class="method-label">Pré-requis + Buffer Overflow</span>Identifiez d'abord l'article sur l'accès indu à un système (143 bis) et le registre CPU qui pointe sur la prochaine instruction (EIP, 3 lettres). Le correctif consiste à remplacer une fonction de copie non sécurisée par sa version bornée à la taille du conteneur — et à sélectionner la bonne base légale de protection des données.</div>
+
+        <div class="mission-link" onclick="toggle('e00_02')"><span>📡 S00E02 : Data Exfiltration</span> <span>🗝️</span></div>
+        <div id="e00_02" class="protocol"><span class="method-label">Réseau & Recel</span>Le pré-requis porte sur l'article CP réprimant le recel de données et sur le protocole utilisé par les outils de traçage réseau. Une fois débloqué, tracez l'IP suspecte dans le journal de trafic avant de couper le flux avec la commande pare-feu appropriée.</div>
+
+        <div class="mission-link" onclick="toggle('e00_03')"><span>🏛️ S00E03 : The Architect (FINAL)</span> <span>🗝️</span></div>
+        <div id="e00_03" class="protocol"><span class="method-label">Droit Pénal & Administration</span>Deux pré-requis : l'article CP sur la soustraction de <b>données personnelles</b> (distinct de celui vu en S00E00/E01) et le port standard des communications web sécurisées. L'enquête finale demande d'identifier, dans l'historique de connexion, l'utilisateur interne complice — puis de neutraliser son compte via la commande d'administration adéquate.</div>
+
+        <div class="mission-link" onclick="toggle('e00_04')"><span>🎼 S00E04 : Le Fragment du Fondateur (BONUS)</span> <span>🗝️</span></div>
+        <div id="e00_04" class="protocol"><span class="method-label">Stéganographie musicale</span>Un code d'accès (indiqué sur l'écran de victoire de S00E03) déverrouille d'abord le fragment. La portée affichée utilise la notation anglo-saxonne des notes : chaque note se nomme directement par une lettre (A, B, C, D, E, F, G). Cliquez sur chaque note de gauche à droite pour révéler sa lettre, puis assemblez les 5 lettres dans l'ordre pour former le mot codé.</div>
+
+        <div class="season-section" style="background: #2c3e50;">SAISON 1 : L'UNITÉ GENESIS (S01E01 → S01E08)</div>
+
+        <div class="mission-link" onclick="toggle('e01_01')"><span>🔓 S01E01 : L'Intrusion</span> <span>🗝️</span></div>
+        <div id="e01_01" class="protocol"><span class="method-label">Droit Pénal & SQL</span>Le premier verrou demande l'article sur l'accès indu à un système et la syntaxe SQL permettant de lister les colonnes d'une table. Ensuite, analysez le journal de trafic réseau pour repérer l'adresse IP externe à l'origine des erreurs d'accès répétées (403) — c'est elle qu'il faut bloquer.</div>
+
+        <div class="mission-link" onclick="toggle('e01_02')"><span>🌐 S01E02 : Accès Sécurisé</span> <span>🗝️</span></div>
+        <div id="e01_02" class="protocol"><span class="method-label">Détérioration de données & OSI</span>Pré-requis : l'article sur la <b>détérioration</b> de données (voisin de celui sur l'accès indu) et la couche du modèle OSI responsable de l'adressage IP. L'enquête finale consiste à identifier, à partir du lexique de menaces fourni, un type d'attaque web dont le nom commence par « Cross-Site ».</div>
+
+        <div class="mission-link" onclick="toggle('e01_03')"><span>📍 S01E03 : Localisation & Investigation Avancée</span> <span>🗝️</span></div>
+        <div id="e01_03" class="protocol"><span class="method-label">nLPD & Sous-réseaux</span>Le premier défi porte sur le terme légal désignant les données de santé/opinions/poursuites pénales dans la loi suisse ; le second sur le nombre d'hôtes utilisables dans un masque /29. L'investigation finale demande de calculer l'adresse de diffusion (broadcast) du sous-réseau /27 concerné à partir de l'IP source interceptée.</div>
+
+        <div class="mission-link" onclick="toggle('e01_04')"><span>👻 S01E04 : Le Proxy Fantôme</span> <span>🗝️</span></div>
+        <div id="e01_04" class="protocol"><span class="method-label">Droit d'auteur & Python</span>Pré-requis : l'acronyme des mesures techniques protégeant une œuvre numérique (LDA) et le numéro de couche OSI hébergeant le protocole UDP. Pour l'investigation, lisez très attentivement l'<b>ordre d'insertion</b> du dictionnaire Python fourni : l'algorithme retourne le premier nœud qui remplit sa condition, pas nécessairement celui qui semble « le plus proche » de la charge.</div>
+
+        <div class="mission-link" onclick="toggle('e01_05')"><span>🛰️ S01E05 : Pistage IP Interne</span> <span>🗝️</span></div>
+        <div id="e01_05" class="protocol"><span class="method-label">Réseau & Droit Pénal</span>Le protocole qui relie une adresse IP à une adresse MAC sur un réseau local, et le nom courant de l'infraction visée par l'article sur l'accès indu. L'investigation se résout par un calcul arithmétique simple (multiplication puis addition) appliqué au dictionnaire de correspondance fourni.</div>
+
+        <div class="mission-link" onclick="toggle('e01_06')"><span>🦠 S01E06 : Corruption Critique</span> <span>🗝️</span></div>
+        <div id="e01_06" class="protocol"><span class="method-label">Linux & nLPD</span>Un utilitaire Linux (5 lettres) permettant de voir les fichiers ouverts par un processus, et le principe nLPD qui impose le réglage le plus protecteur par défaut. Suivez ensuite le registre Python ligne par ligne (addition, multiplication, soustraction dans l'ordre du code) avant d'appliquer la formule finale donnée en commentaire.</div>
+
+        <div class="mission-link" onclick="toggle('e01_07')"><span>🔺 S01E07 : Élévation de Privilèges</span> <span>🗝️</span></div>
+        <div id="e01_07" class="protocol"><span class="method-label">Linux & Droit Pénal</span>L'UID par défaut du super-utilisateur sous Linux, et l'article CP (distinct de celui sur l'accès indu) qui vise l'utilisation frauduleuse d'un système informatique. La structure C++ fournie donne une formule explicite à appliquer directement avec les valeurs indiquées.</div>
+
+        <div class="mission-link" onclick="toggle('e01_08')"><span>📊 S01E08 : Bilan Technique (Fin de Saison)</span> <span>🗝️</span></div>
+        <div id="e01_08" class="protocol"><span class="method-label">Droit d'auteur & Réseau</span>L'article de la LDA (contient un « 2 ») qui protège les logiciels comme des œuvres, et une commande shell listant les connexions TCP actives (deux réponses possibles, l'une historique, l'autre moderne). Le script Python final se résout indice par indice selon que celui-ci est pair ou impair.</div>
+
+        <div class="season-section" style="background: #2c3e50;">SAISON 2 : UNITÉ nLPD (S02E09 → S02E16)</div>
+
+        <div class="mission-link" onclick="toggle('e02_09')"><span>📤 S02E09 : Exfiltration nLPD</span> <span>🗝️</span></div>
+        <div id="e02_09" class="protocol"><span class="method-label">Droit Pénal & Volumétrie</span>La peine maximale (en années) encourue pour l'accès indu à un système, et l'extension standard des fichiers de journalisation Linux. Le calcul de volume exfiltré se fait simplement à partir du nombre de lignes et de la taille moyenne par ligne, donnés dans le dump SQL.</div>
+
+        <div class="mission-link" onclick="toggle('e02_10')"><span>🏥 S02E10 : Unité nLPD — Données Sensibles</span> <span>🗝️</span></div>
+        <div id="e02_10" class="protocol"><span class="method-label">nLPD & Terminal</span>L'article nLPD définissant les données sensibles, et la commande affichant la fin d'un fichier journal. Le checksum final se calcule en suivant scrupuleusement la formule et les valeurs ASCII données dans l'annexe technique.</div>
+
+        <div class="mission-link" onclick="toggle('e02_11')"><span>📬 S02E11 : Droit d'Accès</span> <span>🗝️</span></div>
+        <div id="e02_11" class="protocol"><span class="method-label">nLPD & Réseau</span>Le montant maximal de l'amende encourue en cas de violation intentionnelle du droit d'accès, et l'outil réseau qui affiche le chemin emprunté par un paquet jusqu'à une cible. L'étape finale demande une simple conversion hexadécimal → décimal.</div>
+
+        <div class="mission-link" onclick="toggle('e02_12')"><span>🗑️ S02E12 : Droit à l'Oubli</span> <span>🗝️</span></div>
+        <div id="e02_12" class="protocol"><span class="method-label">nLPD & SQL</span>L'article nLPD imposant l'effacement des données obsolètes, et le mot-clé SQL de suppression d'enregistrements. Attention : une variable critique du log est affichée en texte noir sur fond noir — sélectionnez la zone au curseur pour la révéler avant de reconstituer la commande de purge.</div>
+
+        <div class="mission-link" onclick="toggle('e02_13')"><span>🛠️ S02E13 : Privacy by Design (Audit Niv. 2)</span> <span>🗝️</span></div>
+        <div id="e02_13" class="protocol"><span class="method-label">nLPD & Cryptographie</span>Le principe nLPD (deux mots anglais) imposant une collecte minimale par défaut, et l'option de la commande <code>chmod</code> pour un changement de permissions récursif. L'audit du script Python révèle deux failles à corriger : un algorithme de hachage obsolète, et l'absence de protection contre les attaques par dictionnaire pré-calculé.</div>
+
+        <div class="mission-link" onclick="toggle('e02_14')"><span>📈 S02E14 : Analyse d'Impact (AIPD)</span> <span>🗝️</span></div>
+        <div id="e02_14" class="protocol"><span class="method-label">nLPD & Hachage</span>L'article nLPD (numéro compris entre 20 et 25) sur l'Analyse d'Impact relative à la Protection des Données, et l'option de <code>shasum</code> précisant l'algorithme utilisé. Respectez impérativement l'ordre des opérations mathématiques : l'exposant se calcule toujours avant la multiplication.</div>
+
+        <div class="mission-link" onclick="toggle('e02_15')"><span>🕵️ S02E15 : Sanctions Pénales & Surveillance</span> <span>🗝️</span></div>
+        <div id="e02_15" class="protocol"><span class="method-label">Surveillance & Terminal</span>L'acronyme de la loi fédérale suisse sur la surveillance de la correspondance par poste et télécommunication, et la commande Linux pour suivre un fichier journal en temps réel. La formule Python finale s'applique en respectant scrupuleusement l'ordre des opérations et le cas de récidive.</div>
+
+        <div class="mission-link" onclick="toggle('e02_16')"><span>🏁 S02E16 : Archivage Critique (Fin de Saison)</span> <span>🗝️</span></div>
+        <div id="e02_16" class="protocol"><span class="method-label">nLPD & JavaScript</span>Les trois principes fondamentaux de l'article 5 nLPD qui régissent tout traitement de données, et l'option <code>chmod</code> pour un fichier en lecture seule. Décortiquez le script JavaScript de scellage étape par étape : inversion de tableau, extraction de caractère, puis découpage d'une portion précise.</div>
+
+        <div class="season-section" style="background: #2c3e50;">SAISON 3 : L'OMBRE SYNTHÉTIQUE — MENACES IA (S03E17 → S03E24)</div>
+
+        <div class="mission-link" onclick="toggle('e03_17')"><span>🎭 S03E17 : L'Ombre Synthétique</span> <span>🗝️</span></div>
+        <div id="e03_17" class="protocol"><span class="method-label">Escroquerie informatique & Hachage</span>L'article CP réprimant l'escroquerie par ordinateur (utilisation malveillante de l'IA pour un virement frauduleux), et la commande calculant l'empreinte SHA-256 d'un fichier audio. Suivez la séquence d'index donnée dans le script Python pour reconstituer, caractère par caractère, la signature du codec.</div>
+
+        <div class="mission-link" onclick="toggle('e03_18')"><span>🪪 S03E18 : Identités Synthétiques</span> <span>🗝️</span></div>
+        <div id="e03_18" class="protocol"><span class="method-label">QCM juridique & Réseau</span>Un QCM porte sur la catégorie légale des données biométriques en droit suisse ; le second défi demande une commande affichant les connexions réseau actives avec leurs ports. Le message chiffré se déchiffre par un simple décalage de César (3 rangs vers l'arrière, le tiret ne bouge pas).</div>
+
+        <div class="mission-link" onclick="toggle('e03_19')"><span>🧩 S03E19 : Puzzle Forensique</span> <span>🗝️</span></div>
+        <div id="e03_19" class="protocol"><span class="method-label">QCM & Répertoires Linux</span>Un QCM sur le principe d'intégrité/traçabilité de la preuve numérique, et le chemin absolu du répertoire système temporaire (souvent monté en RAM) sous Linux. La signature finale s'obtient en triant plusieurs blocs SQL par ordre croissant d'identifiant puis en les concaténant.</div>
+
+        <div class="mission-link" onclick="toggle('e03_20')"><span>⚙️ S03E20 : Le Noyau Décisionnel</span> <span>🗝️</span></div>
+        <div id="e03_20" class="protocol"><span class="method-label">QCM pénal & Chiffrement web</span>Un QCM sur l'infraction CP visant la modification/effacement de données (à distinguer de l'accès indu ou de la soustraction), et l'acronyme du protocole de chiffrement standard du port 443. L'équation Python finale doit être résolue en respectant l'ordre des opérations (puissance avant tout).</div>
+
+        <div class="mission-link" onclick="toggle('e03_21')"><span>🖥️ S03E21 : Le Serveur Fantôme</span> <span>🗝️</span></div>
+        <div id="e03_21" class="protocol"><span class="method-label">QCM (transparence) & Traçage IP</span>Un QCM sur le principe de transparence de la nLPD, et la commande de traçage de route des paquets IP. Suivez l'arbre conditionnel du script Python selon les valeurs de fréquence et de stabilité données, puis repérez l'identifiant du serveur caché dans un texte survolable de la page.</div>
+
+        <div class="mission-link" onclick="toggle('e03_22')"><span>🔗 S03E22 : Supply Chain Attack</span> <span>🗝️</span></div>
+        <div id="e03_22" class="protocol"><span class="method-label">QCM (sous-traitance) & POSIX</span>Un QCM sur les conditions cumulatives permettant de confier un traitement à un sous-traitant (Art. 9 nLPD), et la syntaxe POSIX pour exporter une variable d'environnement avec sa valeur. Le hash final se reconstitue en combinant trois fragments d'une même liste, dont l'un est déjà confirmé en mémoire.</div>
+
+        <div class="mission-link" onclick="toggle('e03_23')"><span>🎙️ S03E23 : Deepfake Detection</span> <span>🗝️</span></div>
+        <div id="e03_23" class="protocol"><span class="method-label">QCM (fait justificatif) & Processus</span>Un QCM sur le fait justificatif qui rend licite un enregistrement d'appel effectué à l'insu d'une personne, et une commande combinant deux utilitaires Unix (lister puis filtrer par nom de processus). Les trois valeurs d'investigation (fréquence, gain, latence) sont dissimulées à trois endroits distincts du code source de la page (CSS, attribut HTML, commentaire JS) — pensez à inspecter le code source, pas seulement l'affichage.</div>
+
+        <div class="mission-link" onclick="toggle('e03_24')"><span>🛡️ S03E24 : Ransomware Defense (Fin de Saison)</span> <span>🗝️</span></div>
+        <div id="e03_24" class="protocol"><span class="method-label">QCM (notification) & PowerShell</span>Un QCM sur la condition déclenchant l'obligation de notifier le PFPDT en cas d'incident, et une commande PowerShell interrogeant les clés de registre de persistance. Trois clés sont dissimulées séparément (attribut d'image, addition affichée dans un log, chaîne à inverser lettre par lettre dans un rapport d'incident) — reconstituez-les une par une avant de les combiner.</div>
+
+        <div class="season-section" style="background: #2c3e50;">SAISON 4 : EXPERTISE FINALE — GOUVERNANCE & RÉSILIENCE (S04E25 → S04E35)</div>
+
+        <div class="mission-link" onclick="toggle('e04_25')"><span>📦 S04E25 : Portabilité des Données</span> <span>🗝️</span></div>
+        <div id="e04_25" class="protocol"><span class="method-label">nLPD & Archivage</span>Le droit à la portabilité (Art. 28 nLPD) repose sur l'une de deux bases légales possibles (consentement ou exécution d'un contrat), et la commande d'archivage <code>tar</code> nécessite deux options précises. L'algorithme final combine XOR, décalage binaire et modulo — à dérouler pas à pas sur le papier.</div>
+
+        <div class="mission-link" onclick="toggle('e04_26')"><span>🤖 S04E26 : Profilage Algorithmique</span> <span>🗝️</span></div>
+        <div id="e04_26" class="protocol"><span class="method-label">nLPD & Arborescence de processus</span>L'expression légale exacte (Art. 21 al. 2 nLPD) sur le droit à une révision humaine d'une décision automatisée, et la commande d'arbre de processus filtrée sur un utilisateur précis. Trois valeurs sont cachées à des emplacements différents du code source (attribut HTML, commentaire JS, commentaire CSS).</div>
+
+        <div class="mission-link" onclick="toggle('e04_27')"><span>📋 S04E27 : Le Registre des Traitements</span> <span>🗝️</span></div>
+        <div id="e04_27" class="protocol"><span class="method-label">nLPD & Hachage SHA-1</span>L'article nLPD imposant la tenue d'un registre des activités de traitement, et la commande complète calculant un hash SHA-1 sur un fichier de configuration. Deux validations sont nécessaires simultanément : associer chaque traitement à sa base légale correcte ET saisir le bon checksum numérique.</div>
+
+        <div class="mission-link" onclick="toggle('e04_28')"><span>📹 S04E28 : Surveillance sur le Lieu de Travail</span> <span>🗝️</span></div>
+        <div id="e04_28" class="protocol"><span class="method-label">nLPD/OLT3 & Hachage SHA-256</span>L'article commun à la nLPD et à l'Ordonnance sur le travail (OLT 3) qui interdit la surveillance comportementale des employés, et une commande de hachage SHA-256 sur un exécutable suspect. Ne vous fiez pas qu'au calcul binaire fourni : relisez la <b>description fonctionnelle</b> de chaque caméra dans le journal — certaines sont légitimes (sécurité, incendie) malgré les apparences.</div>
+
+        <div class="mission-link" onclick="toggle('e04_29')"><span>🔥 S04E29 : Destruction Sécurisée</span> <span>🗝️</span></div>
+        <div id="e04_29" class="protocol"><span class="method-label">Droit commercial & Shred</span>La durée légale minimale de conservation des pièces comptables (Code des obligations), et l'option de la commande <code>shred</code> pour une suppression immédiate. Identifiez les archives qui n'ont plus de base légale de conservation, puis sommez les décalages binaires de leurs index.</div>
+
+        <div class="mission-link" onclick="toggle('e04_30')"><span>📝 S04E30 : Audit Global nLPD (Mi-saison)</span> <span>🗝️</span></div>
+        <div id="e04_30" class="protocol"><span class="method-label">LDA & Audit continu</span>Le terme juridique désignant une collection organisée d'œuvres protégée par la LDA, et la commande de suivi continu d'un fichier journal. L'audit enchaîne quatre questions vrai/faux (registre PME, sanction DPO, surveillance email, Privacy by Default) suivies d'un calcul bitwise final combinant XOR et ET logique.</div>
+
+        <div class="mission-link" onclick="toggle('e04_31')"><span>💾 S04E31 : Cyber-Résilience Critique</span> <span>🗝️</span></div>
+        <div id="e04_31" class="protocol"><span class="method-label">Loi sur les banques & Disques</span>L'article de la Loi sur les banques réprimant la violation du secret professionnel bancaire, et la commande affichant l'espace disque disponible en format lisible. Choisissez la configuration de Plan de Reprise d'Activité réellement conforme (délais RTO/RPO, type de stockage, fréquence de tests) avant de dérouler l'algorithme de restauration.</div>
+
+        <div class="mission-link" onclick="toggle('e04_32')"><span>🏠 S04E32 : Smart Home — Contrôle d'Accès</span> <span>🗝️</span></div>
+        <div id="e04_32" class="protocol"><span class="method-label">PFPDT & Requêtes SQL</span>L'acronyme de l'autorité fédérale suisse de surveillance en protection des données, et la commande listant les fichiers/descripteurs réseau ouverts. Configurez le VLAN et le firmware sur les options les plus sécurisées, puis analysez la requête SQL à délai (Blind SQL Injection) en suivant précisément chaque condition imbriquée.</div>
+
+        <div class="mission-link" onclick="toggle('e04_33')"><span>🧹 S04E33 : Data Purge — Right to be Forgotten</span> <span>🗝️</span></div>
+        <div id="e04_33" class="protocol"><span class="method-label">nLPD & Gestion du Swap</span>L'article nLPD sanctionnant la violation du devoir de discrétion, et la commande réactivant la mémoire d'échange (swap) après l'avoir désactivée. L'algorithme Python (XOR, décalage, boucle de soustraction) doit être suivi pas à pas ; associez ensuite chaque trace de données à sa base légale et à sa méthode technique d'effacement appropriée.</div>
+
+        <div class="mission-link" onclick="toggle('e04_34')"><span>🌑 S04E34 : Shadow IT Investigation</span> <span>🗝️</span></div>
+        <div id="e04_34" class="protocol"><span class="method-label">nLPD & Sockets réseau</span>L'article nLPD sur la sous-traitance du traitement de données, et l'utilitaire moderne qui a remplacé <code>netstat</code>. Calculez d'abord la clé numérique de validation à partir de la table fournie avant que la commande de neutralisation ne devienne active sur les deux serveurs non autorisés.</div>
+
+        <div class="mission-link" onclick="toggle('e04_35')"><span>🔏 S04E35 : Signature et Authenticité (FINAL SAISON 4)</span> <span>🗝️</span></div>
+        <div id="e04_35" class="protocol"><span class="method-label">ZertES & Wireshark</span>L'acronyme de la loi suisse sur les services de certification (signatures électroniques), et le filtre Wireshark exact pour isoler les requêtes HTTP de type POST — respectez la casse et les guillemets. Suivez le code C pas à pas (opérations conditionnelles selon la divisibilité par 3, XOR sinon) pour obtenir le paramètre numérique, puis identifiez lequel des quatre segments de hash proposés est complet et non corrompu.</div>
+
+        <a href="MENU_PRINCIPAL.html" class="btn-back">⬅ Retour au menu principal</a>
+
+        <p style="margin-top: 50px; text-align: center; font-size: 0.8em; color: #999; border-top: 1px solid #eee; padding-top: 20px;">
+            Document de référence SWISS SHIELD - Propriété Privée - v2026.2 — Couverture complète des 39 épisodes + 1 bonus
+        </p>
+    </div>
+
+    <script>
+        function toggle(id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const isVisible = el.style.display === 'block';
+            document.querySelectorAll('.protocol').forEach(p => p.style.display = 'none');
+            el.style.display = isVisible ? 'none' : 'block';
+        }
+
+        function filterAide() {
+            const input = document.getElementById('searchBarAide').value.toLowerCase();
+            document.querySelectorAll('.mission-link').forEach(link => {
+                const protocolEl = document.getElementById(link.getAttribute('onclick').match(/'([^']+)'/)[1]);
+                const haystack = (link.innerText + ' ' + (protocolEl ? protocolEl.innerText : '')).toLowerCase();
+                link.style.display = haystack.includes(input) ? '' : 'none';
+                if (protocolEl && input === '') protocolEl.style.display = 'none';
+            });
+            document.querySelectorAll('.season-section').forEach(sec => {
+                let node = sec.nextElementSibling;
+                let anyVisible = false;
+                while (node && !node.classList.contains('season-section')) {
+                    if (node.classList.contains('mission-link') && node.style.display !== 'none') anyVisible = true;
+                    node = node.nextElementSibling;
+                }
+                sec.style.display = (input === '' || anyVisible) ? '' : 'none';
+            });
+        }
+    </script>
+</body>
+</html>

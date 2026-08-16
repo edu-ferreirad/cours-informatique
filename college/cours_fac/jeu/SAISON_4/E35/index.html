@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>S04E35 - SIGNATURE ET AUTHENTICITÉ [FINAL]</title>
+    <style>
+        /* --- EFFET VISUEL FINAL : FLUX QUANTIQUE --- */
+        #data-flow {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            background: linear-gradient(180deg, #050a10 0%, #001529 100%);
+            overflow: hidden;
+        }
+
+        .data-particle {
+            position: absolute;
+            background: #3498db;
+            width: 2px;
+            height: 10px;
+            opacity: 0.3;
+            animation: moveUp linear infinite;
+        }
+
+        @keyframes moveUp {
+            from { transform: translateY(100vh); opacity: 0; }
+            50% { opacity: 0.5; }
+            to { transform: translateY(-10vh); opacity: 0; }
+        }
+
+        /* --- STYLES GENERAUX --- */
+        body { 
+            color: #3498db; 
+            font-family: 'Consolas', 'Courier New', monospace; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 40px; 
+            margin: 0; 
+            min-height: 100vh; 
+            overflow-y: auto;
+        }
+
+        .terminal { 
+            background: rgba(10, 17, 24, 0.95); 
+            border: 2px solid #3498db; 
+            padding: 25px; 
+            width: 95%; 
+            max-width: 850px; 
+            box-shadow: 0 0 50px rgba(52, 152, 219, 0.3); 
+            border-radius: 8px; 
+            position: relative; 
+            overflow: hidden; 
+            backdrop-filter: blur(10px);
+        }
+
+        /* CONTEXTE HISTOIRE S04E35 */
+        .story-context {
+            background: rgba(52, 152, 219, 0.1);
+            border-left: 5px solid #3498db;
+            padding: 20px;
+            margin: 25px 0;
+            text-align: left;
+            font-size: 0.95em;
+            color: #fff;
+            line-height: 1.6;
+        }
+        .story-context b { color: #f1c40f; text-transform: uppercase; }
+        
+        .scan-line { position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: rgba(52, 152, 219, 0.5); box-shadow: 0 0 15px #3498db; display: none; z-index: 10; animation: scanning 2s linear infinite; }
+        @keyframes scanning { from { top: 0; } to { top: 100%; } }
+
+        .header-mission { border-bottom: 2px solid #3498db; margin-bottom: 20px; padding-bottom: 10px; color: #fff; font-weight: bold; text-transform: uppercase; display: flex; justify-content: space-between; font-size: 0.9em; }
+        
+        #lock-screen { text-align: center; padding: 10px; }
+        #pre-requis-screen { display: none; }
+        #mission-content { display: none; }
+        
+        .hash-verification { background: #0d1a25; border: 1px solid #1c3d5a; padding: 20px; margin: 20px 0; border-radius: 4px; text-align: left; }
+        .hash-display { display: grid; grid-template-columns: 1fr; gap: 10px; margin: 15px 0; }
+        .hash-segment { background: #000; border: 1px solid #1c3d5a; padding: 12px; font-size: 0.8em; color: #5dade2; cursor: pointer; transition: 0.2s; border-radius: 4px; }
+        .hash-segment:hover { border-color: #3498db; color: #fff; background: #0a1118; }
+        .hash-label { color: #f1c40f; font-size: 0.85em; margin-bottom: 5px; display: block; font-weight: bold; }
+
+        input[type="text"], input[type="password"] { background: #000; border: 1px solid #3498db; color: #3498db; padding: 12px; width: 90%; font-family: inherit; font-size: 0.9em; text-align: center; outline: none; margin-bottom: 15px; border-radius: 4px; }
+        .main-btn { background: #3498db; color: #fff; border: none; padding: 12px 30px; font-weight: bold; cursor: pointer; border-radius: 4px; text-transform: uppercase; transition: 0.3s; box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4); font-family: inherit; }
+        .main-btn:hover { background: #fff; color: #3498db; }
+        
+        .seal-container { text-align: center; margin: 20px 0; display: none; }
+        .seal { width: 140px; height: 140px; border: 4px double #2ecc71; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: #2ecc71; font-weight: bold; transform: rotate(-10deg); font-size: 0.8em; text-align: center; padding: 10px; animation: pop 0.5s ease-out; background: rgba(46, 204, 113, 0.1); }
+        @keyframes pop { from { transform: scale(0) rotate(0deg); } to { transform: scale(1) rotate(-10deg); } }
+
+        .final-badge { margin-top: 25px; padding: 30px; background: #000; color: #2ecc71; border: 3px solid #f1c40f; border-radius: 8px; text-align: center; font-weight: bold; display: none; box-shadow: 0 0 40px rgba(241, 196, 15, 0.4); }
+        
+        /* BLOCKS DE DEFIS ET CODE */
+        .challenge-block { background: #04090f; border: 1px dashed #3498db; padding: 15px; margin: 15px 0; text-align: left; border-radius: 4px; }
+        .challenge-title { font-weight: bold; color: #f1c40f; text-transform: uppercase; font-size: 0.85em; display: block; margin-bottom: 8px; }
+        .code-window { background: #000; border-left: 3px solid #3498db; padding: 12px; margin: 15px 0; color: #5dade2; font-size: 0.85em; overflow-x: auto; white-space: pre; font-family: monospace; }
+
+        /* BOUTON RETOUR MENTOR */
+        .btn-nav-retour { position: absolute; top: 15px; left: 15px; background: #000; border: 1px solid #3498db; color: #3498db; padding: 6px 12px; text-decoration: none; font-size: 0.8em; font-weight: bold; border-radius: 4px; z-index: 100; }
+        .btn-nav-retour:hover { background: #3498db; color: #000; }
+
+        /* --- SECTION AIDE 3 PILIERS --- */
+        .help-pylons { margin-top: 30px; display: none; grid-template-columns: repeat(3, 1fr); gap: 15px; text-align: left; }
+        .pylon { background: rgba(0, 0, 0, 0.8); border: 1px solid #3498db; padding: 15px; border-radius: 4px; font-size: 0.8em; color: #eee; }
+        .pylon h4 { margin: 0 0 10px 0; color: #f1c40f; text-transform: uppercase; border-bottom: 1px solid #3498db; padding-bottom: 5px; }
+
+        .prequel-alert { background: #e74c3c; color: #fff; padding: 15px; margin-top: 20px; font-size: 0.9em; border-radius: 4px; animation: blink 1.5s infinite; text-transform: uppercase; border: 2px solid #fff; }
+        @keyframes blink { 50% { background: #c0392b; } }
+
+        /* MODE SOBRE */
+        body.mode-sobre, body.mode-sobre * { animation: none !important; transition: none !important; }
+    </style>
+</head>
+<body>
+
+    <div id="data-flow"></div>
+
+    <div class="terminal">
+        <div class="scan-line" id="laser"></div>
+
+        <a href="../../MENU_PRINCIPAL.html" class="btn-nav-retour">&lt; MENU PRINCIPAL</a>
+        <button id="toggle-sobre-btn" onclick="basculerModeSobre()" style="position:absolute;top:15px;right:15px;width:auto;z-index:100;background:#000;border:1px solid #3498db;color:#3498db;padding:6px 12px;font-size:0.8em;font-weight:bold;border-radius:4px;cursor:pointer;">🌓</button>
+
+        <div id="lock-screen" style="margin-top: 25px;">
+            <h2>🖋️ SERVICE DE SIGNATURE QUALIFIÉE</h2>
+
+            <div class="story-context">
+                <b>ÉPILOGUE : L'INTÉGRITÉ SCELLÉE DANS L'ADMINISTRATION</b><br>
+                Le réseau d'infrastructure critique est nettoyé, le Shadow-IT a été neutralisé au sein de la plateforme informatique de la **Chancellerie fédérale à Berne**. Cependant, pour que cet audit de crise ait une valeur de preuve opposable devant le Préposé fédéral (PFPDT) conformément à la **nLPD**, les métadonnées de purge doivent faire l'objet d'un scellage d'authenticité irréversible.<br><br>
+                Une **signature électronique qualifiée** (SEQ) garantit qu'aucune modification ultérieure ne pourra altérer les preuves d'éradication des accès. C'est l'étape ultime : consolider la preuve numérique pour clore la Saison 04.
+            </div>
+
+            <p style="color: #5dade2;">Session S04E34 validée détectée. Saisissez le jeton d'arrêt généré lors du scan :</p>
+            <input type="password" id="passkey" placeholder="CODE DE SESSION E34" autocomplete="off" onchange="sauvegarderAutomatiquement()">
+            <br><br>
+            <button class="main-btn" onclick="unlock()">VÉRIFIER L'ACCÈS FINAL</button>
+        </div>
+
+        <div id="pre-requis-screen" style="margin-top: 25px;">
+            <div class="header-mission">
+                <span>[CONTRÔLE] SÉCURISATION DU CERTIFICAT FÉDÉRAL</span>
+                <span style="color: #f1c40f;">AUTORISATION : REQUISE</span>
+            </div>
+
+            <div class="challenge-block">
+                <span class="challenge-title">⚖️ Défi Juridique : Réglementation de la Signature en Suisse</span>
+                <p>En Suisse, quelle loi fédérale spécifique fixe les conditions-cadres régissant l'utilisation des signatures électroniques certifiées pour qu'elles possèdent juridiquement la même valeur qu'une signature manuscrite ? (Saisir l'acronyme officiel de la loi, ex: LPD, LIn, SCSE...)</p>
+                <input type="text" id="law_ans" placeholder="Entrez l'acronyme de la loi..." autocomplete="off" onchange="sauvegarderAutomatiquement()">
+            </div>
+
+            <div class="challenge-block">
+                <span class="challenge-title">🖥️ Défi Technique : Analyse Forensics de Flux Réseau (Wireshark / Tshark)</span>
+                <p>Lors d'une capture de trafic suspect sur l'interface d'authentification, vous cherchez à isoler uniquement les requêtes réseau contenant un jeton d'accès malveillant transitant via le protocole HTTP POST. Quel **filtre d'affichage (display filter)** standard utiliseriez-vous dans Wireshark pour filtrer spécifiquement ce type de méthode ? (Saisir la syntaxe exacte du filtre de paquets, ex: ip.addr == 10.0.0.1)</p>
+                <input type="text" id="shell_ans" placeholder="Exemple de syntaxe : protocole.methode == ..." autocomplete="off" onchange="sauvegarderAutomatiquement()">
+            </div>
+
+            <center>
+                <button class="main-btn" onclick="verifyPreReq()">GÉNÉRER LA CLÉ D'ÉMISSION</button>
+            </center>
+        </div>
+
+        <div id="mission-content">
+            <div class="header-mission">
+                <span>[SCSE / nLPD] ÉTAPE FINALE : INTÉGRITÉ</span>
+                <span id="statut" style="color: #f1c40f;">STATUT : SIGNATURE REQUISE</span>
+            </div>
+            
+            <p>> <b>ANALYSE DU RAPPORT D'AUDIT :</b> Intégrité compromise par des interférences de session.<br>
+            > <b>DÉFI :</b> Identifiez le <u>seul segment valide</u> parmi les archives corrompues ci-dessous et reconstituez le Hash SHA-256 complet pour sceller le document.</p>
+            
+            <div class="challenge-block">
+                <span class="challenge-title">🧩 Investigation de Clôture : Algorithme d'Authentification Asymétrique</span>
+                <p>Le module de signature asymétrique exige un paramètre de validation d'en-tête dynamique ($R$). Le système a extrait un fragment de mémoire du microcontrôleur de chiffrement HSM de la Confédération. Analysez ce code algorithmique écrit en **C** pour déterminer la valeur exacte de retour :</p>
+
+                <div class="code-window">#include &lt;stdio.h&gt;
+
+int evaluate_final_signature() {
+    int signature_vector = 14;
+    int validation_matrix[4] = {3, 7, 12, 18};
+    int output_buffer = 154;
+
+    for(int i = 0; i < 4; i++) {
+        if(validation_matrix[i] % 3 == 0) {
+            output_buffer += (validation_matrix[i] * 3) - i;
+        } else {
+            output_buffer -= (validation_matrix[i] ^ signature_vector);
+        }
+    }
+    return output_buffer;
+}</div>
+
+                <p style="color: #bbb; font-size: 0.85em;">💡 <i>Méthodologie d'analyse forensics :<br>
+                1. Initialisation : `output_buffer` commence à 154. Le vecteur vaut 14.<br>
+                2. Itération 0 ($i=0$, valeur=3) : 3 est divisible par 3. Le buffer augmente de $(3 \times 3) - 0 = 9$. Le buffer passe à 163.<br>
+                3. Itération 1 ($i=1$, valeur=7) : 7 n'est pas divisible par 3. Calculez le XOR : $7 \oplus 14$. Soustrayez ce résultat du buffer.<br>
+                4. Répétez rigoureusement le déroulement des conditions pour l'index 2 (valeur=12) et l'index 3 (valeur=18) afin d'obtenir la valeur de retour finale.</i></p>
+
+                <p>Saisissez le paramètre numérique de validation calculé :</p>
+                <input type="text" id="final_logic_ans" placeholder="Entrez la valeur entière attendue..." autocomplete="off" onchange="sauvegarderAutomatiquement()">
+            </div>
+
+            <div class="hash-verification">
+                <span class="hash-label">SEGMENTS DÉTECTÉS (UN SEUL EST AUTHENTIQUE) :</span>
+                <div class="hash-display">
+                    <div class="hash-segment">SEG_01 (CORROMPU): e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852bXXX</div>
+                    <div class="hash-segment" onclick="copyToInput('e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855')">SEG_02 (VALIDE): e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</div>
+                    <div class="hash-segment">SEG_03 (CORROMPU): e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b85Z</div>
+                    <div class="hash-segment">SEG_04 (ERREUR): e3b0c442-98fc-1c14-9afb-f4c8996fb92427ae41e4649b934ca495991b7852b855</div>
+                </div>
+                
+                <label class="hash-label">SAISIR LE HASH D'AUTHENTICITÉ FINAL :</label>
+                <input type="text" id="hash-input" placeholder="Cliquez sur le segment valide ou saisissez-le ici" oninput="checkHash()">
+            </div>
+
+            <div id="seal-zone" class="seal-container">
+                <div class="seal">DOCUMENT<br>SCELLÉ ET<br>CERTIFIÉ</div>
+            </div>
+
+            <div id="final-badge" class="final-badge">
+                🏆 CERTIFICATION nLPD OBTENUE 🏆<br><br>
+                CODE DE VALIDATION SAISON 04 : <br>
+                <span style="font-size: 1.5em; color: #fff; letter-spacing: 2px;">TRUSTED-INTEGRITY-2026</span>
+                
+                <hr style="border: 1px solid #f1c40f; margin: 20px 0;">
+                
+                <div class="prequel-alert">
+                    🚨 ALERTE SYSTÈME : ARCHIVES CRITIQUES "COTL" DÉVÉROUILLÉES 🚨<br>
+                    L'origine sous-jacente de la cyberattaque globale a été localisée dans les structures de la Saison 0.<br><br>
+                    🔑 ACCÈS S0 / MOT DE PASSE PREQUEL : <strong>GENESIS-ROOT-INIT</strong>
+                </div>
+            </div>
+
+            <button class="main-btn" id="help-trigger" style="font-size: 0.7em; padding: 5px 15px; margin-top: 10px;" onclick="toggleHelp()">Afficher l'Aide au Scellage</button>
+            <div id="help-section" class="help-pylons">
+                <div class="pylon">
+                    <h4>⚖️ Juridique</h4>
+                    La nLPD exige la traçabilité. Une signature électronique qualifiée a la même valeur légale qu'une signature manuscrite en vertu de la loi **SCSE** et de l'Art. 14 du Code des obligations (CO).
+                </div>
+                <div class="pylon">
+                    <h4>💻 Informatique</h4>
+                    Le Hash SHA-256 produit une empreinte de longueur fixe (256 bits). Son uniformité mathématique assure qu'aucune collision simple ne permette de falsifier le livrable d'audit.
+                </div>
+                <div class="pylon">
+                    <h4>🔍 Forensique</h4>
+                    L'extraction d'images mémoire ou l'exécution pas-à-pas de sous-routines de chiffrement compilées permettent d'isoler les constantes d'authentification injectées frauduleusement.
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 25px;">
+                <a href="../../MENU_PRINCIPAL.html" style="color: #3498db; text-decoration: none; font-size: 0.8em; border: 1px solid #3498db; padding: 8px 15px; border-radius: 4px;">[ QUITTER LA SESSION ET EXPORTER LES LOGS ]</a>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top: 30px; border-top: 3px solid #d80000; padding: 20px; background: #fff; font-family: Arial, sans-serif; position: relative; z-index: 100; width: 90%; max-width: 850px; margin-left:auto; margin-right:auto;">
+        <div id="hint-score-badge" style="background:#111;color:#3fb950;padding:8px 15px;font-weight:bold;text-align:center;">🏆 Score de cet épisode : <span id="hint-score-value">5</span> / 5 pts</div>
+        <div style="display:flex; gap:8px; margin:10px 0;">
+            <button id="hintBtn1" onclick="useHint(1)" style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;">💡 Indice 1 (-1 pt)</button>
+            <button id="hintBtn2" onclick="useHint(2)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🎯 Indice 2 (-2 pts)</button>
+            <button id="hintBtn3" onclick="useHint(3)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🆘 Solution (-3 pts)</button>
+        </div>
+
+        <div id="zoneAideScore" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; color: #333;">
+            <p id="hint-tier-1" style="display:none;"><strong>💡 INFO :</strong> Pré-requis : l'acronyme de la loi suisse sur les signatures électroniques certifiées, et le filtre Wireshark exact pour les requêtes HTTP POST. Ensuite, suivez le code C pas à pas (modulo 3, XOR, ou calcul direct selon chaque valeur), puis identifiez le seul segment de hash non corrompu parmi les 4 proposés.</p>
+            <p id="hint-tier-2" style="display:none;"><strong>🎯 PISTE :</strong> Loi : SCSE. Filtre : <code>http.request.method == "POST"</code> (respectez exactement la casse et les guillemets). Pour le hash, seul SEG_02 est complet et cohérent (les autres sont tronqués, corrompus ou mal formatés).</p>
+            <p id="hint-tier-3" style="display:none;"><strong>🆘 SOLUTION :</strong> Pré-requis : SCSE / http.request.method == "POST". Paramètre numérique : <code>239</code>. Hash à saisir : <code>e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</code> (SEG_02).</p>
+        </div>
+    </div>
+
+    <script>
+        let currentZone = 1;
+        const bg = document.getElementById('data-flow');
+        for (let i = 0; i < 50; i++) {
+            let particle = document.createElement('div');
+            particle.className = 'data-particle';
+            particle.style.left = Math.random() * 100 + 'vw';
+            particle.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            particle.style.animationDelay = Math.random() * 5 + 's';
+            bg.appendChild(particle);
+        }
+
+        function unlock() {
+            const code = document.getElementById('passkey').value.trim().toUpperCase();
+            if (code === 'SHADOW-PROTO-OFF') {
+                document.getElementById('laser').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('lock-screen').style.display = 'none';
+                    document.getElementById('pre-requis-screen').style.display = 'block';
+                    currentZone = 2;
+                    sauvegarderAutomatiquement();
+                }, 500);
+            } else {
+                enregistrerErreur('entree', code, 'SHADOW-PROTO-OFF');
+                alert("ERREUR : Accès refusé. Protocole E34 non validé.");
+            }
+        }
+
+        function verifyPreReq() {
+            const law = document.getElementById('law_ans').value.trim().toUpperCase();
+            const shell = document.getElementById('shell_ans').value.trim(); // Respect des minuscules/majuscules strictes Wireshark
+
+            if (law === 'SCSE' && shell === 'http.request.method == "POST"') {
+                document.getElementById('pre-requis-screen').style.display = 'none';
+                document.getElementById('mission-content').style.display = 'block';
+                currentZone = 3;
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('prerequis', 'law:"' + law + '" / shell:"' + shell + '"', 'SCSE / http.request.method == "POST"');
+                alert("ACCÈS REJETÉ : Les validations de conformité SCSE ou la syntaxe du filtre de paquets réseau sont incorrectes.");
+            }
+        }
+
+        function toggleHelp() {
+            const section = document.getElementById('help-section');
+            section.style.display = (section.style.display === 'grid') ? 'none' : 'grid';
+        }
+
+        function copyToInput(val) {
+            document.getElementById('hash-input').value = val;
+            checkHash();
+        }
+
+        function checkHash() {
+            const masterHash = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+            const inputHash = document.getElementById('hash-input').value.trim();
+            const logicAns = document.getElementById('final_logic_ans').value.trim();
+            
+            if(logicAns !== "239") {
+                sauvegarderAutomatiquement();
+                return; 
+            }
+            
+            if (inputHash === masterHash) {
+                document.getElementById('laser').style.display = 'none';
+                document.getElementById('statut').innerText = "STATUT : INTÉGRITÉ TOTALE VÉRIFIÉE";
+                document.getElementById('statut').style.color = "#2ecc71";
+                document.getElementById('seal-zone').style.display = 'block';
+                document.getElementById('final-badge').style.display = 'block';
+                document.getElementById('help-trigger').style.display = 'none';
+                document.getElementById('help-section').style.display = 'none';
+                
+                document.querySelectorAll('.data-particle').forEach(p => {
+                    p.style.background = '#2ecc71';
+                    p.style.boxShadow = '0 0 10px #2ecc71';
+                });
+            } else {
+                sauvegarderAutomatiquement();
+            }
+        }
+    </script>
+
+    <script>
+        const EP_ID = "S04E35";
+        const HINT_COST = {1:1, 2:2, 3:3};
+        let hintsUsed = {1:false, 2:false, 3:false};
+        let episodeScore = 5;
+        function useHint(level) {
+            if (hintsUsed[level] || (level > 1 && !hintsUsed[level - 1])) return;
+            hintsUsed[level] = true;
+            enregistrerIndiceUsage(level);
+            episodeScore -= HINT_COST[level];
+            document.getElementById('hint-score-value').textContent = episodeScore;
+            document.getElementById('hint-tier-' + level).style.display = 'block';
+            const btn = document.getElementById('hintBtn' + level);
+            btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5';
+            if (level < 3) {
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+            sauvegarderAutomatiquement();
+        }
+        function recordEpisodeSuccess() {
+            let scores = {};
+            try { scores = JSON.parse(localStorage.getItem('swiss_shield_scores') || '{}'); } catch(e) {}
+            if (!(EP_ID in scores) || scores[EP_ID] < episodeScore) scores[EP_ID] = episodeScore;
+            localStorage.setItem('swiss_shield_scores', JSON.stringify(scores));
+            localStorage.removeItem('autosave_' + EP_ID);
+        }
+        function enregistrerErreur(phase, reponseEleve, reponseAttendue) {
+            let debrief = {erreurs:{}, indices:{}};
+            try { debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}'); } catch(e) {}
+            const key = EP_ID + ':' + phase;
+            let entry = debrief.erreurs[key];
+            if (typeof entry === 'number') entry = {compte: entry, exemples: []};
+            if (!entry) entry = {compte: 0, exemples: []};
+            entry.compte++;
+            if (reponseEleve !== undefined && reponseAttendue !== undefined && entry.exemples.length < 5) {
+                entry.exemples.push({reponseEleve: String(reponseEleve), reponseAttendue: String(reponseAttendue)});
+            }
+            debrief.erreurs[key] = entry;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        }
+        function enregistrerIndiceUsage(niveau) {
+            let debrief = {erreurs:{}, indices:{}};
+            try { debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}'); } catch(e) {}
+            const key = EP_ID + ':' + niveau;
+            debrief.indices[key] = (debrief.indices[key] || 0) + 1;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        }
+        function basculerModeSobre() {
+            const actif = document.body.classList.toggle('mode-sobre');
+            localStorage.setItem('swiss_shield_mode_sobre', actif ? '1' : '0');
+        }
+        if (localStorage.getItem('swiss_shield_mode_sobre') === '1') {
+            document.body.classList.add('mode-sobre');
+        }
+        (function pollSuccess(){
+            const ids = ['success','success-msg','success-final','final-zone','step_final','victory-zone','victory-screen','final-step','final-badge'];
+            let recorded = false;
+            setInterval(function(){
+                if (recorded) return;
+                for (const id of ids) {
+                    const el = document.getElementById(id);
+                    if (el && window.getComputedStyle(el).display === 'block') { recordEpisodeSuccess(); recorded = true; return; }
+                }
+            }, 500);
+        })();
+
+        function sauvegarderAutomatiquement() {
+            const etat = {
+                zone: currentZone,
+                inputs: {
+                    passkey: (document.getElementById('passkey') || {}).value || '',
+                    law_ans: (document.getElementById('law_ans') || {}).value || '',
+                    shell_ans: (document.getElementById('shell_ans') || {}).value || '',
+                    final_logic_ans: (document.getElementById('final_logic_ans') || {}).value || '',
+                    hashInput: (document.getElementById('hash-input') || {}).value || ''
+                },
+                hintsUsed: hintsUsed,
+                episodeScore: episodeScore
+            };
+            localStorage.setItem('autosave_' + EP_ID, JSON.stringify(etat));
+        }
+
+        function proposerRestaurationAutosave() {
+            let etat;
+            try { etat = JSON.parse(localStorage.getItem('autosave_' + EP_ID)); } catch(e) { return; }
+            if (!etat) return;
+
+            if (etat.inputs) {
+                if (document.getElementById('passkey')) document.getElementById('passkey').value = etat.inputs.passkey || '';
+                if (document.getElementById('law_ans')) document.getElementById('law_ans').value = etat.inputs.law_ans || '';
+                if (document.getElementById('shell_ans')) document.getElementById('shell_ans').value = etat.inputs.shell_ans || '';
+                if (document.getElementById('final_logic_ans')) document.getElementById('final_logic_ans').value = etat.inputs.final_logic_ans || '';
+                if (document.getElementById('hash-input')) document.getElementById('hash-input').value = etat.inputs.hashInput || '';
+            }
+
+            if (etat.zone >= 2) {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('pre-requis-screen').style.display = 'block';
+                currentZone = 2;
+            }
+            if (etat.zone >= 3) {
+                document.getElementById('pre-requis-screen').style.display = 'none';
+                document.getElementById('mission-content').style.display = 'block';
+                currentZone = 3;
+            }
+
+            if (etat.hintsUsed) {
+                [1,2,3].forEach(function(level){
+                    if (etat.hintsUsed[level]) {
+                        hintsUsed[level] = true;
+                        document.getElementById('hint-tier-' + level).style.display = 'block';
+                        const btn = document.getElementById('hintBtn' + level);
+                        if (btn) { btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5'; }
+                        const next = document.getElementById('hintBtn' + (level + 1));
+                        if (next && level < 3) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+                    }
+                });
+            }
+            if (typeof etat.episodeScore === 'number') {
+                episodeScore = etat.episodeScore;
+                document.getElementById('hint-score-value').textContent = episodeScore;
+            }
+        }
+        proposerRestaurationAutosave();
+    </script>
+</body>
+</html>

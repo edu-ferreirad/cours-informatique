@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>S03E19 - PUZZLE FORENSIQUE</title>
+    <style>
+        /* --- NOUVEL EFFET VISUEL : FRACTAL FRAGMENTATION --- */
+        #frag-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            background: #111; /* Fond très sombre pour faire ressortir le orange */
+        }
+
+        /* --- MODE SOBRE (accessibilité) --- */
+        body.mode-sobre, body.mode-sobre * { animation: none !important; transition: none !important; }
+        body.mode-sobre #frag-canvas { display: none !important; }
+        #toggle-sobre-btn {
+            position: fixed; top: 10px; left: 10px; z-index: 10001;
+            background: #333; color: #ff6600; border: 1px solid #ff6600;
+            padding: 6px 10px; font-size: 0.7em; cursor: pointer; font-family: inherit; border-radius: 3px;
+        }
+
+        body { color: #eee; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 40px; margin: 0; overflow-x: hidden; }
+        
+        .terminal { 
+            background: #f4f4f4; 
+            border: 1px solid #ccc; 
+            color: #333; 
+            padding: 30px; width: 90%; 
+            max-width: 800px; 
+            box-shadow: 15px 15px 0px #ff6600; 
+            border-radius: 0; 
+            position: relative;
+            backdrop-filter: blur(2px);
+        }
+
+        .header { background: #333; color: #fff; padding: 10px; margin: -30px -30px 20px -30px; font-weight: bold; display: flex; justify-content: space-between; }
+
+        /* STYLE CONTEXTE HISTOIRE S3E19 */
+        .story-context {
+            background: rgba(255, 102, 0, 0.1);
+            border-left: 5px solid #ff6600;
+            padding: 20px;
+            margin: 25px 0;
+            text-align: left;
+            font-size: 0.95em;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        #lock-screen { text-align: center; padding: 40px; color: #333; }
+        #pre-requis-screen, #mission-content, #victory-zone { display: none; }
+
+        .evidence-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin: 20px 0; }
+        .source-box { background: #fff; border-left: 5px solid #ff6600; padding: 15px; font-family: 'Courier New', monospace; font-size: 0.85em; text-align: left; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); }
+
+        .annexe-code { background: #222; border-left: 4px solid #ff6600; padding: 12px; margin: 10px 0; text-align: left; font-family: 'Courier New', monospace; font-size: 0.85em; color: #ff9955; white-space: pre-wrap; }
+
+        input { border: 1px solid #ff6600; padding: 12px; width: 300px; font-family: inherit; margin-top: 10px; outline: none; text-align: center; font-size: 1em; background: #fff; color: #333; }
+        button { background: #ff6600; color: #fff; border: none; padding: 12px 25px; font-weight: bold; cursor: pointer; margin-top: 15px; text-transform: uppercase; transition: 0.3s; }
+        button:hover { background: #333; box-shadow: 0 0 15px rgba(255, 102, 0, 0.4); }
+
+        #victory-zone { text-align: center; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .final-code { font-size: 2em; font-weight: bold; color: #ff6600; letter-spacing: 5px; display: block; margin: 15px 0; border: 2px dashed #ff6600; padding: 10px; background: #fff; }
+        
+        /* NAVIGATION OBLIGATOIRE */
+        .btn-navigation-principal { position: absolute; top: 10px; right: 10px; background: #333; color: #fff; border: 1px solid #ff6600; padding: 4px 10px; text-decoration: none; font-size: 0.8em; font-weight: bold; transition: 0.2s; }
+        .btn-navigation-principal:hover { background: #ff6600; color: #fff; }
+
+        .btn-aide-rouge { background: #d80000; color: #fff; border: none; padding: 12px 20px; font-weight: bold; cursor: pointer; width: 100%; max-width: 450px; margin-top: 40px; border-radius: 0; box-shadow: 5px 5px 0px #333; }
+        .aide-box { display: none; background: #fff; color: #333; margin-top: 10px; padding: 20px; width: 90%; max-width: 500px; text-align: left; font-family: sans-serif; border-top: 5px solid #d80000; line-height: 1.5; box-shadow: 5px 5px 15px rgba(0,0,0,0.1); }
+        
+        .qcm-block { text-align: left; margin: 15px 0; font-family: sans-serif; }
+        .qcm-option { display: block; margin: 8px 0; cursor: pointer; color: #444; }
+    </style>
+</head>
+<body>
+    <button id="toggle-sobre-btn" onclick="basculerModeSobre()">🌓 Mode sobre</button>
+
+    <canvas id="frag-canvas"></canvas>
+
+    <div class="terminal">
+        <a href="../../MENU_PRINCIPAL.html" class="btn-navigation-principal">🗂️ MENU PRINCIPAL</a>
+
+        <div id="lock-screen">
+            <div class="header">RECOVERY MODE // S03E19</div>
+            
+            <h2 style="color: #ff6600;">⚠️ SYSTÈME FRAGMENTÉ</h2>
+
+            <div class="story-context">
+                <b>[ ÉTAT D'URGENCE : DATA SHREDDING ]</b><br>
+                L'IA infiltrée a déclenché un protocole d'auto-destruction des journaux d'événements au sein de l'Administration fédérale à Berne pour masquer ses serveurs d'origine. Les preuves volatiles ont été éparpillées dans la mémoire RAM du serveur central de <i>Swiss Shield</i>. <br><br>
+                C'est votre dernière chance de capturer la signature entière avant qu'elle ne soit définitivement purgée du cache. Reconstituez le puzzle forensique.
+            </div>
+
+            <p>Veuillez entrer le code d'accès persistant (Code de fin E18) :</p>
+            <input type="text" id="passkey" placeholder="CODE E18" onchange="sauvegarderAutomatiquement()">
+            <br>
+            <button onclick="unlock()">RECONSTITUER LES PREUVES</button>
+        </div>
+
+        <div id="pre-requis-screen">
+            <div class="header">
+                <span>CONTRÔLE DE PROTOCOLE DE RECOUUREMENT</span>
+                <span>STATUS: AUTH_PENDING</span>
+            </div>
+            
+            <div class="story-context">
+                <b>VÉRIFICATION ADMINISTRATIVE ET TECHNIQUE :</b> L'accès aux outils d'extraction brute de la mémoire RAM nécessite de valider les compétences réglementaires suisses relatives à la manipulation de preuves numériques volatiles.
+            </div>
+
+            <div class="qcm-block">
+                <p style="font-weight: bold; color: #ff6600;">⚖️ QUESTION JURIDIQUE :</p>
+                <p>Dans le cadre d'une enquête pour cyber-escroquerie en Suisse, quel principe fondamental exige que la collecte des preuves numériques n'altère pas les supports originaux et puisse être reproduite à l'identique par un expert tiers ?</p>
+                <label class="qcm-option"><input type="radio" name="jur_qcm" value="X" onchange="sauvegarderAutomatiquement()"> A) Le principe d'opportunité des poursuites pénales.</label>
+                <label class="qcm-option"><input type="radio" name="jur_qcm" value="Y" onchange="sauvegarderAutomatiquement()"> B) Le principe d'intégrité et de traçabilité forensique de la preuve.</label>
+                <label class="qcm-option"><input type="radio" name="jur_qcm" value="Z" onchange="sauvegarderAutomatiquement()"> C) Le principe du secret de fonction fédéral de l'art. 320 CP.</label>
+            </div>
+
+            <div style="text-align: left; margin: 15px 0; font-family: sans-serif;">
+                <p style="font-weight: bold; color: #ff6600;">🖥️ QUESTION TECHNIQUE :</p>
+                <p>Sous Linux, quelle variable d'environnement globale contient le chemin du dossier où sont stockés temporairement les fichiers volatils du système (souvent monté en mémoire RAM de type <code>tmpfs</code>) ? (Fournir le chemin absolu direct, ex: /root)</p>
+                <input type="text" id="tech_input" placeholder="Ex: /chemin/dossier" style="width: 100%; max-width: 350px;" onchange="sauvegarderAutomatiquement()">
+            </div>
+            <br>
+            <button onclick="verifyPreReq()">FORCER LE SYSTÈME DE FICHIERS</button>
+        </div>
+
+        <div id="mission-content">
+            <div class="header">
+                <span>FRAGMENTATION FORENSIQUE</span>
+                <span>STATUS: BREACH_DETECTED</span>
+            </div>
+
+            <p>Le script destructeur a éparpillé les fragments hexadécimaux de la signature de l'attaquant. Analysez le segment de code SQL ci-dessous pour reconstituer la chaîne de caractères finale d'identification du moteur.</p>
+
+            <div class="evidence-grid">
+                <div class="source-box">
+                    <b>DONNÉES COMPILÉES DE LA RAM :</b><br>
+                    Les journaux de transactions contiennent les chaînes de table suivantes fragmentées. Reconstituez le résultat de la requête SQL contenue dans la fenêtre ci-dessous pour trouver l'identifiant exact.
+                </div>
+            </div>
+
+            <div class="annexe-code" style="max-height: 320px; overflow-y: auto;">-- DUMP BRUT DE MÉMOIRE VOLATILE — secteur récupéré avant purge — 6 fragments de table détectés
+-- Le script destructeur a corrompu l'ordre des tables en mémoire. Une seule concerne la signature du moteur.
+
+CREATE TABLE IF NOT EXISTS TempCache_x2A (id INT, bloc TEXT);
+INSERT INTO TempCache_x2A VALUES (1, 'NULL_PTR'), (2, '0x00'), (3, 'VOID');
+-- ↑ Fragment de cache temporaire sans rapport, résidu d'un précédent process.
+
+CREATE TABLE IF NOT EXISTS Evidence_bak2024 (id INT, bloc TEXT);
+INSERT INTO Evidence_bak2024 VALUES (1, 'AI-'), (2, 'VOICE-'), (3, 'CLONE');
+-- ↑ ATTENTION : ancienne sauvegarde de l'épisode précédent (signature vocale), pas la bonne table pour cette enquête.
+
+CREATE TABLE IF NOT EXISTS Evidence (id INT, bloc TEXT);
+INSERT INTO Evidence VALUES (3, 'GEN'), (1, 'AI-'), (2, 'FACIAL-');
+-- ↑ Table "Evidence" — horodatage mémoire le plus récent avant l'altération. Requête associée ci-dessous.
+
+CREATE TABLE IF NOT EXISTS SessionGhost (id INT, bloc TEXT);
+INSERT INTO SessionGhost VALUES (1, 'TMP-'), (2, 'SESSION-'), (3, 'EXPIRED');
+-- ↑ Fragment de session expirée, sans rapport avec l'attaquant.
+
+-- Requête exécutée juste avant l'altération (retrouvée dans le même bloc mémoire que la table "Evidence") :
+SELECT group_concat(bloc, '') AS signature_moteur 
+FROM (SELECT bloc FROM Evidence ORDER BY id ASC);
+
+-- ÉNIGME : Quel est le résultat textuel généré par cette requête, appliquée à la BONNE table ?
+-- Indice : concaténez les blocs dans l'ordre croissant exact imposé par l'ID — de la table "Evidence" uniquement.</div>
+
+            <div id="action-zone" style="text-align: center;">
+                <p>Assemblez l'identifiant extrait (Format strict attendu) :</p>
+                <input type="text" id="sourceV" placeholder="SIGNATURE COMPLÈTE" onchange="sauvegarderAutomatiquement()">
+                <br>
+                <button onclick="signReport()">VÉRIFIER L'INTÉGRITÉ</button>
+            </div>
+
+            <div id="victory-zone">
+                <h3 style="color: #ff6600;">✓ PUZZLE RÉSOLU</h3>
+                <p>Signature identifiée. L'intégrité du système de l'Administration fédérale est restaurée.</p>
+                <p>Code de validation pour l'épisode suivant :</p>
+                <span class="final-code">HUMAN-SHIELD</span>
+
+                <div style="background: #eee; padding: 15px; text-align: left; font-size: 0.85em; border-left: 5px solid #ff6600; margin-bottom: 20px; color: #333;">
+                    <b>📝 export_eleves.csv :</b><br>
+                    S03E19 ; Succès ; Reconstitution forensique terminée. Signature AI-FACIAL-GEN isolée.
+                </div>
+                <a href="../../MENU_PRINCIPAL.html" class="nav-link">⬅ RETOUR AU MENU PRINCIPAL</a>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn-aide-rouge" onclick="toggleAide()">[ 📜 BILAN DES 3 PILIERS - S03E19 ]</button>
+    <div id="zoneAide" class="aide-box">
+        <h3 style="margin-top: 0; color: #d80000;">Synthèse Forensique Appliquée</h3>
+        <p><b>1. Informatique :</b> Le langage SQL structuré permet d'ordonner des chaînes de données atomiques éparpillées en utilisant la clause <code>ORDER BY</code> associée à des fonctions d'agrégation comme <code>group_concat</code>.</p>
+        <p><b>2. Juridique :</b> En droit suisse, la valeur probante d'une preuve numérique dépend de la démonstration de son intégrité (Art. 177 CPP). Toute preuve collectée de façon volatile doit faire l'objet d'un hachage ou d'une journalisation stricte pour être admise au tribunal.</p>
+        <p><b>3. Forensics :</b> L'acquisition de données en mémoire RAM requiert de travailler dans un répertoire temporaire système, pour éviter d'écraser des secteurs physiques sur le disque dur principal de la machine ciblée. Quel est le répertoire standard réservé à cet usage sous Linux ?</p>
+    </div>
+
+    <div style="margin-top: 30px; border-top: 3px solid #d80000; padding: 20px; background: #fff; font-family: Arial, sans-serif; position: relative; z-index: 100; width: 90%; max-width: 500px;">
+        <div id="hint-score-badge" style="background:#111;color:#3fb950;padding:8px 15px;font-weight:bold;text-align:center;">🏆 Score de cet épisode : <span id="hint-score-value">5</span> / 5 pts</div>
+        <div style="display:flex; gap:8px; margin:10px 0;">
+            <button id="hintBtn1" onclick="useHint(1)" style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;">💡 Indice 1 (-1 pt)</button>
+            <button id="hintBtn2" onclick="useHint(2)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🎯 Indice 2 (-2 pts)</button>
+            <button id="hintBtn3" onclick="useHint(3)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🆘 Solution (-3 pts)</button>
+        </div>
+
+        <div id="zoneAideScore" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; color: #333;">
+            <p id="hint-tier-1" style="display:none;"><strong>💡 INFO :</strong> Pré-requis : le QCM porte sur le principe d'intégrité/traçabilité de la preuve numérique, et il faut le chemin absolu du répertoire système temporaire (RAM/tmpfs) sous Linux. Ensuite, triez les blocs SQL par ID croissant et concaténez-les.</p>
+            <p id="hint-tier-2" style="display:none;"><strong>🎯 PISTE :</strong> Réponse QCM : B. Chemin : <code>/tmp</code>. Tri des blocs par ID : 1="AI-", 2="FACIAL-", 3="GEN" → concaténation dans cet ordre.</p>
+            <p id="hint-tier-3" style="display:none;"><strong>🆘 SOLUTION :</strong> Pré-requis : B / /tmp. Signature : <code>AI-FACIAL-GEN</code></p>
+        </div>
+    </div>
+
+    <script>
+        // --- ANIMATION BACKGROUND : FRACTAL SHARDS ---
+        const canvas = document.getElementById('frag-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function init() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            particles = [];
+            for (let i = 0; i < 50; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 5 + 2,
+                    speed: Math.random() * 2 + 1,
+                    angle: Math.random() * Math.PI * 2,
+                    rot: Math.random() * 0.05
+                });
+            }
+        }
+
+        function drawShards() {
+            ctx.fillStyle = 'rgba(17, 17, 17, 0.2)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            particles.forEach(p => {
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.angle);
+                ctx.strokeStyle = '#ff6600';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(-p.size, -p.size, p.size * 2, p.size * 2);
+                
+                ctx.beginPath();
+                ctx.moveTo(0,0);
+                ctx.lineTo(20, 0);
+                ctx.strokeStyle = 'rgba(255, 102, 0, 0.2)';
+                ctx.stroke();
+                
+                ctx.restore();
+
+                p.y += p.speed;
+                p.angle += p.rot;
+                if (p.y > canvas.height) p.y = -20;
+            });
+            requestAnimationFrame(drawShards);
+        }
+
+        window.addEventListener('resize', init);
+        init();
+        function appliquerModeSobre() {
+            const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+            document.body.classList.toggle('mode-sobre', actif);
+            const btn = document.getElementById('toggle-sobre-btn');
+            if (btn) btn.textContent = actif ? '🌓 Mode sobre : ON' : '🌓 Mode sobre';
+        }
+        function basculerModeSobre() {
+            const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+            localStorage.setItem('swiss_shield_mode_sobre', actif ? '0' : '1');
+            appliquerModeSobre();
+        }
+        appliquerModeSobre();
+        if (localStorage.getItem('swiss_shield_mode_sobre') !== '1') drawShards();
+
+        // 1. VERROU DE SESSION
+        function unlock() {
+            const code = document.getElementById('passkey').value.trim().toUpperCase();
+            if (code === 'ETERNITY-SHIELD') {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('pre-requis-screen').style.display = 'block';
+                currentZone = 'pre-requis-screen';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('entree', code, 'ETERNITY-SHIELD');
+                alert("ERREUR : Clé de clôture E18 invalide. Vérifiez l'orthographe !");
+            }
+        }
+
+        // 7. DOUBLE VERROU INTERACTIF
+        function verifyPreReq() {
+            const selectedJur = document.querySelector('input[name="jur_qcm"]:checked');
+            const techValue = document.getElementById('tech_input').value.trim();
+
+            if (!selectedJur) {
+                enregistrerErreur('prerequis', 'qcm=(aucune sélection), technique="' + techValue + '"', 'qcm=Y, technique=/tmp');
+                alert("ERREUR ADMINISTRATION : Veuillez sélectionner une réponse pour l'aspect juridique.");
+                return;
+            }
+
+            const jurValid = (selectedJur.value === "Y");
+            const techValid = (techValue === "/tmp");
+
+            if (jurValid && techValid) {
+                document.getElementById('pre-requis-screen').style.display = 'none';
+                document.getElementById('mission-content').style.display = 'block';
+                currentZone = 'mission-content';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('prerequis', 'qcm=' + selectedJur.value + ', technique="' + techValue + '"', 'qcm=Y, technique=/tmp');
+                alert("PROTOCOLE REJETÉ : Connaissances réglementaires ou chemin système incorrects.");
+            }
+        }
+
+        // 8 & 9. INVESTIGATION FINALE ET TRAITEMENT DES LOGS
+        function signReport() {
+            const val = document.getElementById('sourceV').value.trim().toUpperCase();
+            // Tri par ID : 1 = AI-, 2 = FACIAL-, 3 = GEN
+            // Concaténation attendue : AI-FACIAL-GEN
+            if (val === 'AI-FACIAL-GEN') {
+                document.getElementById('action-zone').style.display = 'none';
+                document.getElementById('victory-zone').style.display = 'block';
+            } else {
+                enregistrerErreur('investigation', val, 'AI-FACIAL-GEN');
+                alert("SIGNATURE INVALIDE : La structure triée de la base de données ne correspond pas à votre chaîne.");
+            }
+        }
+
+        function toggleAide() {
+            var x = document.getElementById("zoneAide");
+            x.style.display = (x.style.display === "block") ? "none" : "block";
+        }
+    </script>
+
+    <script>
+        const EP_ID = "S03E19";
+        const HINT_COST = {1:1, 2:2, 3:3};
+        let hintsUsed = {1:false, 2:false, 3:false};
+        let episodeScore = 5;
+        function useHint(level) {
+            if (hintsUsed[level] || (level > 1 && !hintsUsed[level - 1])) return;
+            hintsUsed[level] = true;
+        enregistrerIndiceUsage(level);
+            episodeScore -= HINT_COST[level];
+            document.getElementById('hint-score-value').textContent = episodeScore;
+            document.getElementById('hint-tier-' + level).style.display = 'block';
+            const btn = document.getElementById('hintBtn' + level);
+            btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5';
+            if (level < 3) {
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+            sauvegarderAutomatiquement();
+        }
+        function recordEpisodeSuccess() {
+            let scores = {};
+            try { scores = JSON.parse(localStorage.getItem('swiss_shield_scores') || '{}'); } catch(e) {}
+            if (!(EP_ID in scores) || scores[EP_ID] < episodeScore) scores[EP_ID] = episodeScore;
+            localStorage.setItem('swiss_shield_scores', JSON.stringify(scores));
+            localStorage.removeItem('autosave_' + EP_ID);
+        }
+    let currentZone = 'lock-screen';
+    function sauvegarderAutomatiquement() {
+        try {
+            const inputs = {};
+            ['passkey', 'tech_input', 'sourceV'].forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) inputs[id] = el.value;
+            });
+            const jurChecked = document.querySelector('input[name="jur_qcm"]:checked');
+            inputs['jur_qcm'] = jurChecked ? jurChecked.value : '';
+            localStorage.setItem('autosave_' + EP_ID, JSON.stringify({
+                zone: currentZone,
+                inputs: inputs,
+                hintsUsed: hintsUsed,
+                episodeScore: episodeScore
+            }));
+        } catch(e) {}
+    }
+    function proposerRestaurationAutosave() {
+        let data;
+        try { data = JSON.parse(localStorage.getItem('autosave_' + EP_ID) || 'null'); } catch(e) { return; }
+        if (!data || !data.zone || data.zone === 'lock-screen') return;
+        document.getElementById('lock-screen').style.display = 'none';
+        if (data.zone === 'mission-content') {
+            document.getElementById('pre-requis-screen').style.display = 'none';
+            document.getElementById('mission-content').style.display = 'block';
+        } else if (data.zone === 'pre-requis-screen') {
+            document.getElementById('pre-requis-screen').style.display = 'block';
+        }
+        currentZone = data.zone;
+        if (data.inputs) {
+            Object.keys(data.inputs).forEach(function(id) {
+                if (id === 'jur_qcm') {
+                    if (data.inputs.jur_qcm) {
+                        const radio = document.querySelector('input[name="jur_qcm"][value="' + data.inputs.jur_qcm + '"]');
+                        if (radio) radio.checked = true;
+                    }
+                    return;
+                }
+                const el = document.getElementById(id);
+                if (el) el.value = data.inputs[id];
+            });
+        }
+        hintsUsed = data.hintsUsed || hintsUsed;
+        episodeScore = (typeof data.episodeScore === 'number') ? data.episodeScore : episodeScore;
+        document.getElementById('hint-score-value').textContent = episodeScore;
+        [1, 2, 3].forEach(function(level) {
+            if (hintsUsed[level]) {
+                document.getElementById('hint-tier-' + level).style.display = 'block';
+                const btn = document.getElementById('hintBtn' + level);
+                if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+        });
+    }
+    function enregistrerIndiceUsage(niveau) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + niveau;
+            debrief.indices[cle] = (debrief.indices[cle] || 0) + 1;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+    function enregistrerErreur(phase, reponseEleve, reponseAttendue) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + phase;
+            if (typeof debrief.erreurs[cle] !== 'object' || debrief.erreurs[cle] === null) {
+                debrief.erreurs[cle] = { compte: (debrief.erreurs[cle] || 0), exemples: [] };
+            }
+            debrief.erreurs[cle].compte++;
+            if (reponseEleve !== undefined && debrief.erreurs[cle].exemples.length < 5) {
+                debrief.erreurs[cle].exemples.push({ reponseEleve: String(reponseEleve).slice(0,100), reponseAttendue: String(reponseAttendue||'').slice(0,100) });
+            }
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+        (function pollSuccess(){
+            const ids = ['success','success-msg','success-final','final-zone','step_final','victory-zone','victory-screen','final-step','final-badge'];
+            let recorded = false;
+            setInterval(function(){
+                if (recorded) return;
+                for (const id of ids) {
+                    const el = document.getElementById(id);
+                    if (el && window.getComputedStyle(el).display === 'block') { recordEpisodeSuccess(); recorded = true; return; }
+                }
+            }, 500);
+        })();
+        proposerRestaurationAutosave();
+    </script>
+</body>
+</html>

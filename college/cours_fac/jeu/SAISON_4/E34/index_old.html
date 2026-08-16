@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>S04E34 - SHADOW IT INVESTIGATION</title>
+    <style>
+        /* --- NOUVEL EFFET VISUEL : RADAR SCANNER --- */
+        #radar-background {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at center, #2b0000 0%, #050000 100%);
+            overflow: hidden;
+        }
+
+        /* Ligne de balayage laser horizontale */
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 62, 62, 0.5);
+            box-shadow: 0 0 20px #ff3e3e;
+            animation: scanMove 4s linear infinite;
+        }
+
+        /* Grille radar en arrière-plan */
+        .grid-overlay {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(255, 62, 62, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 62, 62, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        @keyframes scanMove {
+            0% { top: -10%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 110%; opacity: 0; }
+        }
+
+        /* --- STYLES GENERAUX --- */
+        body { 
+            color: #ff3e3e; 
+            font-family: 'Consolas', 'Courier New', monospace; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 40px; 
+            margin: 0; 
+            min-height: 100vh; 
+            overflow-y: auto;
+        }
+
+        .terminal { 
+            background: rgba(26, 0, 0, 0.95); 
+            border: 2px solid #ff3e3e; 
+            padding: 25px; 
+            width: 95%; 
+            max-width: 900px; 
+            box-shadow: 0 0 60px rgba(255, 0, 0, 0.4); 
+            border-radius: 4px; 
+            backdrop-filter: blur(5px);
+            position: relative;
+        }
+
+        /* CONTEXTE HISTOIRE S04E34 */
+        .story-context {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px dashed #ff3e3e;
+            padding: 20px;
+            margin: 20px auto;
+            text-align: left;
+            font-size: 0.9em;
+            color: #eee;
+            line-height: 1.5;
+            max-width: 750px;
+        }
+        .story-context b { color: #ff3e3e; }
+
+        .header-mission { border-bottom: 1px solid #ff3e3e; margin-bottom: 20px; padding-bottom: 10px; color: #fff; font-weight: bold; text-transform: uppercase; display: flex; justify-content: space-between; }
+        
+        #lock-screen { text-align: center; padding: 20px; }
+        #pre-requis-screen { display: none; }
+        #mission-content { display: none; }
+        
+        .scan-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+        .service-card { background: rgba(42, 0, 0, 0.8); border: 1px solid #ff3e3e; padding: 15px; font-size: 0.85em; position: relative; transition: 0.3s; }
+        .service-card.clean { border-color: #2ecc71; color: #2ecc71; opacity: 0.6; box-shadow: inset 0 0 15px rgba(46, 204, 113, 0.2); }
+        
+        .status-badge { position: absolute; top: 10px; right: 10px; padding: 2px 6px; font-size: 0.7em; border: 1px solid; }
+
+        .console-area { background: #000; border: 1px solid #444; padding: 15px; margin-top: 20px; height: 150px; overflow-y: auto; color: #aaa; font-size: 0.8em; text-align: left;}
+        .cmd-line { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+        .cmd-input { background: transparent; border: none; color: #fff; font-family: inherit; outline: none; width: 100%; }
+
+        input[type="text"], input[type="password"] { background: #000; border: 1px solid #ff3e3e; color: #ff3e3e; padding: 12px; width: 320px; text-align: center; font-family: inherit; margin-bottom: 10px; outline: none; border-radius: 4px; }
+        .main-btn { background: #ff3e3e; color: #fff; border: none; padding: 12px 30px; font-weight: bold; cursor: pointer; text-transform: uppercase; box-shadow: 0 0 15px rgba(255, 62, 62, 0.4); font-family: inherit; border-radius: 4px; }
+        .main-btn:hover { background: #fff; color: #ff3e3e; }
+
+        .export-report { background: rgba(255, 62, 62, 0.1); padding: 15px; border: 1px solid #ff3e3e; margin: 20px 0; font-size: 0.85em; color: #fff; text-align: left; }
+
+        /* BOUTON RETOUR */
+        .btn-nav-retour { position: absolute; top: 15px; left: 15px; background: #000; border: 1px solid #ff3e3e; color: #ff3e3e; padding: 6px 12px; text-decoration: none; font-size: 0.8em; font-weight: bold; border-radius: 4px; }
+        .btn-nav-retour:hover { background: #ff3e3e; color: #000; }
+
+        /* BLOCKS DE DEFIS */
+        .challenge-block { background: #0f0202; border: 1px dashed #ff3e3e; padding: 15px; margin: 15px 0; text-align: left; border-radius: 4px; }
+        .challenge-title { font-weight: bold; color: #ff3e3e; text-transform: uppercase; font-size: 0.85em; display: block; margin-bottom: 8px; }
+        .code-window { background: #000; border-left: 3px solid #ff3e3e; padding: 12px; margin: 15px 0; color: #ff5555; font-size: 0.85em; overflow-x: auto; white-space: pre; font-family: monospace; }
+
+        /* MANUEL PEDAGOGIQUE */
+        .btn-aide { background: #ff3e3e; color: #fff; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; width: 100%; max-width: 450px; margin-top: 30px; text-transform: uppercase; border-radius: 4px; font-family: inherit; }
+        .aide-box { display: none; background: #fff; color: #000; padding: 25px; margin-top: 15px; width: 95%; max-width: 600px; text-align: left; border-top: 5px solid #ff3e3e; font-family: sans-serif; box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-size: 0.9em; }
+        .pillar { margin-bottom: 15px; border-left: 3px solid #ff3e3e; padding-left: 10px; }
+        .pillar b { color: #ff3e3e; text-transform: uppercase; font-size: 0.85em; display: block; margin-bottom: 2px; }
+
+        .code-final { display: none; color: #fff; font-size: 1.8em; letter-spacing: 5px; margin-top: 20px; text-align: center; border: 2px solid #ff3e3e; padding: 15px; animation: flash 1s infinite alternate; background: rgba(255,0,0,0.2); }
+        @keyframes flash { from { opacity: 0.5; } to { opacity: 1; } }
+
+        /* MODE SOBRE */
+        body.mode-sobre, body.mode-sobre * { animation: none !important; transition: none !important; }
+    </style>
+</head>
+<body>
+
+    <div id="radar-background">
+        <div class="grid-overlay"></div>
+        <div class="scan-line"></div>
+        <div class="scan-line" style="animation-delay: 2s;"></div>
+    </div>
+
+    <div class="terminal">
+        <a href="../../MENU_PRINCIPAL.html" class="btn-nav-retour">&lt; MENU PRINCIPAL</a>
+        <button id="toggle-sobre-btn" onclick="basculerModeSobre()" style="position:absolute;top:15px;right:15px;width:auto;z-index:10;background:#000;border:1px solid #ff3e3e;color:#ff3e3e;padding:6px 12px;font-size:0.8em;font-weight:bold;border-radius:4px;cursor:pointer;">🌓</button>
+
+        <div id="lock-screen" style="margin-top: 20px;">
+            <h2>[SYSTEM_ALARM] : SHADOW IT DETECTED</h2>
+            
+            <div class="story-context">
+                <b>HISTORIQUE DE MISSION &amp; CONTEXTE SANITAIRE SUISSE :</b><br>
+                Suite à la mise en conformité des bases de données des <b>Hôpitaux Universitaires de Genève (HUG)</b>, le centre des opérations de cybersécurité cantonal relève des flux réseau anormaux. Des équipes de recherche médicale ont installé clandestinement des passerelles réseau et des serveurs de stockage non supervisés (<b>Shadow IT</b>) pour partager des volumes de résultats cliniques.<br><br>
+                Ces infrastructures de l'ombre contiennent des fichiers d'analyses associés à des copies d'identités de patients et des données salariales, en totale violation des règles d'homologation de sécurité imposées par l'<b>Art. 7 nLPD</b>. Vous devez valider les protocoles administratifs fédéraux avant de purger ces connexions à bas niveau.
+            </div>
+
+            <p>Veuillez entrer le code de session E33 pour initier la transition :</p>
+            <input type="password" id="passkey" placeholder="CODE DE PURGE REÇU" autocomplete="off" onchange="sauvegarderAutomatiquement()">
+            <br><br>
+            <button class="main-btn" onclick="unlock()">Valider le jeton d'accès</button>
+        </div>
+
+        <div id="pre-requis-screen" style="margin-top: 20px;">
+            <div class="header-mission">
+                <span>[AUTHENTIFICATION] EXIGENCES PRÉALABLES DE CONFORMITÉ</span>
+                <span style="color: #ff3e3e;">STATUT: EN ATTENTE</span>
+            </div>
+
+            <div class="challenge-block">
+                <span class="challenge-title">⚖️ Défi Juridique Suisse : nLPD &amp; Sous-traitance</span>
+                <p>Le personnel médical a utilisé un outil de synchronisation cloud externe sans l'accord des administrateurs. Selon la Loi fédérale sur la protection des données, le traitement de données personnelles confié à un sous-traitant n'est licite que si la sécurité est assurée. Quel article spécifique de la **nLPD** régit strictement les conditions de la **sous-traitance du traitement** ? (Format requis : <b>Art. X nLPD</b>, ex: Art. 5 nLPD)</p>
+                <input type="text" id="law_ans" placeholder="Art. ___ nLPD" autocomplete="off" onchange="sauvegarderAutomatiquement()">
+            </div>
+
+            <div class="challenge-block">
+                <span class="challenge-title">🖥️ Défi Technique : Identification de Service local</span>
+                <p>Pour auditer les services réseau d'un serveur tiers suspect sans exécuter un scan agressif, quel utilitaire natif Linux en ligne de commande permet d'afficher les sockets réseau ouverts et d'identifier les ports en écoute (listening) ? (Indiquer uniquement l'utilitaire d'analyse réseau moderne en minuscules, successeur de netstat, ex: ip, ss, ping...)</p>
+                <input type="text" id="shell_ans" placeholder="Nom de la commande..." autocomplete="off" onchange="sauvegarderAutomatiquement()">
+            </div>
+
+            <center>
+                <button class="main-btn" onclick="verifyPreReq()">VÉRIFIER LES AUTORISATIONS</button>
+            </center>
+        </div>
+
+        <div id="mission-content">
+            <div class="header-mission">
+                <span>S04E34 : DETECTION SHADOW-IT</span>
+                <span id="counter">2 ANOMALIES DÉTECTÉES</span>
+            </div>
+            
+            <p>> Analyse du sous-réseau 192.168.1.0/24 terminée.<br>
+            > <small>Utilisez la commande <b>kill [ID]</b> pour fermer les services non autorisés.</small></p>
+            
+            <div class="scan-container">
+                <div class="service-card" id="srv-A1">
+                    <span class="status-badge">UNAUTHORIZED</span>
+                    <b>ID: A1 - NAS_PERSO_SECRET</b><br>
+                    IP: 192.168.1.45<br>
+                    Data: salaires_2025.xlsx (NON CHIFFRÉ)
+                </div>
+                <div class="service-card" id="srv-B4">
+                    <span class="status-badge" style="border-color: #2ecc71; color: #2ecc71;">OFFICIAL</span>
+                    <b>ID: B4 - SERVEUR_RH</b><br>
+                    IP: 192.168.1.10<br>
+                    Data: Registre nLPD v2
+                </div>
+                <div class="service-card" id="srv-C9">
+                    <span class="status-badge">UNAUTHORIZED</span>
+                    <b>ID: C9 - CLOUD_PERSO_PROD</b><br>
+                    IP: 192.168.1.254<br>
+                    Data: copies_passeports.zip (HORS CONTRÔLE)
+                </div>
+                <div class="service-card" id="srv-D2">
+                    <span class="status-badge" style="border-color: #2ecc71; color: #2ecc71;">OFFICIAL</span>
+                    <b>ID: D2 - BACKUP_SECURE</b><br>
+                    IP: 192.168.1.12<br>
+                    Data: Chiffré AES-256
+                </div>
+            </div>
+
+            <div class="challenge-block">
+                <span class="challenge-title">🧩 Investigation Algorithmique : Analyse de l'Entropie d'Exfiltration</span>
+                <p>Le serveur de l'ombre `CLOUD_PERSO_PROD` utilise un algorithme d'obfuscation personnalisé pour exfiltrer les archives. Pour injecter le contre-signal de neutralisation réseau via la console, vous devez calculer précisément la clé numérique d'acquittement générée par ce script d'analyse d'en-tête de bloc :</p>
+                
+                <div class="code-window"># Script d'analyse de trame - HUG / SOC Control
+def analyze_shadow_payload():
+    stream_keys = [12, 19, 45, 64, 152]
+    accumulator = 0
+    
+    # Transformation mathématique itérative
+    for index, value in enumerate(stream_keys):
+        if value % 2 == 0:
+            accumulator += (value >> 1)  # Décalage binaire vers la droite
+        else:
+            accumulator += (value * 2) - index
+            
+    # Ajustement final par inversion bit à bit de contrôle
+    checksum = accumulator ^ 0x0F
+    return checksum</div>
+
+                <p style="color: #bbb; font-size: 0.85em;">💡 <i>Indices d'investigation :<br>
+                1. Suivez le tableau : pour 12 (pair), ajoutez 12 divisé par 2 (6). Pour 19 (impair), l'index est 1, calculez (19 * 2) - 1.<br>
+                2. Répétez l'opération rigoureusement pour les 5 éléments afin de déterminer la valeur cumulée dans `accumulator`. <br>
+                3. Effectuez enfin l'opération XOR finale avec la valeur hexadécimale `0x0F` (qui équivaut à 15 en base décimale).</i></p>
+
+                <p>Saisissez la valeur entière de validation de la clé d'acquittement :</p>
+                <input type="text" id="final_logic_ans" placeholder="Entrez le nombre calculé..." autocomplete="off" onchange="sauvegarderAutomatiquement()">
+            </div>
+
+            <div class="console-area" id="console-logs">
+                [SYSTEM] Scan réseau stabilisé. En attente d'intervention...<br>
+            </div>
+            <div class="cmd-line">
+                <span>admin@nLPD_Scanner:~$</span>
+                <input type="text" id="cmd-input" class="cmd-input" autocomplete="off" onkeydown="handleCommand(event)">
+            </div>
+
+            <div class="export-report">
+                <b>📊 RAPPORT D'INCIDENCE (shadow_audit.csv) :</b><br>
+                S04E34 ; Status: <span id="status-csv">SEARCHING_ANOMALIES</span> ; Scan sous-réseau ; Shadow IT detection.
+            </div>
+
+            <div id="final-badge" class="code-final">
+                EXIT_TOKEN: SHADOW-PROTO-OFF
+            </div>
+            
+            <div style="text-align: center; margin-top: 25px;">
+                <a href="../../MENU_PRINCIPAL.html" style="color: #ff3e3e; text-decoration: none; font-size: 0.8em; border: 1px solid #ff3e3e; padding: 5px 10px;">[ FERMER LA SESSION ]</a>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn-aide" onclick="toggleAide()">[ 📜 MANUEL DES TROIS PILIERS ]</button>
+    
+    <div id="zoneAide" class="aide-box">
+        <h3 style="margin-top:0; border-bottom: 2px solid #ff3e3e; padding-bottom: 5px;">Référentiel Pédagogique - Épisode 34</h3>
+        <div class="pillar">
+            <b>⚙️ Informatique : Shadow IT et Réseau local</b>
+            Le Shadow IT désigne l'utilisation par les collaborateurs de systèmes, logiciels ou services informatiques sans l'approbation explicite de la direction des systèmes d'information (DSI). L'identification passe par la surveillance des terminaux d'écoute et la cartographie des ports ouverts.
+        </div>
+        <div class="pillar">
+            <b>⚖️ Juridique : Gouvernance et Responsabilité</b>
+            L'externalisation ou l'hébergement sauvage de fichiers auprès de prestataires non audités viole le cadre légal de la sous-traitance des données. Un article de la nLPD limite strictement le traitement par des tiers et exige des garanties techniques impératives sous peine de lourdes amendes pour l'entité — retrouvez son numéro.
+        </div>
+        <div class="pillar">
+            <b>🔎 Forensics : Analyse d'Activité et Sockets réseau</b>
+            L'analyse forensique des infrastructures réseau s'appuie sur la corrélation des trames et l'inspection de l'état des sockets du noyau Linux, à l'aide d'un utilitaire moderne successeur de <code>netstat</code>. Cela permet de retracer l'origine d'un service non homologué et de déterminer les volumes de données potentiellement exfiltrés ou exposés.
+        </div>
+    </div>
+
+    <div style="margin-top: 30px; border-top: 3px solid #d80000; padding: 20px; background: #fff; font-family: Arial, sans-serif; position: relative; z-index: 100; width: 90%; max-width: 450px;">
+        <div id="hint-score-badge" style="background:#111;color:#3fb950;padding:8px 15px;font-weight:bold;text-align:center;">🏆 Score de cet épisode : <span id="hint-score-value">5</span> / 5 pts</div>
+        <div style="display:flex; gap:8px; margin:10px 0;">
+            <button id="hintBtn1" onclick="useHint(1)" style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;">💡 Indice 1 (-1 pt)</button>
+            <button id="hintBtn2" onclick="useHint(2)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🎯 Indice 2 (-2 pts)</button>
+            <button id="hintBtn3" onclick="useHint(3)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🆘 Solution (-3 pts)</button>
+        </div>
+
+        <div id="zoneAideScore" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; color: #333;">
+            <p id="hint-tier-1" style="display:none;"><strong>💡 INFO :</strong> Pré-requis : l'article de la nLPD sur la sous-traitance du traitement de données, et l'utilitaire moderne successeur de netstat. Ensuite, kill A1 et C9 (les deux serveurs non autorisés), mais il faut d'abord entrer la bonne clé numérique dans le champ de calcul avant que <code>kill</code> fonctionne.</p>
+            <p id="hint-tier-2" style="display:none;"><strong>🎯 PISTE :</strong> Article : Art. 9 nLPD. Commande : <code>ss</code>. Calcul : 12(pair)→6, 19(impair,i=1)→37, 45(impair,i=2)→88, 64(pair)→32, 152(pair)→76. accumulator=239. checksum=239 XOR 15=224. Cibles à neutraliser : <code>kill a1</code> et <code>kill c9</code> (B4 et D2 sont officiels, ne pas les toucher).</p>
+            <p id="hint-tier-3" style="display:none;"><strong>🆘 SOLUTION :</strong> Pré-requis : Art. 9 nLPD / ss. Clé numérique à entrer : <code>224</code>. Puis dans la console : <code>kill a1</code> et <code>kill c9</code>.</p>
+        </div>
+    </div>
+
+    <script>
+        let killed = [];
+        let currentZone = 1;
+
+        function toggleAide() {
+            const x = document.getElementById("zoneAide");
+            x.style.display = (x.style.display === "none" || x.style.display === "") ? "block" : "none";
+            if(x.style.display === "block") {
+                x.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function unlock() {
+            const code = document.getElementById('passkey').value.trim().toUpperCase();
+            if (code === 'STRICT-PURGE-33-OK') {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('pre-requis-screen').style.display = 'block';
+                currentZone = 2;
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('entree', code, 'STRICT-PURGE-33-OK');
+                alert("ERREUR : Code de purge invalide (Indice : Terminez l'épisode S04E33).");
+            }
+        }
+
+        function verifyPreReq() {
+            const law = document.getElementById('law_ans').value.trim().toLowerCase();
+            const shell = document.getElementById('shell_ans').value.trim().toLowerCase();
+
+            // Validation des deux pré-requis
+            if (law === 'art. 9 nlpd' && shell === 'ss') {
+                document.getElementById('pre-requis-screen').style.display = 'none';
+                document.getElementById('mission-content').style.display = 'block';
+                currentZone = 3;
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('prerequis', 'law:"' + law + '" / shell:"' + shell + '"', 'Art. 9 nLPD / ss');
+                alert("CONTRÔLE ÉCHOUÉ : Base légale nLPD erronée ou commande réseau Linux invalide.");
+            }
+        }
+
+        function handleCommand(e) {
+            if (e.key === "Enter") {
+                const input = document.getElementById('cmd-input');
+                const cmd = input.value.trim().toLowerCase();
+                const log = document.getElementById('console-logs');
+                const logicAns = document.getElementById('final_logic_ans').value.trim();
+                
+                log.innerHTML += `<div>admin@nLPD_Scanner:~$ ${cmd}</div>`;
+                
+                // CRITÈRE 6 : Pédagogie par l'action - validation de la logique algorithmique avant action destructive
+                if (logicAns !== "224") {
+                    enregistrerErreur('investigation', logicAns, '224');
+                    log.innerHTML += `<div style="color: #ff3e3e;">[BLOCAGE] Erreur critique : Clé numérique d'acquittement de charge utile invalide. Calcul d'entropie incorrect.</div>`;
+                    input.value = "";
+                    log.scrollTop = log.scrollHeight;
+                    return;
+                }
+                
+                if (cmd === "kill a1") {
+                    document.getElementById('srv-A1').classList.add('clean');
+                    document.getElementById('srv-A1').querySelector('.status-badge').innerText = "CLOSED";
+                    if(!killed.includes('a1')) killed.push('a1');
+                    log.innerHTML += `<div style="color: #2ecc71;">[OK] NAS_PERSO_SECRET intercepté et déconnecté avec succès.</div>`;
+                    sauvegarderAutomatiquement();
+                } else if (cmd === "kill c9") {
+                    document.getElementById('srv-C9').classList.add('clean');
+                    document.getElementById('srv-C9').querySelector('.status-badge').innerText = "CLOSED";
+                    if(!killed.includes('c9')) killed.push('c9');
+                    log.innerHTML += `<div style="color: #2ecc71;">[OK] CLOUD_PERSO_PROD neutralisé, processus purgé.</div>`;
+                    sauvegarderAutomatiquement();
+                } else if (cmd.startsWith("kill b4") || cmd.startsWith("kill d2")) {
+                    log.innerHTML += `<div style="color: #ff3e3e;">[DENIED] Opération interdite : Ce serveur appartient au cluster officiel approuvé par la direction informatique des HUG.</div>`;
+                } else {
+                    log.innerHTML += `<div style="color: #888;">[?] Instruction non comprise. Syntaxe : kill [ID-CIBLE]. Exemple : kill a1</div>`;
+                }
+
+                input.value = "";
+                log.scrollTop = log.scrollHeight;
+                checkVictory();
+            }
+        }
+
+        function checkVictory() {
+            if (killed.length === 2) {
+                document.getElementById('counter').innerText = "0 ANOMALIES - RÉSEAU CONFORME";
+                document.getElementById('counter').style.color = "#2ecc71";
+                document.getElementById('status-csv').innerText = "ALL_SHADOW_KILLED";
+                document.getElementById('final-badge').style.display = 'block';
+            }
+        }
+    </script>
+
+    <script>
+        const EP_ID = "S04E34";
+        const HINT_COST = {1:1, 2:2, 3:3};
+        let hintsUsed = {1:false, 2:false, 3:false};
+        let episodeScore = 5;
+        function useHint(level) {
+            if (hintsUsed[level] || (level > 1 && !hintsUsed[level - 1])) return;
+            hintsUsed[level] = true;
+            enregistrerIndiceUsage(level);
+            episodeScore -= HINT_COST[level];
+            document.getElementById('hint-score-value').textContent = episodeScore;
+            document.getElementById('hint-tier-' + level).style.display = 'block';
+            const btn = document.getElementById('hintBtn' + level);
+            btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5';
+            if (level < 3) {
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+            sauvegarderAutomatiquement();
+        }
+        function recordEpisodeSuccess() {
+            let scores = {};
+            try { scores = JSON.parse(localStorage.getItem('swiss_shield_scores') || '{}'); } catch(e) {}
+            if (!(EP_ID in scores) || scores[EP_ID] < episodeScore) scores[EP_ID] = episodeScore;
+            localStorage.setItem('swiss_shield_scores', JSON.stringify(scores));
+            localStorage.removeItem('autosave_' + EP_ID);
+        }
+        function enregistrerErreur(phase, reponseEleve, reponseAttendue) {
+            let debrief = {erreurs:{}, indices:{}};
+            try { debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}'); } catch(e) {}
+            const key = EP_ID + ':' + phase;
+            let entry = debrief.erreurs[key];
+            if (typeof entry === 'number') entry = {compte: entry, exemples: []};
+            if (!entry) entry = {compte: 0, exemples: []};
+            entry.compte++;
+            if (reponseEleve !== undefined && reponseAttendue !== undefined && entry.exemples.length < 5) {
+                entry.exemples.push({reponseEleve: String(reponseEleve), reponseAttendue: String(reponseAttendue)});
+            }
+            debrief.erreurs[key] = entry;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        }
+        function enregistrerIndiceUsage(niveau) {
+            let debrief = {erreurs:{}, indices:{}};
+            try { debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}'); } catch(e) {}
+            const key = EP_ID + ':' + niveau;
+            debrief.indices[key] = (debrief.indices[key] || 0) + 1;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        }
+        function basculerModeSobre() {
+            const actif = document.body.classList.toggle('mode-sobre');
+            localStorage.setItem('swiss_shield_mode_sobre', actif ? '1' : '0');
+        }
+        if (localStorage.getItem('swiss_shield_mode_sobre') === '1') {
+            document.body.classList.add('mode-sobre');
+        }
+        (function pollSuccess(){
+            const ids = ['success','success-msg','success-final','final-zone','step_final','victory-zone','victory-screen','final-step','final-badge'];
+            let recorded = false;
+            setInterval(function(){
+                if (recorded) return;
+                for (const id of ids) {
+                    const el = document.getElementById(id);
+                    if (el && window.getComputedStyle(el).display === 'block') { recordEpisodeSuccess(); recorded = true; return; }
+                }
+            }, 500);
+        })();
+
+        function sauvegarderAutomatiquement() {
+            const etat = {
+                zone: currentZone,
+                inputs: {
+                    passkey: (document.getElementById('passkey') || {}).value || '',
+                    law_ans: (document.getElementById('law_ans') || {}).value || '',
+                    shell_ans: (document.getElementById('shell_ans') || {}).value || '',
+                    final_logic_ans: (document.getElementById('final_logic_ans') || {}).value || ''
+                },
+                hintsUsed: hintsUsed,
+                episodeScore: episodeScore,
+                killed: killed
+            };
+            localStorage.setItem('autosave_' + EP_ID, JSON.stringify(etat));
+        }
+
+        function proposerRestaurationAutosave() {
+            let etat;
+            try { etat = JSON.parse(localStorage.getItem('autosave_' + EP_ID)); } catch(e) { return; }
+            if (!etat) return;
+
+            if (etat.inputs) {
+                if (document.getElementById('passkey')) document.getElementById('passkey').value = etat.inputs.passkey || '';
+                if (document.getElementById('law_ans')) document.getElementById('law_ans').value = etat.inputs.law_ans || '';
+                if (document.getElementById('shell_ans')) document.getElementById('shell_ans').value = etat.inputs.shell_ans || '';
+                if (document.getElementById('final_logic_ans')) document.getElementById('final_logic_ans').value = etat.inputs.final_logic_ans || '';
+            }
+
+            if (etat.zone >= 2) {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('pre-requis-screen').style.display = 'block';
+                currentZone = 2;
+            }
+            if (etat.zone >= 3) {
+                document.getElementById('pre-requis-screen').style.display = 'none';
+                document.getElementById('mission-content').style.display = 'block';
+                currentZone = 3;
+
+                if (Array.isArray(etat.killed)) {
+                    killed = etat.killed;
+                    if (killed.includes('a1')) {
+                        document.getElementById('srv-A1').classList.add('clean');
+                        document.getElementById('srv-A1').querySelector('.status-badge').innerText = "CLOSED";
+                    }
+                    if (killed.includes('c9')) {
+                        document.getElementById('srv-C9').classList.add('clean');
+                        document.getElementById('srv-C9').querySelector('.status-badge').innerText = "CLOSED";
+                    }
+                    checkVictory();
+                }
+            }
+
+            if (etat.hintsUsed) {
+                [1,2,3].forEach(function(level){
+                    if (etat.hintsUsed[level]) {
+                        hintsUsed[level] = true;
+                        document.getElementById('hint-tier-' + level).style.display = 'block';
+                        const btn = document.getElementById('hintBtn' + level);
+                        if (btn) { btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5'; }
+                        const next = document.getElementById('hintBtn' + (level + 1));
+                        if (next && level < 3) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+                    }
+                });
+            }
+            if (typeof etat.episodeScore === 'number') {
+                episodeScore = etat.episodeScore;
+                document.getElementById('hint-score-value').textContent = episodeScore;
+            }
+        }
+        proposerRestaurationAutosave();
+    </script>
+</body>
+</html>

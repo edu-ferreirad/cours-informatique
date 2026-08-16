@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>SWISS SHIELD - Logbook de l'Agent</title>
+    <style>
+        :root {
+            --red: #d32f2f;
+            --gold: #ffd700;
+            --bg: #050505;
+            --card-bg: #111;
+            --text: #e0e0e0;
+            --terminal-green: #00ff41;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .logbook-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            border: 2px solid var(--red);
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(211, 47, 47, 0.2);
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px solid var(--red);
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+        }
+
+        h1 { color: var(--red); letter-spacing: 5px; margin: 0; font-size: 2.2em; }
+        .subtitle { color: var(--gold); font-size: 0.9em; letter-spacing: 2px; }
+
+        .season-section {
+            margin-bottom: 40px;
+            border: 1px solid #333;
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        .season-title {
+            color: var(--gold);
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            display: block;
+            border-bottom: 1px solid #333;
+        }
+
+        .grid-episodes {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+        }
+
+        .episode-box {
+            background: #1a1a1a;
+            padding: 10px;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            border-left: 3px solid var(--red);
+        }
+
+        .episode-box label {
+            font-size: 0.7em;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .episode-box input {
+            background: #000;
+            border: 1px solid #444;
+            color: var(--terminal-green);
+            font-family: 'Courier New', monospace;
+            padding: 5px;
+            outline: none;
+        }
+
+        /* Coin Notes */
+        .notes-area {
+            margin-top: 30px;
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 5px;
+            border: 1px solid var(--gold);
+        }
+
+        textarea {
+            width: 100%;
+            height: 250px;
+            background: #000;
+            color: #ccc;
+            border: 1px solid #444;
+            padding: 15px;
+            font-family: 'Segoe UI', sans-serif;
+            resize: vertical;
+            box-sizing: border-box;
+            margin-top: 10px;
+        }
+
+        /* Boutons */
+        .actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            border-radius: 4px;
+            transition: 0.3s;
+            border: none;
+        }
+
+        .btn-save { background: var(--terminal-green); color: #000; }
+        .btn-export { background: var(--gold); color: #000; }
+        .btn-import { background: #3498db; color: #fff; }
+
+        button:hover { transform: translateY(-2px); opacity: 0.9; box-shadow: 0 5px 15px rgba(0,0,0,0.4); }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 30px;
+            color: var(--red);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        input[type="file"] { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="logbook-container">
+    <div class="header">
+        <h1>LOGBOOK DE L'AGENT</h1>
+        <div class="subtitle">SYSTÈME DE SAUVEGARDE DES PREUVES JUDICIAIRES</div>
+    </div>
+
+    <div class="season-section">
+        <span class="season-title">Saison 0 : Genèse (Origines)</span>
+        <div class="grid-episodes" id="grid-s0"></div>
+    </div>
+
+    <div class="season-section">
+        <span class="season-title">Saison 1 : Intrusion (Enquête Fédérale)</span>
+        <div class="grid-episodes" id="grid-s1"></div>
+    </div>
+
+    <div class="season-section">
+        <span class="season-title">Saison 2 : nLPD (Protection des données)</span>
+        <div class="grid-episodes" id="grid-s2"></div>
+    </div>
+
+    <div class="season-section">
+        <span class="season-title">Saison 3 : IA & Crime (Deepfake & Algo)</span>
+        <div class="grid-episodes" id="grid-s3"></div>
+    </div>
+
+    <div class="season-section">
+        <span class="season-title">Saison 4 : Le Procès (Justice & Verdict)</span>
+        <div class="grid-episodes" id="grid-s4"></div>
+    </div>
+
+    <div class="notes-area">
+        <label style="color: var(--gold); font-weight: bold;">📝 NOTES D'ENQUÊTE & ÉLÉMENTS DU RAPPORT FINAL</label>
+        <textarea id="investigation-notes" placeholder="Notez ici vos indices, les noms des suspects, les adresses IP repérées et vos conclusions pour le rapport final d'expertise..."></textarea>
+    </div>
+
+    <div class="actions">
+        <button class="btn-save" onclick="saveToLocal()">💾 Sauvegarder (Local)</button>
+        <button class="btn-export" onclick="exportData()">📤 Exporter les preuves (.json)</button>
+        <button class="btn-import" onclick="document.getElementById('importFile').click()">📥 Importer un dossier</button>
+        <input type="file" id="importFile" accept=".json" onchange="importData(event)">
+    </div>
+
+    <a href="MENU_PRINCIPAL.html" class="back-link">[ RETOUR AU TERMINAL CENTRAL ]</a>
+</div>
+
+<script>
+    // Configuration des épisodes
+    const episodes = {
+        s0: [0, 1, 2, 3, 4],
+        s1: [1, 2, 3, 4, 5, 6, 7, 8],
+        s2: [9, 10, 11, 12, 13, 14, 15, 16],
+        s3: [17, 18, 19, 20, 21, 22, 23, 24],
+        s4: [25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]
+    };
+
+    // Génération dynamique des champs
+    function generateUI() {
+        for (let s in episodes) {
+            const container = document.getElementById(`grid-${s}`);
+            episodes[s].forEach(num => {
+                const id = `ep_${s}_${num}`;
+                const div = document.createElement('div');
+                div.className = 'episode-box';
+                div.innerHTML = `
+                    <label>ÉPISODE ${num.toString().padStart(2, '0')}</label>
+                    <input type="text" id="${id}" placeholder="Clé de sortie...">
+                `;
+                container.appendChild(div);
+            });
+        }
+    }
+
+    // Sauvegarde automatique dans le LocalStorage
+    function saveToLocal() {
+        let data = { passwords: {}, notes: "" };
+        // On récupère tous les inputs
+        document.querySelectorAll('.episode-box input').forEach(input => {
+            data.passwords[input.id] = input.value;
+        });
+        data.notes = document.getElementById('investigation-notes').value;
+
+        localStorage.setItem('swiss_shield_logbook', JSON.stringify(data));
+        alert("📊 SYNC : Données enregistrées dans le navigateur.");
+    }
+
+    // Exportation vers un fichier JSON
+    function exportData() {
+        saveToLocal(); // On sauvegarde avant d'exporter
+        const data = localStorage.getItem('swiss_shield_logbook');
+        const blob = new Blob([data], {type: 'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'LOGBOOK_SWISS_SHIELD.json';
+        a.click();
+    }
+
+    // Importation depuis un fichier JSON
+    function importData(event) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const data = JSON.parse(e.target.result);
+            localStorage.setItem('swiss_shield_logbook', JSON.stringify(data));
+            loadFromLocal();
+            alert("📥 IMPORT : Dossier d'enquête mis à jour.");
+        };
+        reader.readAsText(event.target.files[0]);
+    }
+
+    // Chargement des données
+    function loadFromLocal() {
+        const saved = localStorage.getItem('swiss_shield_logbook');
+        if (saved) {
+            const data = JSON.parse(saved);
+            for (let id in data.passwords) {
+                const el = document.getElementById(id);
+                if (el) el.value = data.passwords[id];
+            }
+            document.getElementById('investigation-notes').value = data.notes || "";
+        }
+    }
+
+    window.onload = function() {
+        generateUI();
+        loadFromLocal();
+    };
+</script>
+
+</body>
+</html>

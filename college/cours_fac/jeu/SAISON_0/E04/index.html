@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>S00E04 - BONUS - LE FRAGMENT DU FONDATEUR</title>
+    <style>
+        :root {
+            --gold: #ffd700;
+            --parchment: #e8dcb5;
+            --terminal-bg: #0a0705;
+            --matrix-green: #00ff41;
+            --deep-red: #8b0000;
+        }
+
+        /* --- MODE SOBRE (accessibilité) --- */
+        body.mode-sobre, body.mode-sobre * { animation: none !important; transition: none !important; }
+        body.mode-sobre #note-canvas { display: none !important; }
+        #toggle-sobre-btn {
+            position: fixed; top: 10px; left: 10px; z-index: 10001;
+            background: #000; color: var(--gold); border: 1px solid var(--gold);
+            padding: 6px 10px; font-size: 0.7em; cursor: pointer; font-family: inherit; border-radius: 3px;
+        }
+        #retour-menu-btn {
+            position: fixed; top: 10px; right: 10px; z-index: 10001;
+            background: #000; color: var(--gold); border: 1px solid var(--gold);
+            padding: 6px 10px; font-size: 0.7em; cursor: pointer; font-family: inherit; border-radius: 3px;
+            text-decoration: none;
+        }
+
+        #note-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0; opacity: 0.35; pointer-events: none;
+        }
+
+        body {
+            background-color: var(--terminal-bg);
+            color: var(--parchment);
+            font-family: 'Georgia', 'Consolas', serif;
+            padding: 20px; margin: 0;
+            overflow-x: hidden;
+        }
+
+        .pwn-container {
+            border: 2px solid var(--gold);
+            max-width: 900px; margin: 0 auto;
+            background: rgba(10, 7, 5, 0.97);
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.15);
+            position: relative;
+            z-index: 10;
+        }
+
+        .header {
+            background: var(--gold); color: #000;
+            padding: 10px 18px; font-weight: bold;
+            display: flex; justify-content: space-between; align-items: center;
+            text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.9em;
+        }
+        .header .bonus-tag { background: #000; color: var(--gold); padding: 3px 10px; border-radius: 3px; font-size: 0.85em; }
+
+        #lock-screen {
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; min-height: 480px; text-align: center;
+            background: #000; padding: 30px;
+        }
+        #lock-screen p { max-width: 520px; line-height: 1.7; color: #ccc; }
+
+        #mission-content, #victory-screen { display: none; }
+
+        .content { padding: 35px; }
+
+        input[type="text"] {
+            background: #1a1510; border: 1px solid var(--gold); color: #fff;
+            width: 100%; font-family: inherit; outline: none; font-size: 1.05em;
+            padding: 12px; box-sizing: border-box; margin-top: 8px; border-radius: 3px;
+        }
+
+        .btn-final {
+            background: var(--gold); color: #000; border: none;
+            padding: 15px 30px; cursor: pointer; font-weight: bold;
+            width: 100%; margin-top: 20px; font-family: inherit; font-size: 1em;
+            transition: 0.3s; border-radius: 3px;
+        }
+        .btn-final:hover { background: #fff; box-shadow: 0 0 25px var(--gold); }
+
+        .lore-box {
+            background: rgba(255, 215, 0, 0.04); border-left: 3px solid var(--gold);
+            padding: 16px 20px; margin: 18px 0; font-size: 0.92em; line-height: 1.7; color: #ddd;
+        }
+
+        .staff-box {
+            background: #f4ecd8; border-radius: 6px; padding: 25px 15px 15px 15px; margin: 20px 0;
+        }
+        .legend-box {
+            background: #1a1510; border: 1px dashed #665; padding: 14px 16px; margin: 16px 0;
+            font-size: 0.85em; color: #ccc; line-height: 1.8;
+        }
+        .legend-box code { background: #000; color: var(--gold); padding: 1px 6px; border-radius: 3px; }
+
+        .hint-panel { margin-top: 25px; border-top: 1px dashed #554; padding-top: 15px; }
+        .hint-panel button {
+            background: #1a1510; color: var(--gold); border: 1px solid var(--gold);
+            padding: 8px 14px; margin-right: 8px; cursor: pointer; font-family: inherit;
+            border-radius: 3px; font-size: 0.85em;
+        }
+        .hint-panel button:disabled { opacity: 0.4; cursor: default; }
+        .hint-panel p { font-size: 0.85em; color: #ccc; margin-top: 10px; line-height: 1.6; }
+        #hint-score { text-align: right; font-size: 0.8em; color: #999; margin-top: 10px; }
+        #hint-score-value { color: var(--gold); font-weight: bold; }
+
+        #victory-screen {
+            border: 3px double var(--gold); padding: 40px 30px; text-align: center;
+            background: radial-gradient(circle at center, rgba(255,215,0,0.08), transparent 70%);
+        }
+        #victory-screen h2 { color: var(--gold); font-size: 1.6em; margin-bottom: 10px; letter-spacing: 0.05em; }
+        #victory-screen .lore-final { text-align: left; max-width: 600px; margin: 20px auto; line-height: 1.75; color: #ddd; font-size: 0.95em; }
+        #victory-canvas { width: 100%; height: 160px; display: block; margin: 15px 0; }
+        .badge-final {
+            display: inline-block; margin: 15px 0; padding: 14px 30px; border: 2px solid var(--gold);
+            border-radius: 50px; color: var(--gold); font-weight: bold; letter-spacing: 0.15em; font-size: 1.3em;
+        }
+        #btn-rejouer-melodie {
+            background: none; border: 1px solid var(--gold); color: var(--gold);
+            padding: 8px 16px; cursor: pointer; font-family: inherit; border-radius: 3px; margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="note-canvas"></canvas>
+<button id="toggle-sobre-btn" onclick="basculerModeSobre()">🌓 Mode sobre</button>
+<a id="retour-menu-btn" href="../../MENU_PRINCIPAL.html">🏠 Menu principal</a>
+
+<div class="pwn-container">
+    <div class="header">
+        <span>UNIT: SWISS-SHIELD-GENESIS | S00E04</span>
+        <span class="bonus-tag">★ BONUS OPTIONNEL</span>
+    </div>
+
+    <div id="lock-screen">
+        <h2 style="color:var(--gold);">🎼 LE FRAGMENT DU FONDATEUR</h2>
+        <p>
+            En marge des archives que vous venez de consulter, une note manuscrite attend d'être déchiffrée.
+            Elle ne fait partie d'aucune mission officielle — c'est une curiosité, laissée volontairement par
+            quelqu'un qui savait qu'un jour, quelqu'un d'assez attentif la trouverait.
+        </p>
+        <p style="margin-top:15px;">Entrez le code inscrit au dos du fragment pour l'ouvrir :</p>
+        <input type="text" id="passkey" placeholder="CODE DU FRAGMENT" style="max-width:320px; text-align:center;">
+        <button class="btn-final" style="max-width:320px;" onclick="unlock()">DÉCHIFFRER LE FRAGMENT</button>
+    </div>
+
+    <div id="mission-content" class="content">
+        <div class="lore-box">
+            <strong>📜 Note du fondateur — retrouvée avec le fragment :</strong><br><br>
+            « Avant que le Collectif Prométhée ne devienne ce réseau numérique que vous connaissez, j'ai appris
+            une chose essentielle en étudiant les résistances du XX<sup>e</sup> siècle : les canaux les plus
+            surveillés ne sont pas toujours les plus dangereux à utiliser — ce sont les canaux qu'on ne pense
+            même pas à surveiller. Pendant la Seconde Guerre mondiale, des agents ont dissimulé des messages
+            entiers dans des partitions musicales, en écrivant simplement les notes correspondant aux lettres
+            qu'ils voulaient transmettre. Une partition ne trompe aucun algorithme — un algorithme ne cherche
+            même pas à la lire. J'ai laissé ce fragment ici pour rappeler que la vraie sécurité commence par la
+            capacité à penser en dehors du numérique. »
+        </div>
+
+        <p style="line-height:1.6;">
+            Voici la portée retrouvée avec la note. Chaque note correspond à une lettre — lisez-les de gauche à
+            droite pour reconstituer le mot codé.
+        </p>
+
+        <div class="staff-box">
+            <svg id="staff-svg" viewBox="0 0 340 130" style="width:100%; height:auto;">
+                <!-- Lignes de la portée -->
+                <line x1="20" y1="20" x2="320" y2="20" stroke="#333" stroke-width="1.5"></line>
+                <line x1="20" y1="40" x2="320" y2="40" stroke="#333" stroke-width="1.5"></line>
+                <line x1="20" y1="60" x2="320" y2="60" stroke="#333" stroke-width="1.5"></line>
+                <line x1="20" y1="80" x2="320" y2="80" stroke="#333" stroke-width="1.5"></line>
+                <line x1="20" y1="100" x2="320" y2="100" stroke="#333" stroke-width="1.5"></line>
+                <!-- Clé de sol stylisée -->
+                <text x="25" y="95" font-size="70" fill="#222" font-family="serif">&#119070;</text>
+                <!-- Notes : B(y=60) A(y=70) D(y=40) G(y=80) E(y=100) -->
+                <g class="note-group" data-note="B">
+                    <ellipse cx="120" cy="60" rx="9" ry="7" fill="#111"></ellipse>
+                    <line x1="128" y1="60" x2="128" y2="20" stroke="#111" stroke-width="1.5"></line>
+                </g>
+                <g class="note-group" data-note="A">
+                    <ellipse cx="170" cy="70" rx="9" ry="7" fill="#111"></ellipse>
+                    <line x1="178" y1="70" x2="178" y2="25" stroke="#111" stroke-width="1.5"></line>
+                </g>
+                <g class="note-group" data-note="D">
+                    <ellipse cx="220" cy="40" rx="9" ry="7" fill="#111"></ellipse>
+                    <line x1="211" y1="40" x2="211" y2="85" stroke="#111" stroke-width="1.5"></line>
+                </g>
+                <g class="note-group" data-note="G">
+                    <ellipse cx="255" cy="80" rx="9" ry="7" fill="#111"></ellipse>
+                    <line x1="263" y1="80" x2="263" y2="35" stroke="#111" stroke-width="1.5"></line>
+                </g>
+                <g class="note-group" data-note="E">
+                    <ellipse cx="290" cy="100" rx="9" ry="7" fill="#111"></ellipse>
+                    <line x1="298" y1="100" x2="298" y2="55" stroke="#111" stroke-width="1.5"></line>
+                </g>
+            </svg>
+        </div>
+
+        <div class="legend-box">
+            <strong>🔑 Technique de décodage :</strong> dans la notation musicale anglo-saxonne, les notes se
+            nomment directement avec des lettres : <code>A B C D E F G</code> (puis le cycle recommence).
+            Cliquez sur chaque note de la portée ci-dessus pour révéler sa lettre — dans l'ordre, ces lettres
+            forment un mot complet.
+        </div>
+
+        <p id="notes-reveelees" style="font-family:'Consolas',monospace; letter-spacing:0.3em; font-size:1.3em; color:var(--gold); min-height:1.5em; text-align:center;"></p>
+
+        <label for="reponse" style="display:block; margin-top:20px; color:#ccc;">Mot reconstitué :</label>
+        <input type="text" id="reponse" placeholder="Entrez le mot déchiffré" onchange="sauvegarderAutomatiquement()">
+        <button class="btn-final" onclick="verifier()">VALIDER LE DÉCHIFFREMENT</button>
+
+        <div class="hint-panel">
+            <button id="hintBtn1" onclick="useHint(1)">💡 Indice 1 (-1 pt)</button>
+            <button id="hintBtn2" onclick="useHint(2)" disabled>🎯 Indice 2 (-2 pts)</button>
+            <button id="hintBtn3" onclick="useHint(3)" disabled>🆘 Indice 3 (-3 pts)</button>
+            <div id="hint-score">Score de l'épisode : <span id="hint-score-value">5</span> / 5</div>
+            <p id="hint-tier-1" style="display:none;"><strong>💡 INFO :</strong> Cliquez sur chaque note de la portée : elle révèle sa lettre. Il y a 5 notes, donc un mot de 5 lettres.</p>
+            <p id="hint-tier-2" style="display:none;"><strong>🎯 PISTE :</strong> Les 5 lettres, dans l'ordre de la portée, sont <code>B</code>, <code>A</code>, <code>?</code>, <code>?</code>, <code>?</code> — cliquez sur les notes pour trouver les 3 dernières.</p>
+            <p id="hint-tier-3" style="display:none;"><strong>🆘 SOLUTION :</strong> Le mot complet est <code>BADGE</code> — un clin d'œil à ce que vous venez de recevoir en devenant membre de la Swiss Shield.</p>
+        </div>
+    </div>
+
+    <div id="victory-screen">
+        <h2>🎵 LE FRAGMENT EST DÉCHIFFRÉ</h2>
+        <canvas id="victory-canvas"></canvas>
+        <div class="badge-final">B — A — D — G — E</div>
+        <br>
+        <button id="btn-rejouer-melodie" onclick="jouerMelodie()">🔊 Réécouter la mélodie</button>
+        <div class="lore-final">
+            La mélodie que vous venez d'entendre n'est pas qu'un assemblage de notes : c'est le tout premier
+            mot de passe utilisé par le fondateur du Collectif Prométhée, bien avant qu'il ne devienne un
+            réseau numérique. Un rappel simple, transmis à travers le temps : la meilleure protection combine
+            toujours plusieurs couches — numérique, humaine, et parfois, un peu d'histoire.
+            <br><br>
+            Ce fragment n'ouvre aucune autre porte. Il n'existe que pour être trouvé, comme vous venez de le
+            faire.
+        </div>
+        <a href="../../MENU_PRINCIPAL.html" class="btn-final" style="text-decoration:none; display:inline-block; max-width:320px;">🏠 RETOUR AU MENU PRINCIPAL</a>
+    </div>
+</div>
+
+<script>
+    const EP_ID = "S00E04";
+    const PASSKEY_ATTENDUE = "NOTE-FANTOME-1943";
+    const REPONSE_ATTENDUE = "BADGE";
+    const NOTE_ORDRE = ["B", "A", "D", "G", "E"];
+    let notesTrouvees = [];
+
+    const HINT_COST = {1:1, 2:2, 3:3};
+    let hintsUsed = {1:false, 2:false, 3:false};
+    let episodeScore = 5;
+    let currentZone = 'lock-screen';
+
+    function unlock() {
+        const code = document.getElementById('passkey').value.trim().toUpperCase();
+        if (code === PASSKEY_ATTENDUE) {
+            document.getElementById('lock-screen').style.display = 'none';
+            document.getElementById('mission-content').style.display = 'block';
+            currentZone = 'mission-content';
+            sauvegarderAutomatiquement();
+        } else {
+            enregistrerErreur('entree', code, PASSKEY_ATTENDUE);
+            alert("CODE INCORRECT : ce fragment reste illisible avec ce code.");
+        }
+    }
+
+    document.querySelectorAll('.note-group').forEach(function(g) {
+        g.style.cursor = 'pointer';
+        g.addEventListener('click', function() {
+            const lettre = this.dataset.note;
+            if (!notesTrouvees.includes(lettre + '_' + Array.from(document.querySelectorAll('.note-group')).indexOf(this))) {
+                this.querySelectorAll('ellipse').forEach(function(el) { el.setAttribute('fill', '#c9a227'); });
+                afficherNotesReveelees();
+                sauvegarderAutomatiquement();
+            }
+        });
+    });
+
+    function afficherNotesReveelees() {
+        const groupes = document.querySelectorAll('.note-group');
+        let texte = '';
+        groupes.forEach(function(g) {
+            const revele = g.querySelector('ellipse').getAttribute('fill') === '#c9a227';
+            texte += revele ? g.dataset.note : '·';
+            texte += ' ';
+        });
+        document.getElementById('notes-reveelees').textContent = texte.trim();
+    }
+
+    function verifier() {
+        const reponse = document.getElementById('reponse').value.trim().toUpperCase();
+        if (reponse === REPONSE_ATTENDUE) {
+            document.getElementById('mission-content').style.display = 'none';
+            document.getElementById('victory-screen').style.display = 'block';
+            currentZone = 'victory-screen';
+            recordEpisodeSuccess();
+            setTimeout(jouerMelodie, 400);
+            setTimeout(lancerFeuxArtifice, 300);
+        } else {
+            enregistrerErreur('decodage', reponse, REPONSE_ATTENDUE);
+            alert("Ce n'est pas le bon mot. Regardez bien chaque note de la portée.");
+        }
+    }
+
+    // --- AUDIO RÉEL : la mélodie B-A-D-G-E est réellement synthétisée et jouée via l'API Web Audio,
+    // aucun fichier audio, aucun réseau — fonctionne aussi en file:// depuis la clé USB.
+    const FREQUENCES = { B: 493.88, A: 440.00, D: 293.66, G: 392.00, E: 329.63 };
+    function jouerMelodie() {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            let t = ctx.currentTime;
+            NOTE_ORDRE.forEach(function(note) {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(FREQUENCES[note], t);
+                gain.gain.setValueAtTime(0, t);
+                gain.gain.linearRampToValueAtTime(0.25, t + 0.05);
+                gain.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(t);
+                osc.stop(t + 0.6);
+                t += 0.55;
+            });
+        } catch(e) {
+            // La synthèse audio n'est pas disponible sur ce navigateur : la mélodie reste visible ci-dessus.
+        }
+    }
+
+    // --- Petite animation de feux d'artifice dorés sur le canvas de victoire, purement décorative.
+    function lancerFeuxArtifice() {
+        const canvas = document.getElementById('victory-canvas');
+        if (!canvas || document.body.classList.contains('mode-sobre')) return;
+        canvas.width = canvas.offsetWidth;
+        canvas.height = 160;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        let particules = [];
+        for (let i = 0; i < 60; i++) {
+            particules.push({
+                x: canvas.width / 2, y: canvas.height / 2,
+                vx: (Math.random() - 0.5) * 6, vy: (Math.random() - 0.5) * 6,
+                vie: 60 + Math.random() * 30
+            });
+        }
+        let frame = 0;
+        function animer() {
+            frame++;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particules.forEach(function(p) {
+                p.x += p.vx; p.y += p.vy; p.vie--;
+                ctx.fillStyle = 'rgba(255, 215, 0, ' + Math.max(0, p.vie / 90) + ')';
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            particules = particules.filter(function(p) { return p.vie > 0; });
+            if (frame < 90 && particules.length > 0) requestAnimationFrame(animer);
+        }
+        animer();
+    }
+
+    function useHint(level) {
+        if (hintsUsed[level] || (level > 1 && !hintsUsed[level - 1])) return;
+        hintsUsed[level] = true;
+        enregistrerIndiceUsage(level);
+        episodeScore -= HINT_COST[level];
+        document.getElementById('hint-score-value').textContent = episodeScore;
+        document.getElementById('hint-tier-' + level).style.display = 'block';
+        const btn = document.getElementById('hintBtn' + level);
+        btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5';
+        if (level < 3) {
+            const next = document.getElementById('hintBtn' + (level + 1));
+            if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+        }
+        sauvegarderAutomatiquement();
+    }
+
+    function recordEpisodeSuccess() {
+        let scores = {};
+        try { scores = JSON.parse(localStorage.getItem('swiss_shield_scores') || '{}'); } catch(e) {}
+        if (!(EP_ID in scores) || scores[EP_ID] < episodeScore) scores[EP_ID] = episodeScore;
+        localStorage.setItem('swiss_shield_scores', JSON.stringify(scores));
+        localStorage.removeItem('autosave_' + EP_ID);
+    }
+
+    function sauvegarderAutomatiquement() {
+        try {
+            const notesEtat = [];
+            document.querySelectorAll('.note-group').forEach(function(g) {
+                notesEtat.push(g.querySelector('ellipse').getAttribute('fill') === '#c9a227');
+            });
+            const el = document.getElementById('reponse');
+            localStorage.setItem('autosave_' + EP_ID, JSON.stringify({
+                zone: currentZone,
+                inputs: { reponse: el ? el.value : '' },
+                notesEtat: notesEtat,
+                hintsUsed: hintsUsed,
+                episodeScore: episodeScore
+            }));
+        } catch(e) {}
+    }
+
+    function proposerRestaurationAutosave() {
+        let data;
+        try { data = JSON.parse(localStorage.getItem('autosave_' + EP_ID) || 'null'); } catch(e) { return; }
+        if (!data || !data.zone || data.zone === 'lock-screen' || data.zone === 'victory-screen') return;
+        document.getElementById('lock-screen').style.display = 'none';
+        document.getElementById('mission-content').style.display = 'block';
+        currentZone = data.zone;
+
+        if (data.notesEtat) {
+            const groupes = document.querySelectorAll('.note-group');
+            groupes.forEach(function(g, i) {
+                if (data.notesEtat[i]) {
+                    g.querySelectorAll('ellipse').forEach(function(el) { el.setAttribute('fill', '#c9a227'); });
+                }
+            });
+            afficherNotesReveelees();
+        }
+        if (data.inputs && document.getElementById('reponse')) {
+            document.getElementById('reponse').value = data.inputs.reponse || '';
+        }
+        hintsUsed = data.hintsUsed || hintsUsed;
+        episodeScore = (typeof data.episodeScore === 'number') ? data.episodeScore : episodeScore;
+        document.getElementById('hint-score-value').textContent = episodeScore;
+        [1, 2, 3].forEach(function(level) {
+            if (hintsUsed[level]) {
+                document.getElementById('hint-tier-' + level).style.display = 'block';
+                const btn = document.getElementById('hintBtn' + level);
+                if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+        });
+    }
+
+    function enregistrerIndiceUsage(niveau) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + niveau;
+            debrief.indices[cle] = (debrief.indices[cle] || 0) + 1;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+
+    function enregistrerErreur(phase, reponseEleve, reponseAttendue) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + phase;
+            if (typeof debrief.erreurs[cle] !== 'object' || debrief.erreurs[cle] === null) {
+                debrief.erreurs[cle] = { compte: (debrief.erreurs[cle] || 0), exemples: [] };
+            }
+            debrief.erreurs[cle].compte++;
+            if (reponseEleve !== undefined && debrief.erreurs[cle].exemples.length < 5) {
+                debrief.erreurs[cle].exemples.push({ reponseEleve: String(reponseEleve).slice(0,100), reponseAttendue: String(reponseAttendue||'').slice(0,100) });
+            }
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+
+    (function pollSuccess(){
+        const ids = ['victory-screen'];
+        let recorded = false;
+        setInterval(function(){
+            if (recorded) return;
+            for (const id of ids) {
+                const elt = document.getElementById(id);
+                if (elt && getComputedStyle(elt).display === 'block') { recordEpisodeSuccess(); recorded = true; return; }
+            }
+        }, 800);
+    })();
+
+    // --- Animation de fond : notes de musique dorées flottantes ---
+    function drawNotesBg() {
+        const canvas = document.getElementById('note-canvas');
+        if (!canvas) return;
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        const notes = [];
+        for (let i = 0; i < 25; i++) {
+            notes.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                vy: 0.3 + Math.random() * 0.6,
+                taille: 10 + Math.random() * 14,
+                alpha: 0.15 + Math.random() * 0.25,
+                symbole: Math.random() > 0.5 ? '♪' : '♫'
+            });
+        }
+        function boucle() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.font = '20px serif';
+            notes.forEach(function(n) {
+                ctx.globalAlpha = n.alpha;
+                ctx.fillStyle = '#ffd700';
+                ctx.font = n.taille + 'px serif';
+                ctx.fillText(n.symbole, n.x, n.y);
+                n.y -= n.vy;
+                if (n.y < -20) { n.y = canvas.height + 20; n.x = Math.random() * canvas.width; }
+            });
+            ctx.globalAlpha = 1;
+            requestAnimationFrame(boucle);
+        }
+        boucle();
+    }
+    window.addEventListener('resize', function() {
+        const canvas = document.getElementById('note-canvas');
+        if (canvas) { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    });
+
+    function appliquerModeSobre() {
+        const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+        document.body.classList.toggle('mode-sobre', actif);
+        const btn = document.getElementById('toggle-sobre-btn');
+        if (btn) btn.textContent = actif ? '🌓 Mode animé' : '🌓 Mode sobre';
+    }
+    function basculerModeSobre() {
+        const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+        localStorage.setItem('swiss_shield_mode_sobre', actif ? '0' : '1');
+        appliquerModeSobre();
+    }
+    appliquerModeSobre();
+    if (localStorage.getItem('swiss_shield_mode_sobre') !== '1') drawNotesBg();
+
+    proposerRestaurationAutosave();
+</script>
+
+</body>
+</html>

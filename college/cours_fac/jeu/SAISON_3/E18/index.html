@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>S03E18 - IDENTITÉS SYNTHÉTIQUES</title>
+    <style>
+        /* --- NOUVEL EFFET VISUEL : BIO-GRID RADAR PULSE --- */
+        #bio-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            background: #02040a;
+        }
+
+        /* --- MODE SOBRE (accessibilité) --- */
+        body.mode-sobre, body.mode-sobre * { animation: none !important; transition: none !important; }
+        body.mode-sobre #bio-canvas { display: none !important; }
+        #toggle-sobre-btn {
+            position: fixed; top: 10px; right: 10px; z-index: 10001;
+            background: #000; color: #1f6feb; border: 1px solid #1f6feb;
+            padding: 6px 10px; font-size: 0.7em; cursor: pointer; font-family: inherit; border-radius: 3px;
+        }
+
+        body { color: #e6edf3; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 40px; margin: 0; overflow-x: hidden; }
+        
+        .terminal { 
+            background: rgba(13, 17, 23, 0.9); 
+            border: 2px solid #1f6feb; 
+            padding: 30px; width: 90%; 
+            max-width: 800px; 
+            box-shadow: 0 0 60px rgba(31, 111, 235, 0.4); 
+            border-radius: 12px; 
+            text-align: center;
+            backdrop-filter: blur(8px);
+            position: relative;
+        }
+
+        /* STYLE CONTEXTE HISTOIRE S3E18 */
+        .story-context {
+            background: rgba(31, 111, 235, 0.15);
+            border: 1px solid #1f6feb;
+            padding: 20px;
+            margin: 25px 0;
+            text-align: left;
+            font-size: 0.95em;
+            color: #c9d1d9;
+            line-height: 1.6;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .story-context::before {
+            content: "TOP SECRET // SWISS SHIELD // HÔPITAUX UNIVERSITAIRES DE GENÈVE";
+            display: block;
+            font-size: 0.7em;
+            color: #1f6feb;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+            font-weight: bold;
+        }
+
+        .header-status { border-left: 4px solid #1f6feb; padding-left: 15px; margin-bottom: 30px; text-align: left; }
+
+        #lock-screen { padding: 40px; }
+        #double-verrou-screen, #mission-content, #victory-zone { display: none; }
+
+        .investigation-box { background: #000; border: 1px dashed #1f6feb; padding: 15px; margin: 20px 0; text-align: left; font-family: 'Courier New', monospace; font-size: 0.9em; color: #3fb950; line-height: 1.5; }
+
+        .code-box { background: #161b22; border: 1px solid #30363d; padding: 15px; border-radius: 6px; margin: 15px 0; font-family: 'Courier New', monospace; font-size: 0.85em; text-align: left; color: #58a6ff; overflow-x: auto; white-space: pre; }
+
+        input { background: #0d1117; border: 1px solid #1f6feb; color: #fff; padding: 12px; width: 320px; font-family: inherit; border-radius: 6px; outline: none; margin-bottom: 15px; text-align: center; font-size: 1.05em; }
+        button { background: #1f6feb; color: #fff; border: none; padding: 12px 30px; font-weight: bold; cursor: pointer; border-radius: 6px; transition: 0.2s; text-transform: uppercase; margin-top: 10px; }
+        button:hover { background: #388bfd; box-shadow: 0 0 15px rgba(31, 111, 235, 0.4); }
+
+        .final-badge { border: 2px solid #30363d; padding: 20px; display: inline-block; margin-top: 20px; border-radius: 10px; background: rgba(31, 111, 235, 0.1); }
+        .victory-code { color: #ffd700; font-size: 2em; letter-spacing: 3px; font-family: monospace; display: block; margin: 15px 0; text-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
+
+        .csv-info { background: #fff; color: #000; padding: 15px; margin-top: 20px; border-radius: 4px; text-align: left; font-size: 0.85em; border-left: 5px solid #1f6feb; }
+
+        .btn-aide-rouge { background: #d80000; color: #fff; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; width: 100%; max-width: 450px; margin-top: 40px; border-radius: 3px; }
+        .aide-box { display: none; background: #fff; color: #333; margin-top: 10px; padding: 20px; width: 90%; max-width: 500px; text-align: left; border-radius: 5px; font-family: sans-serif; border-top: 5px solid #d80000; line-height: 1.5; }
+        
+        /* BOUTON RETOUR IMPÉRATIF */
+        .btn-retour-principal { position: absolute; top: 15px; left: 15px; background: #21262d; border: 1px solid #30363d; color: #c9d1d9; padding: 6px 14px; border-radius: 6px; text-decoration: none; font-size: 0.85em; font-weight: bold; transition: 0.2s; }
+        .btn-retour-principal:hover { background: #30363d; color: #1f6feb; border-color: #1f6feb; }
+
+        .qcm-label { display: block; text-align: left; margin: 10px 0; padding-left: 20px; font-family: sans-serif; color: #c9d1d9; font-size: 0.95em; }
+    </style>
+</head>
+<body>
+    <button id="toggle-sobre-btn" onclick="basculerModeSobre()">🌓 Mode sobre</button>
+
+    <canvas id="bio-canvas"></canvas>
+
+    <div class="terminal">
+        <a href="../../MENU_PRINCIPAL.html" class="btn-retour-principal">⬅ MENU</a>
+
+        <div id="lock-screen">
+            <h2 style="color: #1f6feb; text-shadow: 0 0 15px rgba(31,111,235,0.5); margin-top: 20px;">🔍 AUTHENTIFICATION NIVEAU 3</h2>
+            
+            <div class="story-context">
+                <b>[ MISSION : GHOST IN THE MIRROR ]</b><br>
+                L'IA infiltrée ne se contente plus de voix synthétiques. Elle tente maintenant de franchir nos barrières biométriques en générant des visages hyper-réalistes pour usurper l'accès aux serveurs critiques des Hôpitaux Universitaires de Genève (HUG).<br><br>
+                Une brèche a été détectée dans le terminal de la Direction Générale. Le système de surveillance visuelle attend votre analyse pour confirmer l'usurpation.
+            </div>
+
+            <p>Entrez le jeton d'accès (Code de fin E17) :</p>
+            <input type="text" id="passkey" placeholder="CODE CERTIFICAT E17" onchange="sauvegarderAutomatiquement()">
+            <br>
+            <button onclick="unlock()">ACTIVER LE MONITORING VISUEL</button>
+        </div>
+
+        <div id="double-verrou-screen">
+            <div class="header-status">
+                <h2 style="margin:0; color: #1f6feb;">CONTRÔLE DE VALIDATION DES INFRASTRUCTURES CRITIQUES</h2>
+                <span style="color: #8b949e; font-size: 0.9em;">Vérification réglementaire et système (HUG / SRC)</span>
+            </div>
+            
+            <div style="text-align: left; padding: 5px;">
+                <p style="color: #ffd700; font-weight: bold;">⚖️ ÉTAPE 1 : Défi Juridique (LPD Suisse)</p>
+                <p style="color: #e6edf3; font-size: 0.95em;">Les caractéristiques d'un visage humain utilisées pour un système d'authentification biométrique entrent dans une catégorie spécifique de la Loi fédérale sur la protection des données (LPD). De quel type de données s'agit-il réglementairement ?</p>
+                
+                <label class="qcm-label"><input type="radio" name="qcm_lpd" value="A" onchange="sauvegarderAutomatiquement()"> A) Des données personnelles ordinaires à traçabilité restreinte.</label>
+                <label class="qcm-label"><input type="radio" name="qcm_lpd" value="B" onchange="sauvegarderAutomatiquement()"> B) Des données personnelles sensibles (données biométriques identifiant de manière unique).</label>
+                <label class="qcm-label"><input type="radio" name="qcm_lpd" value="C" onchange="sauvegarderAutomatiquement()"> C) Des données de profils comportementaux commerciaux soumis à la LDA.</label>
+                
+                <br>
+                <p style="color: #ffd700; font-weight: bold;">🖥️ ÉTAPE 2 : Défi Technique (Administration Réseau)</p>
+                <p style="color: #e6edf3; font-size: 0.95em;">Un analyseur de paquets a capturé des requêtes suspectes vers l'API de reconnaissance faciale. Quelle commande système sous Linux permet d'afficher en temps réel toutes les connexions réseau actives (sockets de type TCP en écoute et établies) avec leurs numéros de ports associés ?</p>
+                <input type="text" id="tech_cmd" placeholder="Entrez la commande Linux exacte" style="width: 100%; max-width: 400px;" onchange="sauvegarderAutomatiquement()">
+            </div>
+            <br>
+            <button onclick="verifyDoubleLock()">DÉVERROUILLER L'ANALYSEUR BIO-MÉTRIQUE</button>
+        </div>
+
+        <div id="mission-content">
+            <div class="header-status">
+                <h2 style="margin:0;">S03E18 : ANALYSE DE PERSISTANCE VISUELLE</h2>
+                <span style="color: #8b949e; font-size: 0.9em;">Détection de deepfakes faciaux en temps réel</span>
+            </div>
+
+            <p>Le système a bloqué une tentative d'accès via reconnaissance faciale aux dossiers médicaux des HUG. L'image semble générée.<br>Reconstituez le <b>moteur de synthèse</b> d'après le fragment d'algorithme inverse trouvé en mémoire vive.</p>
+
+            <div class="investigation-box">
+                [IMAGE_METADATA_SCAN]<br>
+                > SOURCE: WEBCAM_STREAM_04<br>
+                > PIXEL_COHERENCE: 94% (INCONSISTENT)<br>
+                > ARTEFACTS: EYE_REFLECTIONS_MISMATCH<br>
+                [STATUT] : Signature masquée par un chiffrement de type décalage circulaire (César adaptatif).
+            </div>
+
+            <div class="code-box">/* EXTRAIT DE L'ALGORITHME DE CHRONO-OBFUSCATION RETROUVÉ (C / C++) */
+#include &lt;stdio.h&gt;
+
+void decode_signature() {
+    // La signature chiffrée interceptée dans le tampon d'injection biométrique :
+    char cipher[] = "DK-IDFLDO-JHQ";
+    
+    // RÈGLE DE DÉCHIFFREMENT DU SYSTÈME SWISS SHIELD :
+    // Chaque caractère alphabétique a subi un décalage de +3 dans l'alphabet (A -> D, B -> E...).
+    // Pour retrouver la signature brute du moteur, vous devez appliquer le décalage inverse (-3).
+    // Attention : Les caractères non alphabétiques comme '-' restent inchangés.
+    
+    printf("Reconstruction en cours...");
+    // Énigme : Appliquez manuellement la soustraction de 3 rangs sur la chaîne "DK-IDFLDO-JHQ".
+}</div>
+
+            <div id="action-zone">
+                <input type="text" id="sourceV" placeholder="MOTEUR DE SYNTHÈSE EXTRAIT" onchange="sauvegarderAutomatiquement()">
+                <br>
+                <button onclick="signReport()">VALIDER L'AUDIT</button>
+            </div>
+
+            <div id="victory-zone">
+                <h3 style="color: #3fb950;">✓ INTRUSION VISUELLE BLOQUÉE</h3>
+                <p>L'identité synthétique a été révoquée avec succès. Votre surveillance a protégé l'intégrité des données de l'infrastructure médicale.</p>
+
+                <div class="final-badge">
+                    <p><b>CODE DE CLÔTURE DÉFINITIVE (À EXPORTER) :</b></p>
+                    <span class="victory-code">ETERNITY-SHIELD</span>
+                </div>
+
+                <div class="csv-info">
+                    <b>📝 RAPPORT DE SURVEILLANCE (export_eleves.csv)</b><br>
+                    S03E18 ; Alerte Visuelle ; Usurpation par AI-FACIAL-GEN bloquée. Shield actif.
+                </div>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <a href="../../MENU_PRINCIPAL.html" style="color: #8b949e; text-decoration: none; font-weight: bold;">[ Déconnexion de la session Expert ]</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn-aide-rouge" onclick="toggleAide()">[ 📜 BILAN DES 3 PILIERS - S03E18 ]</button>
+    <div id="zoneAide" class="aide-box">
+        <h3 style="margin-top: 0; color: #d80000;">Dossier de Surveillance Continue</h3>
+        <p><b>1. Informatique :</b> Les systèmes de biométrie faciale peuvent être contournés par des réseaux antagonistes génératifs (GANs) capables de modéliser des textures de peau et des géométries faciales synthétiques extrêmement convaincantes.</p>
+        <p><b>2. Juridique :</b> Selon la nouvelle Loi fédérale sur la protection des données (nLPD) en vigueur en Suisse, les données biométriques sont formellement classées comme des <b>données personnelles sensibles</b> (Art. 5 nLPD). Leur traitement automatisé requiert des mesures de sécurité organisationnelles et techniques accrues ainsi qu'une analyse d'impact stricte.</p>
+        <p><b>3. Forensics :</b> L'analyse de persistance forensic visuelle repose sur la recherche d'incohérences physiques (comme la divergence directionnelle des reflets dans les pupilles). L'obfuscation de bas niveau par chiffrement de César inversé démontre la persistance d'artefacts d'écriture mémoire laissés lors du passage des processus de chiffrement.</p>
+    </div>
+
+    <div style="margin-top: 30px; border-top: 3px solid #d80000; padding: 20px; background: #fff; font-family: Arial, sans-serif; position: relative; z-index: 100; width: 90%; max-width: 500px;">
+        <div id="hint-score-badge" style="background:#111;color:#3fb950;padding:8px 15px;font-weight:bold;text-align:center;">🏆 Score de cet épisode : <span id="hint-score-value">5</span> / 5 pts</div>
+        <div style="display:flex; gap:8px; margin:10px 0;">
+            <button id="hintBtn1" onclick="useHint(1)" style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;">💡 Indice 1 (-1 pt)</button>
+            <button id="hintBtn2" onclick="useHint(2)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🎯 Indice 2 (-2 pts)</button>
+            <button id="hintBtn3" onclick="useHint(3)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🆘 Solution (-3 pts)</button>
+        </div>
+
+        <div id="zoneAideScore" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; color: #333;">
+            <p id="hint-tier-1" style="display:none;"><strong>💡 INFO :</strong> Pré-requis : le QCM juridique porte sur la catégorie légale des données biométriques (nLPD), et il faut une commande Linux pour afficher les connexions réseau actives avec ports. Ensuite, décalez chaque lettre de "DK-IDFLDO-JHQ" de 3 rangs vers l'arrière dans l'alphabet (le tiret reste inchangé).</p>
+            <p id="hint-tier-2" style="display:none;"><strong>🎯 PISTE :</strong> Réponse QCM : B (données personnelles sensibles). Commande : <code>netstat -a</code> (ou <code>ss -l</code>). Décalage César -3 : D→A, K→I, I→F, D→A, F→C, L→I, D→A, O→L, J→G, H→E, Q→N.</p>
+            <p id="hint-tier-3" style="display:none;"><strong>🆘 SOLUTION :</strong> Pré-requis : B / netstat -a. Moteur de synthèse : <code>AI-FACIAL-GEN</code></p>
+        </div>
+    </div>
+
+    <script>
+        // --- ANIMATION BACKGROUND : BIO-GRID RADAR PULSE ---
+        const canvas = document.getElementById('bio-canvas');
+        const ctx = canvas.getContext('2d');
+        let pulseSize = 0;
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        function drawBioGrid() {
+            ctx.fillStyle = 'rgba(2, 4, 10, 0.15)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const step = 40;
+            ctx.strokeStyle = 'rgba(31, 111, 235, 0.05)';
+            ctx.lineWidth = 1;
+
+            for(let x = 0; x < canvas.width; x += step) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+            for(let y = 0; y < canvas.height; y += step) {
+                ctx.beginPath();
+                ctx.moveTo(0, y); ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+
+            ctx.beginPath();
+            ctx.arc(canvas.width/2, canvas.height/2, pulseSize, 0, Math.PI*2);
+            ctx.strokeStyle = `rgba(31, 111, 235, ${1 - pulseSize/(canvas.width/1.5)})`;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            pulseSize += 4;
+            if (pulseSize > canvas.width / 1.5) pulseSize = 0;
+
+            requestAnimationFrame(drawBioGrid);
+        }
+        function appliquerModeSobre() {
+            const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+            document.body.classList.toggle('mode-sobre', actif);
+            const btn = document.getElementById('toggle-sobre-btn');
+            if (btn) btn.textContent = actif ? '🌓 Mode sobre : ON' : '🌓 Mode sobre';
+        }
+        function basculerModeSobre() {
+            const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+            localStorage.setItem('swiss_shield_mode_sobre', actif ? '0' : '1');
+            appliquerModeSobre();
+        }
+        appliquerModeSobre();
+        if (localStorage.getItem('swiss_shield_mode_sobre') !== '1') drawBioGrid();
+
+        // 1. VERROU DE SESSION
+        function unlock() {
+            const code = document.getElementById('passkey').value.trim().toUpperCase();
+            if (code === 'NEURAL-SHIELD-2026') {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('double-verrou-screen').style.display = 'block';
+                currentZone = 'double-verrou-screen';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('entree', code, 'NEURAL-SHIELD-2026');
+                alert("JETON INVALIDE : Accès refusé. Veuillez vérifier le code issu de l'épisode précédent.");
+            }
+        }
+
+        // 7. VÉRIFICATION DU DOUBLE VERROU INTERACTIF
+        function verifyDoubleLock() {
+            const qcmSelected = document.querySelector('input[name="qcm_lpd"]:checked');
+            const techCmd = document.getElementById('tech_cmd').value.trim().toLowerCase();
+
+            if (!qcmSelected) {
+                enregistrerErreur('prerequis', 'qcm=(aucune sélection), commande="' + techCmd + '"', 'qcm=B, commande contient netstat/ss avec -a/-l');
+                alert("ERREUR ANALYSEUR : Vous devez sélectionner une réponse pour le volet juridique.");
+                return;
+            }
+
+            // Validation Juridique (B) et Technique (netstat -tulpen ou netstat -an ou ss -tuln)
+            const jurValid = (qcmSelected.value === "B");
+            const techValid = (techCmd.includes("netstat") || techCmd.includes("ss")) && (techCmd.includes("-a") || techCmd.includes("-l"));
+
+            if (jurValid && techValid) {
+                document.getElementById('double-verrou-screen').style.display = 'none';
+                document.getElementById('mission-content').style.display = 'block';
+                currentZone = 'mission-content';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('prerequis', 'qcm=' + qcmSelected.value + ', commande="' + techCmd + '"', 'qcm=B, commande contient netstat/ss avec -a/-l');
+                alert("ACCÈS RESTREINT : Échec des tests de pré-requis juridiques ou réseau.");
+            }
+        }
+
+        // 8 & 9. VALIDATION DE L'INVESTIGATION ET RÉSOLUTION CHANTIER COMPLEXE
+        function signReport() {
+            const val = document.getElementById('sourceV').value.trim().toUpperCase();
+            
+            // Calcul du décalage -3 sur "DK-IDFLDO-JHQ" :
+            // D - 3 = A | K - 3 = I
+            // I - 3 = F | D - 3 = A | F - 3 = C | L - 3 = I | D - 3 = A | O - 3 = L
+            // J - 3 = G | H - 3 = E | Q - 3 = N
+            // Résultat attendu : AI-FACIAL-GEN
+
+            if (val === 'AI-FACIAL-GEN') {
+                document.getElementById('action-zone').style.display = 'none';
+                document.getElementById('victory-zone').style.display = 'block';
+            } else {
+                enregistrerErreur('investigation', val, 'AI-FACIAL-GEN');
+                alert("ERREUR COHÉRENCE : La signature fournie ne résout pas correctement le décalage de l'algorithme d'obfuscation.");
+            }
+        }
+
+        function toggleAide() {
+            var x = document.getElementById("zoneAide");
+            x.style.display = (x.style.display === "block") ? "none" : "block";
+        }
+    </script>
+
+    <script>
+        const EP_ID = "S03E18";
+        const HINT_COST = {1:1, 2:2, 3:3};
+        let hintsUsed = {1:false, 2:false, 3:false};
+        let episodeScore = 5;
+        function useHint(level) {
+            if (hintsUsed[level] || (level > 1 && !hintsUsed[level - 1])) return;
+            hintsUsed[level] = true;
+        enregistrerIndiceUsage(level);
+            episodeScore -= HINT_COST[level];
+            document.getElementById('hint-score-value').textContent = episodeScore;
+            document.getElementById('hint-tier-' + level).style.display = 'block';
+            const btn = document.getElementById('hintBtn' + level);
+            btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5';
+            if (level < 3) {
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+            sauvegarderAutomatiquement();
+        }
+        function recordEpisodeSuccess() {
+            let scores = {};
+            try { scores = JSON.parse(localStorage.getItem('swiss_shield_scores') || '{}'); } catch(e) {}
+            if (!(EP_ID in scores) || scores[EP_ID] < episodeScore) scores[EP_ID] = episodeScore;
+            localStorage.setItem('swiss_shield_scores', JSON.stringify(scores));
+            localStorage.removeItem('autosave_' + EP_ID);
+        }
+    let currentZone = 'lock-screen';
+    function sauvegarderAutomatiquement() {
+        try {
+            const inputs = {};
+            ['passkey', 'tech_cmd', 'sourceV'].forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) inputs[id] = el.value;
+            });
+            const qcmChecked = document.querySelector('input[name="qcm_lpd"]:checked');
+            inputs['qcm_lpd'] = qcmChecked ? qcmChecked.value : '';
+            localStorage.setItem('autosave_' + EP_ID, JSON.stringify({
+                zone: currentZone,
+                inputs: inputs,
+                hintsUsed: hintsUsed,
+                episodeScore: episodeScore
+            }));
+        } catch(e) {}
+    }
+    function proposerRestaurationAutosave() {
+        let data;
+        try { data = JSON.parse(localStorage.getItem('autosave_' + EP_ID) || 'null'); } catch(e) { return; }
+        if (!data || !data.zone || data.zone === 'lock-screen') return;
+        document.getElementById('lock-screen').style.display = 'none';
+        if (data.zone === 'mission-content') {
+            document.getElementById('double-verrou-screen').style.display = 'none';
+            document.getElementById('mission-content').style.display = 'block';
+        } else if (data.zone === 'double-verrou-screen') {
+            document.getElementById('double-verrou-screen').style.display = 'block';
+        }
+        currentZone = data.zone;
+        if (data.inputs) {
+            Object.keys(data.inputs).forEach(function(id) {
+                if (id === 'qcm_lpd') {
+                    if (data.inputs.qcm_lpd) {
+                        const radio = document.querySelector('input[name="qcm_lpd"][value="' + data.inputs.qcm_lpd + '"]');
+                        if (radio) radio.checked = true;
+                    }
+                    return;
+                }
+                const el = document.getElementById(id);
+                if (el) el.value = data.inputs[id];
+            });
+        }
+        hintsUsed = data.hintsUsed || hintsUsed;
+        episodeScore = (typeof data.episodeScore === 'number') ? data.episodeScore : episodeScore;
+        document.getElementById('hint-score-value').textContent = episodeScore;
+        [1, 2, 3].forEach(function(level) {
+            if (hintsUsed[level]) {
+                document.getElementById('hint-tier-' + level).style.display = 'block';
+                const btn = document.getElementById('hintBtn' + level);
+                if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+        });
+    }
+    function enregistrerIndiceUsage(niveau) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + niveau;
+            debrief.indices[cle] = (debrief.indices[cle] || 0) + 1;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+    function enregistrerErreur(phase, reponseEleve, reponseAttendue) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + phase;
+            if (typeof debrief.erreurs[cle] !== 'object' || debrief.erreurs[cle] === null) {
+                debrief.erreurs[cle] = { compte: (debrief.erreurs[cle] || 0), exemples: [] };
+            }
+            debrief.erreurs[cle].compte++;
+            if (reponseEleve !== undefined && debrief.erreurs[cle].exemples.length < 5) {
+                debrief.erreurs[cle].exemples.push({ reponseEleve: String(reponseEleve).slice(0,100), reponseAttendue: String(reponseAttendue||'').slice(0,100) });
+            }
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+        (function pollSuccess(){
+            const ids = ['success','success-msg','success-final','final-zone','step_final','victory-zone','victory-screen','final-step','final-badge'];
+            let recorded = false;
+            setInterval(function(){
+                if (recorded) return;
+                for (const id of ids) {
+                    const el = document.getElementById(id);
+                    if (el && window.getComputedStyle(el).display === 'block') { recordEpisodeSuccess(); recorded = true; return; }
+                }
+            }, 500);
+        })();
+        proposerRestaurationAutosave();
+    </script>
+</body>
+</html>

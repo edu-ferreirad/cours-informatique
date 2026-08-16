@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>S03E24 - RANSOMWARE DEFENSE</title>
+    <style>
+        /* --- NOUVEL EFFET VISUEL FINAL : CYBER-HELLFIRE GLITCH --- */
+        #final-bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -2;
+            background: radial-gradient(circle, #440000 0%, #000000 100%);
+        }
+        
+        #pixel-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            z-index: -1;
+            opacity: 0.4;
+        }
+
+        body { background-color: #0a0a0a; color: #00d4ff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 40px; margin: 0; overflow-x: hidden; }
+        
+        .terminal { 
+            background: rgba(0, 0, 0, 0.95); 
+            border: 2px solid #ff3e3e; /* Bordure rouge pour l'alerte */
+            padding: 30px; width: 95%; 
+            max-width: 900px; 
+            box-shadow: 0 0 60px rgba(255, 62, 62, 0.4); 
+            position: relative; 
+            border-radius: 5px;
+            backdrop-filter: blur(10px);
+        }
+
+        /* CONTEXTE HISTOIRE FINAL S3 */
+        .crisis-briefing {
+            background: rgba(255, 62, 62, 0.15);
+            border: 1px solid #ff3e3e;
+            padding: 20px;
+            margin: 20px 0;
+            color: #ffcccc;
+            font-size: 1em;
+            line-height: 1.6;
+        }
+        .crisis-briefing b { color: #ff3e3e; text-shadow: 0 0 5px #000; }
+        
+        #lock-screen, #pre-requis-screen, #mission-content { transition: opacity 0.5s; }
+        #pre-requis-screen, #mission-content { display: none; }
+
+        .timer-zone { font-size: 2.5em; color: #ff3e3e; text-align: center; margin: 20px 0; font-family: 'Courier New', monospace; font-weight: bold; text-shadow: 0 0 15px #ff3e3e; }
+        
+        .alert-banner { background: #ff3e3e; color: #fff; padding: 10px; text-align: center; font-weight: bold; animation: blink 0.8s infinite; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 3px; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.2; } 100% { opacity: 1; } }
+
+        .log-area { background: #050505; border: 1px solid #333; padding: 15px; font-family: 'Courier New', monospace; font-size: 0.85em; color: #aaa; height: 180px; overflow-y: auto; margin-bottom: 20px; }
+        .log-entry { margin-bottom: 5px; border-bottom: 1px solid #111; padding-bottom: 2px; }
+        .log-highlight { color: #00d4ff; font-weight: bold; }
+
+        .decrypt-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 20px; }
+        input { background: #111; border: 1px solid #ff3e3e; color: #ff3e3e; padding: 12px; text-align: center; outline: none; font-size: 1.1em; width: 100%; box-sizing: border-box; font-family: 'Courier New', monospace; }
+        input:focus { box-shadow: 0 0 15px #ff3e3e; background: #000; }
+        
+        button { background: #ff3e3e; color: #fff; border: none; padding: 15px 30px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 20px; width: 100%; transition: 0.3s; font-size: 1.1em; }
+        button:hover { background: #fff; color: #ff3e3e; box-shadow: 0 0 30px #ff3e3e; }
+
+        #victory-screen { display: none; text-align: center; padding: 40px; border: 3px double #00ff41; background: rgba(0, 255, 65, 0.1); color: #00ff41; }
+        .final-key { font-size: 2.5em; display: block; margin: 20px 0; text-shadow: 0 0 20px #00ff41; background: #000; padding: 10px; border: 1px dashed #00ff41; }
+        
+        .export-report { background: rgba(0, 212, 255, 0.1); padding: 15px; text-align: left; font-size: 0.85em; border: 1px solid #00d4ff; margin: 20px 0; font-family: 'Courier New', monospace; color: #00d4ff; }
+
+        .btn-aide-rouge { background: #d80000; color: #fff; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; width: 100%; max-width: 450px; margin-top: 40px; border-radius: 2px; text-transform: uppercase; }
+        .aide-box { display: none; background: #fff; color: #000; padding: 25px; margin-top: 10px; width: 90%; max-width: 450px; text-align: left; border-top: 5px solid #d80000; font-family: sans-serif; box-shadow: 0 10px 30px rgba(0,0,0,0.5); line-height: 1.4; font-size: 0.9em; }
+
+        .ghost-img { opacity: 0.01; width: 1px; height: 1px; position: absolute; }
+
+        /* MANDATORY ARTIFACT 4 : BOUTON NAV RETOUR */
+        .btn-retour-nav { position: absolute; top: 15px; left: 15px; background: #000; border: 1px solid #ff3e3e; color: #ff3e3e; padding: 6px 12px; text-decoration: none; font-size: 0.8em; font-weight: bold; border-radius: 4px; z-index: 10; font-family: monospace; }
+        .btn-retour-nav:hover { background: #ff3e3e; color: #000; }
+
+        /* STYLES DES VERROUS INTERMEDIAIRES (POINT 7) */
+        .qcm-section { text-align: left; margin: 20px 0; font-family: monospace; }
+        .qcm-label { display: block; margin: 10px 0; cursor: pointer; color: #ffcccc; }
+        .code-window { background: #050505; border: 1px solid #00d4ff; padding: 15px; border-radius: 4px; margin: 15px 0; font-family: 'Courier New', monospace; font-size: 0.85em; color: #00d4ff; text-align: left; overflow-x: auto; white-space: pre; }
+
+        /* MODE SOBRE */
+        body.mode-sobre, body.mode-sobre * { animation: none !important; transition: none !important; }
+        body.mode-sobre #pixel-canvas { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div id="final-bg"></div>
+    <canvas id="pixel-canvas"></canvas>
+
+    <div class="terminal">
+        <a href="../../MENU_PRINCIPAL.html" class="btn-retour-nav">⬅ NAV MENU</a>
+        <button id="toggle-sobre-btn" onclick="basculerModeSobre()" style="position:absolute;top:15px;right:15px;width:auto;z-index:10;background:#000;border:1px solid #ff3e3e;color:#ff3e3e;padding:6px 12px;font-size:0.8em;font-weight:bold;border-radius:4px;cursor:pointer;font-family:monospace;">🌓</button>
+
+        <div id="lock-screen">
+            <h2 style="color: #ff3e3e; text-shadow: 0 0 15px rgba(255, 62, 62, 0.7); margin-top:25px;">🚨 PROTOCOLE DE CRISE FINALE S03</h2>
+            
+            <div class="crisis-briefing">
+                <b>[ ÉTAT D'URGENCE ABSOLU ]</b><br>
+                Le ransomware <b>LockBit 4.0</b> s'est propagé via le serveur fantôme que nous traquions. Les fichiers de la comptabilité et des RH de la centrale de gestion des urgences à Berne sont en train d'être verrouillés par une clé AES-256. <br><br>
+                En tant que responsable de la protection des données, vous devez appliquer l'<b>Art. 24 nLPD</b> : stopper l'incident et préparer la notification au PFPDT. 
+            </div>
+
+            <p>Code d'authentification requis (Fin E23) :</p>
+            <input type="text" id="passkey" placeholder="AUTHENTIFICATION" style="border-color: #00d4ff; color: #00d4ff; max-width: 350px;" onchange="sauvegarderAutomatiquement()">
+            <br>
+            <button onclick="unlock()" style="background: #00d4ff; max-width: 350px;">ENTRER DANS LA ZONE DE GUERRE</button>
+        </div>
+
+        <div id="pre-requis-screen">
+            <div class="alert-banner" style="background: #00d4ff; color: #000;">🔒 VÉRIFICATION DES ACCRÉDITATIONS AVANT RECONSTRUCTION</div>
+            
+            <div class="qcm-section">
+                <p style="color: #ff3e3e; font-weight: bold;">⚖️ CADRE JURIDIQUE DE CRUISE FINALE (Notification de violation Art. 24 nLPD) :</p>
+                <p>Suite au chiffrement massif des données RH par LockBit 4.0, la nLPD impose une annonce au PFPDT sous quelles conditions strictes ?</p>
+                <label class="qcm-label"><input type="radio" name="nlpd_qcm" value="nok1" onchange="sauvegarderAutomatiquement()"> A) Dès que le montant de la rançon dépasse 50'000 CHF.</label>
+                <label class="qcm-label"><input type="radio" name="nlpd_qcm" value="ok_lpd" onchange="sauvegarderAutomatiquement()"> B) Dès que la violation entraîne un risque élevé pour la personnalité ou les droits fondamentaux de la personne concernée.</label>
+                <label class="qcm-label"><input type="radio" name="nlpd_qcm" value="nok2" onchange="sauvegarderAutomatiquement()"> C) Uniquement si les sauvegardes physiques locales ont également été physiquement détruites.</label>
+            </div>
+
+            <div style="text-align: left; margin-top: 25px; font-family: monospace;">
+                <p style="color: #ff3e3e; font-weight: bold;">🖥️ FORFEIT DE PERSISTANCE (ANALYSE DE REGISTRE CYBER) :</p>
+                <p>Le ransomware a modifié une clé de registre de persistance pour se relancer à chaque démarrage. Quelle commande PowerShell administrative permet de lister les valeurs d'exécution automatique contenues dans le dossier de configuration Run de la machine ?</p>
+                <input type="text" id="tech_cmd" placeholder="Commande PS (ex: Get-ItemProperty ... ou Get-ChildItem ...)" style="width: 100%; max-width: 600px; margin: 10px 0; border-color: #00d4ff; color: #00d4ff;" onchange="sauvegarderAutomatiquement()">
+            </div>
+            <br>
+            <button onclick="verifyPreReq()" style="background: #00d4ff;">CHARGER LES MODULES DE DÉCHIFFREMENT</button>
+        </div>
+
+        <div id="mission-content">
+            <div class="alert-banner">🚨 RANSOMWARE DETECTÉ : LOCKBIT 4.0 🚨</div>
+            
+            <p>> <b>Situation :</b> Chiffrement massif détecté. Vous avez 60 secondes pour injecter les vecteurs de neutralisation Alpha, Bêta et Gamma.</p>
+            
+            <div class="timer-zone">AUTO-DESTRUCTION DANS : <span id="timer">60</span>s</div>
+
+            <div class="log-area" id="logs" style="height: 220px;">
+                <div class="log-entry">[NET] Connexion entrante 185.220.101.44 -&gt; sql-proxy-04 (port 443)</div>
+                <div class="log-entry">[SYSTEM] Tentative d'accès non autorisée via Proxy Glacier-Zero...</div>
+                <div class="log-entry">[INFO] Service de sauvegarde nocturne : dernier snapshot OK (23:58:02)</div>
+                <div class="log-entry">[WARN] Chiffrement du répertoire /FINANCES en cours...</div>
+                <div class="log-entry">[INFO] Analyse du paquet : Fragment Beta détecté. Somme de contrôle : <span class="log-highlight">128 + 256</span></div>
+                <div class="log-entry">[SYSTEM] Rotation des logs applicative terminée (taille : 4.2 Go)</div>
+                <div class="log-entry">[INFO] Rapport d'incident n° : <span class="log-highlight" title="Indice Gamma : Inversez-moi">EXE_REVRES</span></div>
+                <div class="log-entry">[WARN] Tentative de connexion refusée : compte de service SVC_BACKUP_RO</div>
+                <div class="log-entry">[SYSTEM] Scan des métadonnées image en cours...</div>
+                <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="CYBER-77" class="ghost-img">
+                <div class="log-entry">[INFO] Vérification d'intégrité disque planifiée : aucune anomalie physique</div>
+                <div class="log-entry">[WARN] Processus svchost_update32.exe : utilisation CPU anormale (94%)</div>
+            </div>
+
+            <div class="code-window"># --- RUNTIME FORENSIC DE CRYPTO-SÉCURITÉ (ALGORITHME INTERNE LOCKBIT) ---
+# Indice Algorithmique de fin de saison : 
+# La clé Alpha est dissimulée dans les métadonnées de l'image fantôme de la visionneuse.
+# La clé Bêta est le résultat décimal de l'addition mathématique affichée dans la zone de logs.
+# La clé Gamma nécessite l'inversion structurelle de la chaîne de caractères du rapport d'incident.
+
+def final_validation_sequence(alpha, beta, gamma):
+    # Algorithme de vérification combinatoire polymorphe
+    xor_gate_1 = (alpha == "CYBER-77")
+    xor_gate_2 = (int(beta) == 128 + 256)
+    xor_gate_3 = (gamma[::-1] == "EXE_REVRES")
+    
+    if xor_gate_1 and xor_gate_2 and xor_gate_3:
+        return "DECRYPT_SUCCESS"
+    return "SYSTEM_DESTROYED"</div>
+
+            <div id="investigation-zone">
+                <div class="decrypt-grid">
+                    <input type="text" id="keyAlpha" placeholder="CLÉ ALPHA" onchange="sauvegarderAutomatiquement()">
+                    <input type="text" id="keyBeta" placeholder="CLÉ BÊTA" onchange="sauvegarderAutomatiquement()">
+                    <input type="text" id="keyGamma" placeholder="CLÉ GAMMA" onchange="sauvegarderAutomatiquement()">
+                </div>
+                <button onclick="neutralize()">NEUTRALISER LE RANSOMWARE</button>
+            </div>
+        </div>
+
+        <div id="victory-screen">
+            <h2 style="margin-top:0;">✓ RÉSILIENCE CYBER CONFIRMÉE</h2>
+            <p>Le chiffrement a été stoppé à 98%. Les sauvegardes immuables sont intactes.</p>
+            <p>Votre code final de Saison 3 :</p>
+            <b class="final-key">CYBER-RESILIENT-2026</b>
+            
+            <div class="export-report">
+                <b>📝 RAPPORT D'INCIDENT FINAL (export_eleves.csv) :</b><br>
+                S03E24 ; Succès ; Ransomware neutralisé (Clés: CYBER-77, 384, SERVER_EXE). Données restaurées. 
+                <i>Félicitations, Expert en Protection des Données 2026.</i>
+            </div>
+
+            <a href="../../MENU_PRINCIPAL.html" style="color: #00ff41; text-decoration: none; border: 1px solid #00ff41; padding: 10px 20px; display: inline-block; font-weight: bold;">FIN DE MISSION</a>
+        </div>
+    </div>
+
+    <button class="btn-aide-rouge" onclick="toggleAide()">[ 📜 RAPPORT DE CRISE CYBER 2026 ]</button>
+    <div id="zoneAide" class="aide-box">
+        <h3 style="color: #d80000; margin-top: 0;">Gestion de Ransomware & Conformité</h3>
+        <p><b>1. Informatique :</b> Le ransomware exploite des routines de chiffrement asymétrique ou symétrique ultra-rapides. Une fois la clé maîtresse détruite ou séquestrée, l'inversion par force brute est mathématiquement impossible sans les vecteurs de neutralisation correspondants.</p>
+        <p><b>2. Juridique (Suisse) :</b> Selon l'<b>Art. 24 nLPD</b>, toute violation de la sécurité des données doit être annoncée au PFPDT dans les meilleurs délais si elle engendre un risque élevé. L'omission délibérée d'une notification peut entraîner de lourdes sanctions administratives et nuire à la réputation de l'infrastructure d'importance systémique.</p>
+        <p><b>3. Forensics (Analyse des Traces) :</b> 
+            - <i>Alpha :</i> Dissimulé dans l'attribut alternatif d'un tag média au sein de l'arbre structurel DOM.
+            - <i>Bêta :</i> Demande la résolution de l'équation de registre résiduelle présente dans les journaux de fuite.
+            - <i>Gamma :</i> Repose sur une inversion de pile (String Reversing), une technique classique de masquage de chaînes de caractères utilisée par les attaquants dans les en-têtes d'exécutables (MZ/PE).
+        </p>
+    </div>
+
+    <div style="margin-top: 30px; border-top: 3px solid #d80000; padding: 20px; background: #fff; font-family: Arial, sans-serif; position: relative; z-index: 100; width: 90%; max-width: 450px;">
+        <div id="hint-score-badge" style="background:#111;color:#3fb950;padding:8px 15px;font-weight:bold;text-align:center;">🏆 Score de cet épisode : <span id="hint-score-value">5</span> / 5 pts</div>
+        <div style="display:flex; gap:8px; margin:10px 0;">
+            <button id="hintBtn1" onclick="useHint(1)" style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;">💡 Indice 1 (-1 pt)</button>
+            <button id="hintBtn2" onclick="useHint(2)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🎯 Indice 2 (-2 pts)</button>
+            <button id="hintBtn3" onclick="useHint(3)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🆘 Solution (-3 pts)</button>
+        </div>
+
+        <div id="zoneAideScore" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; color: #333;">
+            <p id="hint-tier-1" style="display:none;"><strong>💡 INFO :</strong> Pré-requis : le QCM porte sur la condition de notification au PFPDT selon l'Art. 24 nLPD, et il faut une commande PowerShell pour interroger les clés de registre de persistance. Ensuite, la clé Alpha est cachée dans l'attribut <code>alt</code> d'une image du DOM, la Bêta est le résultat de l'addition affichée dans les logs, et la Gamma s'obtient en inversant une chaîne du rapport d'incident.</p>
+            <p id="hint-tier-2" style="display:none;"><strong>🎯 PISTE :</strong> Réponse QCM : B (risque élevé). Commande : <code>Get-ItemProperty</code> (ou Get-ChildItem / reg query) sur la clé Run. Alpha : attribut <code>alt="CYBER-77"</code> de l'image fantôme. Bêta : 128 + 256 = 384. Gamma : inversez lettre par lettre <code>EXE_REVRES</code>.</p>
+            <p id="hint-tier-3" style="display:none;"><strong>🆘 SOLUTION :</strong> Pré-requis : B / Get-ItemProperty. Clés : Alpha <code>CYBER-77</code>, Bêta <code>384</code>, Gamma <code>SERVER_EXE</code></p>
+        </div>
+    </div>
+
+    <script>
+        // --- ANIMATION PIXELS TOMBANTS (FALLING FIRE) ---
+        const canvas = document.getElementById('pixel-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const pixels = [];
+        for(let i=0; i<100; i++) {
+            pixels.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 4 + 1,
+                speed: Math.random() * 5 + 2
+            });
+        }
+
+        function drawPixels() {
+            if (localStorage.getItem('swiss_shield_mode_sobre') === '1') { return; }
+            ctx.clearRect(0,0, canvas.width, canvas.height);
+            ctx.fillStyle = "#ff3e3e";
+            pixels.forEach(p => {
+                ctx.fillRect(p.x, p.y, p.size, p.size);
+                p.y += p.speed;
+                if(p.y > canvas.height) p.y = -10;
+            });
+            requestAnimationFrame(drawPixels);
+        }
+        drawPixels();
+
+        let timeLeft = 60;
+        let timerId;
+
+        function toggleAide() {
+            var x = document.getElementById("zoneAide");
+            x.style.display = (x.style.display === "block") ? "none" : "block";
+        }
+
+        function startTimer() {
+            timerId = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer').innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timerId);
+                    alert("FATAL ERROR : Système entièrement chiffré. Rançon de 50 BTC exigée.");
+                    location.reload();
+                }
+                pixels.forEach(p => p.speed += 0.05);
+            }, 1000);
+        }
+
+        // POINT 1 : VERROU DE SESSION
+        function unlock() {
+            const code = document.getElementById('passkey').value.trim().toUpperCase();
+            if (code === 'AI-FRAUD-DETECTION-99') {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('pre-requis-screen').style.display = 'block';
+                currentZone = 'pre-requis-screen';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('entree', code, 'AI-FRAUD-DETECTION-99');
+                alert("ACCÈS REFUSÉ : Authentification S03E23 requise.");
+            }
+        }
+
+        // POINT 7 : ACTION DOUBLE VERROU INTERMEDIAIRE
+        function verifyPreReq() {
+            const selectedLpd = document.querySelector('input[name="nlpd_qcm"]:checked');
+            const techCmd = document.getElementById('tech_cmd').value.trim().toLowerCase();
+
+            if (!selectedLpd) {
+                enregistrerErreur('prerequis', 'nlpd=(aucune sélection), commande="' + techCmd + '"', 'nlpd=ok_lpd, commande Get-ItemProperty/Get-ChildItem/reg query');
+                alert("ERREUR CRITIQUE : L'évaluation d'impact juridique nLPD est obligatoire.");
+                return;
+            }
+
+            const jurValid = (selectedLpd.value === "ok_lpd");
+            
+            // Validation de la commande technique PowerShell pour interroger le registre (Get-ItemProperty / Get-ChildItem / reg query)
+            const techValid = (techCmd.includes("get-itemproperty") || techCmd.includes("get-childitem") || techCmd.includes("reg query") || techCmd.includes("get-item"));
+
+            if (jurValid && techValid) {
+                document.getElementById('pre-requis-screen').style.display = 'none';
+                document.getElementById('mission-content').style.display = 'block';
+                currentZone = 'mission-content';
+                sauvegarderAutomatiquement();
+                startTimer(); // Le compte à rebours de 60s commence ici, une fois les verrous passés
+            } else {
+                enregistrerErreur('prerequis', 'nlpd=' + selectedLpd.value + ', commande="' + techCmd + '"', 'nlpd=ok_lpd, commande Get-ItemProperty/Get-ChildItem/reg query');
+                alert("ÉCHEC DES ACCRÉDITATIONS : Mauvaise interprétation de l'Art. 24 ou commande d'extraction de registre incorrecte.");
+            }
+        }
+
+        // POINT 6 & POINT 8 : ETAPE INVESTIGATION FINALE SANS MOTS EN CLAIR
+        function neutralize() {
+            const a = document.getElementById('keyAlpha').value.trim().toUpperCase();
+            const b = document.getElementById('keyBeta').value.trim();
+            const g = document.getElementById('keyGamma').value.trim().toUpperCase();
+
+            if (a === 'CYBER-77' && b === '384' && g === 'SERVER_EXE') {
+                clearInterval(timerId);
+                document.getElementById('mission-content').style.display = 'none';
+                document.getElementById('victory-screen').style.display = 'block';
+                document.body.style.background = "#001a00"; 
+                document.getElementById('final-bg').style.background = "radial-gradient(circle, #004400 0%, #000000 100%)";
+            } else {
+                enregistrerErreur('investigation', 'alpha="' + a + '", beta="' + b + '", gamma="' + g + '"', 'alpha=CYBER-77, beta=384, gamma=SERVER_EXE');
+                alert("ERREUR CRITIQUE : Alignement des clés incorrect. Accélération de la corruption cryptographique !");
+                timeLeft -= 10;
+                document.getElementById('timer').style.fontSize = "3.5em";
+            }
+        }
+    </script>
+
+    <script>
+        const EP_ID = "S03E24";
+        const HINT_COST = {1:1, 2:2, 3:3};
+        let hintsUsed = {1:false, 2:false, 3:false};
+        let episodeScore = 5;
+        function useHint(level) {
+            if (hintsUsed[level] || (level > 1 && !hintsUsed[level - 1])) return;
+            hintsUsed[level] = true;
+            enregistrerIndiceUsage(level);
+            episodeScore -= HINT_COST[level];
+            document.getElementById('hint-score-value').textContent = episodeScore;
+            document.getElementById('hint-tier-' + level).style.display = 'block';
+            const btn = document.getElementById('hintBtn' + level);
+            btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5';
+            if (level < 3) {
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+            sauvegarderAutomatiquement();
+        }
+        function recordEpisodeSuccess() {
+            let scores = {};
+            try { scores = JSON.parse(localStorage.getItem('swiss_shield_scores') || '{}'); } catch(e) {}
+            if (!(EP_ID in scores) || scores[EP_ID] < episodeScore) scores[EP_ID] = episodeScore;
+            localStorage.setItem('swiss_shield_scores', JSON.stringify(scores));
+            localStorage.removeItem('autosave_' + EP_ID);
+        }
+        let currentZone = 'lock-screen';
+        function sauvegarderAutomatiquement() {
+            try {
+                const inputs = {};
+                ['passkey', 'tech_cmd', 'keyAlpha', 'keyBeta', 'keyGamma'].forEach(function(id) {
+                    const el = document.getElementById(id);
+                    if (el) inputs[id] = el.value;
+                });
+                const lpdChecked = document.querySelector('input[name="nlpd_qcm"]:checked');
+                inputs['nlpd_qcm'] = lpdChecked ? lpdChecked.value : '';
+                localStorage.setItem('autosave_' + EP_ID, JSON.stringify({
+                    zone: currentZone,
+                    inputs: inputs,
+                    hintsUsed: hintsUsed,
+                    episodeScore: episodeScore
+                }));
+            } catch(e) {}
+        }
+        function proposerRestaurationAutosave() {
+            let data;
+            try { data = JSON.parse(localStorage.getItem('autosave_' + EP_ID) || 'null'); } catch(e) { return; }
+            if (!data || !data.zone || data.zone === 'lock-screen') return;
+            document.getElementById('lock-screen').style.display = 'none';
+            if (data.zone === 'mission-content') {
+                document.getElementById('pre-requis-screen').style.display = 'none';
+                document.getElementById('mission-content').style.display = 'block';
+            } else if (data.zone === 'pre-requis-screen') {
+                document.getElementById('pre-requis-screen').style.display = 'block';
+            }
+            currentZone = data.zone;
+            if (data.inputs) {
+                Object.keys(data.inputs).forEach(function(id) {
+                    if (id === 'nlpd_qcm') {
+                        if (data.inputs.nlpd_qcm) {
+                            const radio = document.querySelector('input[name="nlpd_qcm"][value="' + data.inputs.nlpd_qcm + '"]');
+                            if (radio) radio.checked = true;
+                        }
+                        return;
+                    }
+                    const el = document.getElementById(id);
+                    if (el) el.value = data.inputs[id];
+                });
+            }
+            hintsUsed = data.hintsUsed || hintsUsed;
+            episodeScore = (typeof data.episodeScore === 'number') ? data.episodeScore : episodeScore;
+            document.getElementById('hint-score-value').textContent = episodeScore;
+            [1, 2, 3].forEach(function(level) {
+                if (hintsUsed[level]) {
+                    document.getElementById('hint-tier-' + level).style.display = 'block';
+                    const btn = document.getElementById('hintBtn' + level);
+                    if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+                    const next = document.getElementById('hintBtn' + (level + 1));
+                    if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+                }
+            });
+            // Le minuteur de 60s redémarre à neuf si on restaure en pleine mission (mécanique de jeu volontaire).
+            if (data.zone === 'mission-content' && typeof startTimer === 'function') {
+                startTimer();
+            }
+        }
+        function enregistrerErreur(phase, reponseEleve, reponseAttendue) {
+            let debrief = {erreurs:{}, indices:{}};
+            try { debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}'); } catch(e) {}
+            const key = EP_ID + ':' + phase;
+            if (typeof debrief.erreurs[key] !== 'object' || debrief.erreurs[key] === null) {
+                debrief.erreurs[key] = { compte: (debrief.erreurs[key] || 0), exemples: [] };
+            }
+            debrief.erreurs[key].compte++;
+            if (reponseEleve !== undefined && debrief.erreurs[key].exemples.length < 5) {
+                debrief.erreurs[key].exemples.push({ reponseEleve: String(reponseEleve).slice(0,100), reponseAttendue: String(reponseAttendue||'').slice(0,100) });
+            }
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        }
+        function enregistrerIndiceUsage(niveau) {
+            let debrief = {erreurs:{}, indices:{}};
+            try { debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}'); } catch(e) {}
+            const key = EP_ID + ':' + niveau;
+            debrief.indices[key] = (debrief.indices[key] || 0) + 1;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        }
+        function basculerModeSobre() {
+            const actif = document.body.classList.toggle('mode-sobre');
+            localStorage.setItem('swiss_shield_mode_sobre', actif ? '1' : '0');
+            if (!actif) { drawPixels(); }
+        }
+        if (localStorage.getItem('swiss_shield_mode_sobre') === '1') {
+            document.body.classList.add('mode-sobre');
+        }
+        (function pollSuccess(){
+            const ids = ['success','success-msg','success-final','final-zone','step_final','victory-zone','victory-screen','final-step','final-badge'];
+            let recorded = false;
+            setInterval(function(){
+                if (recorded) return;
+                for (const id of ids) {
+                    const el = document.getElementById(id);
+                    if (el && window.getComputedStyle(el).display === 'block') { recordEpisodeSuccess(); recorded = true; return; }
+                }
+            }, 500);
+        })();
+        proposerRestaurationAutosave();
+    </script>
+</body>
+</html>

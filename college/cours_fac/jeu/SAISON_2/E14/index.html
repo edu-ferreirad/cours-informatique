@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>S02E14 - ANALYSE D'IMPACT (AIPD)</title>
+    <style>
+        /* --- DESIGN ORIGINAL : PLASMA STORM --- */
+        body {
+            background: #000;
+            color: #fff;
+            font-family: 'Arial Black', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+            margin: 0;
+            min-height: 100vh;
+            position: relative;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .plasma-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(45deg, #ff0000, #00ff00, #0000ff, #ff00ff);
+            background-size: 400% 400%;
+            animation: plasmaMove 10s ease infinite;
+            z-index: -2;
+            opacity: 0.5;
+            filter: blur(50px);
+        }
+
+        @keyframes plasmaMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* --- MODE SOBRE (accessibilité) --- */
+        body.mode-sobre, body.mode-sobre * { animation: none !important; transition: none !important; }
+        #toggle-sobre-btn {
+            position: fixed; top: 10px; right: 10px; z-index: 10001;
+            background: #000; color: #fff; border: 2px solid #fff;
+            padding: 6px 10px; font-size: 0.7em; cursor: pointer; font-family: inherit; border-radius: 3px;
+        }
+
+        .terminal {
+            background: rgba(0, 0, 0, 0.95);
+            border: 8px solid #fff;
+            padding: 40px;
+            width: 90%;
+            max-width: 900px;
+            box-shadow: 0 0 100px #ff0000;
+            z-index: 10;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .alert-banner {
+            background: #e74c3c;
+            color: #fff;
+            padding: 25px;
+            margin: -40px -40px 30px -40px;
+            font-size: 2em;
+            font-weight: 900;
+            text-align: center;
+        }
+
+        .mission-context {
+            background: #fff; color: #000; padding: 20px; margin-bottom: 30px; border: 4px solid #2ecc71;
+        }
+
+        input { background: #000; border: 4px solid #2ecc71; color: #2ecc71; padding: 15px; width: 80%; font-size: 1.5em; text-align: center; margin-bottom: 20px; }
+        button { background: #2ecc71; color: #000; border: none; padding: 20px 40px; font-weight: 900; cursor: pointer; font-size: 1.2em; text-transform: uppercase; margin: 10px; }
+
+        .nav-button {
+            position: absolute;
+            top: 10px; left: 10px;
+            background: #000; color: #fff; border: 2px solid #fff;
+            padding: 10px; text-decoration: none; font-weight: bold; z-index: 100;
+        }
+
+        .aide-box {
+            display: none; background: #ffff00; color: #000; padding: 30px;
+            width: 80%; max-width: 600px; border: 10px solid #ff0000;
+            position: relative; z-index: 1000; font-weight: 900; margin-top: 20px;
+        }
+
+        .annexe-code { background: #222; color: #00ff00; padding: 15px; font-family: monospace; border: 2px solid #2ecc71; margin: 15px 0; text-align: left; }
+        .hidden-step { display: none; }
+        .code-final { color: #000; font-size: 2.5em; background: #2ecc71; padding: 15px; display: block; margin-top: 15px; }
+    </style>
+</head>
+<body>
+    <button id="toggle-sobre-btn" onclick="basculerModeSobre()">🌓 Mode sobre</button>
+
+    <a href="../../MENU_PRINCIPAL.html" class="nav-button"> < RETOUR MENU </a>
+    <div class="plasma-bg"></div>
+
+    <div class="terminal">
+        <div id="step1">
+            <div class="alert-banner">🚨 ACCÈS RESTREINT : S02E14 🚨</div>
+            <div class="mission-context">
+                <b>INFRASTRUCTURE CRITIQUE :</b> Administration Fédérale Suisse.
+                Le déploiement d'un système de reconnaissance faciale aux douanes nécessite une validation juridique stricte.
+            </div>
+            <p>CLEF DE SESSION (FIN E13) :</p>
+            <input type="text" id="passkey" placeholder="CODE E13" onchange="sauvegarderAutomatiquement()">
+            <br>
+            <button onclick="unlock()">INITIALISER L'AIPD</button>
+        </div>
+
+        <div id="step2" class="hidden-step">
+            <h2 style="color: #2ecc71;">[VÉRIFICATION DES PRÉ-REQUIS]</h2>
+            <div class="mission-context">
+                <b>DÉFI JURIDIQUE :</b> Trouvez l'article exact de la nLPD (suisse) qui définit l'obligation de l'Analyse d'Impact.
+                <br><input type="text" id="check_jur" placeholder="Art. ?? nLPD" onchange="sauvegarderAutomatiquement()">
+            </div>
+            <div class="mission-context">
+                <b>DÉFI TECHNIQUE :</b> Pour garantir l'intégrité de l'analyse, quelle commande terminal (macOS/Linux) génère un condensat <b>SHA-256</b> ?
+                <br><input type="text" id="check_tech" placeholder="Utilitaire + option" onchange="sauvegarderAutomatiquement()">
+            </div>
+            <button onclick="verifyPreReqs()">VALIDER LES DOSSIERS</button>
+        </div>
+
+        <div id="step3" class="hidden-step">
+            <h2 style="color: #2ecc71;">[LOGIQUE DE RISQUE ÉLEVÉ]</h2>
+            <p>Le Préposé fédéral (PFPDT) exige le calcul du score critique d'impact pour ce projet biométrique :</p>
+            <div class="annexe-code">
+                # Algorithme de sévérité suisse<br>
+                volume_donnees = 5<br>
+                facteur_sensibilite = 4<br><br>
+                # Rappel : le volume est au carré avant multiplication<br>
+                score_final = (volume_donnees ** 2) * facteur_sensibilite
+            </div>
+            <p>VALEUR DU SEUIL À TRANSMETTRE :</p>
+            <input type="number" id="final_answer" placeholder="Score calculé" onchange="sauvegarderAutomatiquement()">
+            <br>
+            <button onclick="solveInvestigation()">TRANSMETTRE AU PFPDT</button>
+        </div>
+
+        <div id="step_final" class="hidden-step">
+            <h2 style="color: #2ecc71;">AIPD VALIDÉE ✅</h2>
+            <p>Exportation de la clé de succès Episode 14 :</p>
+            <span class="code-final">AIPD-RISK-22</span>
+        </div>
+    </div>
+
+    <button style="background: #d80000; color: #fff; border: 4px solid #fff;" onclick="toggleAide()">[ 🆘 PILIERS D'AIDE ]</button>
+
+    <div id="zoneAide" class="aide-box">
+        <h2 style="color: #ff0000;">ARCHIVES PÉDAGOGIQUES</h2>
+        <p><b>JURIDIQUE :</b> Consultez la section 4 de la nLPD (Obligations du responsable). Cherchez l'article situé entre le 20 et le 25.</p>
+        <p><b>TECHNIQUE :</b> L'utilitaire standard est `shasum`. L'argument `-a` permet de spécifier l'algorithme souhaité (256).</p>
+        <p><b>FORENSICS :</b> En analyse de traces, l'opérateur `**` en Python (et dans ce défi) représente une **exponentiation** (puissance).</p>
+        <button onclick="toggleAide()" style="background:#000; color:#fff; width:100%;">RETOURNER AU TERMINAL</button>
+    </div>
+
+    <div style="margin-top: 30px; border-top: 3px solid #d80000; padding: 20px; background: #fff; font-family: Arial, sans-serif; position: relative; z-index: 100; width: 80%; max-width: 600px;">
+        <div id="hint-score-badge" style="background:#111;color:#3fb950;padding:8px 15px;font-weight:bold;text-align:center;">🏆 Score de cet épisode : <span id="hint-score-value">5</span> / 5 pts</div>
+        <div style="display:flex; gap:8px; margin:10px 0;">
+            <button id="hintBtn1" onclick="useHint(1)" style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;">💡 Indice 1 (-1 pt)</button>
+            <button id="hintBtn2" onclick="useHint(2)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🎯 Indice 2 (-2 pts)</button>
+            <button id="hintBtn3" onclick="useHint(3)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🆘 Solution (-3 pts)</button>
+        </div>
+
+        <div id="zoneAideScore" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; color: #333;">
+            <p id="hint-tier-1" style="display:none;"><strong>💡 INFO :</strong> Pré-requis : l'article de la nLPD (entre 20 et 25) sur l'Analyse d'Impact, et la commande shasum avec son option d'algorithme. Ensuite, appliquez l'algorithme de sévérité en respectant l'ordre des opérations (exposant avant multiplication).</p>
+            <p id="hint-tier-2" style="display:none;"><strong>🎯 PISTE :</strong> Article : 22 nLPD. Commande : <code>shasum -a 256</code>. Calcul : volume_donnees² = 5² = 25, puis × facteur_sensibilite (4).</p>
+            <p id="hint-tier-3" style="display:none;"><strong>🆘 SOLUTION :</strong> Pré-requis : 22 / shasum -a 256. Score final : <code>100</code></p>
+        </div>
+    </div>
+
+    <script>
+        function appliquerModeSobre() {
+            const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+            document.body.classList.toggle('mode-sobre', actif);
+            const btn = document.getElementById('toggle-sobre-btn');
+            if (btn) btn.textContent = actif ? '🌓 Mode sobre : ON' : '🌓 Mode sobre';
+        }
+        function basculerModeSobre() {
+            const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+            localStorage.setItem('swiss_shield_mode_sobre', actif ? '0' : '1');
+            appliquerModeSobre();
+        }
+        appliquerModeSobre();
+
+        function toggleAide() {
+            var x = document.getElementById("zoneAide");
+            x.style.display = (x.style.display === "block") ? "none" : "block";
+        }
+
+        function unlock() {
+            const val = document.getElementById('passkey').value.trim().toUpperCase();
+            if (val === 'DESIGN-SEC-07') {
+                document.getElementById('step1').classList.add('hidden-step');
+                document.getElementById('step2').classList.remove('hidden-step');
+                currentZone = 'step2';
+                sauvegarderAutomatiquement();
+            } else { enregistrerErreur('entree', val, 'DESIGN-SEC-07'); alert("ACCÈS REFUSÉ : Clef E13 invalide."); }
+        }
+
+        function verifyPreReqs() {
+            let j = document.getElementById('check_jur').value.trim();
+            let t = document.getElementById('check_tech').value.trim();
+            // Validation souple sur l'article, stricte sur la commande
+            if ((j.includes('22')) && (t.toLowerCase() === 'shasum -a 256')) {
+                document.getElementById('step2').classList.add('hidden-step');
+                document.getElementById('step3').classList.remove('hidden-step');
+                currentZone = 'step3';
+                sauvegarderAutomatiquement();
+            } else { enregistrerErreur('prerequis', 'article="' + j + '", commande="' + t + '"', 'article contient 22, commande="shasum -a 256"'); alert("ERREUR : Les preuves de conformité sont incomplètes."); }
+        }
+
+        function solveInvestigation() {
+            const val = document.getElementById('final_answer').value;
+            if (val === '100') {
+                document.getElementById('step3').classList.add('hidden-step');
+                document.getElementById('step_final').classList.remove('hidden-step');
+            } else { enregistrerErreur('investigation', val, '100'); alert("ANALYSE REJETÉE : Le calcul du score est erroné."); }
+        }
+    </script>
+
+    <script>
+        const EP_ID = "S02E14";
+        const HINT_COST = {1:1, 2:2, 3:3};
+        let hintsUsed = {1:false, 2:false, 3:false};
+        let episodeScore = 5;
+        function useHint(level) {
+            if (hintsUsed[level] || (level > 1 && !hintsUsed[level - 1])) return;
+            hintsUsed[level] = true;
+        enregistrerIndiceUsage(level);
+            episodeScore -= HINT_COST[level];
+            document.getElementById('hint-score-value').textContent = episodeScore;
+            document.getElementById('hint-tier-' + level).style.display = 'block';
+            const btn = document.getElementById('hintBtn' + level);
+            btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5';
+            if (level < 3) {
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+            sauvegarderAutomatiquement();
+        }
+        function recordEpisodeSuccess() {
+            let scores = {};
+            try { scores = JSON.parse(localStorage.getItem('swiss_shield_scores') || '{}'); } catch(e) {}
+            if (!(EP_ID in scores) || scores[EP_ID] < episodeScore) scores[EP_ID] = episodeScore;
+            localStorage.setItem('swiss_shield_scores', JSON.stringify(scores));
+            localStorage.removeItem('autosave_' + EP_ID);
+        }
+    let currentZone = 'step1';
+    function sauvegarderAutomatiquement() {
+        try {
+            const inputs = {};
+            ['passkey', 'check_jur', 'check_tech', 'final_answer'].forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) inputs[id] = el.value;
+            });
+            localStorage.setItem('autosave_' + EP_ID, JSON.stringify({
+                zone: currentZone,
+                inputs: inputs,
+                hintsUsed: hintsUsed,
+                episodeScore: episodeScore
+            }));
+        } catch(e) {}
+    }
+    function proposerRestaurationAutosave() {
+        let data;
+        try { data = JSON.parse(localStorage.getItem('autosave_' + EP_ID) || 'null'); } catch(e) { return; }
+        if (!data || !data.zone || data.zone === 'step1') return;
+        document.getElementById('step1').classList.add('hidden-step');
+        if (data.zone === 'step3') {
+            document.getElementById('step2').classList.add('hidden-step');
+            document.getElementById('step3').classList.remove('hidden-step');
+        } else if (data.zone === 'step2') {
+            document.getElementById('step2').classList.remove('hidden-step');
+        }
+        currentZone = data.zone;
+        if (data.inputs) {
+            Object.keys(data.inputs).forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) el.value = data.inputs[id];
+            });
+        }
+        hintsUsed = data.hintsUsed || hintsUsed;
+        episodeScore = (typeof data.episodeScore === 'number') ? data.episodeScore : episodeScore;
+        document.getElementById('hint-score-value').textContent = episodeScore;
+        [1, 2, 3].forEach(function(level) {
+            if (hintsUsed[level]) {
+                document.getElementById('hint-tier-' + level).style.display = 'block';
+                const btn = document.getElementById('hintBtn' + level);
+                if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+        });
+    }
+    function enregistrerIndiceUsage(niveau) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + niveau;
+            debrief.indices[cle] = (debrief.indices[cle] || 0) + 1;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+    function enregistrerErreur(phase, reponseEleve, reponseAttendue) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + phase;
+            if (typeof debrief.erreurs[cle] !== 'object' || debrief.erreurs[cle] === null) {
+                debrief.erreurs[cle] = { compte: (debrief.erreurs[cle] || 0), exemples: [] };
+            }
+            debrief.erreurs[cle].compte++;
+            if (reponseEleve !== undefined && debrief.erreurs[cle].exemples.length < 5) {
+                debrief.erreurs[cle].exemples.push({ reponseEleve: String(reponseEleve).slice(0,100), reponseAttendue: String(reponseAttendue||'').slice(0,100) });
+            }
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+        (function pollSuccess(){
+            // Cet épisode utilise l'id "step_final" pour l'écran de succès (pas "final-zone").
+            const ids = ['success','success-msg','success-final','final-zone','step_final','victory-zone','victory-screen','final-step','final-badge'];
+            let recorded = false;
+            setInterval(function(){
+                if (recorded) return;
+                for (const id of ids) {
+                    const el = document.getElementById(id);
+                    if (el && window.getComputedStyle(el).display === 'block') { recordEpisodeSuccess(); recorded = true; return; }
+                }
+            }, 500);
+        })();
+        proposerRestaurationAutosave();
+    </script>
+</body>
+</html>

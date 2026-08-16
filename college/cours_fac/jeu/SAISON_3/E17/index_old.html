@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>S03E17 - L'OMBRE SYNTHÉTIQUE</title>
+    <style>
+        /* --- NOUVEL EFFET VISUEL : NEURAL BACKGROUND --- */
+        #neural-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at center, #001520 0%, #050505 100%);
+        }
+
+        /* --- MODE SOBRE (accessibilité) --- */
+        body.mode-sobre, body.mode-sobre * { animation: none !important; transition: none !important; }
+        body.mode-sobre #neural-canvas { display: none !important; }
+        #toggle-sobre-btn {
+            position: fixed; top: 10px; right: 10px; z-index: 10001;
+            background: #000; color: #00d4ff; border: 1px solid #00d4ff;
+            padding: 6px 10px; font-size: 0.7em; cursor: pointer; font-family: inherit; border-radius: 3px;
+        }
+
+        body { color: #00d4ff; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 40px; margin: 0; overflow-x: hidden; }
+        
+        .terminal { 
+            background: rgba(0, 16, 21, 0.95); 
+            border: 3px double #00d4ff; 
+            padding: 30px; width: 90%; 
+            max-width: 800px; 
+            box-shadow: 0 0 50px rgba(0, 212, 255, 0.3); 
+            border-radius: 15px; 
+            text-align: center;
+            position: relative;
+            backdrop-filter: blur(5px);
+        }
+
+        .header-s3 { border-bottom: 2px solid #00d4ff; margin-bottom: 30px; padding-bottom: 15px; font-size: 1.5em; font-weight: bold; text-transform: uppercase; letter-spacing: 3px; }
+
+        /* STYLE CONTEXTE HISTOIRE S3 */
+        .story-context {
+            background: rgba(0, 212, 255, 0.1);
+            border-left: 4px solid #00d4ff;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: left;
+            font-size: 0.95em;
+            color: #e0faff;
+            line-height: 1.4;
+        }
+
+        #lock-screen { padding: 40px; }
+        #pre-requis-screen, #mission-content, #victory-zone { display: none; }
+
+        .investigation-box { background: #000; border: 1px dashed #00d4ff; padding: 15px; margin: 20px 0; text-align: left; font-family: 'Courier New', monospace; font-size: 0.9em; color: #00ff41; line-height: 1.5; }
+
+        .annexe-code { background: #051015; border-left: 3px solid #9d50bb; padding: 12px; margin: 15px 0; text-align: left; font-family: 'Courier New', monospace; font-size: 0.85em; color: #b8efff; white-space: pre-wrap; }
+
+        input { background: #000; border: 1px solid #00d4ff; color: #00d4ff; padding: 12px; width: 300px; font-family: inherit; font-size: 1.1em; text-align: center; outline: none; border-radius: 4px; margin-top: 10px; }
+        button { background: #00d4ff; color: #000; border: none; padding: 12px 30px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 15px; border-radius: 4px; text-transform: uppercase; }
+        button:hover { background: #fff; box-shadow: 0 0 20px #00d4ff; }
+
+        .victory-code { font-size: 2em; font-family: 'Courier New', monospace; color: #fff; background: #00d4ff; padding: 15px; border-radius: 8px; display: inline-block; margin: 20px 0; border: 2px solid #fff; box-shadow: 0 0 15px rgba(0,212,255,0.5); }
+
+        .csv-info { background: #fff; color: #000; padding: 15px; margin-top: 20px; border-radius: 4px; text-align: left; font-size: 0.9em; border-left: 5px solid #00d4ff; }
+
+        .btn-aide-rouge { background: #d80000; color: #fff; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; width: 100%; max-width: 400px; margin-top: 40px; border-radius: 3px; }
+        .aide-box { display: none; background: #fff; color: #333; margin-top: 10px; padding: 20px; width: 90%; max-width: 500px; text-align: left; border-radius: 5px; font-family: sans-serif; border-top: 5px solid #d80000; line-height: 1.5; }
+        
+        .nav-btn { position: absolute; top: 15px; left: 15px; background: #000; color: #00d4ff; border: 1px solid #00d4ff; padding: 5px 12px; text-decoration: none; border-radius: 4px; font-size: 0.8em; font-weight: bold; }
+        .nav-btn:hover { background: #00d4ff; color: #000; }
+    </style>
+</head>
+<body>
+    <button id="toggle-sobre-btn" onclick="basculerModeSobre()">🌓 Mode sobre</button>
+
+    <canvas id="neural-canvas"></canvas>
+
+    <div class="terminal">
+        <a href="../../MENU_PRINCIPAL.html" class="nav-btn">⬅ RETOUR MENU</a>
+
+        <div id="lock-screen">
+            <h2 style="color: #00d4ff; text-shadow: 0 0 10px #00d4ff; margin-top: 20px;">📂 ARCHIVES SAISON 3 : ACCÈS RESTREINT</h2>
+            
+            <div class="story-context">
+                <b>[ DOSSIER : NEURAL THREAT ]</b><br>
+                Après la chute de COTL en Saison 2, une nouvelle menace a émergé des réseaux fantômes. L'unité <i>Swiss Shield</i> et le Centre national pour la cybersécurité (NCSC) à Berne font face à des attaques d'une précision chirurgicale ciblant les infrastructures critiques suisses à l'aide d'IA génératives. <br><br>
+                L'épisode 1 de la Saison 3 commence ici : les frontières entre humain et synthétique s'effacent. Prouvez votre habilité à traquer l'invisible.
+            </div>
+
+            <p>Identifiant de fin de Saison 2 requis :</p>
+            <input type="text" id="passkey" placeholder="CODE S2E16" onchange="sauvegarderAutomatiquement()">
+            <br>
+            <button onclick="unlock()">INITIALISER LA SÉQUENCE S03</button>
+        </div>
+
+        <div id="pre-requis-screen">
+            <div class="header-s3">CONTRÔLE DE CONFORMITÉ OPÉRATIONNELLE</div>
+            <div class="story-context">
+                <b>VÉRIFICATION DE SÉCURITÉ :</b> Avant d'accéder aux outils forensiques d'analyse des flux de la Banque Nationale Suisse (BNS), authentifiez vos connaissances juridiques et techniques standard.
+            </div>
+
+            <div style="text-align: left; padding: 10px; color: #fff;">
+                <p><b>⚖️ DÉFI JURIDIQUE :</b> L'utilisation d'une voix synthétique pour tromper un système informatique et effectuer un transfert de fonds illicite tombe sous le coup de quel article du Code Pénal Suisse (CP) réprimant l'<b>escroquerie par ordinateur</b> ? (Donnez uniquement le numéro de l'article, ex: 143)</p>
+                <input type="text" id="pre_jur" placeholder="Numéro d'article CP" onchange="sauvegarderAutomatiquement()">
+
+                <p><b>🖥️ DÉFI TECHNIQUE :</b> Quelle commande Linux native permet de calculer l'empreinte cryptographique forte SHA-256 d'un fichier audio suspect nommé <code>flux.wav</code> pour garantir son intégrité forensique ?</p>
+                <input type="text" id="pre_tech" placeholder="Ex: commande flux.wav" onchange="sauvegarderAutomatiquement()">
+            </div>
+            <br>
+            <button onclick="verifyPreReq()">VÉRIFIER LES PROTOCOLES</button>
+        </div>
+
+        <div id="mission-content">
+            <div class="header-s3">S03E17 : ANALYSE DE L'ATTAQUE "VISHING"</div>
+
+            <p style="color: #fff;">Un appel frauduleux utilisant un <b>Deepfake Vocal</b> a été intercepté. <br>Analysez la structure de l'algorithme d'obfuscation pour reconstituer la clé du codec d'origine.</p>
+
+            <div class="investigation-box">
+                [AUDIO_STREAM_ANALYSIS]<br>
+                > FREQUENCY: 44.1kHz  |  LATENCY: 12ms (ANOMALY)<br>
+                > SOURCE_NODE: NODE-CH-ZURICH<br>
+                [STATUT] : Signature masquée par un dictionnaire d'index dynamiques.
+            </div>
+
+            <div class="annexe-code">
+# Extrait du reverse-engineering du malware vocal (Python)
+def extract_codec_signature():
+    alphabet = ["O", "E", "D", "V", "-", "3", "I", "C", "P"]
+    
+    # Ordre de reconstruction basé sur les index du tableau 'alphabet'
+    # Analysez la suite logique pour retrouver le mot secret
+    index_sequence = [2, 1, 1, 8, 4, 3, 0, 6, 7, 1, 4, 3, 5]
+    
+    secret = "".join([alphabet[i] for i in index_sequence])
+    return secret # Indice : Le résultat prend la forme XXXX-XXXX-XX
+            </div>
+
+            <div id="action-zone">
+                <input type="text" id="sourceV" placeholder="SIGNATURE DU CODEC RECONSTITUÉE" onchange="sauvegarderAutomatiquement()">
+                <br>
+                <button onclick="signReport()">VALIDER L'INVESTIGATION</button>
+            </div>
+
+            <div id="victory-zone">
+                <h3 style="color: #00ff41;">✓ SIGNATURE IDENTIFIÉE</h3>
+                <p>L'IA criminelle a été tracée. Vous avez bloqué la tentative de virement frauduleux.</p>
+
+                <p>Voici votre code de validation E17 :</p>
+                <span class="victory-code">NEURAL-SHIELD-2026</span>
+
+                <div class="csv-info">
+                    <b>📝 RAPPORT S03 (export_eleves.csv)</b><br>
+                    S03E17 ; Validé ; Deepfake identifié (DEEP-VOICE-V3). Expert niveau IA activé.
+                </div>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <a href="../../MENU_PRINCIPAL.html" style="color: #00d4ff; text-decoration: none; font-weight: bold;">[ RETOUR AU MENU PRINCIPAL ]</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn-aide-rouge" onclick="toggleAide()">[ 📜 BILAN DES 3 PILIERS - S03 ]</button>
+    <div id="zoneAide" class="aide-box">
+        <h3 style="margin-top: 0; color: #d80000;">Synthèse de l'Expert (S03E17)</h3>
+        <p><b>1. Informatique :</b> Le <i>vishing</i> (phishing vocal) par IA synthétise des caractéristiques biométriques de la voix (fréquences fondamentales, prosodie) pour contourner les contrôles d'identité physiques ou automatisés.</p>
+        <p><b>2. Juridique :</b> L'utilisation malveillante de l'informatique pour falsifier des données et modifier un transfert de patrimoine financier est réprimée en Suisse par un article du Code Pénal désignant l'escroquerie par ordinateur, passible d'une peine privative de liberté pouvant aller jusqu'à 5 ans. Cherchez son numéro.</p>
+        <p><b>3. Forensics :</b> La préservation des preuves numériques implique l'utilisation d'une fonction de hachage pour geler l'état des fichiers d'analyses avant traitement — cherchez la commande correspondante dans votre mémento Linux. L'obfuscation basique de chaînes de caractères se résout en associant méthodiquement chaque pointeur numérique (index) à sa valeur de dictionnaire.</p>
+    </div>
+
+    <div style="margin-top: 30px; border-top: 3px solid #d80000; padding: 20px; background: #fff; font-family: Arial, sans-serif; position: relative; z-index: 100; width: 90%; max-width: 500px;">
+        <div id="hint-score-badge" style="background:#111;color:#3fb950;padding:8px 15px;font-weight:bold;text-align:center;">🏆 Score de cet épisode : <span id="hint-score-value">5</span> / 5 pts</div>
+        <div style="display:flex; gap:8px; margin:10px 0;">
+            <button id="hintBtn1" onclick="useHint(1)" style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;">💡 Indice 1 (-1 pt)</button>
+            <button id="hintBtn2" onclick="useHint(2)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🎯 Indice 2 (-2 pts)</button>
+            <button id="hintBtn3" onclick="useHint(3)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🆘 Solution (-3 pts)</button>
+        </div>
+
+        <div id="zoneAideScore" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; color: #333;">
+            <p id="hint-tier-1" style="display:none;"><strong>💡 INFO :</strong> Pré-requis : l'article du CP suisse sur l'escroquerie par ordinateur, et la commande Linux pour calculer un hash SHA-256 d'un fichier audio. Ensuite, suivez la séquence d'index dans le tableau <code>alphabet</code> une par une.</p>
+            <p id="hint-tier-2" style="display:none;"><strong>🎯 PISTE :</strong> Article : 147. Commande : <code>sha256sum flux.wav</code>. Séquence : pour chaque index de <code>index_sequence</code>, prenez le caractère à cette position dans <code>alphabet = ["O","E","D","V","-","3","I","C","P"]</code> (index 0 = O, 1 = E, 2 = D, etc.).</p>
+            <p id="hint-tier-3" style="display:none;"><strong>🆘 SOLUTION :</strong> Pré-requis : 147 / sha256sum flux.wav. Signature du codec : <code>DEEP-VOICE-V3</code></p>
+        </div>
+    </div>
+
+    <script>
+        // --- ANIMATION BACKGROUND : NEURAL RAIN ---
+        const canvas = document.getElementById('neural-canvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const columns = Math.floor(canvas.width / 20);
+        const drops = new Array(columns).fill(1);
+
+        function drawNeural() {
+            ctx.fillStyle = 'rgba(5, 5, 5, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.font = '15px monospace';
+            
+            for (let i = 0; i < drops.length; i++) {
+                const text = Math.random() > 0.5 ? "0" : "1";
+                ctx.fillStyle = Math.random() > 0.8 ? "#9d50bb" : "#00d4ff";
+                
+                ctx.fillText(text, i * 20, drops[i] * 20);
+
+                if (drops[i] * 20 > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+        setInterval(drawNeural, 50);
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        function appliquerModeSobre() {
+            const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+            document.body.classList.toggle('mode-sobre', actif);
+            const btn = document.getElementById('toggle-sobre-btn');
+            if (btn) btn.textContent = actif ? '🌓 Mode sobre : ON' : '🌓 Mode sobre';
+        }
+        function basculerModeSobre() {
+            const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+            localStorage.setItem('swiss_shield_mode_sobre', actif ? '0' : '1');
+            appliquerModeSobre();
+        }
+        appliquerModeSobre();
+
+        // 1. GESTION VERROU DE SESSION
+        function unlock() {
+            const code = document.getElementById('passkey').value.trim().toUpperCase();
+            if (code === 'CYBER-COMPLIANT-2026') {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('pre-requis-screen').style.display = 'block';
+                currentZone = 'pre-requis-screen';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('entree', code, 'CYBER-COMPLIANT-2026');
+                alert("ACCÈS REFUSÉ : Code de validation Saison 2 invalide.");
+            }
+        }
+
+        // 2. GESTION DOUBLE VERROU PRE-REQUIS
+        function verifyPreReq() {
+            const jur = document.getElementById('pre_jur').value.trim();
+            const tech = document.getElementById('pre_tech').value.trim().toLowerCase();
+
+            const jurValid = (jur === "147");
+            const techValid = (tech === "sha256sum flux.wav");
+
+            if (jurValid && techValid) {
+                document.getElementById('pre-requis-screen').style.display = 'none';
+                document.getElementById('mission-content').style.display = 'block';
+                currentZone = 'mission-content';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('prerequis', 'article="' + jur + '", commande="' + tech + '"', 'article=147, commande="sha256sum flux.wav"');
+                alert("CONFORMITÉ COMPROMISE : Erreur dans l'analyse de l'article ou de la signature de hachage.");
+            }
+        }
+
+        // 3. GESTION VALIDATION FINALE
+        function signReport() {
+            const val = document.getElementById('sourceV').value.trim().toUpperCase();
+            // Résolution manuelle des index :
+            // 2=D, 1=E, 1=E, 8=P, 4=-, 3=V, 0=O, 6=I, 7=C, 1=E, 4=-, 3=V, 5=3
+            // Résultat strict attendu : DEEP-VOICE-V3
+            if (val === 'DEEP-VOICE-V3') {
+                document.getElementById('action-zone').style.display = 'none';
+                document.getElementById('victory-zone').style.display = 'block';
+            } else {
+                enregistrerErreur('investigation', val, 'DEEP-VOICE-V3');
+                alert("ERREUR : La signature du Codec reconstruit ne correspond pas aux index de l'algorithme.");
+            }
+        }
+
+        function toggleAide() {
+            var x = document.getElementById("zoneAide");
+            x.style.display = (x.style.display === "block") ? "none" : "block";
+        }
+    </script>
+
+    <script>
+        const EP_ID = "S03E17";
+        const HINT_COST = {1:1, 2:2, 3:3};
+        let hintsUsed = {1:false, 2:false, 3:false};
+        let episodeScore = 5;
+        function useHint(level) {
+            if (hintsUsed[level] || (level > 1 && !hintsUsed[level - 1])) return;
+            hintsUsed[level] = true;
+        enregistrerIndiceUsage(level);
+            episodeScore -= HINT_COST[level];
+            document.getElementById('hint-score-value').textContent = episodeScore;
+            document.getElementById('hint-tier-' + level).style.display = 'block';
+            const btn = document.getElementById('hintBtn' + level);
+            btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5';
+            if (level < 3) {
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+            sauvegarderAutomatiquement();
+        }
+        function recordEpisodeSuccess() {
+            let scores = {};
+            try { scores = JSON.parse(localStorage.getItem('swiss_shield_scores') || '{}'); } catch(e) {}
+            if (!(EP_ID in scores) || scores[EP_ID] < episodeScore) scores[EP_ID] = episodeScore;
+            localStorage.setItem('swiss_shield_scores', JSON.stringify(scores));
+            localStorage.removeItem('autosave_' + EP_ID);
+        }
+    let currentZone = 'lock-screen';
+    function sauvegarderAutomatiquement() {
+        try {
+            const inputs = {};
+            ['passkey', 'pre_jur', 'pre_tech', 'sourceV'].forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) inputs[id] = el.value;
+            });
+            localStorage.setItem('autosave_' + EP_ID, JSON.stringify({
+                zone: currentZone,
+                inputs: inputs,
+                hintsUsed: hintsUsed,
+                episodeScore: episodeScore
+            }));
+        } catch(e) {}
+    }
+    function proposerRestaurationAutosave() {
+        let data;
+        try { data = JSON.parse(localStorage.getItem('autosave_' + EP_ID) || 'null'); } catch(e) { return; }
+        if (!data || !data.zone || data.zone === 'lock-screen') return;
+        document.getElementById('lock-screen').style.display = 'none';
+        if (data.zone === 'mission-content') {
+            document.getElementById('pre-requis-screen').style.display = 'none';
+            document.getElementById('mission-content').style.display = 'block';
+        } else if (data.zone === 'pre-requis-screen') {
+            document.getElementById('pre-requis-screen').style.display = 'block';
+        }
+        currentZone = data.zone;
+        if (data.inputs) {
+            Object.keys(data.inputs).forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) el.value = data.inputs[id];
+            });
+        }
+        hintsUsed = data.hintsUsed || hintsUsed;
+        episodeScore = (typeof data.episodeScore === 'number') ? data.episodeScore : episodeScore;
+        document.getElementById('hint-score-value').textContent = episodeScore;
+        [1, 2, 3].forEach(function(level) {
+            if (hintsUsed[level]) {
+                document.getElementById('hint-tier-' + level).style.display = 'block';
+                const btn = document.getElementById('hintBtn' + level);
+                if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+        });
+    }
+    function enregistrerIndiceUsage(niveau) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + niveau;
+            debrief.indices[cle] = (debrief.indices[cle] || 0) + 1;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+    function enregistrerErreur(phase, reponseEleve, reponseAttendue) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + phase;
+            if (typeof debrief.erreurs[cle] !== 'object' || debrief.erreurs[cle] === null) {
+                debrief.erreurs[cle] = { compte: (debrief.erreurs[cle] || 0), exemples: [] };
+            }
+            debrief.erreurs[cle].compte++;
+            if (reponseEleve !== undefined && debrief.erreurs[cle].exemples.length < 5) {
+                debrief.erreurs[cle].exemples.push({ reponseEleve: String(reponseEleve).slice(0,100), reponseAttendue: String(reponseAttendue||'').slice(0,100) });
+            }
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+        (function pollSuccess(){
+            const ids = ['success','success-msg','success-final','final-zone','step_final','victory-zone','victory-screen','final-step','final-badge'];
+            let recorded = false;
+            setInterval(function(){
+                if (recorded) return;
+                for (const id of ids) {
+                    const el = document.getElementById(id);
+                    if (el && window.getComputedStyle(el).display === 'block') { recordEpisodeSuccess(); recorded = true; return; }
+                }
+            }, 500);
+        })();
+        proposerRestaurationAutosave();
+    </script>
+</body>
+</html>

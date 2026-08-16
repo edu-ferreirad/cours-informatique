@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>S03E23 - DEEPFAKE DETECTION</title>
+    <style>
+        :root { --detect: "18hz"; } 
+        
+        /* --- EFFET VISUEL : CYBER VORTEX AUDIO --- */
+        body { 
+            background: radial-gradient(circle at center, #200020 0%, #050005 100%); 
+            color: #ff00ff; 
+            font-family: 'Orbitron', sans-serif; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 40px; 
+            margin: 0; 
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .bg-waves {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 800px; height: 800px;
+            z-index: -1;
+            opacity: 0.3;
+        }
+        .wave-circle {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px solid #ff00ff;
+            border-radius: 50%;
+            animation: expand 4s infinite linear;
+        }
+        @keyframes expand {
+            0% { width: 0; height: 0; opacity: 1; border-color: #ff00ff; }
+            50% { border-color: #00ffff; }
+            100% { width: 1000px; height: 1000px; opacity: 0; }
+        }
+
+        .terminal { 
+            background: rgba(0, 0, 0, 0.9); 
+            border: 2px solid #ff00ff; 
+            padding: 25px; 
+            width: 95%; 
+            max-width: 850px; 
+            box-shadow: 0 0 40px rgba(255, 0, 255, 0.6); 
+            border-radius: 10px; 
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+
+        .story-header {
+            background: linear-gradient(90deg, #ff00ff22, transparent);
+            border-left: 4px solid #ff00ff;
+            padding: 15px;
+            margin-bottom: 25px;
+            font-size: 0.9em;
+            color: #ffccff;
+        }
+        
+        .header-mission { border-bottom: 1px solid #ff00ff; margin-bottom: 20px; padding-bottom: 10px; color: #fff; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; display: flex; justify-content: space-between; }
+        
+        #lock-screen, #pre-requis-screen, #mission-content { transition: opacity 0.5s; }
+        #pre-requis-screen, #mission-content { display: none; }
+        
+        .wave-container { height: 120px; display: flex; align-items: center; justify-content: center; gap: 8px; margin: 30px 0; background: rgba(255, 0, 255, 0.05); border-radius: 5px; }
+        .bar { width: 12px; background: #ff00ff; animation: pulse 1.2s infinite ease-in-out; border-radius: 10px; box-shadow: 0 0 10px #ff00ff; }
+        @keyframes pulse { 0%, 100% { height: 20px; opacity: 0.5; } 50% { height: 100px; opacity: 1; } }
+        
+        .analysis-box { background: rgba(255, 0, 255, 0.1); border: 1px solid #ff00ff; padding: 20px; color: #fff; font-family: 'Courier New', monospace; font-size: 0.9em; margin-bottom: 20px; }
+        .critical { color: #ff00ff; font-weight: bold; text-shadow: 0 0 5px #ff00ff; }
+
+        .input-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 20px 0; }
+        input { background: #000; border: 1px solid #ff00ff; color: #ff00ff; padding: 12px; font-family: inherit; font-size: 1em; text-align: center; outline: none; width: 100%; box-sizing: border-box; }
+        input:focus { box-shadow: 0 0 15px #ff00ff; border-color: #fff; }
+        
+        button { background: #ff00ff; color: #000; border: none; padding: 15px 30px; font-weight: bold; cursor: pointer; transition: 0.3s; text-transform: uppercase; width: 100%; }
+        button:hover { background: #fff; box-shadow: 0 0 25px #ff00ff; transform: scale(1.02); }
+
+        #victory-zone { display: none; text-align: center; background: rgba(0, 255, 255, 0.1); border: 2px solid #00ffff; padding: 20px; margin-top: 20px; }
+        .code-final { color: #00ffff; font-size: 2.2em; letter-spacing: 5px; margin: 15px 0; display: block; text-shadow: 0 0 10px #00ffff; }
+        
+        .export-report { background: rgba(255, 0, 255, 0.1); padding: 15px; text-align: left; font-size: 0.85em; border: 1px solid #ff00ff; margin: 20px 0; font-family: 'Courier New', monospace; color: #fff; }
+
+        .btn-aide-rouge { background: #d80000; color: #fff; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; width: 450px; margin-top: 40px; border-radius: 2px; text-transform: uppercase; }
+        .aide-box { display: none; background: #fff; color: #000; padding: 25px; margin-top: 10px; width: 450px; text-align: left; border-top: 5px solid #d80000; font-family: sans-serif; box-shadow: 0 10px 30px rgba(0,0,0,0.5); line-height: 1.4; }
+
+        /* BOUTON RETOUR MANDATOIRE ARTIFACT 4 */
+        .btn-retour-nav { position: absolute; top: 15px; left: 15px; background: #000; border: 1px solid #ff00ff; color: #ff00ff; padding: 6px 12px; text-decoration: none; font-size: 0.8em; font-weight: bold; border-radius: 4px; z-index: 10; }
+        .btn-retour-nav:hover { background: #ff00ff; color: #000; }
+
+        /* INTERFACES FILTRÉES PRÉ-REQUIS */
+        .qcm-section { text-align: left; margin: 15px 0; font-family: 'Courier New', monospace; }
+        .qcm-label { display: block; margin: 10px 0; cursor: pointer; font-size: 0.9em; color: #ffccff; }
+        .code-window { background: #110011; border: 1px solid #ff00ff; padding: 15px; border-radius: 4px; margin: 15px 0; font-family: 'Courier New', monospace; font-size: 0.85em; color: #ff99ff; text-align: left; overflow-x: auto; white-space: pre; }
+
+        /* AJOUT : TRANSCRIPTION DE L'APPEL INTERCEPTÉ (pur habillage narratif, aucune logique de jeu) */
+        .btn-transcription { background: #000; border: 1px solid #00ffff; color: #00ffff; padding: 10px 18px; font-size: 0.85em; font-weight: bold; cursor: pointer; text-transform: uppercase; width: 100%; margin: 15px 0; border-radius: 4px; }
+        .btn-transcription:hover { background: #00ffff; color: #000; }
+        .transcription-box { display: none; background: #0a0014; border: 1px solid #00ffff; border-radius: 6px; padding: 18px 20px; margin-bottom: 15px; text-align: left; font-size: 0.88em; line-height: 1.7; color: #ccffff; }
+        .transcription-box .repli { margin-bottom: 10px; }
+        .transcription-box .locuteur { color: #00ffff; font-weight: bold; }
+        .transcription-box .locuteur.suspect { color: #ff00ff; }
+        .transcription-box .horodatage { color: #666; font-size: 0.8em; }
+        .transcription-box .note-analyste { color: #ffcc00; font-style: italic; font-size: 0.85em; border-left: 2px solid #ffcc00; padding-left: 10px; margin-top: 12px; }
+
+        /* MODE SOBRE */
+        body.mode-sobre, body.mode-sobre * { animation: none !important; transition: none !important; }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="bg-waves">
+        <div class="wave-circle" style="animation-delay: 0s"></div>
+        <div class="wave-circle" style="animation-delay: 1s"></div>
+        <div class="wave-circle" style="animation-delay: 2s"></div>
+        <div class="wave-circle" style="animation-delay: 3s"></div>
+    </div>
+
+    <div class="terminal">
+        <a href="../../MENU_PRINCIPAL.html" class="btn-retour-nav">⬅ NAV MENU</a>
+        <button id="toggle-sobre-btn" onclick="basculerModeSobre()" style="position:absolute;top:15px;right:15px;width:auto;z-index:10;background:#000;border:1px solid #ff00ff;color:#ff00ff;padding:6px 12px;font-size:0.8em;font-weight:bold;border-radius:4px;cursor:pointer;">🌓</button>
+
+        <div id="lock-screen">
+            <h2 style="color: #ff00ff; text-shadow: 0 0 10px #ff00ff;">🎙️ ANALYSEUR BIOMÉTRIQUE V3.2</h2>
+            
+            <div class="story-header">
+                <b>[ ALERTE FRAUDE AU PRÉSIDENT ]</b><br>
+                Un appel audio vient d'être intercepté par la cellule de crise de la Banque Nationale Suisse (BNS) à Zurich. La voix est identifiée comme celle du gouverneur, mais le système exige une vérification biométrique suite à une anomalie. En 2026, les <b>Deepfakes vocaux</b> par IA générative sont la menace prioritaire de détournement d'actifs d'importance systémique.
+            </div>
+
+            <p>Saisissez la signature d'audit de l'épisode précédent (S03E22) :</p>
+            <input type="text" id="passkey" placeholder="CODE DE SESSION" style="width: 300px;" onchange="sauvegarderAutomatiquement()">
+            <br>
+            <button onclick="unlock()" style="width: 300px; margin-top: 20px;">DÉCRYPTER LE FLUX AUDIO</button>
+        </div>
+
+        <div id="pre-requis-screen">
+            <div class="header-mission">
+                <span>[PRÉ-REQUIS] SÉCURISATION FORENSIC ET GESTION DES PROCESSUS</span>
+                <span style="color: #00ffff;">VÉRIFICATION COERCITIVE</span>
+            </div>
+            <p>> <b>STATUT :</b> Validez les bases légales et analysez la table des processus du serveur de téléphonie pour localiser l'exécutable suspect.</p>
+            
+            <div class="qcm-section">
+                <p style="color: #00ffff; font-weight: bold;">⚖️ CADRE JURIDIQUE DES APPELS ENREGISTRÉS (Code Pénal Suisse - CP) :</p>
+                <p>Un collaborateur bancaire enregistre l'appel suspect du prétendu directeur à son insu pour conserver la preuve de l'escroquerie. Au regard de l'Art. 179ter CP (Enregistrement illicite de conversations), quel fait justificatif valide la licéité et la recevabilité immédiate de cet enregistrement ?</p>
+                <label class="qcm-label"><input type="radio" name="cp_qcm" value="nok1" onchange="sauvegarderAutomatiquement()"> A) L'enregistrement est libre dès lors que la somme en jeu dépasse 100'000 CHF.</label>
+                <label class="qcm-label"><input type="radio" name="cp_qcm" value="ok_cp" onchange="sauvegarderAutomatiquement()"> B) L'acte commis pour préserver des intérêts légitimes supérieurs (état de nécessité, Art. 17 CP) supprime le caractère illicite de la capture.</label>
+                <label class="qcm-label"><input type="radio" name="cp_qcm" value="nok2" onchange="sauvegarderAutomatiquement()"> C) L'utilisation d'outils d'IA annule l'application du Code Pénal sur le territoire helvétique.</label>
+            </div>
+
+            <div style="text-align: left; margin-top: 20px;">
+                <p style="color: #00ffff; font-weight: bold;">🖥️ TRACABILITÉ FORENSIC (FILTRAGE DE PROCESSUS SYSTEME) :</p>
+                <p>Le binaire malveillant injectant le faux flux audio s'exécute sous le nom de <code>rtp_voice_cloner</code>. Quelle commande Unix standard combinée permet d'afficher en ligne de commande la liste complète de tous les processus actifs pour y isoler et filtrer uniquement les lignes liées à ce binaire ?</p>
+                <input type="text" id="tech_cmd" placeholder="Commande shell (ex: ps ... | grep ...)" style="width: 100%; max-width: 500px; margin: 10px 0;" onchange="sauvegarderAutomatiquement()">
+            </div>
+            <br>
+            <div style="text-align: center;">
+                <button onclick="verifyPreReq()">INITIALISER LES CAPTEURS SPECTRAUX</button>
+            </div>
+        </div>
+
+        <div id="mission-content">
+            <div class="header-mission">
+                <span>[AI-FRAUD-DETECTION] S03E23</span>
+                <span style="background: #ff00ff; color: #000; padding: 0 5px;">URGENT</span>
+            </div>
+            
+            <p>> <u>ALERTE ARCHITECTURE</u> : L'attaquant a implémenté un script de masquage dynamique. Les preuves d'artefacts n'apparaissent plus de manière statique.</p>
+            
+            <button class="btn-transcription" onclick="toggleTranscription()">🔊 RÉÉCOUTER / LIRE LA TRANSCRIPTION DE L'APPEL INTERCEPTÉ</button>
+            <button class="btn-transcription" id="btn-audio-appel" onclick="lireAppelAudio()" style="border-color:#ff00ff; color:#ff00ff;">🎧 ÉCOUTER L'APPEL (synthèse vocale du navigateur)</button>
+            <div class="transcription-box" id="transcription-box">
+                <div class="horodatage">[ENREGISTREMENT — 08:47:12 — Ligne directe Direction BNS]</div>
+                <div class="repli"><span class="locuteur suspect">« Gouverneur » (voix) :</span> Je n'ai pas le temps de passer par les canaux habituels. Il y a une fuite en cours sur le dossier Confédéral-7, il faut geler et transférer les avoirs vers le compte de sauvegarde immédiatement. C'est confidentiel, ne remontez ça à personne pour l'instant.</div>
+                <div class="repli"><span class="locuteur">Analyste BNS :</span> Je comprends l'urgence, mais je dois suivre la procédure de double validation pour tout transfert de cette ampleur.</div>
+                <div class="repli"><span class="locuteur suspect">« Gouverneur » (voix) :</span> Il n'y a pas le temps ! J'en prends la pleine responsabilité. Faites-le maintenant, je vous envoie la confirmation par un canal sécurisé dans la minute.</div>
+                <div class="repli"><span class="locuteur">Analyste BNS :</span> ...Un instant, monsieur le Gouverneur. Votre voix semble... légèrement en décalage sur la fin des phrases. Je vais devoir vérifier avant de continuer.</div>
+                <div class="repli"><span class="locuteur suspect">« Gouverneur » (voix) :</span> C'est une mauvaise ligne, rien de plus. Dépêchez-vous, chaque minute compte !</div>
+                <div class="horodatage">[FIN D'APPEL — 08:49:58 — Raccroché par l'appelant]</div>
+                <div class="note-analyste">Note de l'analyste : demande de transfert d'urgence, confidentialité exigée, pression temporelle, refus de suivre la procédure normale — tous les signaux classiques d'une fraude au président. J'ai transmis l'enregistrement à l'unité forensic pour analyse spectrale du flux audio.</div>
+            </div>
+
+            <div class="wave-container">
+                <div class="bar" style="animation-delay: 0.1s"></div>
+                <div class="bar" style="animation-delay: 0.4s"></div>
+                <div class="bar" style="animation-delay: 0.2s"></div>
+                <div class="bar" style="animation-delay: 0.6s"></div>
+                <div class="bar" style="animation-delay: 0.3s"></div>
+                <div class="bar" style="animation-delay: 0.5s"></div>
+                <div class="bar" style="animation-delay: 0.7s"></div>
+                <div class="bar" style="animation-delay: 0.2s"></div>
+            </div>
+
+            <div class="analysis-box">
+                <p>> Analyse structurelle du décodeur d'échantillons...</p>
+                <p>> Statut d'acquisition : <span class="critical">POLYMORPHIQUE ACTIF</span></p>
+                <data value="gain-0.8db" id="data-point"></data>
+                <p>> <i>Indice Forensics : Un décalage d'inversion bitwise s'est produit. Utilisez les indices dissimulés pour déduire l'algorithme d'isolation.</i></p>
+            </div>
+
+            <div class="code-window"># --- PIPELINE DE VÉRIFICATION COMBINATOIRE (PYTHON 3) ---
+def analyze_spectral_footprint(freq_css, tag_gain, js_latency):
+    # Les entrées de l'élève doivent correspondre aux anomalies masquées du système :
+    # 1. Inspecter :root { --detect: ... } dans la structure du DOM
+    # 2. Inspecter la balise HTML data (id="data-point")
+    # 3. Analyser le fil de latence injecté en queue de script.
+    
+    # Équation de cohérence cryptographique implémentée :
+    if len(freq_css) == 4 and tag_gain.startswith("gain-") and js_latency.endswith("ms"):
+        return "VERDICT_DEEPFAKE_CONFIRMED"
+    return "DENIED"</div>
+
+            <div id="investigation-zone">
+                <div class="input-grid">
+                    <input type="text" id="freqIn" placeholder="Fréquence (CSS)" onchange="sauvegarderAutomatiquement()">
+                    <input type="text" id="gainIn" placeholder="Gain (DATA tag)" onchange="sauvegarderAutomatiquement()">
+                    <input type="text" id="msIn" placeholder="Latence (JS comment)" onchange="sauvegarderAutomatiquement()">
+                </div>
+                <button onclick="verifyDeepfake()">VALIDER LE VERDICT DEEPFAKE</button>
+            </div>
+
+            <div id="victory-zone">
+                <h3 style="color: #00ffff;">✓ TENTATIVE D'USURPATION BLOQUÉE</h3>
+                <p>La preuve technique a été établie conformément à l'Art. 21 de la nLPD.</p>
+                <p>Code de sortie (pour E24) :</p>
+                <span class="code-final">AI-FRAUD-DETECTION-99</span>
+                
+                <div class="export-report">
+                    <b>📝 RAPPORT DE DÉTECTION (export_eleves.csv) :</b><br>
+                    S03E23 ; Succès ; Deepfake identifié (18hz, gain-0.8db, 42ms). Violation Art. 21 nLPD bloquée.
+                </div>
+
+                <a href="../../MENU_PRINCIPAL.html" style="color: #fff; text-decoration: none; border: 1px solid #fff; padding: 10px 20px; display: inline-block;">⬅ QUITTER</a>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn-aide-rouge" onclick="toggleAide()">[ 📜 RAPPORT DE CONFORMITÉ IA 2026 ]</button>
+    <div id="zoneAide" class="aide-box">
+        <h3>Le Défi des Deepfakes Vocaux</h3>
+        <p><b>1. Informatique :</b> L'échantillonnage fréquentiel d'une synthèse artificielle laisse des micro-harmoniques rigides qu'un larynx biologique est incapable de reproduire de manière linéaire.</p>
+        <p><b>2. Juridique (Suisse) :</b> Selon l'<b>Art. 21 nLPD</b>, l'entité doit informer la personne concernée lorsqu'elle prend une décision reposant exclusivement sur un traitement automatisé. De plus, l'<b>Art. 179ter CP</b> protège contre les enregistrements mais cède face au motif justificatif de l'état de nécessité.</p>
+        <p><b>3. Forensics :</b> Le dépistage d'empreinte logicielle requiert de fouiller récursivement les couches de l'application :
+            - <i>Fréquence :</i> Dissimulée dans les sélecteurs globaux CSS (`:root`).
+            - <i>Gain d'acquisition :</i> Intégré comme attribut structurel d'injection de données HTML.
+            - <i>Latence CPU :</i> Dissimulée au plus bas niveau des commentaires du moteur d'exécution.
+        </p>
+    </div>
+
+    <div style="margin-top: 30px; border-top: 3px solid #d80000; padding: 20px; background: #fff; font-family: Arial, sans-serif; position: relative; z-index: 100; width: 90%; max-width: 450px;">
+        <div id="hint-score-badge" style="background:#111;color:#3fb950;padding:8px 15px;font-weight:bold;text-align:center;">🏆 Score de cet épisode : <span id="hint-score-value">5</span> / 5 pts</div>
+        <div style="display:flex; gap:8px; margin:10px 0;">
+            <button id="hintBtn1" onclick="useHint(1)" style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;">💡 Indice 1 (-1 pt)</button>
+            <button id="hintBtn2" onclick="useHint(2)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🎯 Indice 2 (-2 pts)</button>
+            <button id="hintBtn3" onclick="useHint(3)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🆘 Solution (-3 pts)</button>
+        </div>
+
+        <div id="zoneAideScore" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; color: #333;">
+            <p id="hint-tier-1" style="display:none;"><strong>💡 INFO :</strong> Pré-requis : le QCM porte sur le fait justificatif qui rend licite un enregistrement d'appel effectué à l'insu de la personne (Art. 179ter / Art. 17 CP), et il faut une commande combinant deux outils Unix pour lister puis filtrer les processus contenant "rtp_voice_cloner". Ensuite, les 3 valeurs de l'investigation sont cachées dans le code source de la page (CSS, balise HTML, commentaire JS).</p>
+            <p id="hint-tier-2" style="display:none;"><strong>🎯 PISTE :</strong> Réponse QCM : B (état de nécessité, Art. 17 CP). Commande : <code>ps aux | grep rtp_voice_cloner</code>. Fréquence : variable CSS <code>--detect</code> dans <code>:root</code>. Gain : attribut <code>value</code> de la balise <code>&lt;data id="data-point"&gt;</code>. Latence : commentaire tout en bas du script.</p>
+            <p id="hint-tier-3" style="display:none;"><strong>🆘 SOLUTION :</strong> Pré-requis : B / ps aux | grep rtp_voice_cloner. Valeurs : Fréquence <code>18hz</code>, Gain <code>gain-0.8db</code>, Latence <code>42ms</code></p>
+        </div>
+    </div>
+
+    <script>
+        // AJOUT : bascule pur affichage de la transcription d'appel (aucune logique de jeu, aucune reponse)
+        // AJOUT : lecture reelle a voix haute via l'API native du navigateur (aucun fichier audio,
+        // aucun reseau — fonctionne aussi en file:// depuis la cle USB). Se degrade proprement si le
+        // navigateur ne supporte pas la synthese vocale ou n'a aucune voix francaise installee.
+        function lireAppelAudio() {
+            if (!('speechSynthesis' in window)) {
+                alert("La lecture audio n'est pas disponible sur ce navigateur. Utilise la transcription écrite ci-dessus.");
+                return;
+            }
+            window.speechSynthesis.cancel();
+            var repliques = [
+                { texte: "Je n'ai pas le temps de passer par les canaux habituels. Il y a une fuite en cours sur le dossier Confédéral-7, il faut geler et transférer les avoirs vers le compte de sauvegarde immédiatement. C'est confidentiel, ne remontez ça à personne pour l'instant.", pitch: 0.7 },
+                { texte: "Je comprends l'urgence, mais je dois suivre la procédure de double validation pour tout transfert de cette ampleur.", pitch: 1.0 },
+                { texte: "Il n'y a pas le temps ! J'en prends la pleine responsabilité. Faites-le maintenant, je vous envoie la confirmation par un canal sécurisé dans la minute.", pitch: 0.7 },
+                { texte: "Un instant, monsieur le Gouverneur. Votre voix semble légèrement en décalage sur la fin des phrases. Je vais devoir vérifier avant de continuer.", pitch: 1.0 },
+                { texte: "C'est une mauvaise ligne, rien de plus. Dépêchez-vous, chaque minute compte !", pitch: 0.7 }
+            ];
+            var voix = window.speechSynthesis.getVoices().filter(function(v) { return v.lang && v.lang.indexOf('fr') === 0; });
+            var i = 0;
+            function suivante() {
+                if (i >= repliques.length) return;
+                var u = new SpeechSynthesisUtterance(repliques[i].texte);
+                u.lang = 'fr-FR';
+                u.pitch = repliques[i].pitch;
+                u.rate = 1.0;
+                if (voix.length > 0) u.voice = voix[0];
+                u.onend = function() { i++; suivante(); };
+                window.speechSynthesis.speak(u);
+            }
+            suivante();
+        }
+
+        function toggleTranscription() {
+            var t = document.getElementById("transcription-box");
+            t.style.display = (t.style.display === "block") ? "none" : "block";
+        }
+
+        function toggleAide() {
+            var x = document.getElementById("zoneAide");
+            x.style.display = (x.style.display === "block") ? "none" : "block";
+        }
+
+        // 1. VERROU DE SESSION DE LA SESSION S03E22
+        function unlock() {
+            const code = document.getElementById('passkey').value.trim().toUpperCase();
+            if (code === 'VENDOR-RISK-09') {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('pre-requis-screen').style.display = 'block';
+                currentZone = 'pre-requis-screen';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('entree', code, 'VENDOR-RISK-09');
+                alert("ERREUR : Accès refusé. Clé de session invalide.");
+            }
+        }
+
+        // 7. DOUBLE VERROU DE PRÉ-REQUIS VALIDATION (Nouveau Verrou Technique)
+        function verifyPreReq() {
+            const selectedCp = document.querySelector('input[name="cp_qcm"]:checked');
+            const techCmd = document.getElementById('tech_cmd').value.trim().toLowerCase();
+
+            if (!selectedCp) {
+                enregistrerErreur('prerequis', 'cp=(aucune sélection), commande="' + techCmd + '"', 'cp=ok_cp, commande contient ps/grep/rtp_voice_cloner');
+                alert("ERREUR : Approbation légale obligatoire manquante.");
+                return;
+            }
+
+            const jurValid = (selectedCp.value === "ok_cp");
+            
+            // Nouveau mécanisme technique de validation : Analyse forensic des processus du serveur (ps + grep)
+            const techValid = (techCmd.includes("ps") && techCmd.includes("grep") && techCmd.includes("rtp_voice_cloner"));
+
+            if (jurValid && techValid) {
+                document.getElementById('pre-requis-screen').style.display = 'none';
+                document.getElementById('mission-content').style.display = 'block';
+                currentZone = 'mission-content';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('prerequis', 'cp=' + selectedCp.value + ', commande="' + techCmd + '"', 'cp=ok_cp, commande contient ps/grep/rtp_voice_cloner');
+                alert("CONFLIT ADMINISTRATIF : Mauvaise qualification de l'état de nécessité ou commande d'isolation des processus incorrecte.");
+            }
+        }
+
+        // 8. LOGIQUE D'INVESTIGATION EXTRACTION
+        function verifyDeepfake() {
+            const freq = document.getElementById('freqIn').value.trim().toLowerCase();
+            const gain = document.getElementById('gainIn').value.trim().toLowerCase();
+            const ms = document.getElementById('msIn').value.trim().toLowerCase();
+
+            if (freq === '18hz' && gain === 'gain-0.8db' && ms === '42ms') {
+                document.getElementById('investigation-zone').style.display = 'none';
+                document.getElementById('victory-zone').style.display = 'block';
+            } else {
+                enregistrerErreur('investigation', 'freq="' + freq + '", gain="' + gain + '", ms="' + ms + '"', 'freq=18hz, gain=gain-0.8db, ms=42ms');
+                alert("ANALYSE ERRONÉE : Les artefacts ne correspondent pas au spectre capturé !");
+            }
+        }
+
+        /* INDICE 3 : Micro-latence réseau détectée par BioMetric-Guard : 42ms */
+    </script>
+
+    <script>
+        const EP_ID = "S03E23";
+        const HINT_COST = {1:1, 2:2, 3:3};
+        let hintsUsed = {1:false, 2:false, 3:false};
+        let episodeScore = 5;
+        function useHint(level) {
+            if (hintsUsed[level] || (level > 1 && !hintsUsed[level - 1])) return;
+            hintsUsed[level] = true;
+            enregistrerIndiceUsage(level);
+            episodeScore -= HINT_COST[level];
+            document.getElementById('hint-score-value').textContent = episodeScore;
+            document.getElementById('hint-tier-' + level).style.display = 'block';
+            const btn = document.getElementById('hintBtn' + level);
+            btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5';
+            if (level < 3) {
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+            sauvegarderAutomatiquement();
+        }
+        function recordEpisodeSuccess() {
+            let scores = {};
+            try { scores = JSON.parse(localStorage.getItem('swiss_shield_scores') || '{}'); } catch(e) {}
+            if (!(EP_ID in scores) || scores[EP_ID] < episodeScore) scores[EP_ID] = episodeScore;
+            localStorage.setItem('swiss_shield_scores', JSON.stringify(scores));
+            localStorage.removeItem('autosave_' + EP_ID);
+        }
+        let currentZone = 'lock-screen';
+        function sauvegarderAutomatiquement() {
+            try {
+                const inputs = {};
+                ['passkey', 'tech_cmd', 'freqIn', 'gainIn', 'msIn'].forEach(function(id) {
+                    const el = document.getElementById(id);
+                    if (el) inputs[id] = el.value;
+                });
+                const cpChecked = document.querySelector('input[name="cp_qcm"]:checked');
+                inputs['cp_qcm'] = cpChecked ? cpChecked.value : '';
+                localStorage.setItem('autosave_' + EP_ID, JSON.stringify({
+                    zone: currentZone,
+                    inputs: inputs,
+                    hintsUsed: hintsUsed,
+                    episodeScore: episodeScore
+                }));
+            } catch(e) {}
+        }
+        function proposerRestaurationAutosave() {
+            let data;
+            try { data = JSON.parse(localStorage.getItem('autosave_' + EP_ID) || 'null'); } catch(e) { return; }
+            if (!data || !data.zone || data.zone === 'lock-screen') return;
+            document.getElementById('lock-screen').style.display = 'none';
+            if (data.zone === 'mission-content') {
+                document.getElementById('pre-requis-screen').style.display = 'none';
+                document.getElementById('mission-content').style.display = 'block';
+            } else if (data.zone === 'pre-requis-screen') {
+                document.getElementById('pre-requis-screen').style.display = 'block';
+            }
+            currentZone = data.zone;
+            if (data.inputs) {
+                Object.keys(data.inputs).forEach(function(id) {
+                    if (id === 'cp_qcm') {
+                        if (data.inputs.cp_qcm) {
+                            const radio = document.querySelector('input[name="cp_qcm"][value="' + data.inputs.cp_qcm + '"]');
+                            if (radio) radio.checked = true;
+                        }
+                        return;
+                    }
+                    const el = document.getElementById(id);
+                    if (el) el.value = data.inputs[id];
+                });
+            }
+            hintsUsed = data.hintsUsed || hintsUsed;
+            episodeScore = (typeof data.episodeScore === 'number') ? data.episodeScore : episodeScore;
+            document.getElementById('hint-score-value').textContent = episodeScore;
+            [1, 2, 3].forEach(function(level) {
+                if (hintsUsed[level]) {
+                    document.getElementById('hint-tier-' + level).style.display = 'block';
+                    const btn = document.getElementById('hintBtn' + level);
+                    if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+                    const next = document.getElementById('hintBtn' + (level + 1));
+                    if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+                }
+            });
+        }
+        function enregistrerErreur(phase, reponseEleve, reponseAttendue) {
+            let debrief = {erreurs:{}, indices:{}};
+            try { debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}'); } catch(e) {}
+            const key = EP_ID + ':' + phase;
+            if (typeof debrief.erreurs[key] !== 'object' || debrief.erreurs[key] === null) {
+                debrief.erreurs[key] = { compte: (debrief.erreurs[key] || 0), exemples: [] };
+            }
+            debrief.erreurs[key].compte++;
+            if (reponseEleve !== undefined && debrief.erreurs[key].exemples.length < 5) {
+                debrief.erreurs[key].exemples.push({ reponseEleve: String(reponseEleve).slice(0,100), reponseAttendue: String(reponseAttendue||'').slice(0,100) });
+            }
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        }
+        function enregistrerIndiceUsage(niveau) {
+            let debrief = {erreurs:{}, indices:{}};
+            try { debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}'); } catch(e) {}
+            const key = EP_ID + ':' + niveau;
+            debrief.indices[key] = (debrief.indices[key] || 0) + 1;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        }
+        function basculerModeSobre() {
+            const actif = document.body.classList.toggle('mode-sobre');
+            localStorage.setItem('swiss_shield_mode_sobre', actif ? '1' : '0');
+        }
+        if (localStorage.getItem('swiss_shield_mode_sobre') === '1') {
+            document.body.classList.add('mode-sobre');
+        }
+        (function pollSuccess(){
+            const ids = ['success','success-msg','success-final','final-zone','step_final','victory-zone','victory-screen','final-step','final-badge'];
+            let recorded = false;
+            setInterval(function(){
+                if (recorded) return;
+                for (const id of ids) {
+                    const el = document.getElementById(id);
+                    if (el && window.getComputedStyle(el).display === 'block') { recordEpisodeSuccess(); recorded = true; return; }
+                }
+            }, 500);
+        })();
+        proposerRestaurationAutosave();
+    </script>
+</body>
+</html>

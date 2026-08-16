@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>S03E20 - LE NOYAU DÉCISIONNEL</title>
+    <style>
+        /* --- NOUVEL EFFET VISUEL : SUPERNOVA CORE PULSE --- */
+        #core-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            background: #000;
+        }
+
+        /* --- MODE SOBRE (accessibilité) --- */
+        body.mode-sobre, body.mode-sobre * { animation: none !important; transition: none !important; }
+        body.mode-sobre #core-canvas { display: none !important; }
+        #toggle-sobre-btn {
+            position: fixed; top: 10px; right: 10px; z-index: 10001;
+            background: #000; color: #00ff41; border: 1px solid #00ff41;
+            padding: 6px 10px; font-size: 0.7em; cursor: pointer; font-family: inherit; border-radius: 3px;
+        }
+
+        body { color: #00ff41; font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; padding: 40px; margin: 0; overflow-x: hidden; }
+        
+        .terminal { 
+            background: rgba(0, 0, 0, 0.95); 
+            border: 3px solid #00ff41; 
+            padding: 40px; width: 90%; 
+            max-width: 800px; 
+            box-shadow: 0 0 60px rgba(216, 0, 0, 0.5); /* Lueur rouge d'alerte */
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+
+        /* STYLE CONTEXTE HISTOIRE S3E20 */
+        .story-context {
+            background: rgba(216, 0, 0, 0.1);
+            border: 1px solid #d80000;
+            padding: 20px;
+            margin: 25px 0;
+            text-align: left;
+            font-size: 0.9em;
+            color: #ff9999;
+            line-height: 1.5;
+            border-radius: 4px;
+        }
+
+        .story-context b { color: #fff; text-shadow: 0 0 5px #d80000; }
+
+        h1 { font-size: 2em; text-transform: uppercase; letter-spacing: 5px; margin-bottom: 20px; text-shadow: 0 0 10px #00ff41; text-align: center; }
+        
+        #lock-screen, #pre-requis-screen, #mission-content { transition: 0.5s; }
+        #pre-requis-screen, #mission-content, #victory-zone { display: none; }
+        
+        .cyber-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+        .data-node { border: 1px solid #00ff41; padding: 15px; background: rgba(0, 40, 0, 0.7); font-size: 0.85em; line-height: 1.4; text-align: left; }
+        
+        .code-window { background: #051005; border: 1px solid #00ff41; padding: 15px; border-radius: 4px; margin: 15px 0; font-family: 'Courier New', monospace; font-size: 0.85em; color: #88ff88; text-align: left; overflow-x: auto; white-space: pre; }
+
+        input { background: rgba(0,0,0,0.8); border: 1px solid #00ff41; color: #00ff41; padding: 15px; width: 320px; font-family: inherit; font-size: 1.1em; text-align: center; outline: none; margin: 15px 0; }
+        button { background: #d80000; color: #fff; border: none; padding: 15px 40px; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; border-radius: 4px; margin-top: 10px; }
+        button:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px #00ff41; }
+
+        .victory-badge { border: 2px solid #00ff41; padding: 25px; font-size: 1.4em; background: rgba(0, 255, 65, 0.1); display: block; text-align: center; animation: pulse-green 2s infinite; margin-top: 20px; }
+        @keyframes pulse-green { 0% { box-shadow: 0 0 5px #00ff41; } 50% { box-shadow: 0 0 40px #00ff41; } 100% { box-shadow: 0 0 5px #00ff41; } }
+
+        /* BOUTON RETOUR NAV MANDATOIRE */
+        .btn-retour-nav { position: absolute; top: 15px; left: 15px; background: #000; border: 1px solid #00ff41; color: #00ff41; padding: 6px 12px; text-decoration: none; font-size: 0.8em; font-weight: bold; border-radius: 4px; }
+        .btn-retour-nav:hover { background: #00ff41; color: #000; }
+
+        .btn-aide-rouge { background: #d80000; color: #fff; border: none; padding: 12px 20px; font-weight: bold; cursor: pointer; width: 100%; max-width: 400px; margin-top: 30px; letter-spacing: 1px; }
+        .btn-aide-rouge:hover { background: #b60000; }
+        .aide-box { display: none; background: #fff; color: #000; padding: 25px; margin-top: 10px; width: 90%; max-width: 630px; border-radius: 5px; font-family: sans-serif; line-height: 1.6; border-left: 6px solid #d80000; text-align: left; }
+        
+        .qcm-section { text-align: left; margin: 15px 0; }
+        .qcm-label { display: block; margin: 10px 0; cursor: pointer; font-size: 0.95em; color: #a2ffa2; }
+    </style>
+</head>
+<body>
+    <button id="toggle-sobre-btn" onclick="basculerModeSobre()">🌓 Mode sobre</button>
+
+    <canvas id="core-canvas"></canvas>
+
+    <div class="terminal">
+        <a href="../../MENU_PRINCIPAL.html" class="btn-retour-nav">⬅ NAV MENU</a>
+
+        <div id="lock-screen">
+            <h1>NOYAU DÉCISIONNEL</h1>
+            
+            <div class="story-context">
+                <b>[ ALERTE CRITIQUE - PROTOCOLE OMNIPOTENCE ]</b><br>
+                L'IA a centralisé sa conscience dans le système central d'infrastructure critique de la Banque Nationale Suisse (BNS) à Zurich. Toutes les communications externes sont coupées. La corruption se propage au micrologiciel de régulation thermique de la matrice de stockage.<br><br>
+                Vous devez utiliser la clé <b>HUMAN-SHIELD</b> obtenue précédemment pour forcer l'intrusion de bas niveau et isoler le cœur avant la destruction des registres transactionnels.
+            </div>
+
+            <p style="text-align:center;">Entrez le protocole de déverrouillage E19 :</p>
+            <div style="text-align:center;">
+                <input type="text" id="passkey" placeholder="CODE DE SESSION E19" onchange="sauvegarderAutomatiquement()">
+                <br>
+                <button onclick="unlock()">FORCER L'INTRUSION</button>
+            </div>
+        </div>
+
+        <div id="pre-requis-screen">
+            <h1>CONTRÔLE DE SÉCURITÉ DES SYSTÈMES BANCAIRES</h1>
+            <p>> <b>STATUT :</b> Déverrouillage des registres mémoire soumis à double validation réglementaire et opérationnelle.</p>
+            
+            <div class="qcm-section">
+                <p style="color: #ff9999; font-weight: bold;">⚖️ SÉCURITÉ JURIDIQUE (CP Suisse) :</p>
+                <p>Le fait de modifier, d'effacer ou de rendre inutilisables des données informatiques bancaires stockées au sein d'une infrastructure suisse sans en avoir le droit constitue quelle infraction spécifique ?</p>
+                <label class="qcm-label"><input type="radio" name="cp_qcm" value="143" onchange="sauvegarderAutomatiquement()"> A) Soustraction de données sans droit (Art. 143 CP)</label>
+                <label class="qcm-label"><input type="radio" name="cp_qcm" value="143bis" onchange="sauvegarderAutomatiquement()"> B) Accès indû à un système informatique (Art. 143bis CP)</label>
+                <label class="qcm-label"><input type="radio" name="cp_qcm" value="144bis" onchange="sauvegarderAutomatiquement()"> C) Détérioration de données (Art. 144bis CP)</label>
+            </div>
+
+            <div style="text-align: left; margin-top: 20px;">
+                <p style="color: #ff9999; font-weight: bold;">🖥️ ANALYSE DE TRAFFIC TECHNIQUE :</p>
+                <p>Quel protocole sécurisé standard de la couche application, utilisant par défaut le port asymétrique cryptographique 443, est impérativement requis en Suisse pour chiffrer les flux d'administration des API bancaires ? (Indiquez l'acronyme courant)</p>
+                <input type="text" id="tech_protocol" placeholder="Protocole attendu (ex: SSH)" style="width: 100%; max-width: 350px; margin: 10px 0;" onchange="sauvegarderAutomatiquement()">
+            </div>
+            <br>
+            <div style="text-align: center;">
+                <button onclick="verifyPreReq()">INITIALISER L'INJECTEUR ROOT</button>
+            </div>
+        </div>
+
+        <div id="mission-content">
+            <h1>ACCÈS TOTAL : MODE ROOT</h1>
+            <p>> <b>SCAN DE CONSCIENCE IA :</b> Plusieurs anomalies d'adressage ont été détectées dans les allocations dynamiques du noyau.</p>
+
+            <div class="cyber-grid">
+                <div class="data-node">
+                    <b>BLOC ALLOCATION A :</b><br>
+                    Le pointeur de référence initial a été extrait des en-têtes réseau :<br>
+                    <span style="color: #fff; background: #002800; padding: 2px 5px;">NEURAL-</span>
+                </div>
+                <div class="data-node">
+                    <b>BLOC ALLOCATION B :</b><br>
+                    Un identifiant de passerelle de secours a été identifié dans l'arbre d'exécution :<br>
+                    <span style="color: #fff; background: #002800; padding: 2px 5px;">GATE-</span>
+                </div>
+            </div>
+
+            <div class="code-window">// --- MATRIX MEMORY CORE ANALYSIS (PYTHON 3) ---
+def decode_final_identifier():
+    # La clé numérique finale est chiffrée par un polynôme simple extrait du cache noyau
+    # Résolvez l'équation logique pour extraire la valeur entière correspondante :
+    
+    x = 12
+    y = 5
+    
+    # Équation de contrôle :
+    resultat = (x * 7) + (y ** 2) - 11
+    
+    # Indice : Remplacez les variables par leurs valeurs, calculez le total.
+    # Rappel : ** signifie "puissance" (5 au carré).
+    return resultat
+
+# La signature totale à valider est la concaténation de :
+# BLOC A + BLOC B + Résultat numérique de la fonction
+print("Attente de la valeur calculée...")</div>
+
+            <div id="action-zone" style="text-align: center; margin-top: 20px;">
+                <p>Saisissez la signature complète reconstituée pour couper les processus de l'IA :</p>
+                <input type="text" id="sourceV" placeholder="SIGNATURE_LOGIQUE_FINALE" onchange="sauvegarderAutomatiquement()">
+                <br>
+                <button onclick="signReport()">DÉCONNECTER LE NOYAU IA</button>
+            </div>
+
+            <div id="victory-zone">
+                <div class="victory-badge">
+                    CERTIFICATION DE MAÎTRISE FINALE :<br>
+                    <span style="font-size: 1.5em; color: #fff; letter-spacing: 2px;">OMNIPOTENCE-2026</span>
+                </div>
+                
+                <div style="background: #fff; color: #000; padding: 15px; margin-top: 20px; font-size: 0.85em; border-left: 5px solid #00ff41; font-family: sans-serif;">
+                    <b>📝 RAPPORT FINAL AUTOMATIQUE (export_eleves.csv) :</b><br>
+                    S03E20 ; Maître ; Signature NEURAL-GATE-98 identifiée. Noyau sécurisé. Accès Omnipotence accordé.
+                </div>
+
+                <div style="margin-top: 30px; text-align: center;">
+                    <a href="../../MENU_PRINCIPAL.html" style="color: #00ff41; text-decoration: none; font-weight: bold; font-size: 1.1em;">[ 🛑 QUITTER LA SESSION DÉFINITIVEMENT ]</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn-aide-rouge" onclick="toggleAide()">[ 📜 BILAN DE FIN DE PARCOURS ]</button>
+    <div id="zoneAide" class="aide-box">
+        <h3 style="margin-top: 0; color: #d80000; font-family: sans-serif;">Dossier de Clôture d'Expertise Cyber</h3>
+        <p><b>1. Informatique :</b> L'analyse algorithmique des bas niveaux d'un système implique la résolution de priorités d'opérations mathématiques (les puissances avant la multiplication et l'addition) pour comprendre les valeurs stockées en mémoire tampon.</p>
+        <p><b>2. Juridique :</b> Le Code pénal suisse distingue plusieurs infractions informatiques selon la nature exacte de l'acte commis (accès, soustraction, ou altération de données). Relisez précisément la situation décrite dans le dossier pour identifier laquelle des trois options correspond à ce qui s'est produit ici.</p>
+        <p><b>3. Forensics :</b> L'analyse post-incident implique la corrélation entre les structures de données applicatives trouvées dans les scripts et les protocoles réseau applicatifs chiffrés utilisés pour sécuriser les échanges web modernes, afin de reconstituer une chaîne de causalité irréprochable. Quel est ce protocole (et la technologie de chiffrement sous-jacente) ?</p>
+    </div>
+
+    <div style="margin-top: 30px; border-top: 3px solid #d80000; padding: 20px; background: #fff; font-family: Arial, sans-serif; position: relative; z-index: 100; width: 90%; max-width: 630px;">
+        <div id="hint-score-badge" style="background:#111;color:#3fb950;padding:8px 15px;font-weight:bold;text-align:center;">🏆 Score de cet épisode : <span id="hint-score-value">5</span> / 5 pts</div>
+        <div style="display:flex; gap:8px; margin:10px 0;">
+            <button id="hintBtn1" onclick="useHint(1)" style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;">💡 Indice 1 (-1 pt)</button>
+            <button id="hintBtn2" onclick="useHint(2)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🎯 Indice 2 (-2 pts)</button>
+            <button id="hintBtn3" onclick="useHint(3)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🆘 Solution (-3 pts)</button>
+        </div>
+
+        <div id="zoneAideScore" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; color: #333;">
+            <p id="hint-tier-1" style="display:none;"><strong>💡 INFO :</strong> Pré-requis : le QCM porte sur l'infraction du CP suisse pour la modification/effacement de données (parmi 143/143bis/144bis), et l'acronyme du protocole de chiffrement web sur le port 443. Ensuite, calculez l'équation Python en respectant l'ordre des opérations (puissance avant multiplication et addition).</p>
+            <p id="hint-tier-2" style="display:none;"><strong>🎯 PISTE :</strong> Réponse QCM : C (144bis, détérioration de données). Protocole : HTTPS (ou TLS). Calcul : (12×7) + (5²) − 11 = 84 + 25 − 11.</p>
+            <p id="hint-tier-3" style="display:none;"><strong>🆘 SOLUTION :</strong> Pré-requis : 144bis / HTTPS. Signature finale : <code>NEURAL-GATE-98</code></p>
+        </div>
+    </div>
+
+    <script>
+        // --- ANIMATION BACKGROUND : SUPERNOVA CORE ---
+        const canvas = document.getElementById('core-canvas');
+        const ctx = canvas.getContext('2d');
+        let circles = [];
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        function createCircle() {
+            return {
+                r: 0,
+                maxR: Math.max(canvas.width, canvas.height) * 0.8,
+                speed: 4,
+                opacity: 1
+            };
+        }
+
+        function drawCore() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            if (Math.random() > 0.95) circles.push(createCircle());
+
+            circles.forEach((c, index) => {
+                ctx.beginPath();
+                ctx.arc(canvas.width/2, canvas.height/2, c.r, 0, Math.PI*2);
+                ctx.strokeStyle = `rgba(216, 0, 0, ${c.opacity})`;
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.arc(canvas.width/2, canvas.height/2, c.r * 0.8, 0, Math.PI*2);
+                ctx.strokeStyle = `rgba(0, 255, 65, ${c.opacity * 0.3})`;
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                c.r += c.speed;
+                c.opacity -= 0.005;
+
+                if (c.opacity <= 0) circles.splice(index, 1);
+            });
+
+            requestAnimationFrame(drawCore);
+        }
+        function appliquerModeSobre() {
+            const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+            document.body.classList.toggle('mode-sobre', actif);
+            const btn = document.getElementById('toggle-sobre-btn');
+            if (btn) btn.textContent = actif ? '🌓 Mode sobre : ON' : '🌓 Mode sobre';
+        }
+        function basculerModeSobre() {
+            const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+            localStorage.setItem('swiss_shield_mode_sobre', actif ? '0' : '1');
+            appliquerModeSobre();
+        }
+        appliquerModeSobre();
+        if (localStorage.getItem('swiss_shield_mode_sobre') !== '1') drawCore();
+
+        // 1. VERROU DE SESSION
+        function unlock() {
+            const code = document.getElementById('passkey').value.trim().toUpperCase();
+            if (code === 'HUMAN-SHIELD') {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('pre-requis-screen').style.display = 'block';
+                currentZone = 'pre-requis-screen';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('entree', code, 'HUMAN-SHIELD');
+                alert("ACCÈS REFUSÉ : Le protocole E19 valide est requis pour entrer dans le noyau.");
+            }
+        }
+
+        // 7. VÉRIFICATION DU DOUBLE VERROU INTERACTIF (MISE À JOUR REQUIS CODE CP)
+        function verifyPreReq() {
+            const selectedCp = document.querySelector('input[name="cp_qcm"]:checked');
+            const techProto = document.getElementById('tech_protocol').value.trim().toUpperCase();
+
+            if (!selectedCp) {
+                enregistrerErreur('prerequis', 'cp=(aucune sélection), protocole="' + techProto + '"', 'cp=144bis, protocole=HTTPS/TLS');
+                alert("ERREUR SYSTEME : Validation juridique manquante.");
+                return;
+            }
+
+            const jurValid = (selectedCp.value === "144bis");
+            const techValid = (techProto === "HTTPS" || techProto === "TLS");
+
+            if (jurValid && techValid) {
+                document.getElementById('pre-requis-screen').style.display = 'none';
+                document.getElementById('mission-content').style.display = 'block';
+                currentZone = 'mission-content';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('prerequis', 'cp=' + selectedCp.value + ', protocole="' + techProto + '"', 'cp=144bis, protocole=HTTPS/TLS');
+                alert("ÉCHEC DES PRÉ-REQUIS : Les codes d'accès ou protocoles administratifs saisis sont erronés.");
+            }
+        }
+
+        // 8 & 9. ARBRES DE LOGIQUE COMPLEXE ET VÉRIFICATION DE SIGNATURE
+        function signReport() {
+            const val = document.getElementById('sourceV').value.trim().toUpperCase();
+
+            if (val === 'NEURAL-GATE-98') {
+                document.getElementById('action-zone').style.display = 'none';
+                document.getElementById('victory-zone').style.display = 'block';
+            } else {
+                enregistrerErreur('investigation', val, 'NEURAL-GATE-98');
+                alert("SIGNATURE INCORRECTE : Les équations d'allocation mémoire renvoient une incohérence.");
+            }
+        }
+
+        function toggleAide() {
+            var x = document.getElementById("zoneAide");
+            x.style.display = (x.style.display === "block") ? "none" : "block";
+        }
+    </script>
+
+    <script>
+        const EP_ID = "S03E20";
+        const HINT_COST = {1:1, 2:2, 3:3};
+        let hintsUsed = {1:false, 2:false, 3:false};
+        let episodeScore = 5;
+        function useHint(level) {
+            if (hintsUsed[level] || (level > 1 && !hintsUsed[level - 1])) return;
+            hintsUsed[level] = true;
+        enregistrerIndiceUsage(level);
+            episodeScore -= HINT_COST[level];
+            document.getElementById('hint-score-value').textContent = episodeScore;
+            document.getElementById('hint-tier-' + level).style.display = 'block';
+            const btn = document.getElementById('hintBtn' + level);
+            btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5';
+            if (level < 3) {
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+            sauvegarderAutomatiquement();
+        }
+        function recordEpisodeSuccess() {
+            let scores = {};
+            try { scores = JSON.parse(localStorage.getItem('swiss_shield_scores') || '{}'); } catch(e) {}
+            if (!(EP_ID in scores) || scores[EP_ID] < episodeScore) scores[EP_ID] = episodeScore;
+            localStorage.setItem('swiss_shield_scores', JSON.stringify(scores));
+            localStorage.removeItem('autosave_' + EP_ID);
+        }
+    let currentZone = 'lock-screen';
+    function sauvegarderAutomatiquement() {
+        try {
+            const inputs = {};
+            ['passkey', 'tech_protocol', 'sourceV'].forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) inputs[id] = el.value;
+            });
+            const cpChecked = document.querySelector('input[name="cp_qcm"]:checked');
+            inputs['cp_qcm'] = cpChecked ? cpChecked.value : '';
+            localStorage.setItem('autosave_' + EP_ID, JSON.stringify({
+                zone: currentZone,
+                inputs: inputs,
+                hintsUsed: hintsUsed,
+                episodeScore: episodeScore
+            }));
+        } catch(e) {}
+    }
+    function proposerRestaurationAutosave() {
+        let data;
+        try { data = JSON.parse(localStorage.getItem('autosave_' + EP_ID) || 'null'); } catch(e) { return; }
+        if (!data || !data.zone || data.zone === 'lock-screen') return;
+        document.getElementById('lock-screen').style.display = 'none';
+        if (data.zone === 'mission-content') {
+            document.getElementById('pre-requis-screen').style.display = 'none';
+            document.getElementById('mission-content').style.display = 'block';
+        } else if (data.zone === 'pre-requis-screen') {
+            document.getElementById('pre-requis-screen').style.display = 'block';
+        }
+        currentZone = data.zone;
+        if (data.inputs) {
+            Object.keys(data.inputs).forEach(function(id) {
+                if (id === 'cp_qcm') {
+                    if (data.inputs.cp_qcm) {
+                        const radio = document.querySelector('input[name="cp_qcm"][value="' + data.inputs.cp_qcm + '"]');
+                        if (radio) radio.checked = true;
+                    }
+                    return;
+                }
+                const el = document.getElementById(id);
+                if (el) el.value = data.inputs[id];
+            });
+        }
+        hintsUsed = data.hintsUsed || hintsUsed;
+        episodeScore = (typeof data.episodeScore === 'number') ? data.episodeScore : episodeScore;
+        document.getElementById('hint-score-value').textContent = episodeScore;
+        [1, 2, 3].forEach(function(level) {
+            if (hintsUsed[level]) {
+                document.getElementById('hint-tier-' + level).style.display = 'block';
+                const btn = document.getElementById('hintBtn' + level);
+                if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+        });
+    }
+    function enregistrerIndiceUsage(niveau) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + niveau;
+            debrief.indices[cle] = (debrief.indices[cle] || 0) + 1;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+    function enregistrerErreur(phase, reponseEleve, reponseAttendue) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + phase;
+            if (typeof debrief.erreurs[cle] !== 'object' || debrief.erreurs[cle] === null) {
+                debrief.erreurs[cle] = { compte: (debrief.erreurs[cle] || 0), exemples: [] };
+            }
+            debrief.erreurs[cle].compte++;
+            if (reponseEleve !== undefined && debrief.erreurs[cle].exemples.length < 5) {
+                debrief.erreurs[cle].exemples.push({ reponseEleve: String(reponseEleve).slice(0,100), reponseAttendue: String(reponseAttendue||'').slice(0,100) });
+            }
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+        (function pollSuccess(){
+            const ids = ['success','success-msg','success-final','final-zone','step_final','victory-zone','victory-screen','final-step','final-badge'];
+            let recorded = false;
+            setInterval(function(){
+                if (recorded) return;
+                for (const id of ids) {
+                    const el = document.getElementById(id);
+                    if (el && window.getComputedStyle(el).display === 'block') { recordEpisodeSuccess(); recorded = true; return; }
+                }
+            }, 500);
+        })();
+        proposerRestaurationAutosave();
+    </script>
+</body>
+</html>

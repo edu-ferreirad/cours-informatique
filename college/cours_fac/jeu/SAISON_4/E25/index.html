@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>S04E25 - PORTABILITÉ DES DONNÉES</title>
+    <style>
+        /* --- NOUVEL EFFET VISUEL S04 : DATA STREAM ARRIÈRE-PLAN --- */
+        #data-stream-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at center, #0a1128 0%, #00040a 100%);
+        }
+
+        body { color: #ff9f1c; background-color: #00040a; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 40px; margin: 0; }
+        
+        .terminal { 
+            background: rgba(26, 26, 26, 0.95); 
+            border: 2px solid #ff9f1c; 
+            padding: 25px; width: 90%; 
+            max-width: 800px; 
+            box-shadow: 0 0 40px rgba(255, 159, 28, 0.4); 
+            border-radius: 8px; 
+            backdrop-filter: blur(5px);
+            position: relative;
+        }
+
+        .story-context {
+            background: rgba(255, 159, 28, 0.1);
+            border-left: 4px solid #ff9f1c;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: left;
+            font-size: 0.95em;
+            color: #ffeedd;
+            line-height: 1.4;
+        }
+
+        .story-context b { color: #fff; text-shadow: 0 0 5px #ff9f1c; }
+
+        .header-mission { border-bottom: 2px solid #ff9f1c; margin-bottom: 20px; padding-bottom: 10px; color: #fff; font-weight: bold; text-transform: uppercase; display: flex; justify-content: space-between; }
+        
+        #lock-screen { text-align: center; padding: 40px; }
+        #pre-requis-screen, #mission-content, #final-step { display: none; }
+        
+        .export-status { background: #262626; border-radius: 4px; padding: 20px; margin: 20px 0; border-left: 5px solid #ff9f1c; text-align: left; }
+        .file-format { font-family: 'Courier New', monospace; color: #4ade80; background: #000; padding: 5px 10px; border-radius: 3px; }
+        
+        input { background: #000; border: 1px solid #ff9f1c; color: #ff9f1c; padding: 12px; width: 100%; max-width: 400px; font-family: inherit; font-size: 1.1em; text-align: center; outline: none; margin-bottom: 15px; border-radius: 4px; box-sizing: border-box; }
+        button { background: #ff9f1c; color: #000; border: none; padding: 12px 25px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 15px; border-radius: 4px; width: 100%; max-width: 400px; text-transform: uppercase; letter-spacing: 1px; }
+        button:hover { background: #fff; box-shadow: 0 0 15px #ff9f1c; }
+
+        .code-final { color: #fff; font-size: 2.2em; letter-spacing: 5px; margin: 15px 0; display: block; text-shadow: 0 0 10px #ff9f1c; text-align: center; background: rgba(255, 159, 28, 0.1); padding: 10px; border: 1px dashed #ff9f1c; }
+        .status-msg { color: #4ade80; font-family: monospace; font-size: 0.9em; }
+
+        .export-report { background: rgba(255, 159, 28, 0.1); padding: 15px; text-align: left; font-size: 0.85em; border: 1px solid #ff9f1c; margin: 20px 0; font-family: monospace; color: #fff; }
+
+        .btn-aide-rouge { background: #d80000; color: #fff; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; width: 100%; max-width: 450px; margin-top: 40px; border-radius: 2px; text-transform: uppercase; }
+        .aide-box { display: none; background: #fff; color: #000; padding: 25px; margin-top: 10px; width: 90%; max-width: 450px; text-align: left; border-top: 5px solid #d80000; font-family: sans-serif; box-shadow: 0 10px 30px rgba(0,0,0,0.5); line-height: 1.4; font-size: 0.9em; position: relative; z-index: 999; }
+
+        .btn-navigation-retour { position: absolute; top: 15px; left: 15px; background: #000; border: 1px solid #ff9f1c; color: #ff9f1c; padding: 5px 12px; text-decoration: none; font-size: 0.8em; font-family: monospace; font-weight: bold; border-radius: 4px; }
+        .btn-navigation-retour:hover { background: #ff9f1c; color: #000; }
+
+        .interactive-challenge { text-align: left; margin: 25px 0; font-family: monospace; border-top: 1px dashed #ff9f1c; padding-top: 20px; }
+        .code-window { background: #020617; border: 1px solid #00d4ff; padding: 15px; border-radius: 5px; margin: 15px 0; font-family: 'Courier New', monospace; font-size: 0.85em; color: #38bdf8; overflow-x: auto; white-space: pre; text-align: left; }
+
+        /* MODE SOBRE */
+        body.mode-sobre, body.mode-sobre * { animation: none !important; transition: none !important; }
+        body.mode-sobre #data-stream-canvas { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <canvas id="data-stream-canvas"></canvas>
+
+    <div class="terminal">
+        <a href="../../MENU_PRINCIPAL.html" class="btn-navigation-retour">⬅ MENU</a>
+        <button id="toggle-sobre-btn" onclick="basculerModeSobre()" style="position:absolute;top:15px;right:15px;width:auto;z-index:10;background:#000;border:1px solid #ff9f1c;color:#ff9f1c;padding:5px 12px;font-size:0.8em;font-family:monospace;font-weight:bold;border-radius:4px;cursor:pointer;">🌓</button>
+
+        <div id="lock-screen">
+            <h2 style="color: #ff9f1c; margin-top: 20px;">📤 REQUÊTE D'EXPORTATION SÉCURISÉE - S04</h2>
+            
+            <div class="story-context">
+                <b>[ CONTEXTE NARRATIF SUISSE // ADMINISTRATION FÉDÉRALE ]</b><br>
+                La cyber-résilience de l'administration du canton de Berne est établie. Nous entrons dans la phase opérationnelle de la conformité <b>nLPD</b>. Un citoyen genevois, M. Morel, fait valoir son droit à la migration de son dossier fiscal complet vers une fiduciaire privée basée à Lausanne. <br><br>
+                Vous devez authentifier cette demande inter-systèmes avec la clé d'infrastructure issue de l'épisode précédent (Fin S03E24) pour initialiser la passerelle de transmission sécurisée.
+            </div>
+
+            <p>Veuillez entrer le code de résilience (Fin E24) :</p>
+            <input type="text" id="passkey" placeholder="CODE E24" onchange="sauvegarderAutomatiquement()">
+            <br>
+            <button onclick="unlock()">DÉVERROUILLER L'ACCÈS ART. 28</button>
+        </div>
+
+        <div id="pre-requis-screen">
+            <div class="header-mission">
+                <span>[VERROUS DE SÉCURITÉ CONVERGENTS]</span>
+                <span>AUTHENTICATION STAGE</span>
+            </div>
+            
+            <div class="interactive-challenge">
+                <p style="color: #fff; font-weight: bold;">⚖️ DÉFI I - ANALYSE JURIDIQUE STRICTE (nLPD) :</p>
+                <p>L'exercice du droit à la portabilité selon l'Art. 28 al. 1 nLPD exige deux conditions cumulatives concernant la nature du traitement. L'une est que le traitement soit effectué de manière automatisée. Quelle est l'autre condition impérative liée au consentement ou à la relation contractuelle ? Répondez précisément par l'expression légale exacte : "le traitement s'effectue avec le..." ou "le traitement s'effectue sur la..."</p>
+                <input type="text" id="law_input" placeholder="Expression légale exacte (ex: base du consentement ou de l'exécution d'un contrat)" style="max-width: 100%;" onchange="sauvegarderAutomatiquement()">
+            </div>
+
+            <div class="interactive-challenge">
+                <p style="color: #fff; font-weight: bold;">🖥️ DÉFI II - INTERCONNEXION DES SYSTÈMES SÉCURISÉS :</p>
+                <p>Pour exporter les structures applicatives sans altération depuis notre serveur sécurisé sous architecture Linux, quelle option de la commande <code>tar</code> permet de créer une archive compressée au format <code>.tar.gz</code> tout en préservant explicitement l'intégralité des permissions d'accès et d'exécution d'origine des fichiers ?</p>
+                <input type="text" id="tech_cmd" placeholder="Indiquez les options de commande (ex: -cvf, -xzvf...)" style="max-width: 350px;" onchange="sauvegarderAutomatiquement()">
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <button onclick="verifyPreReq()">VALIDER LES PRÉ-REQUIS DE FLUX</button>
+            </div>
+        </div>
+
+        <div id="mission-content">
+            <div class="header-mission">
+                <span>[DATA-PORTABILITY] S04E25</span>
+                <span>nLPD 2026</span>
+            </div>
+            
+            <p>> <b>Analyse :</b> Demande de portabilité pour M. Morel (ID: 8829) confirmée.</p>
+            
+            <div class="export-status">
+                <p><b>Condition de transfert :</b> Les données doivent être récupérées sans frais et dans un format courant et interopérable.</p>
+                <p><b>Format cible :</b> <span class="file-format">JSON STRUCTURED</span></p>
+                <p class="status-msg">> En attente du jeton d'autorisation de transfert (Algorithme Reverse de Jeton)...</p>
+            </div>
+
+            <p style="color: #fff; font-weight: bold;">🧩 ANALYSE DU REVERSE CRYPTO-ALGORITHME :</p>
+            <p style="font-size: 0.9em; line-height: 1.4;">Un token dynamique a été généré par notre backend d'infrastructure en C, mais sa transmission mémoire a subi un entrelacement binaire partiel. Analysez l'algorithme source ci-dessous. Déduisez la valeur exacte renvoyée par la fonction pour obtenir le jeton de validation final.</p>
+
+            <div class="code-window">// --- REVERSE ENGINEERING CHALLENGE // REF-S04-LPD ---
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+// Données d'infrastructure statiques stockées en registres
+const char* BASE_SUITE = "X-PORT-"; 
+const int PARITY_MASK  = 0x1F2A;
+
+int compute_dynamic_key() {
+    int seed = 2026;
+    int shift_val = 3;
+    // Opération de masquage et décalage logique
+    int intermediate = (seed ^ 0xAF) &lt;&lt; 1; 
+    // Résultat mathématique déduit pour le jeton d'exportation
+    return (intermediate % 1000) + 124; 
+}
+
+void get_final_token(char* output) {
+    char temp[32];
+    int dynamic_code = compute_dynamic_key();
+    
+    // Le jeton final concatène la base et le code calculé
+    sprintf(output, "%s%d", BASE_SUITE, dynamic_code);
+}</div>
+
+            <div style="text-align: center; margin-top: 20px;">
+                <input type="text" id="token" placeholder="ENTRER LE JETON DYNAMIQUE CALCULÉ" onchange="sauvegarderAutomatiquement()">
+                <br>
+                <button onclick="verifyTransfer()">VÉRIFIER L'INTÉGRITÉ DU FLUX</button>
+            </div>
+
+            <div id="final-step">
+                <p style="margin-top: 20px; color: #fff; text-align: left;">Le droit à la portabilité garantit que l'usager reste maître de ses données en changeant de fournisseur.</p>
+                <p>Notez votre code pour l'épisode 26 :</p>
+                <span class="code-final">EXPORT-JSON-28</span>
+                
+                <div class="export-report">
+                    <b>📝 RAPPORT DE PORTABILITÉ (export_eleves.csv) :</b><br>
+                    S04E25 ; Succès ; Transfert JSON validé via Jeton Dynamique Réversible (Art. 28 nLPD).
+                </div>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <a href="../../MENU_PRINCIPAL.html" style="color: #ff9f1c; text-decoration: none; border: 1px solid #ff9f1c; padding: 10px 20px; font-weight: bold; display: inline-block;">[ Terminer la Phase ]</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn-aide-rouge" onclick="toggleAide()">[ 📜 RAPPORT DE CONFORMITÉ ART. 28 ]</button>
+    <div id="zoneAide" class="aide-box">
+        <h3 style="color: #d80000; margin-top: 0; font-family: monospace;">Modèle Éducatif des 3 Piliers</h3>
+        <p><b>1. Informatique :</b> L'analyse d'un code source nécessite de suivre l'ordre des priorités des opérateurs. En C, l'opération `^` correspond à un XOR bit-à-bit, suivi du décalage à gauche `<<`. Le reste de la division entière `%` isole les composants numériques avant l'addition finale.</p>
+        <p><b>2. Juridique :</b> L'<b>Art. 28 nLPD</b> stipule explicitement que l'exercice de ce droit requiert l'une de deux conditions d'habilitation possibles : l'accord explicite de la personne concernée, ou l'exécution d'un engagement liant les deux parties. À vous de retrouver les deux termes juridiques exacts.</p>
+        <p><b>3. Forensics :</b> Pour reconstituer la clé, simulez l'état de la mémoire pas à pas sur votre feuille : `2026 ^ 175` (car `0xAF` en base 10 vaut 175). Multipliez par deux (décalage de 1), prenez le reste modulo 1000 et ajoutez 124 pour obtenir le suffixe du jeton d'architecture.</p>
+    </div>
+
+    <div style="margin-top: 30px; border-top: 3px solid #d80000; padding: 20px; background: #fff; font-family: Arial, sans-serif; position: relative; z-index: 100; width: 90%; max-width: 450px;">
+        <div id="hint-score-badge" style="background:#111;color:#3fb950;padding:8px 15px;font-weight:bold;text-align:center;">🏆 Score de cet épisode : <span id="hint-score-value">5</span> / 5 pts</div>
+        <div style="display:flex; gap:8px; margin:10px 0;">
+            <button id="hintBtn1" onclick="useHint(1)" style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;">💡 Indice 1 (-1 pt)</button>
+            <button id="hintBtn2" onclick="useHint(2)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🎯 Indice 2 (-2 pts)</button>
+            <button id="hintBtn3" onclick="useHint(3)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🆘 Solution (-3 pts)</button>
+        </div>
+
+        <div id="zoneAideScore" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; color: #333;">
+            <p id="hint-tier-1" style="display:none;"><strong>💡 INFO :</strong> Pré-requis : le droit à la portabilité (Art. 28 nLPD) requiert l'une de deux bases légales (un mot lié à l'accord de la personne, un mot lié à l'exécution d'un accord contractuel), et une commande d'archivage avec des options contenant les lettres « c » et « p ». Ensuite, appliquez l'algorithme : XOR(2026, 175) → décalage ×2 → modulo 1000 → +124.</p>
+            <p id="hint-tier-2" style="display:none;"><strong>🎯 PISTE :</strong> Réponse juridique : « consentement » ou « contrat ». Commande : par exemple <code>tar -cvpf</code>. Pour le calcul : suivez pas à pas le XOR bit à bit puis le décalage et le modulo, comme détaillé dans le pilier Forensics.</p>
+            <p id="hint-tier-3" style="display:none;"><strong>🆘 SOLUTION :</strong> Pré-requis : consentement (ou contrat) / tar -cvpf. Jeton final : <code>X-PORT-890</code></p>
+        </div>
+    </div>
+
+    <script>
+        // --- ANIMATION BACKGROUND : DATA STREAM ---
+        const canvas = document.getElementById('data-stream-canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        const particles = [];
+        const numParticles = 100;
+        const color = "#ff9f1c"; 
+
+        function createParticle() {
+            return {
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 3 + 1,
+                speedX: (Math.random() - 0.5) * 4, 
+                speedY: (Math.random() - 0.5) * 1, 
+                opacity: Math.random() * 0.5 + 0.2
+            };
+        }
+
+        function initParticles() {
+            for (let i = 0; i < numParticles; i++) {
+                particles.push(createParticle());
+            }
+        }
+
+        function drawParticles() {
+            if (localStorage.getItem('swiss_shield_mode_sobre') === '1') { return; }
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = color;
+
+            particles.forEach(p => {
+                ctx.globalAlpha = p.opacity;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.globalAlpha = p.opacity * 0.2;
+                particles.forEach(other => {
+                    const dy = other.y - p.y;
+                    const dx = other.x - p.x;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    if(dist < 100) {
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(other.x, other.y);
+                        ctx.strokeStyle = color;
+                        ctx.lineWidth = 0.5;
+                        ctx.stroke();
+                    }
+                });
+
+                p.x += p.speedX;
+                p.y += p.speedY;
+
+                if (p.x < 0) p.x = canvas.width;
+                if (p.x > canvas.width) p.x = 0;
+                if (p.y < 0) p.y = canvas.height;
+                if (p.y > canvas.height) p.y = 0;
+            });
+            ctx.globalAlpha = 1;
+            requestAnimationFrame(drawParticles);
+        }
+
+        initParticles();
+        drawParticles();
+
+        function toggleAide() {
+            var x = document.getElementById("zoneAide");
+            x.style.display = (x.style.display === "block") ? "none" : "block";
+        }
+
+        function unlock() {
+            const code = document.getElementById('passkey').value.trim().toUpperCase();
+            if (code === 'CYBER-RESILIENT-2026') {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('pre-requis-screen').style.display = 'block';
+                currentZone = 'pre-requis-screen';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('entree', code, 'CYBER-RESILIENT-2026');
+                alert("ACCÈS REFUSÉ : Intégrité de la passerelle S03 cassée.");
+            }
+        }
+
+        function verifyPreReq() {
+            const lawInput = document.getElementById('law_input').value.trim().toLowerCase();
+            const techCmd = document.getElementById('tech_cmd').value.trim().toLowerCase();
+
+            const lawValid = (lawInput.includes("consentement") || lawInput.includes("contrat"));
+            const techValid = (techCmd.includes("p") && (techCmd.includes("c") || techCmd.includes("z")));
+
+            if (lawValid && techValid) {
+                document.getElementById('pre-requis-screen').style.display = 'none';
+                document.getElementById('mission-content').style.display = 'block';
+                currentZone = 'mission-content';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('prerequis', 'loi="' + lawInput + '", commande="' + techCmd + '"', 'loi contient consentement/contrat, commande contient c/z et p');
+                alert("ÉCHEC DES VÉRIFICATIONS : Les protocoles de l'administration fédérale interdisent l'initialisation du canal.");
+            }
+        }
+
+        function verifyTransfer() {
+            const token = document.getElementById('token').value.trim().toUpperCase();
+            // Résolution mathématique attendue de l'algorithme C : X-PORT-890
+            if (token === 'X-PORT-890') {
+                document.getElementById('final-step').style.display = 'block';
+                document.querySelector('button[onclick="verifyTransfer()"]').style.display = 'none';
+                document.getElementById('token').style.borderColor = '#4ade80';
+            } else {
+                enregistrerErreur('investigation', token, 'X-PORT-890');
+                alert("ERREUR CRITIQUE : Échec du calcul de l'empreinte binaire du Jeton.");
+            }
+        }
+    </script>
+
+    <script>
+        const EP_ID = "S04E25";
+        const HINT_COST = {1:1, 2:2, 3:3};
+        let hintsUsed = {1:false, 2:false, 3:false};
+        let episodeScore = 5;
+        function useHint(level) {
+            if (hintsUsed[level] || (level > 1 && !hintsUsed[level - 1])) return;
+            hintsUsed[level] = true;
+            enregistrerIndiceUsage(level);
+            episodeScore -= HINT_COST[level];
+            document.getElementById('hint-score-value').textContent = episodeScore;
+            document.getElementById('hint-tier-' + level).style.display = 'block';
+            const btn = document.getElementById('hintBtn' + level);
+            btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5';
+            if (level < 3) {
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+            sauvegarderAutomatiquement();
+        }
+        function recordEpisodeSuccess() {
+            let scores = {};
+            try { scores = JSON.parse(localStorage.getItem('swiss_shield_scores') || '{}'); } catch(e) {}
+            if (!(EP_ID in scores) || scores[EP_ID] < episodeScore) scores[EP_ID] = episodeScore;
+            localStorage.setItem('swiss_shield_scores', JSON.stringify(scores));
+            localStorage.removeItem('autosave_' + EP_ID);
+        }
+        let currentZone = 'lock-screen';
+        function sauvegarderAutomatiquement() {
+            try {
+                const inputs = {};
+                ['passkey', 'law_input', 'tech_cmd', 'token'].forEach(function(id) {
+                    const el = document.getElementById(id);
+                    if (el) inputs[id] = el.value;
+                });
+                localStorage.setItem('autosave_' + EP_ID, JSON.stringify({
+                    zone: currentZone,
+                    inputs: inputs,
+                    hintsUsed: hintsUsed,
+                    episodeScore: episodeScore
+                }));
+            } catch(e) {}
+        }
+        function proposerRestaurationAutosave() {
+            let data;
+            try { data = JSON.parse(localStorage.getItem('autosave_' + EP_ID) || 'null'); } catch(e) { return; }
+            if (!data || !data.zone || data.zone === 'lock-screen') return;
+            document.getElementById('lock-screen').style.display = 'none';
+            if (data.zone === 'mission-content') {
+                document.getElementById('pre-requis-screen').style.display = 'none';
+                document.getElementById('mission-content').style.display = 'block';
+            } else if (data.zone === 'pre-requis-screen') {
+                document.getElementById('pre-requis-screen').style.display = 'block';
+            }
+            currentZone = data.zone;
+            if (data.inputs) {
+                Object.keys(data.inputs).forEach(function(id) {
+                    const el = document.getElementById(id);
+                    if (el) el.value = data.inputs[id];
+                });
+            }
+            hintsUsed = data.hintsUsed || hintsUsed;
+            episodeScore = (typeof data.episodeScore === 'number') ? data.episodeScore : episodeScore;
+            document.getElementById('hint-score-value').textContent = episodeScore;
+            [1, 2, 3].forEach(function(level) {
+                if (hintsUsed[level]) {
+                    document.getElementById('hint-tier-' + level).style.display = 'block';
+                    const btn = document.getElementById('hintBtn' + level);
+                    if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+                    const next = document.getElementById('hintBtn' + (level + 1));
+                    if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+                }
+            });
+        }
+        function enregistrerErreur(phase, reponseEleve, reponseAttendue) {
+            let debrief = {erreurs:{}, indices:{}};
+            try { debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}'); } catch(e) {}
+            const key = EP_ID + ':' + phase;
+            if (typeof debrief.erreurs[key] !== 'object' || debrief.erreurs[key] === null) {
+                debrief.erreurs[key] = { compte: (debrief.erreurs[key] || 0), exemples: [] };
+            }
+            debrief.erreurs[key].compte++;
+            if (reponseEleve !== undefined && debrief.erreurs[key].exemples.length < 5) {
+                debrief.erreurs[key].exemples.push({ reponseEleve: String(reponseEleve).slice(0,100), reponseAttendue: String(reponseAttendue||'').slice(0,100) });
+            }
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        }
+        function enregistrerIndiceUsage(niveau) {
+            let debrief = {erreurs:{}, indices:{}};
+            try { debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}'); } catch(e) {}
+            const key = EP_ID + ':' + niveau;
+            debrief.indices[key] = (debrief.indices[key] || 0) + 1;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        }
+        function basculerModeSobre() {
+            const actif = document.body.classList.toggle('mode-sobre');
+            localStorage.setItem('swiss_shield_mode_sobre', actif ? '1' : '0');
+            if (!actif) { drawParticles(); }
+        }
+        if (localStorage.getItem('swiss_shield_mode_sobre') === '1') {
+            document.body.classList.add('mode-sobre');
+        }
+        (function pollSuccess(){
+            const ids = ['success','success-msg','success-final','final-zone','step_final','victory-zone','victory-screen','final-step','final-badge'];
+            let recorded = false;
+            setInterval(function(){
+                if (recorded) return;
+                for (const id of ids) {
+                    const el = document.getElementById(id);
+                    if (el && window.getComputedStyle(el).display === 'block') { recordEpisodeSuccess(); recorded = true; return; }
+                }
+            }, 500);
+        })();
+        proposerRestaurationAutosave();
+    </script>
+</body>
+</html>

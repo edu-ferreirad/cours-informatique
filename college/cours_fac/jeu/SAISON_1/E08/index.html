@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>S01E08 - BILAN TECHNIQUE (FIN DE SAISON)</title>
+    <style>
+        :root {
+            --neon-blue: #00f2ff;
+            --neon-purple: #bc13fe;
+            --gold: #ffd700;
+            --deep-space: #020005;
+        }
+
+        /* --- MODE SOBRE (accessibilité) --- */
+        body.mode-sobre, body.mode-sobre * { animation: none !important; transition: none !important; }
+        body.mode-sobre::before { animation: none !important; }
+        #toggle-sobre-btn {
+            position: fixed; top: 10px; right: 10px; z-index: 10001;
+            background: #000; color: var(--neon-blue); border: 1px solid var(--neon-blue);
+            padding: 6px 10px; font-size: 0.7em; cursor: pointer; font-family: inherit; border-radius: 3px;
+        }
+
+        body {
+            background-color: var(--deep-space);
+            color: #ffffff;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background:
+                radial-gradient(1px 1px at 20px 30px, #eee, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 40px 70px, #fff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 50px 160px, var(--neon-blue), rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 90px 40px, var(--neon-purple), rgba(0,0,0,0));
+            background-size: 200px 200px;
+            animation: hyperspace 1.5s linear infinite;
+            z-index: -1;
+            opacity: 0.6;
+        }
+
+        @keyframes hyperspace {
+            from { transform: scale(1) translateY(0); opacity: 0; }
+            50% { opacity: 1; }
+            to { transform: scale(2.5) translateY(100px); opacity: 0; }
+        }
+
+        .terminal {
+            background: rgba(0, 0, 0, 0.9);
+            border: 3px solid var(--neon-blue);
+            padding: 30px;
+            width: 90%;
+            max-width: 850px;
+            box-shadow: 0 0 50px var(--neon-purple), inset 0 0 20px rgba(0, 242, 255, 0.2);
+            border-radius: 15px;
+            z-index: 10;
+            backdrop-filter: blur(15px);
+            position: relative;
+        }
+
+        .btn-retour {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            color: var(--neon-blue);
+            text-decoration: none;
+            border: 1px solid var(--neon-blue);
+            padding: 5px 10px;
+            font-size: 0.8em;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+
+        .btn-retour:hover { background: var(--neon-blue); color: #000; }
+
+        .header-mission {
+            border-bottom: 3px double var(--neon-blue);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            color: var(--gold);
+            font-weight: bold;
+            font-size: 1.4em;
+            text-align: center;
+        }
+
+        .story-context {
+            background: linear-gradient(135deg, rgba(188, 19, 254, 0.2) 0%, rgba(0, 242, 255, 0.1) 100%);
+            border: 2px solid var(--neon-purple);
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+        }
+
+        #pre-requisites, #mission-content, #final-zone { display: none; }
+
+        .challenge-box {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border: 1px solid var(--neon-blue);
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .code-snippet {
+            background: #000;
+            color: #00ff41;
+            padding: 15px;
+            font-family: 'Consolas', monospace;
+            border-radius: 5px;
+            border: 1px solid #333;
+            margin: 15px 0;
+            white-space: pre;
+            overflow-x: auto;
+        }
+
+        input { background: #000; border: 2px solid var(--neon-purple); color: #fff; padding: 12px; width: 280px; font-family: inherit; margin: 10px 0; text-align: center; }
+        button { background: var(--gold); color: #000; border: none; padding: 12px 30px; font-weight: bold; cursor: pointer; border-radius: 5px; text-transform: uppercase; }
+        button:hover { box-shadow: 0 0 20px var(--gold); transform: scale(1.02); }
+
+        .code-final { color: #00ff41; font-size: 2.2em; letter-spacing: 5px; margin: 20px 0; display: block; text-shadow: 0 0 15px #00ff41; border: 2px dashed #00ff41; padding: 15px; text-align: center; }
+
+        .btn-aide-rouge { background: #ff0000; color: #fff; border: none; padding: 12px 25px; font-weight: bold; cursor: pointer; width: 100%; max-width: 400px; margin-top: 30px; border-radius: 5px; }
+        .aide-box { display: none; background: #fff; color: #333; margin-top: 10px; padding: 20px; width: 100%; max-width: 400px; border-left: 10px solid #ff0000; border-radius: 5px; }
+        .pillar-tag { font-weight: bold; color: #ff0000; text-transform: uppercase; font-size: 0.8em; display: block; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <button id="toggle-sobre-btn" onclick="basculerModeSobre()">🌓 Mode sobre</button>
+
+    <div class="terminal">
+        <a href="../../MENU_PRINCIPAL.html" class="btn-retour">[ ESC ]</a>
+
+        <div id="lock-screen">
+            <h2 style="color: var(--gold);">⚠️ SESSION S01 FINALE ⚠️</h2>
+            <div class="story-context">
+                "Agent, l'opération 'Helvetic Shield' touche à sa fin. Le Service de renseignement de la Confédération (SRC) exige une signature finale pour valider le démantèlement du botnet découvert à Zurich.
+                Injectez la clé de session de l'E07 (Élévation Root) pour ouvrir le canal sécurisé."
+            </div>
+            <input type="text" id="passkey" placeholder="CLEF DE SORTIE E07">
+            <br>
+            <button onclick="unlock()">OUVRIR LE DOSSIER</button>
+        </div>
+
+        <div id="pre-requisites">
+            <div class="header-mission">[VÉRIFICATION DES COMPÉTENCES]</div>
+
+            <div class="challenge-box">
+                <p><strong>1. Juridique (Propriété Intellectuelle) :</strong> Quel article de la <b>LDA</b> (Loi sur le droit d'auteur) protège les programmes informatiques en tant qu'œuvres de l'esprit en Suisse ?</p>
+                <input type="text" id="pre-jur" placeholder="Art. X LDA" onchange="sauvegarderAutomatiquement()">
+            </div>
+
+            <div class="challenge-box">
+                <p><strong>2. Réseau (Ligne de commande) :</strong> Quelle commande permet de lister toutes les connexions TCP actives sur une machine Linux pour détecter un rebond ?</p>
+                <input type="text" id="pre-tech" placeholder="Commande shell" onchange="sauvegarderAutomatiquement()">
+            </div>
+
+            <div style="text-align: center;">
+                <button onclick="validatePreReq()">SYNCHRONISER LES DONNÉES</button>
+            </div>
+        </div>
+
+        <div id="mission-content">
+            <div class="header-mission">[INVESTIGATION] CALCUL DE L'IP DE REBOND</div>
+            <div class="story-context">
+                "L'attaquant a utilisé un algorithme de masquage pour son adresse IP. Nous avons intercepté ce script Python utilisé pour générer le dernier octet de son adresse IP de contrôle (172.16.254.X). Résolvez l'algorithme pour identifier X."
+            </div>
+
+            <div class="code-snippet">
+# Source: Intercepted_Botnet_Seed.py
+def generate_target_octet():
+    data = [12, 45, 78, 23]
+    key = 5
+    result = 0
+
+    for i in range(len(data)):
+        if i % 2 == 0:
+            result += data[i] * key
+        else:
+            result += data[i] // key
+
+    # X est le reste de (result + 27) par 256
+    return (result + 27) % 256
+
+# X = ?
+            </div>
+
+            <div style="text-align: center;">
+                <p>IP FINALE DÉDUITE : 172.16.254.<input type="text" id="finalX" style="width: 60px;"></p>
+                <button onclick="checkFinal()">SIGNER LE RAPPORT FINAL</button>
+            </div>
+        </div>
+
+        <div id="final-zone">
+            <div class="header-mission">FÉLICITATIONS, AGENT</div>
+            <p>Le SRC confirme l'arrestation. Le système est désormais hors de danger.</p>
+            <span class="code-final">SHIELD-SEASON-2</span>
+            <p>Exportez ce code. La saison 2 vous attend pour des missions internationales.</p>
+            <button onclick="window.location.href='../../MENU_PRINCIPAL.html'">FERMER LA SAISON</button>
+        </div>
+    </div>
+
+    <button class="btn-aide-rouge" onclick="toggleAide()">[ 🆘 DOSSIER D'INDICES ]</button>
+
+    <div id="zoneAide" class="aide-box">
+        <h3 style="color: #ff0000; margin-top: 0;">SUPPORT OPÉRATIONNEL</h3>
+        <span class="pillar-tag">Informatique</span>
+        <p>Le script Python utilise l'opérateur modulo (%) et la division entière (//). Suivez bien l'indice <b>i</b> (0, 1, 2, 3).</p>
+        <span class="pillar-tag">Juridique</span>
+        <p>La LDA (Loi sur le Droit d'Auteur) protège le code dès sa création. L'article 2 alinéa 3 est la base de cette protection en Suisse.</p>
+        <span class="pillar-tag">Forensics</span>
+        <p>Deux commandes Unix permettent de lister les connexions réseau actives sur une machine : l'une, historique, l'autre plus moderne (Socket Statistics). Cherchez leurs noms dans votre mémento Linux.</p>
+    </div>
+
+    <div style="margin-top: 30px; border-top: 3px solid #d80000; padding: 20px; background: #fff; font-family: Arial, sans-serif; position: relative; z-index: 100; width: 90%; max-width: 850px; margin-left:auto; margin-right:auto;">
+        <div id="hint-score-badge" style="background:#111;color:#3fb950;padding:8px 15px;font-weight:bold;text-align:center;">🏆 Score de cet épisode : <span id="hint-score-value">5</span> / 5 pts</div>
+        <div style="display:flex; gap:8px; margin:10px 0;">
+            <button id="hintBtn1" onclick="useHint(1)" style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;">💡 Indice 1 (-1 pt)</button>
+            <button id="hintBtn2" onclick="useHint(2)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🎯 Indice 2 (-2 pts)</button>
+            <button id="hintBtn3" onclick="useHint(3)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🆘 Solution (-3 pts)</button>
+        </div>
+
+        <div id="zoneAideScore" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; color: #333;">
+            <p id="hint-tier-1" style="display:none;"><strong>💡 INFO :</strong> Pré-requis : l'article de la LDA (contient un « 2 ») qui protège les logiciels, et une commande shell pour lister les connexions TCP actives (historique ou moderne). Ensuite, suivez le script Python indice par indice (i=0,1,2,3) selon parité.</p>
+            <p id="hint-tier-2" style="display:none;"><strong>🎯 PISTE :</strong> Article LDA : 2. Commande : <code>netstat</code> ou <code>ss</code>. Calcul : i=0 (pair) 12×5=60, i=1 (impair) 45//5=9, i=2 (pair) 78×5=390, i=3 (impair) 23//5=4. Total=463. Résultat = (463+27) % 256.</p>
+            <p id="hint-tier-3" style="display:none;"><strong>🆘 SOLUTION :</strong> Pré-requis : 2 / netstat (ou ss). Octet final : <code>234</code></p>
+        </div>
+    </div>
+
+    <script>
+        function appliquerModeSobre() {
+            const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+            document.body.classList.toggle('mode-sobre', actif);
+            const btn = document.getElementById('toggle-sobre-btn');
+            if (btn) btn.textContent = actif ? '🌓 Mode sobre : ON' : '🌓 Mode sobre';
+        }
+        function basculerModeSobre() {
+            const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+            localStorage.setItem('swiss_shield_mode_sobre', actif ? '0' : '1');
+            appliquerModeSobre();
+        }
+        appliquerModeSobre();
+
+        // Verrou 1 : Session précédente
+        function unlock() {
+            const key = document.getElementById('passkey').value.trim().toUpperCase();
+            if (key === 'SUDO-ROOT-99') {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('pre-requisites').style.display = 'block';
+                currentZone = 'pre-requisites';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('entree', key, 'SUDO-ROOT-99');
+                alert("ACCÈS REFUSÉ : Clé S01E07 invalide.");
+            }
+        }
+
+        // Verrou 2 : Pré-requis
+        function validatePreReq() {
+            const jur = document.getElementById('pre-jur').value.trim().toUpperCase();
+            const tech = document.getElementById('pre-tech').value.trim().toLowerCase();
+
+            // Art 2 LDA / ss ou netstat
+            const jurValid = (jur.includes('2'));
+            const techValid = (tech === 'ss' || tech === 'netstat' || tech.includes('netstat'));
+
+            if (jurValid && techValid) {
+                document.getElementById('pre-requisites').style.display = 'none';
+                document.getElementById('mission-content').style.display = 'block';
+                currentZone = 'mission-content';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('prerequis', 'article="' + jur + '", commande="' + tech + '"', 'article contient "2", commande="ss" ou "netstat"');
+                alert("ERREUR : Réponses incorrectes. Vérifiez l'article LDA et la commande réseau.");
+            }
+        }
+
+        // Investigation Finale
+        function checkFinal() {
+            const x = document.getElementById('finalX').value.trim();
+            /* CALCUL :
+               i=0 (pair): 12 * 5 = 60
+               i=1 (impair): 45 // 5 = 9
+               i=2 (pair): 78 * 5 = 390
+               i=3 (impair): 23 // 5 = 4
+               Total = 60 + 9 + 390 + 4 = 463
+               Result = (463 + 27) % 256 = 490 % 256 = 234
+            */
+            if (x === '234') {
+                document.getElementById('mission-content').style.display = 'none';
+                document.getElementById('final-zone').style.display = 'block';
+            } else {
+                enregistrerErreur('investigation', x, '234');
+                alert("ALERTE : Calcul de l'IP erroné. L'attaquant est toujours actif.");
+            }
+        }
+
+        function toggleAide() {
+            const x = document.getElementById("zoneAide");
+            x.style.display = (x.style.display === "block") ? "none" : "block";
+        }
+    </script>
+
+    <script>
+        const EP_ID = "S01E08";
+        const HINT_COST = {1:1, 2:2, 3:3};
+        let hintsUsed = {1:false, 2:false, 3:false};
+        let episodeScore = 5;
+        function useHint(level) {
+            if (hintsUsed[level] || (level > 1 && !hintsUsed[level - 1])) return;
+            hintsUsed[level] = true;
+        enregistrerIndiceUsage(level);
+            episodeScore -= HINT_COST[level];
+            document.getElementById('hint-score-value').textContent = episodeScore;
+            document.getElementById('hint-tier-' + level).style.display = 'block';
+            const btn = document.getElementById('hintBtn' + level);
+            btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5';
+            if (level < 3) {
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+            sauvegarderAutomatiquement();
+        }
+        function recordEpisodeSuccess() {
+            let scores = {};
+            try { scores = JSON.parse(localStorage.getItem('swiss_shield_scores') || '{}'); } catch(e) {}
+            if (!(EP_ID in scores) || scores[EP_ID] < episodeScore) scores[EP_ID] = episodeScore;
+            localStorage.setItem('swiss_shield_scores', JSON.stringify(scores));
+            localStorage.removeItem('autosave_' + EP_ID);
+        }
+    let currentZone = 'lock-screen';
+    function sauvegarderAutomatiquement() {
+        try {
+            const inputs = {};
+            ['pre-jur', 'pre-tech', 'finalX'].forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) inputs[id] = el.value;
+            });
+            localStorage.setItem('autosave_' + EP_ID, JSON.stringify({
+                zone: currentZone,
+                inputs: inputs,
+                hintsUsed: hintsUsed,
+                episodeScore: episodeScore
+            }));
+        } catch(e) {}
+    }
+    function proposerRestaurationAutosave() {
+        let data;
+        try { data = JSON.parse(localStorage.getItem('autosave_' + EP_ID) || 'null'); } catch(e) { return; }
+        if (!data || !data.zone || data.zone === 'lock-screen') return;
+        document.getElementById('lock-screen').style.display = 'none';
+        if (data.zone === 'mission-content') {
+            document.getElementById('pre-requisites').style.display = 'none';
+            document.getElementById('mission-content').style.display = 'block';
+        } else if (data.zone === 'pre-requisites') {
+            document.getElementById('pre-requisites').style.display = 'block';
+        }
+        currentZone = data.zone;
+        if (data.inputs) {
+            Object.keys(data.inputs).forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) el.value = data.inputs[id];
+            });
+        }
+        hintsUsed = data.hintsUsed || hintsUsed;
+        episodeScore = (typeof data.episodeScore === 'number') ? data.episodeScore : episodeScore;
+        document.getElementById('hint-score-value').textContent = episodeScore;
+        [1, 2, 3].forEach(function(level) {
+            if (hintsUsed[level]) {
+                document.getElementById('hint-tier-' + level).style.display = 'block';
+                const btn = document.getElementById('hintBtn' + level);
+                if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+        });
+    }
+    function enregistrerIndiceUsage(niveau) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + niveau;
+            debrief.indices[cle] = (debrief.indices[cle] || 0) + 1;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+    function enregistrerErreur(phase, reponseEleve, reponseAttendue) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + phase;
+            if (typeof debrief.erreurs[cle] !== 'object' || debrief.erreurs[cle] === null) {
+                debrief.erreurs[cle] = { compte: (debrief.erreurs[cle] || 0), exemples: [] };
+            }
+            debrief.erreurs[cle].compte++;
+            if (reponseEleve !== undefined && debrief.erreurs[cle].exemples.length < 5) {
+                debrief.erreurs[cle].exemples.push({ reponseEleve: String(reponseEleve).slice(0,100), reponseAttendue: String(reponseAttendue||'').slice(0,100) });
+            }
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+        (function pollSuccess(){
+            const ids = ['success','success-msg','success-final','final-zone','victory-zone','victory-screen','final-step','final-badge'];
+            let recorded = false;
+            setInterval(function(){
+                if (recorded) return;
+                for (const id of ids) {
+                    const el = document.getElementById(id);
+                    if (el && el.style.display === 'block') { recordEpisodeSuccess(); recorded = true; return; }
+                }
+            }, 500);
+        })();
+        proposerRestaurationAutosave();
+    </script>
+</body>
+</html>

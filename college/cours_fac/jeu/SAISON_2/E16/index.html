@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>S02E16 - ARCHIVAGE CRITIQUE S2</title>
+    <style>
+        /* --- EFFET VISUEL MASSIF : GOLDEN DATA STREAM --- */
+        body {
+            background-color: #050505;
+            color: #ffd700;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: "10101101001101010110011010101010110101101010110101010101011010101010101010110101010101011010101101010110101101010101011010101";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 200%;
+            font-family: 'Courier New', monospace;
+            font-size: 20px;
+            line-height: 1;
+            color: rgba(255, 215, 0, 0.15);
+            word-wrap: break-word;
+            animation: dataFlow 20s linear infinite;
+            z-index: -2;
+            white-space: pre-wrap;
+        }
+
+        @keyframes dataFlow { from { transform: translateY(-50%); } to { transform: translateY(0%); } }
+
+        /* --- MODE SOBRE (accessibilité) --- */
+        body.mode-sobre, body.mode-sobre * { animation: none !important; transition: none !important; }
+        body.mode-sobre::before { animation: none !important; }
+        #toggle-sobre-btn {
+            position: fixed; top: 10px; right: 10px; z-index: 10001;
+            background: #000; color: #ffd700; border: 1px solid #ffd700;
+            padding: 6px 10px; font-size: 0.7em; cursor: pointer; font-family: inherit; border-radius: 3px;
+        }
+
+        .terminal {
+            background: rgba(10, 10, 10, 0.95);
+            border: 4px solid #ffd700;
+            padding: 30px;
+            width: 90%;
+            max-width: 850px;
+            box-shadow: 0 0 60px rgba(255, 215, 0, 0.4), inset 0 0 20px rgba(255, 215, 0, 0.1);
+            border-radius: 15px;
+            text-align: center;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-final { border-bottom: 2px solid #ffd700; margin-bottom: 30px; padding-bottom: 15px; font-size: 1.5em; font-weight: bold; text-transform: uppercase; letter-spacing: 3px; }
+
+        .story-context {
+            background: rgba(255, 215, 0, 0.1);
+            border: 2px solid #ffd700;
+            padding: 25px;
+            margin-bottom: 30px;
+            text-align: left;
+            line-height: 1.6;
+            color: #fff;
+            border-radius: 8px;
+        }
+        .story-context b { color: #ffd700; font-size: 1.1em; text-shadow: 0 0 10px #ffd700; }
+
+        #lock-screen, #pre-requis-screen, #investigation-screen, #victory-zone { display: none; }
+        #lock-screen { display: block; }
+
+        .investigation-box { background: #000; border: 1px dashed #ffd700; padding: 15px; margin: 20px 0; text-align: left; font-family: 'Courier New', monospace; font-size: 0.9em; color: #00ff41; }
+
+        input { background: #000; border: 2px solid #ffd700; color: #ffd700; padding: 15px; width: 300px; font-family: inherit; font-size: 1.2em; text-align: center; outline: none; border-radius: 4px; margin: 10px 0; }
+        button { background: #ffd700; color: #000; border: none; padding: 15px 40px; font-weight: 900; cursor: pointer; transition: 0.3s; margin-top: 15px; border-radius: 4px; text-transform: uppercase; }
+        button:hover { background: #fff; box-shadow: 0 0 30px #ffd700; transform: scale(1.05); }
+
+        .annexe-code { background: #1a1a1a; border-left: 5px solid #ffd700; padding: 15px; color: #ced4da; text-align: left; font-size: 0.85em; margin: 10px 0; font-family: 'Courier New', monospace; white-space: pre; }
+
+        .nav-btn { position: absolute; top: 10px; left: 10px; background: #000; color: #ffd700; border: 1px solid #ffd700; padding: 5px 10px; text-decoration: none; border-radius: 5px; font-size: 0.8em; }
+
+        .aide-box { display: none; background: #fff; color: #333; margin-top: 10px; padding: 25px; width: 90%; max-width: 600px; text-align: left; border-radius: 5px; border-top: 10px solid #d80000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 200; position: relative; }
+        .victory-code { font-size: 2em; font-family: 'Courier New', monospace; color: #fff; background: linear-gradient(45deg, #b8860b, #ffd700); padding: 15px; border-radius: 8px; display: inline-block; margin: 20px 0; border: 2px solid #fff; }
+    </style>
+</head>
+<body>
+
+    <button id="toggle-sobre-btn" onclick="basculerModeSobre()">🌓 Mode sobre</button>
+    <a href="../../MENU_PRINCIPAL.html" class="nav-btn">⬅ RETOUR MENU</a>
+
+    <div class="terminal">
+        <!-- 1. VERROU DE SESSION -->
+        <div id="lock-screen">
+            <h2 style="color: #ffd700; letter-spacing: 5px; text-shadow: 0 0 20px #ffd700;">🏆 ARCHIVAGE SAISON 2</h2>
+            <div class="story-context">
+                <b>HISTOIRE :</b> Shiel-DB est tombé. Le Ministère Public de la Confédération exige une clôture du dossier. Authentifiez-vous avec le code de sanction finale (E15) pour procéder au scellage numérique des preuves.
+            </div>
+            <p>CODE D'ACCÈS REQUIS (E15) :</p>
+            <input type="text" id="passkey" placeholder="CODE SEMAINE 15" onchange="sauvegarderAutomatiquement()">
+            <br>
+            <button onclick="unlock()">DÉVERROUILLER LE BILAN</button>
+        </div>
+
+        <!-- 2. DOUBLE VERROU DE PRÉ-REQUIS -->
+        <div id="pre-requis-screen">
+            <div class="header-final">CONTRÔLE DE CONFORMITÉ PRÉ-ARCHIVAGE</div>
+            <div class="story-context">
+                Avant l'archivage, vérifiez les protocoles légaux suisses et techniques.
+            </div>
+
+            <div style="text-align: left; padding: 10px;">
+                <p><b>DÉFI JURIDIQUE :</b> Selon l'Art. 5 nLPD, quels principes (3 mots) doivent régir tout traitement de données ?</p>
+                <input type="text" id="pre_jur" placeholder="Ex: Bonne foi, ..." onchange="sauvegarderAutomatiquement()">
+
+                <p><b>DÉFI TECHNIQUE :</b> Quelle commande Linux permet de modifier les permissions d'un fichier d'archive pour le mettre en lecture seule (444) ?</p>
+                <input type="text" id="pre_tech" placeholder="Ex: chmod ..." onchange="sauvegarderAutomatiquement()">
+            </div>
+            <button onclick="verifyPre()">VÉRIFIER LES PROTOCOLES</button>
+        </div>
+
+        <!-- 3. INVESTIGATION COMPLEXE (Matu Suisse Level) -->
+        <div id="investigation-screen">
+            <div class="header-final">ANALYSE DE LA CLEF DE SCELLAGE</div>
+            <div class="story-context">
+                <b>CRITIQUE :</b> Le script ci-dessous génère la clef finale de scellage en manipulant des tableaux et des chaînes de caractères. Analysez la logique de concaténation pour extraire la clef sans exécuter le code.
+            </div>
+
+            <div class="annexe-code">
+const data = ["S", "H", "I", "E", "L", "D"];
+const salt = "A9-Z2";
+
+const generateSeal = (arr, s) => {
+    // 1. On inverse le tableau initial
+    let step1 = [...arr].reverse();
+
+    // 2. On prend le premier caractère du sel
+    let step2 = s.charAt(0);
+
+    // 3. On extrait une portion du tableau inversé
+    // de l'index 1 à l'index 3 (exclu)
+    let step3 = step1.slice(1, 3).join("");
+
+    // 4. On ajoute le dernier caractère du tableau d'origine
+    let step4 = arr[arr.length - 1];
+
+    return step2 + step3 + step4;
+};
+
+// console.log(generateSeal(data, salt));
+            </div>
+
+            <div class="investigation-box">
+                [LOGS_DU_NOYAU]<br>
+                > initial_set: ["S", "H", "I", "E", "L", "D"]<br>
+                > salt_id: "A9-Z2"<br>
+                > status: En attente de la signature générée...
+            </div>
+
+            <input type="text" id="sourceV" placeholder="SIGNATURE_FINALE" onchange="sauvegarderAutomatiquement()">
+            <br>
+            <button onclick="signReport()">SCELLER DÉFINITIVEMENT</button>
+        </div>
+
+        <!-- VICTOIRE -->
+        <div id="victory-zone">
+            <div style="font-size: 80px;">🛡️</div>
+            <h2 style="color:#ffd700">EXPERTISE SAISON 2 VALIDÉE</h2>
+            <p>Le dossier Shiel-DB est archivé. Les protocoles nLPD sont respectés.</p>
+            <span class="victory-code">CYBER-COMPLIANT-2026</span>
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="../../MENU_PRINCIPAL.html" style="color: #ffd700; text-decoration: none; font-weight: bold;">[ QUITTER LE SYSTÈME ]</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- AIDE -->
+    <button class="btn-aide-rouge" onclick="toggleAide()" style="margin-top:20px; background:none; border:1px solid #ffd700; color:#ffd700; padding:10px; cursor:pointer;">[ 📜 MANUEL D'ANALYSE ]</button>
+    <div id="zoneAide" class="aide-box">
+        <h3 style="margin-top: 0; color: #d80000;">Notes pour l'enquêteur</h3>
+        <p><b>Droit :</b> L'Art. 5 nLPD est le socle de la protection des données en Suisse.</p>
+        <p><b>Logique de Code :</b>
+            * <code>.reverse()</code> retourne l'ordre : D, L, E, I, H, S.
+            * <code>.slice(1, 3)</code> récupère les éléments aux index 1 et 2.
+            * <code>.charAt(0)</code> cible le tout premier caractère de la chaîne.
+        </p>
+    </div>
+
+    <div style="margin-top: 30px; border-top: 3px solid #d80000; padding: 20px; background: #fff; font-family: Arial, sans-serif; position: relative; z-index: 100; width: 90%; max-width: 600px;">
+        <div id="hint-score-badge" style="background:#111;color:#3fb950;padding:8px 15px;font-weight:bold;text-align:center;">🏆 Score de cet épisode : <span id="hint-score-value">5</span> / 5 pts</div>
+        <div style="display:flex; gap:8px; margin:10px 0;">
+            <button id="hintBtn1" onclick="useHint(1)" style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;">💡 Indice 1 (-1 pt)</button>
+            <button id="hintBtn2" onclick="useHint(2)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🎯 Indice 2 (-2 pts)</button>
+            <button id="hintBtn3" onclick="useHint(3)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🆘 Solution (-3 pts)</button>
+        </div>
+
+        <div id="zoneAideScore" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; color: #333;">
+            <p id="hint-tier-1" style="display:none;"><strong>💡 INFO :</strong> Pré-requis : les trois principes (Art. 5 nLPD) qui régissent tout traitement de données, et la commande chmod pour passer un fichier en lecture seule (444). Ensuite, suivez le script JS étape par étape (reverse, slice, charAt).</p>
+            <p id="hint-tier-2" style="display:none;"><strong>🎯 PISTE :</strong> Principes : bonne foi, proportionnalité, licéité. Commande : <code>chmod 444</code>. Étapes : reverse → D,L,E,I,H,S. salt.charAt(0) → « A ». slice(1,3) sur le tableau inversé → « LE ». Dernier élément du tableau d'origine → « D ».</p>
+            <p id="hint-tier-3" style="display:none;"><strong>🆘 SOLUTION :</strong> Pré-requis : bonne foi/proportionnalité/licéité, chmod 444. Signature finale : <code>ALED</code></p>
+        </div>
+    </div>
+
+    <script>
+        function appliquerModeSobre() {
+            const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+            document.body.classList.toggle('mode-sobre', actif);
+            const btn = document.getElementById('toggle-sobre-btn');
+            if (btn) btn.textContent = actif ? '🌓 Mode sobre : ON' : '🌓 Mode sobre';
+        }
+        function basculerModeSobre() {
+            const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+            localStorage.setItem('swiss_shield_mode_sobre', actif ? '0' : '1');
+            appliquerModeSobre();
+        }
+        appliquerModeSobre();
+
+        function toggleAide() {
+            var x = document.getElementById("zoneAide");
+            x.style.display = (x.style.display === "block") ? "none" : "block";
+        }
+
+        function unlock() {
+            const code = document.getElementById('passkey').value.trim().toUpperCase();
+            if (code === 'FINE-250K-CHF') {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('pre-requis-screen').style.display = 'block';
+                currentZone = 'pre-requis-screen';
+                sauvegarderAutomatiquement();
+            } else { enregistrerErreur('entree', code, 'FINE-250K-CHF'); alert("ACCÈS REFUSÉ. Code E15 invalide."); }
+        }
+
+        function verifyPre() {
+            const jur = document.getElementById('pre_jur').value.toLowerCase();
+            const tech = document.getElementById('pre_tech').value.toLowerCase();
+
+            const jurValid = jur.includes("bonne foi") && jur.includes("proportionnalité") && jur.includes("licéité");
+            const techValid = tech.includes("chmod 444");
+
+            if (jurValid && techValid) {
+                document.getElementById('pre-requis-screen').style.display = 'none';
+                document.getElementById('investigation-screen').style.display = 'block';
+                currentZone = 'investigation-screen';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('prerequis', 'juridique="' + jur + '", technique="' + tech + '"', 'juridique contient bonne foi/proportionnalité/licéité, technique contient chmod 444');
+                alert("ERREUR : Protocoles de conformité invalides.");
+            }
+        }
+
+        function signReport() {
+            const val = document.getElementById('sourceV').value.trim().toUpperCase();
+            // Analyse :
+            // step1 (reverse): D, L, E, I, H, S
+            // step2 (salt 0): A
+            // step3 (slice 1,3): LE
+            // step4 (arr last): D
+            // Result: ALED
+            if (val === 'ALED') {
+                document.getElementById('investigation-screen').style.display = 'none';
+                document.getElementById('victory-zone').style.display = 'block';
+                document.body.style.background = "radial-gradient(circle, #222 0%, #000 100%)";
+            } else {
+                enregistrerErreur('investigation', val, 'ALED');
+                alert("SIGNATURE ERRONÉE. Vérifiez vos index (0 est le premier).");
+            }
+        }
+    </script>
+
+    <script>
+        const EP_ID = "S02E16";
+        const HINT_COST = {1:1, 2:2, 3:3};
+        let hintsUsed = {1:false, 2:false, 3:false};
+        let episodeScore = 5;
+        function useHint(level) {
+            if (hintsUsed[level] || (level > 1 && !hintsUsed[level - 1])) return;
+            hintsUsed[level] = true;
+        enregistrerIndiceUsage(level);
+            episodeScore -= HINT_COST[level];
+            document.getElementById('hint-score-value').textContent = episodeScore;
+            document.getElementById('hint-tier-' + level).style.display = 'block';
+            const btn = document.getElementById('hintBtn' + level);
+            btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5';
+            if (level < 3) {
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+            sauvegarderAutomatiquement();
+        }
+        function recordEpisodeSuccess() {
+            let scores = {};
+            try { scores = JSON.parse(localStorage.getItem('swiss_shield_scores') || '{}'); } catch(e) {}
+            if (!(EP_ID in scores) || scores[EP_ID] < episodeScore) scores[EP_ID] = episodeScore;
+            localStorage.setItem('swiss_shield_scores', JSON.stringify(scores));
+            localStorage.removeItem('autosave_' + EP_ID);
+        }
+    let currentZone = 'lock-screen';
+    function sauvegarderAutomatiquement() {
+        try {
+            const inputs = {};
+            ['passkey', 'pre_jur', 'pre_tech', 'sourceV'].forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) inputs[id] = el.value;
+            });
+            localStorage.setItem('autosave_' + EP_ID, JSON.stringify({
+                zone: currentZone,
+                inputs: inputs,
+                hintsUsed: hintsUsed,
+                episodeScore: episodeScore
+            }));
+        } catch(e) {}
+    }
+    function proposerRestaurationAutosave() {
+        let data;
+        try { data = JSON.parse(localStorage.getItem('autosave_' + EP_ID) || 'null'); } catch(e) { return; }
+        if (!data || !data.zone || data.zone === 'lock-screen') return;
+        document.getElementById('lock-screen').style.display = 'none';
+        if (data.zone === 'investigation-screen') {
+            document.getElementById('pre-requis-screen').style.display = 'none';
+            document.getElementById('investigation-screen').style.display = 'block';
+        } else if (data.zone === 'pre-requis-screen') {
+            document.getElementById('pre-requis-screen').style.display = 'block';
+        }
+        currentZone = data.zone;
+        if (data.inputs) {
+            Object.keys(data.inputs).forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) el.value = data.inputs[id];
+            });
+        }
+        hintsUsed = data.hintsUsed || hintsUsed;
+        episodeScore = (typeof data.episodeScore === 'number') ? data.episodeScore : episodeScore;
+        document.getElementById('hint-score-value').textContent = episodeScore;
+        [1, 2, 3].forEach(function(level) {
+            if (hintsUsed[level]) {
+                document.getElementById('hint-tier-' + level).style.display = 'block';
+                const btn = document.getElementById('hintBtn' + level);
+                if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+        });
+    }
+    function enregistrerIndiceUsage(niveau) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + niveau;
+            debrief.indices[cle] = (debrief.indices[cle] || 0) + 1;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+    function enregistrerErreur(phase, reponseEleve, reponseAttendue) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + phase;
+            if (typeof debrief.erreurs[cle] !== 'object' || debrief.erreurs[cle] === null) {
+                debrief.erreurs[cle] = { compte: (debrief.erreurs[cle] || 0), exemples: [] };
+            }
+            debrief.erreurs[cle].compte++;
+            if (reponseEleve !== undefined && debrief.erreurs[cle].exemples.length < 5) {
+                debrief.erreurs[cle].exemples.push({ reponseEleve: String(reponseEleve).slice(0,100), reponseAttendue: String(reponseAttendue||'').slice(0,100) });
+            }
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+        (function pollSuccess(){
+            const ids = ['success','success-msg','success-final','final-zone','step_final','victory-zone','victory-screen','final-step','final-badge'];
+            let recorded = false;
+            setInterval(function(){
+                if (recorded) return;
+                for (const id of ids) {
+                    const el = document.getElementById(id);
+                    if (el && window.getComputedStyle(el).display === 'block') { recordEpisodeSuccess(); recorded = true; return; }
+                }
+            }, 500);
+        })();
+        proposerRestaurationAutosave();
+    </script>
+</body>
+</html>

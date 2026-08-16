@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>S01E04 - LE PROXY FANTÔME</title>
+    <style>
+        :root {
+            --gold: #ffcc00;
+            --dark-bg: #050505;
+            --alert-red: #d80000;
+            --code-green: #00ff41;
+        }
+
+        canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background: #000;
+        }
+
+        /* --- MODE SOBRE (accessibilité) --- */
+        body.mode-sobre, body.mode-sobre * { animation: none !important; transition: none !important; }
+        body.mode-sobre #warpCanvas { display: none !important; }
+        #toggle-sobre-btn {
+            position: fixed; top: 10px; right: 10px; z-index: 10001;
+            background: #000; color: var(--gold); border: 1px solid var(--gold);
+            padding: 6px 10px; font-size: 0.7em; cursor: pointer; font-family: inherit; border-radius: 3px;
+        }
+
+        body {
+            color: var(--gold);
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        .terminal {
+            background: rgba(0, 0, 0, 0.95);
+            border: 2px solid var(--gold);
+            padding: 25px;
+            width: 95%;
+            max-width: 900px;
+            box-shadow: 0 0 30px rgba(255, 204, 0, 0.3);
+            border-radius: 5px;
+            backdrop-filter: blur(8px);
+            position: relative;
+        }
+
+        .header-mission { border-bottom: 2px solid var(--gold); margin-bottom: 20px; padding-bottom: 10px; color: #fff; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; }
+
+        .btn-navigation { position: absolute; top: 10px; right: 10px; text-decoration: none; color: var(--gold); border: 1px solid var(--gold); padding: 5px 10px; font-size: 0.8em; transition: 0.3s; }
+        .btn-navigation:hover { background: var(--gold); color: #000; }
+
+        .story-alert {
+            background: rgba(255, 204, 0, 0.05);
+            border-left: 4px solid var(--gold);
+            padding: 15px;
+            margin-bottom: 25px;
+            color: #eee;
+        }
+
+        #pre-requisites, #mission-content, #final-zone { display: none; }
+
+        /* Annexes de code stylisées */
+        .annex-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
+        .annexe-window {
+            background: #050505;
+            border: 1px solid #444;
+            border-top: 20px solid #333;
+            border-radius: 3px;
+            position: relative;
+        }
+        .annexe-window::before { content: "● ● ●"; position: absolute; top: -18px; left: 10px; font-size: 10px; color: #666; }
+        .annexe-label { position: absolute; top: -18px; right: 10px; font-size: 10px; color: #aaa; text-transform: uppercase; }
+
+        .code-block { padding: 10px; color: var(--code-green); font-size: 0.8em; line-height: 1.4; overflow-x: auto; white-space: pre; }
+
+        input { background: #000; border: 1px solid var(--gold); color: var(--gold); padding: 10px; width: 300px; font-family: inherit; text-align: center; margin-top: 10px; outline: none; }
+        button { background: var(--gold); color: #000; border: none; padding: 12px 25px; font-weight: bold; cursor: pointer; margin-top: 15px; text-transform: uppercase; transition: 0.3s; }
+        button:hover { background: #fff; box-shadow: 0 0 15px var(--gold); }
+
+        .code-final { color: #000; font-size: 2em; letter-spacing: 5px; background: var(--gold); padding: 10px; font-weight: bold; display: inline-block; margin-top: 20px; }
+
+        .btn-aide-rouge { background: var(--alert-red); color: #fff; border: none; padding: 12px 25px; font-weight: bold; cursor: pointer; width: 400px; margin-top: 40px; border-radius: 4px; }
+        .aide-box { display: none; background: #fff; color: #111; margin-top: 10px; padding: 20px; width: 400px; text-align: left; border-radius: 5px; border-left: 10px solid var(--alert-red); font-family: sans-serif; }
+        .pillar-title { font-weight: bold; color: var(--alert-red); text-transform: uppercase; display: block; margin-top: 10px; border-bottom: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+    <button id="toggle-sobre-btn" onclick="basculerModeSobre()">🌓 Mode sobre</button>
+
+    <canvas id="warpCanvas"></canvas>
+
+    <div class="terminal">
+        <a href="../../MENU_PRINCIPAL.html" class="btn-navigation">[ RETOUR AU HUB ]</a>
+
+        <div id="lock-screen">
+            <div class="header-mission">S01E04 : AUTHENTIFICATION REQUISE</div>
+            <div class="story-alert">
+                "Agent, l'intrus s'est replié derrière un rebond complexe. Le point d'entrée est localisé sur un serveur de l'Administration Fédérale à Berne. Injectez la signature S01E03 pour ouvrir le tunnel."
+            </div>
+            <input type="text" id="passkey" placeholder="CODE SESSION E03">
+            <br>
+            <button onclick="unlock()">ÉTABLIR LE TUNNEL</button>
+        </div>
+
+        <div id="pre-requisites">
+            <div class="header-mission">[SÉCURITÉ] VÉRIFICATION DES ACCRÉDITATIONS</div>
+            <div class="story-alert">
+                "Accès bloqué par le pare-feu fédéral. Résolvez ces deux protocoles pour prouver votre identité."
+            </div>
+            <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 5px;">
+                <p><strong>1. Juridique (LDA) :</strong> Comment appelle-t-on le dispositif technique (3 lettres) visant à empêcher l'utilisation illicite d'une œuvre numérique ?</p>
+                <input type="text" id="jurInput" placeholder="Réponse (ex: VPN)" onchange="sauvegarderAutomatiquement()">
+
+                <p style="margin-top:20px;"><strong>2. Technique :</strong> Dans le modèle OSI, à quelle couche (chiffre) appartient le protocole UDP ?</p>
+                <input type="number" id="techInput" placeholder="Couche N°" onchange="sauvegarderAutomatiquement()">
+            </div>
+            <button onclick="validatePreReq()">DÉVERROUILLER L'ACCÈS PROXY</button>
+        </div>
+
+        <div id="mission-content">
+            <div class="header-mission">[INVESTIGATION] LE PROXY FANTÔME</div>
+            <div class="story-alert">
+                "L'intrus utilise une grappe de serveurs proxies. Analysez les logs capturés et l'algorithme de routage Python pour identifier le nom du serveur qui gérera le prochain paquet (Sensor Load = 77)."
+            </div>
+
+            <div class="annex-container">
+                <div class="annexe-window">
+                    <span class="annexe-label">Source: Routing.py</span>
+                    <div class="code-block">
+def select_proxy(data_load):
+    nodes = {
+        "CH-BERN-01": {"cap": 100, "status": "UP"},
+        "CH-ZUG-99":   {"cap": 80, "status": "UP"},
+        "CH-GEN-77":  {"cap": 78, "status": "UP"},
+        "CH-URI-04":  {"cap": 50, "status": "DOWN"}
+    }
+    for name, info in nodes.items():
+        if info["status"] == "UP":
+            if data_load < info["cap"]:
+                return name
+    return "FAILOVER"</div>
+                </div>
+
+                <div class="annexe-window">
+                    <span class="annexe-label">Log: Sensor_Dump.log</span>
+                    <div class="code-block">
+[12:00:01] SCAN START...
+[12:00:05] SENSOR_A: 102.4
+[12:00:09] SENSOR_B: 77.0
+[12:00:12] Paquet intercepté.
+[12:00:15] Calcul du routage...
+[12:00:18] ALGO: data_load = SENSOR_B
+[12:00:20] En attente de cible...</div>
+                </div>
+            </div>
+
+            <div style="text-align: center;">
+                <p>Identifiez le serveur cible (Ordre de priorité du dictionnaire) :</p>
+                <input type="text" id="proxyID" placeholder="NOM-DU-SERVEUR">
+                <br>
+                <button onclick="checkFinal()">FORCER LE PASSAGE</button>
+            </div>
+        </div>
+
+        <div id="final-zone">
+            <div class="header-mission">S01E04 : SUCCÈS</div>
+            <div class="story-alert">
+                "Excellent travail. Le tunnel est stable. Nous traçons désormais l'origine du signal vers un bunker privé."
+            </div>
+            <p>CLÉ D'EXPORTATION POUR S01E05 :</p>
+            <span class="code-final">GHOST-TRACED-2026</span>
+            <br>
+            <button onclick="window.location.href='../../MENU_PRINCIPAL.html'">RETOUR AU HUB</button>
+        </div>
+    </div>
+
+    <button class="btn-aide-rouge" onclick="toggleAide()">[ 📜 PROTOCOLE D'AIDE - 3 PILIERS ]</button>
+    <div id="zoneAide" class="aide-box">
+        <span class="pillar-title">1. Informatique (Concepts)</span>
+        <p>En Python, l'ordre dans un dictionnaire (depuis 3.7+) est l'ordre d'insertion. L'algorithme renvoie le <b>premier</b> serveur qui remplit les conditions.</p>
+
+        <span class="pillar-title">2. Juridique (LDA)</span>
+        <p>Les <b>DRM</b> (Digital Rights Management) sont protégés en Suisse par la LDA. Contourner ces mesures est illégal, sauf exceptions limitées.</p>
+
+        <span class="pillar-title">3. Forensics (Analyse)</span>
+        <p>Regardez bien la condition : <code>data_load < info["cap"]</code>. Le serveur <b>CH-GEN-77</b> a une capacité de 78. Est-ce que 77 est strictement inférieur à 78 ?</p>
+    </div>
+
+    <div style="margin-top: 30px; border-top: 3px solid #d80000; padding: 20px; background: #fff; font-family: Arial, sans-serif; position: relative; z-index: 100; width: 90%; max-width: 900px;">
+        <div id="hint-score-badge" style="background:#111;color:#3fb950;padding:8px 15px;font-weight:bold;text-align:center;">🏆 Score de cet épisode : <span id="hint-score-value">5</span> / 5 pts</div>
+        <div style="display:flex; gap:8px; margin:10px 0;">
+            <button id="hintBtn1" onclick="useHint(1)" style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;">💡 Indice 1 (-1 pt)</button>
+            <button id="hintBtn2" onclick="useHint(2)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🎯 Indice 2 (-2 pts)</button>
+            <button id="hintBtn3" onclick="useHint(3)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🆘 Solution (-3 pts)</button>
+        </div>
+
+        <div id="zoneAideScore" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; color: #333;">
+            <p id="hint-tier-1" style="display:none;"><strong>💡 INFO :</strong> Pré-requis : un acronyme de 3 lettres pour la protection technique des œuvres numériques (LDA), et le numéro de la couche OSI du protocole UDP. Ensuite, lisez bien l'ordre du dictionnaire Python dans <code>routing.py</code>.</p>
+            <p id="hint-tier-2" style="display:none;"><strong>🎯 PISTE :</strong> Réponse juridique : DRM. Couche OSI d'UDP : couche 4 (transport). Dans <code>select_proxy</code>, la boucle parcourt les nœuds dans l'ordre du dictionnaire et retourne le <b>premier</b> nœud « UP » dont la capacité est strictement supérieure au load (77). Regardez lequel vient en premier dans le dictionnaire.</p>
+            <p id="hint-tier-3" style="display:none;"><strong>🆘 SOLUTION :</strong> Pré-requis : DRM / 4. Serveur cible : <code>CH-BERN-01</code> (premier nœud « UP » du dictionnaire avec cap 100 > 77)</p>
+        </div>
+    </div>
+
+    <script>
+        // --- VISUELS WARP SPEED ---
+        const canvas = document.getElementById('warpCanvas');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+        const numStars = 200;
+
+        function initStars() {
+            stars = [];
+            for (let i = 0; i < numStars; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width - canvas.width / 2,
+                    y: Math.random() * canvas.height - canvas.height / 2,
+                    z: Math.random() * canvas.width,
+                    o: Math.random()
+                });
+            }
+        }
+
+        function updateStars() {
+            ctx.fillStyle = "black";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < numStars; i++) {
+                let s = stars[i];
+                s.z -= 15;
+                if (s.z <= 0) s.z = canvas.width;
+                let x = (s.x / s.z) * (canvas.width / 2) + canvas.width / 2;
+                let y = (s.y / s.z) * (canvas.height / 2) + canvas.height / 2;
+                let size = (1 - s.z / canvas.width) * 5;
+                ctx.fillStyle = "rgba(255, 204, 0, " + (1 - s.z / canvas.width) + ")";
+                ctx.fillRect(x, y, size, size);
+            }
+            requestAnimationFrame(updateStars);
+        }
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            initStars();
+        });
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        initStars();
+        function appliquerModeSobre() {
+            const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+            document.body.classList.toggle('mode-sobre', actif);
+            const btn = document.getElementById('toggle-sobre-btn');
+            if (btn) btn.textContent = actif ? '🌓 Mode sobre : ON' : '🌓 Mode sobre';
+        }
+        function basculerModeSobre() {
+            const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+            localStorage.setItem('swiss_shield_mode_sobre', actif ? '0' : '1');
+            appliquerModeSobre();
+        }
+        appliquerModeSobre();
+        if (localStorage.getItem('swiss_shield_mode_sobre') !== '1') updateStars();
+
+        // --- LOGIQUE MÉTIER ---
+        function unlock() {
+            const key = document.getElementById('passkey').value.trim().toUpperCase();
+            if (key === 'SIGNAL-40') {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('pre-requisites').style.display = 'block';
+                currentZone = 'pre-requisites';
+                sauvegarderAutomatiquement();
+            } else { enregistrerErreur('entree', key, 'SIGNAL-40'); alert("ERREUR : Clé de session invalide."); }
+        }
+
+        function validatePreReq() {
+            const jur = document.getElementById('jurInput').value.trim().toUpperCase();
+            const tech = document.getElementById('techInput').value.trim();
+
+            if (jur === 'DRM' && tech === '4') {
+                document.getElementById('pre-requisites').style.display = 'none';
+                document.getElementById('mission-content').style.display = 'block';
+                currentZone = 'mission-content';
+                sauvegarderAutomatiquement();
+            } else { enregistrerErreur('prerequis', 'juridique="' + jur + '", technique="' + tech + '"', 'juridique="DRM", technique="4"'); alert("ACCÈS REFUSÉ : Vérifiez vos bases OSI et LDA."); }
+        }
+
+        function checkFinal() {
+            const val = document.getElementById('proxyID').value.trim().toUpperCase();
+            // CH-BERN-01 cap 100 > 77 -> OK
+            // Mais l'ordre de priorité dans la boucle for renverra CH-BERN-01 en premier.
+            if (val === 'CH-BERN-01') {
+                document.getElementById('mission-content').style.display = 'none';
+                document.getElementById('final-zone').style.display = 'block';
+            } else { enregistrerErreur('investigation', val, 'CH-BERN-01'); alert("ERREUR : Routage incorrect. Le paquet n'a pas atteint cette cible."); }
+        }
+
+        function toggleAide() {
+            var x = document.getElementById("zoneAide");
+            x.style.display = (x.style.display === "block") ? "none" : "block";
+        }
+    </script>
+
+    <script>
+        const EP_ID = "S01E04";
+        const HINT_COST = {1:1, 2:2, 3:3};
+        let hintsUsed = {1:false, 2:false, 3:false};
+        let episodeScore = 5;
+        function useHint(level) {
+            if (hintsUsed[level] || (level > 1 && !hintsUsed[level - 1])) return;
+            hintsUsed[level] = true;
+        enregistrerIndiceUsage(level);
+            episodeScore -= HINT_COST[level];
+            document.getElementById('hint-score-value').textContent = episodeScore;
+            document.getElementById('hint-tier-' + level).style.display = 'block';
+            const btn = document.getElementById('hintBtn' + level);
+            btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5';
+            if (level < 3) {
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+            sauvegarderAutomatiquement();
+        }
+        function recordEpisodeSuccess() {
+            let scores = {};
+            try { scores = JSON.parse(localStorage.getItem('swiss_shield_scores') || '{}'); } catch(e) {}
+            if (!(EP_ID in scores) || scores[EP_ID] < episodeScore) scores[EP_ID] = episodeScore;
+            localStorage.setItem('swiss_shield_scores', JSON.stringify(scores));
+            localStorage.removeItem('autosave_' + EP_ID);
+        }
+    let currentZone = 'lock-screen';
+    function sauvegarderAutomatiquement() {
+        try {
+            const inputs = {};
+            ['jurInput', 'techInput', 'proxyID'].forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) inputs[id] = el.value;
+            });
+            localStorage.setItem('autosave_' + EP_ID, JSON.stringify({
+                zone: currentZone,
+                inputs: inputs,
+                hintsUsed: hintsUsed,
+                episodeScore: episodeScore
+            }));
+        } catch(e) {}
+    }
+    function proposerRestaurationAutosave() {
+        let data;
+        try { data = JSON.parse(localStorage.getItem('autosave_' + EP_ID) || 'null'); } catch(e) { return; }
+        if (!data || !data.zone || data.zone === 'lock-screen') return;
+        document.getElementById('lock-screen').style.display = 'none';
+        if (data.zone === 'mission-content') {
+            document.getElementById('pre-requisites').style.display = 'none';
+            document.getElementById('mission-content').style.display = 'block';
+        } else if (data.zone === 'pre-requisites') {
+            document.getElementById('pre-requisites').style.display = 'block';
+        }
+        currentZone = data.zone;
+        if (data.inputs) {
+            Object.keys(data.inputs).forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) el.value = data.inputs[id];
+            });
+        }
+        hintsUsed = data.hintsUsed || hintsUsed;
+        episodeScore = (typeof data.episodeScore === 'number') ? data.episodeScore : episodeScore;
+        document.getElementById('hint-score-value').textContent = episodeScore;
+        [1, 2, 3].forEach(function(level) {
+            if (hintsUsed[level]) {
+                document.getElementById('hint-tier-' + level).style.display = 'block';
+                const btn = document.getElementById('hintBtn' + level);
+                if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+        });
+    }
+    function enregistrerIndiceUsage(niveau) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + niveau;
+            debrief.indices[cle] = (debrief.indices[cle] || 0) + 1;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+    function enregistrerErreur(phase, reponseEleve, reponseAttendue) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + phase;
+            if (typeof debrief.erreurs[cle] !== 'object' || debrief.erreurs[cle] === null) {
+                debrief.erreurs[cle] = { compte: (debrief.erreurs[cle] || 0), exemples: [] };
+            }
+            debrief.erreurs[cle].compte++;
+            if (reponseEleve !== undefined && debrief.erreurs[cle].exemples.length < 5) {
+                debrief.erreurs[cle].exemples.push({ reponseEleve: String(reponseEleve).slice(0,100), reponseAttendue: String(reponseAttendue||'').slice(0,100) });
+            }
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+        (function pollSuccess(){
+            const ids = ['success','success-msg','success-final','final-zone','victory-zone','victory-screen','final-step','final-badge'];
+            let recorded = false;
+            setInterval(function(){
+                if (recorded) return;
+                for (const id of ids) {
+                    const el = document.getElementById(id);
+                    if (el && el.style.display === 'block') { recordEpisodeSuccess(); recorded = true; return; }
+                }
+            }, 500);
+        })();
+        proposerRestaurationAutosave();
+    </script>
+</body>
+</html>

@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>S02E10 - UNIT nLPD : DONNÉES SENSIBLES</title>
+    <style>
+        body {
+            background-color: #0a0a0a;
+            color: #2ecc71;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+            margin: 0;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, rgba(139, 0, 0, 0.8) 0%, rgba(10, 10, 10, 0) 70%);
+            z-index: -1;
+            animation: alerteCritique 1s infinite alternate;
+            pointer-events: none;
+        }
+
+        @keyframes alerteCritique {
+            0% { opacity: 0.5; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.1); }
+        }
+
+        /* --- MODE SOBRE (accessibilité) --- */
+        body.mode-sobre, body.mode-sobre * { animation: none !important; transition: none !important; }
+        body.mode-sobre::before { animation: none !important; }
+        #toggle-sobre-btn {
+            position: fixed; top: 10px; right: 10px; z-index: 10001;
+            background: #000; color: #2ecc71; border: 1px solid #2ecc71;
+            padding: 6px 10px; font-size: 0.7em; cursor: pointer; font-family: inherit; border-radius: 3px;
+        }
+
+        .terminal {
+            background: rgba(17, 17, 17, 0.95);
+            border: 2px solid #2ecc71;
+            padding: 25px;
+            width: 90%;
+            max-width: 900px;
+            box-shadow: 0 0 30px rgba(231, 76, 60, 0.5);
+            border-radius: 8px;
+            z-index: 10;
+        }
+
+        .header-mission { border-bottom: 2px solid #2ecc71; margin-bottom: 20px; padding-bottom: 10px; color: #fff; font-weight: bold; text-transform: uppercase; text-align: center; }
+
+        .story-context {
+            background: rgba(231, 76, 60, 0.1);
+            border-left: 4px solid #e74c3c;
+            padding: 15px;
+            margin-bottom: 25px;
+            color: #bdc3c7;
+            line-height: 1.6;
+        }
+
+        #lock-screen, #prerequisites, #mission-content, #final-zone { display: none; }
+        .active { display: block !important; }
+
+        /* Fenêtres d'annexes stylisées */
+        .annexe-box {
+            background: #001a00;
+            border: 1px solid #00ff00;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 0.8em;
+            color: #00ff00;
+            box-shadow: inset 0 0 5px #000;
+        }
+
+        .code-window {
+            background: #000;
+            border: 1px solid #444;
+            padding: 15px;
+            color: #2ecc71;
+            font-size: 0.85em;
+            margin: 15px 0;
+            border-radius: 4px;
+            position: relative;
+        }
+
+        input { background: #000; border: 1px solid #2ecc71; color: #2ecc71; padding: 12px; width: 300px; font-family: inherit; margin-top: 10px; border-radius: 4px; text-align: center; }
+        button { background: #2ecc71; color: #000; border: none; padding: 12px 25px; font-weight: bold; cursor: pointer; margin-top: 15px; text-transform: uppercase; border-radius: 4px; }
+        button:hover { background: #fff; box-shadow: 0 0 15px #2ecc71; }
+
+        .back-btn { position: absolute; top: 20px; left: 20px; color: #2ecc71; text-decoration: none; border: 1px solid #2ecc71; padding: 5px 10px; font-size: 0.8em; }
+
+        .piliers-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 30px; }
+        .pilier { background: rgba(46, 204, 113, 0.05); border: 1px solid #2ecc71; padding: 10px; font-size: 0.75em; border-radius: 4px; }
+
+        .code-final { color: #ffd700; font-size: 2em; letter-spacing: 5px; display: block; padding: 20px; border: 2px dashed #ffd700; text-align: center; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <button id="toggle-sobre-btn" onclick="basculerModeSobre()">🌓 Mode sobre</button>
+
+    <a href="../../MENU_PRINCIPAL.html" class="back-btn">< RETOUR TERMINAL</a>
+
+    <div class="terminal">
+        <div id="lock-screen" class="active">
+            <div class="header-mission">SÉCURITÉ FÉDÉRALE - IDENTIFICATION REQUISE</div>
+            <div class="story-context">
+                "Agent, nous sommes sur une affaire de violation massive de la nLPD dans un hôpital universitaire vaudois. Le code de l'épisode précédent est requis pour accéder aux serveurs forensics."
+            </div>
+            <div style="text-align: center;">
+                <input type="text" id="passkey" placeholder="CODE DE FIN S02E09">
+                <br>
+                <button onclick="unlock()">DÉVERROUILLER</button>
+            </div>
+        </div>
+
+        <div id="prerequisites">
+            <div class="header-mission">PROTOCOLE D'ACCÈS nLPD</div>
+            <div class="annexe-box">
+                > INDICE JURIDIQUE : Les données sensibles sont définies dans la première partie de la loi, juste après le champ d'application.<br>
+                > INDICE TECHNIQUE : "La tête pour le début, la queue pour la fin".
+            </div>
+            <div style="padding: 10px;">
+                <p>1. Selon la nLPD, quel article définit précisément les "données sensibles" ?</p>
+                <input type="text" id="req1" placeholder="Ex: Art. 99" onchange="sauvegarderAutomatiquement()">
+
+                <p>2. Commande Linux pour lire uniquement les dernières lignes d'un fichier log :</p>
+                <input type="text" id="req2" placeholder="Commande shell..." onchange="sauvegarderAutomatiquement()">
+            </div>
+            <div style="text-align:center;"><button onclick="checkPrereq()">ENTRER DANS LE DUMP</button></div>
+        </div>
+
+        <div id="mission-content">
+            <div class="header-mission">INVESTIGATION : INTEGRITY_CHECK_X64</div>
+            <div class="story-context">
+                Les pirates ont tenté de corrompre le registre patient pour ralentir l'enquête. Vous devez calculer le <strong>Checksum de Validation</strong> de l'objet JSON ci-dessous en suivant l'algorithme de la Confédération.
+            </div>
+
+            <div class="annexe-box">
+                <strong>ANNEXE A-10 : TABLE DE CALCUL</strong><br>
+                - Premier caractère ASCII de 'UID' : C = 67, H = 72, P = 80.<br>
+                - Multiplicateur de Danger : 1.5 si 'ST' == 'CRITICAL', sinon 1.0.<br>
+                - Formule : (Somme ASCII des 2 lettres de l'UID) * Multiplicateur * (Nombre de clés dans l'objet).
+            </div>
+
+            <div class="code-window">
+                {
+                    "UID": "PH-902",
+                    "ST": "CRITICAL",
+                    "DATA": "ONCOLOGY_REPORT_04",
+                    "SIGNED": true
+                }
+            </div>
+
+            <div style="text-align: center;">
+                <p>CALCULEZ LE RÉSULTAT FINAL :</p>
+                <input type="text" id="investigationInput" placeholder="Valeur entière">
+                <br>
+                <button onclick="verifyInvestigation()">SOUMETTRE L'ANALYSE</button>
+            </div>
+        </div>
+
+        <div id="final-zone">
+            <div class="header-mission">RÉSULTAT DE L'EXPERTISE</div>
+            <div class="story-context">
+                Analyse terminée. L'intégrité est confirmée. La fuite concerne bien des données sensibles au sens de l'Art. 5 nLPD. Le dossier est transmis au Préposé fédéral à la protection des données.
+            </div>
+            <span class="code-final">ART-5-SENSITIVE</span>
+            <div style="text-align:center;">
+                <button onclick="location.href='../../MENU_PRINCIPAL.html'">FERMER LA SESSION</button>
+            </div>
+        </div>
+
+        <div class="piliers-container">
+            <div class="pilier">
+                <h4>INFORMATIQUE</h4>
+                Le calcul de checksum (Somme de contrôle) est la base de la cybersécurité pour détecter toute altération de données.
+            </div>
+            <div class="pilier">
+                <h4>JURIDIQUE</h4>
+                Art. 5 nLPD : "Sont des données sensibles... les données sur la santé, la sphère intime ou l'appartenance à une race."
+            </div>
+            <div class="pilier">
+                <h4>FORENSICS</h4>
+                Analyse de logs : La commande <code>tail -f</code> est l'outil n°1 pour surveiller une attaque en cours sur un serveur suisse.
+            </div>
+        </div>
+
+        <div style="margin-top: 30px; border-top: 3px solid #d80000; padding: 20px; background: #fff; font-family: Arial, sans-serif; position: relative; z-index: 100;">
+            <div id="hint-score-badge" style="background:#111;color:#3fb950;padding:8px 15px;font-weight:bold;text-align:center;">🏆 Score de cet épisode : <span id="hint-score-value">5</span> / 5 pts</div>
+            <div style="display:flex; gap:8px; margin:10px 0;">
+                <button id="hintBtn1" onclick="useHint(1)" style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;">💡 Indice 1 (-1 pt)</button>
+                <button id="hintBtn2" onclick="useHint(2)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🎯 Indice 2 (-2 pts)</button>
+                <button id="hintBtn3" onclick="useHint(3)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🆘 Solution (-3 pts)</button>
+            </div>
+
+            <div id="zoneAideScore" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; color: #333;">
+                <p id="hint-tier-1" style="display:none;"><strong>💡 INFO :</strong> Pré-requis : l'article de la nLPD qui définit les données sensibles, et la commande shell pour lire la fin d'un fichier log. Ensuite, calculez le checksum en suivant la formule de l'annexe A-10.</p>
+                <p id="hint-tier-2" style="display:none;"><strong>🎯 PISTE :</strong> Article : Art. 5. Commande : <code>tail</code>. Calcul : ASCII de P(80)+H(72)=152, ×1.5 (CRITICAL)=228, ×4 clés (UID, ST, DATA, SIGNED).</p>
+                <p id="hint-tier-3" style="display:none;"><strong>🆘 SOLUTION :</strong> Pré-requis : Art.5 / tail. Checksum final : <code>912</code></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function appliquerModeSobre() {
+            const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+            document.body.classList.toggle('mode-sobre', actif);
+            const btn = document.getElementById('toggle-sobre-btn');
+            if (btn) btn.textContent = actif ? '🌓 Mode sobre : ON' : '🌓 Mode sobre';
+        }
+        function basculerModeSobre() {
+            const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+            localStorage.setItem('swiss_shield_mode_sobre', actif ? '0' : '1');
+            appliquerModeSobre();
+        }
+        appliquerModeSobre();
+
+        function unlock() {
+            const pass = document.getElementById('passkey').value.trim().toUpperCase();
+            if (pass === "NOTIF-LPD-BERNE") {
+                document.getElementById('lock-screen').classList.remove('active');
+                document.getElementById('prerequisites').classList.add('active');
+                currentZone = 'prerequisites';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('entree', pass, 'NOTIF-LPD-BERNE');
+                alert("CODE ERRONÉ : Accès refusé par le serveur de Berne.");
+            }
+        }
+
+        function checkPrereq() {
+            const r1 = document.getElementById('req1').value.trim().replace(/\s/g, '').toUpperCase();
+            const r2 = document.getElementById('req2').value.trim().toLowerCase();
+
+            if (r1 === "ART.5" && r2 === "tail") {
+                document.getElementById('prerequisites').classList.remove('active');
+                document.getElementById('mission-content').classList.add('active');
+                currentZone = 'mission-content';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('prerequis', 'article="' + r1 + '", commande="' + r2 + '"', 'article="ART.5", commande="tail"');
+                alert("DÉFAUT DE COMPÉTENCE : Revoyez vos annexes.");
+            }
+        }
+
+        function verifyInvestigation() {
+            const val = document.getElementById('investigationInput').value.trim();
+            /* CALCUL :
+               1. ASCII : P(80) + H(72) = 152
+               2. Multiplicateur (CRITICAL) = 1.5 -> 152 * 1.5 = 228
+               3. Clés (UID, ST, DATA, SIGNED) = 4 keys
+               4. Final : 228 * 4 = 912
+            */
+            if (val === "912") {
+                document.getElementById('mission-content').classList.remove('active');
+                document.getElementById('final-zone').classList.add('active');
+            } else {
+                enregistrerErreur('investigation', val, '912');
+                alert("ÉCHEC DE VALIDATION : Le checksum ne correspond pas au dump mémoire.");
+            }
+        }
+    </script>
+
+    <script>
+        const EP_ID = "S02E10";
+        const HINT_COST = {1:1, 2:2, 3:3};
+        let hintsUsed = {1:false, 2:false, 3:false};
+        let episodeScore = 5;
+        function useHint(level) {
+            if (hintsUsed[level] || (level > 1 && !hintsUsed[level - 1])) return;
+            hintsUsed[level] = true;
+        enregistrerIndiceUsage(level);
+            episodeScore -= HINT_COST[level];
+            document.getElementById('hint-score-value').textContent = episodeScore;
+            document.getElementById('hint-tier-' + level).style.display = 'block';
+            const btn = document.getElementById('hintBtn' + level);
+            btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5';
+            if (level < 3) {
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+            sauvegarderAutomatiquement();
+        }
+        function recordEpisodeSuccess() {
+            let scores = {};
+            try { scores = JSON.parse(localStorage.getItem('swiss_shield_scores') || '{}'); } catch(e) {}
+            if (!(EP_ID in scores) || scores[EP_ID] < episodeScore) scores[EP_ID] = episodeScore;
+            localStorage.setItem('swiss_shield_scores', JSON.stringify(scores));
+            localStorage.removeItem('autosave_' + EP_ID);
+        }
+    let currentZone = 'lock-screen';
+    function sauvegarderAutomatiquement() {
+        try {
+            const inputs = {};
+            ['req1', 'req2', 'investigationInput'].forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) inputs[id] = el.value;
+            });
+            localStorage.setItem('autosave_' + EP_ID, JSON.stringify({
+                zone: currentZone,
+                inputs: inputs,
+                hintsUsed: hintsUsed,
+                episodeScore: episodeScore
+            }));
+        } catch(e) {}
+    }
+    function proposerRestaurationAutosave() {
+        let data;
+        try { data = JSON.parse(localStorage.getItem('autosave_' + EP_ID) || 'null'); } catch(e) { return; }
+        if (!data || !data.zone || data.zone === 'lock-screen') return;
+        document.getElementById('lock-screen').classList.remove('active');
+        if (data.zone === 'mission-content') {
+            document.getElementById('prerequisites').classList.remove('active');
+            document.getElementById('mission-content').classList.add('active');
+        } else if (data.zone === 'prerequisites') {
+            document.getElementById('prerequisites').classList.add('active');
+        }
+        currentZone = data.zone;
+        if (data.inputs) {
+            Object.keys(data.inputs).forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) el.value = data.inputs[id];
+            });
+        }
+        hintsUsed = data.hintsUsed || hintsUsed;
+        episodeScore = (typeof data.episodeScore === 'number') ? data.episodeScore : episodeScore;
+        document.getElementById('hint-score-value').textContent = episodeScore;
+        [1, 2, 3].forEach(function(level) {
+            if (hintsUsed[level]) {
+                document.getElementById('hint-tier-' + level).style.display = 'block';
+                const btn = document.getElementById('hintBtn' + level);
+                if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+        });
+    }
+    function enregistrerIndiceUsage(niveau) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + niveau;
+            debrief.indices[cle] = (debrief.indices[cle] || 0) + 1;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+    function enregistrerErreur(phase, reponseEleve, reponseAttendue) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + phase;
+            if (typeof debrief.erreurs[cle] !== 'object' || debrief.erreurs[cle] === null) {
+                debrief.erreurs[cle] = { compte: (debrief.erreurs[cle] || 0), exemples: [] };
+            }
+            debrief.erreurs[cle].compte++;
+            if (reponseEleve !== undefined && debrief.erreurs[cle].exemples.length < 5) {
+                debrief.erreurs[cle].exemples.push({ reponseEleve: String(reponseEleve).slice(0,100), reponseAttendue: String(reponseAttendue||'').slice(0,100) });
+            }
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+        (function pollSuccess(){
+            // Cet épisode toggle via classList('active') + règle CSS !important, pas via
+            // style.display inline : on utilise getComputedStyle pour capter la visibilité réelle.
+            const ids = ['success','success-msg','success-final','final-zone','victory-zone','victory-screen','final-step','final-badge'];
+            let recorded = false;
+            setInterval(function(){
+                if (recorded) return;
+                for (const id of ids) {
+                    const el = document.getElementById(id);
+                    if (el && window.getComputedStyle(el).display === 'block') { recordEpisodeSuccess(); recorded = true; return; }
+                }
+            }, 500);
+        })();
+        proposerRestaurationAutosave();
+    </script>
+</body>
+</html>

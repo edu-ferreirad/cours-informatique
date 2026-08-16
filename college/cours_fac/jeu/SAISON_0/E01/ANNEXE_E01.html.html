@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>RENS_TECH_S00E01 - DOSSIER DE MATURITÉ</title>
+    <style>
+        body { background: #1a1a1a; color: #dcdcdc; font-family: 'Segoe UI', sans-serif; padding: 30px; }
+        .doc { background: white; color: #333; padding: 40px; max-width: 750px; margin: auto; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        h1 { color: #c0392b; border-bottom: 2px solid #c0392b; }
+        .code-block { background: #f4f4f4; padding: 10px; border-left: 4px solid #7f8c8d; font-family: monospace; }
+        .note { border: 1px solid #bdc3c7; padding: 15px; margin-top: 20px; font-style: italic; }
+        .highlight { background: #fff3cd; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="doc">
+        <h1>Rapport d'incident : Serveur Test-Node-01</h1>
+        <p><strong>Objet :</strong> Analyse de vulnérabilité sur la fonction de traitement des noms de fichiers.</p>
+
+        <h3>1. Cadre Juridique (Rappel Maturité Suisse)</h3>
+        <p>L'utilisation d'outils pour découvrir une faille sans autorisation tombe sous le coup du Code Pénal.
+           L'article <span class="highlight">143bis</span> (Accès indu à un système informatique) punit quiconque s'introduit dans un système protégé. Si des données sont endommagées, l'Art. 144bis s'ajoute au dossier.</p>
+
+        <h3>2. Analyse Technique (Log de compilation)</h3>
+        <p>Le compilateur GCC a émis un avertissement sur le fichier <code>exploit_research.c</code> :</p>
+        <div class="code-block">
+            warning: 'strcpy' is deprecated: This function does not verify buffer size.
+            Consider using 'strncpy(dest, src, n)' where n is the size of the destination buffer.
+        </div>
+
+        <h3>3. Indice Forensique</h3>
+        <p>Lors de l'audit du groupe COTL, un mot de passe de test a été retrouvé dans les commentaires du binaire :
+           <code>0x53 0x59 0x4e 0x2d 0x41 0x43 0x4b</code> (Traduction ASCII nécessaire pour le bypass).</p>
+
+        <div class="note">
+            Note pour les étudiants : Pour sécuriser la fonction, le développeur doit impérativement spécifier la taille du buffer (64 octets dans ce cas précis).
+        </div>
+    </div>
+</body>
+</html>

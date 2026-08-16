@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>S00E02 - SWISS SHIELD - DATA_EXFILTRATION</title>
+    <style>
+        :root {
+            --matrix-green: #00ff41;
+            --terminal-bg: #050a05;
+            --warning-orange: #ffaa00;
+            --system-blue: #3498db;
+            --legal-gold: #ffcc00;
+            --forensic-red: #ff3333;
+        }
+
+        body {
+            background-color: var(--terminal-bg);
+            color: var(--matrix-green);
+            font-family: 'Consolas', 'Lucida Console', monospace;
+            padding: 20px; margin: 0;
+            overflow-x: hidden;
+        }
+
+        /* --- EFFET VISUEL : RADAR & PARTICULES (ORIGINE) --- */
+        #effect-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; opacity: 0.3;
+        }
+
+        .radar-sweep {
+            position: fixed; top: 50%; left: 50%;
+            width: 200vw; height: 200vw;
+            background: conic-gradient(from 0deg, transparent 0%, rgba(0, 255, 65, 0.1) 10%, transparent 20%);
+            transform: translate(-50%, -50%);
+            animation: sweep 6s linear infinite;
+            pointer-events: none; z-index: -1;
+        }
+
+        @keyframes sweep {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* --- MODE SOBRE (accessibilité) --- */
+        body.mode-sobre, body.mode-sobre * { animation: none !important; transition: none !important; }
+        body.mode-sobre #effect-canvas, body.mode-sobre .radar-sweep { display: none !important; }
+        #toggle-sobre-btn {
+            position: fixed; top: 10px; right: 10px; z-index: 10001;
+            background: #000; color: var(--matrix-green); border: 1px solid var(--matrix-green);
+            padding: 6px 10px; font-size: 0.7em; cursor: pointer; font-family: inherit; border-radius: 3px;
+        }
+
+        .pwn-container {
+            border: 1px solid var(--matrix-green);
+            max-width: 1000px; margin: 0 auto;
+            background: rgba(0, 10, 0, 0.95);
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.2);
+            position: relative; z-index: 1;
+        }
+
+        #lock-screen, #pre-req-screen, #main-content { display: none; }
+
+        .header {
+            background: var(--matrix-green); color: #000;
+            padding: 5px 15px; font-weight: bold;
+            display: flex; justify-content: space-between;
+        }
+
+        .content { padding: 25px; }
+
+        .story-container {
+            background: rgba(0, 20, 0, 0.8); border-left: 4px solid var(--system-blue);
+            padding: 20px; margin: 20px; text-align: left; line-height: 1.5; font-size: 0.95em;
+        }
+
+        .annexe-window {
+            background: #000; border: 1px solid #333; padding: 10px; font-size: 0.8em; color: #888; margin: 15px 0;
+        }
+
+        .network-log {
+            background: #000; border: 1px solid #333; height: 180px; overflow-y: auto;
+            padding: 10px; font-size: 0.85em; color: #888; margin: 20px 0;
+        }
+
+        .packet { border-bottom: 1px solid #111; padding: 4px 0; }
+        .suspicious { color: var(--warning-orange); font-weight: bold; }
+
+        .console-area {
+            background: #001; border: 1px solid var(--system-blue); padding: 20px; margin-top: 20px;
+        }
+
+        .input-cmd {
+            background: transparent; border: none; color: #fff; width: 80%;
+            font-family: inherit; outline: none; font-size: 1.1em;
+            border-bottom: 1px solid #333;
+        }
+
+        .btn {
+            background: var(--matrix-green); color: #000; border: none;
+            padding: 12px 25px; cursor: pointer; font-weight: bold; text-transform: uppercase;
+        }
+
+        .btn-secondary {
+            background: transparent; color: var(--matrix-green); border: 1px solid var(--matrix-green);
+            padding: 8px 15px; text-decoration: none; font-size: 0.8em; display: inline-block; margin-top: 10px;
+        }
+
+        .success-msg {
+            display: none; border: 2px solid var(--matrix-green); padding: 20px;
+            text-align: center; margin-top: 20px; background: rgba(0,255,65,0.1);
+        }
+
+        .help-grid {
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 30px;
+        }
+
+        .help-card {
+            background: rgba(0, 15, 0, 0.7); border: 1px solid #222; padding: 15px; font-size: 0.85em;
+        }
+
+        .help-card h4 { margin-top: 0; text-transform: uppercase; font-size: 0.9em; display: flex; align-items: center; gap: 8px; }
+    </style>
+</head>
+<body onload="initApp()">
+<button id="toggle-sobre-btn" onclick="basculerModeSobre()">🌓 Mode sobre</button>
+
+<canvas id="effect-canvas"></canvas>
+<div class="radar-sweep"></div>
+
+<div class="pwn-container">
+    <div class="header">
+        <span>UNIT: SWISS-SHIELD-TRAJECTORY | S00E02</span>
+        <span>STATUS: <span id="status-text" style="color:red">LOCKED</span></span>
+    </div>
+
+    <div id="lock-screen" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 550px;">
+        <h2 style="color: var(--system-blue);">[ DOSSIER RECRUTEMENT : ANALYSTE X ]</h2>
+        <div class="story-container">
+            <span style="color: var(--matrix-green)">> NARRATION :</span><br>
+            La Swiss Shield vous a tracé après votre patch du kernel. Vos anciens alliés de **COTL** exfiltrent des données fédérales. Prouvez votre valeur en interceptant le flux.
+        </div>
+        <p>Entrez la clé de l'épisode précédent :</p>
+        <input type="text" id="unlock-key" placeholder="VULN-PATCH-XXXX" style="background:#000; border:1px solid var(--matrix-green); color:#fff; padding:10px; text-align:center;">
+        <br>
+        <button class="btn" onclick="validateUnlock()">DÉVERROUILLER</button>
+        <br>
+        <a href="../../MENU_PRINCIPAL.html" class="btn-secondary">RETOUR MENU PRINCIPAL</a>
+    </div>
+
+    <div id="pre-req-screen" class="content">
+        <h3 style="color:var(--legal-gold)">[ PRÉ-REQUIS : ANALYSE DE TRACES ]</h3>
+        <div class="annexe-window">
+            <b>DOC_INTERNE_RFC :</b><br>
+            - Le recel de données numériques est puni par l'<b>Art. 160</b> du Code Pénal (CP).<br>
+            - Pour identifier la route d'un pirate, on utilise le protocole <b>ICMP</b> via l'outil 'trace'.
+        </div>
+        <p>1. Numéro de l'article CP sur le recel :</p>
+        <input type="text" id="pre-req-1" class="input-cmd" placeholder="Numéro uniquement" onchange="sauvegarderAutomatiquement()">
+        <p>2. Nom du protocole utilisé par Traceroute (4 lettres) :</p>
+        <input type="text" id="pre-req-2" class="input-cmd" placeholder="Acronyme" onchange="sauvegarderAutomatiquement()">
+        <br><br>
+        <button class="btn" onclick="validatePreReq()">ACCÉDER AU TERMINAL</button>
+    </div>
+
+    <div id="main-content" class="content">
+        <div style="border-left: 3px solid var(--system-blue); padding-left: 15px;">
+            <b>>> ALERTE EXFILTRATION :</b> Identifiez l'IP suspecte (port 443), tracez-la et coupez le flux.
+        </div>
+
+        <div class="network-log" id="net-log" style="height: 220px;">
+            <div class="packet">[09:43:51] IP 10.0.2.15 > 216.58.212.142.443: TLS Handshake</div>
+            <div class="packet">[09:44:02] IP 10.0.2.22 > 192.168.1.1.53: DNS Query</div>
+            <div class="packet">[09:44:05] IP 10.0.2.15 > 8.8.8.8.53: DNS Query</div>
+            <div class="packet">[09:44:09] IP 10.0.2.31 > 91.198.174.192.443: TLS Handshake</div>
+            <div class="packet suspicious">[09:44:12] IP 10.0.2.15 > 141.95.12.88.443: Flags [P.], DATA EXFIL</div>
+            <div class="packet">[09:44:15] IP 10.0.2.15 > 192.168.1.1.80: HTTP GET</div>
+            <div class="packet">[09:44:19] IP 10.0.2.44 > 172.67.0.12.443: TLS Handshake</div>
+            <div class="packet">[09:44:23] IP 10.0.2.15 > 8.8.4.4.53: DNS Query</div>
+            <div class="packet">[09:44:27] IP 10.0.2.19 > 40.90.4.1.443: TLS Handshake</div>
+        </div>
+
+        <div class="console-area">
+            <div id="console-output" style="color:#aaa; font-size:0.9em; margin-bottom:10px; height:80px; overflow-y:auto;">
+                En attente de commandes (traceroute [IP] / iptables -A OUTPUT -d [IP] -j DROP)
+            </div>
+            <span style="color:var(--system-blue)">admin@shield:~$</span>
+            <input type="text" id="console-input" class="input-cmd" onkeydown="handleConsole(event)">
+        </div>
+
+        <div class="help-grid">
+            <div class="help-card">
+                <h4 style="color:var(--system-blue)">🛠️ Informatique</h4>
+                <p><b>iptables</b> est l'outil standard sous Linux pour filtrer les paquets réseau entrant et sortant.</p>
+            </div>
+            <div class="help-card">
+                <h4 style="color:var(--forensic-red)">🔍 Forensics</h4>
+                <p>L'IP 141.95.x.x appartient souvent à des VPS utilisés comme relais pour l'exfiltration.</p>
+            </div>
+            <div class="help-card">
+                <h4 style="color:var(--legal-gold)">⚖️ Juridique</h4>
+                <p>La <b>LPD</b> révisée exige une réaction immédiate en cas de violation de la sécurité des données.</p>
+            </div>
+        </div>
+
+        <div id="success" class="success-msg">
+            [+] FLUX INTERCEPTÉ : 141.95.12.88 (Bloqué).<br>
+            [+] CODE DE PROGRESSION : <b>SHIELD-NET-INTERCEPT-202</b><br><br>
+            <a href="../../MENU_PRINCIPAL.html" class="btn">TERMINER LA MISSION</a>
+        </div>
+    </div>
+</div>
+
+<div style="margin-top: 30px; border-top: 3px solid #d80000; padding: 20px; background: #fff; font-family: Arial, sans-serif; position: relative; z-index: 100; width: 90%; max-width: 1000px; margin-left:auto; margin-right:auto;">
+    <div id="hint-score-badge" style="background:#111;color:#3fb950;padding:8px 15px;font-weight:bold;text-align:center;">🏆 Score de cet épisode : <span id="hint-score-value">5</span> / 5 pts</div>
+    <div style="display:flex; gap:8px; margin:10px 0;">
+        <button id="hintBtn1" onclick="useHint(1)" style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;">💡 Indice 1 (-1 pt)</button>
+        <button id="hintBtn2" onclick="useHint(2)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🎯 Indice 2 (-2 pts)</button>
+        <button id="hintBtn3" onclick="useHint(3)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🆘 Solution (-3 pts)</button>
+    </div>
+
+    <div id="zoneAide" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; color: #333;">
+        <p id="hint-tier-1" style="display:none;"><strong>💡 INFO :</strong> Le pré-requis demande l'article CP sur le recel de données, et l'acronyme du protocole utilisé par l'outil de traçage réseau (traceroute).</p>
+        <p id="hint-tier-2" style="display:none;"><strong>🎯 PISTE :</strong> Il s'agit de l'article 160 CP, et du protocole ICMP. Ensuite, dans le terminal, tracez d'abord l'IP suspecte relevée dans le journal réseau (141.95.12.88) avec <code>traceroute [IP]</code> avant de la bloquer.</p>
+        <p id="hint-tier-3" style="display:none;"><strong>🆘 SOLUTION :</strong> Pré-requis : 160 / ICMP. Terminal : <code>traceroute 141.95.12.88</code> puis <code>iptables -A OUTPUT -d 141.95.12.88 -j DROP</code></p>
+    </div>
+</div>
+
+<script>
+    const EP_ID = "S00E02";
+    const HINT_COST = {1:1, 2:2, 3:3};
+    let hintsUsed = {1:false, 2:false, 3:false};
+    let episodeScore = 5;
+    function useHint(level) {
+        if (hintsUsed[level] || (level > 1 && !hintsUsed[level - 1])) return;
+        hintsUsed[level] = true;
+        enregistrerIndiceUsage(level);
+        episodeScore -= HINT_COST[level];
+        document.getElementById('hint-score-value').textContent = episodeScore;
+        document.getElementById('hint-tier-' + level).style.display = 'block';
+        const btn = document.getElementById('hintBtn' + level);
+        btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5';
+        if (level < 3) {
+            const next = document.getElementById('hintBtn' + (level + 1));
+            if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+        }
+        sauvegarderAutomatiquement();
+    }
+    function recordEpisodeSuccess() {
+        let scores = {};
+        try { scores = JSON.parse(localStorage.getItem('swiss_shield_scores') || '{}'); } catch(e) {}
+        if (!(EP_ID in scores) || scores[EP_ID] < episodeScore) scores[EP_ID] = episodeScore;
+        localStorage.setItem('swiss_shield_scores', JSON.stringify(scores));
+        localStorage.removeItem('autosave_' + EP_ID);
+    }
+    let currentZone = 'lock-screen';
+    function sauvegarderAutomatiquement() {
+        try {
+            const inputs = {};
+            ['pre-req-1', 'pre-req-2'].forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) inputs[id] = el.value;
+            });
+            localStorage.setItem('autosave_' + EP_ID, JSON.stringify({
+                zone: currentZone,
+                inputs: inputs,
+                traceDone: traceDone,
+                hintsUsed: hintsUsed,
+                episodeScore: episodeScore
+            }));
+        } catch(e) {}
+    }
+    function proposerRestaurationAutosave() {
+        let data;
+        try { data = JSON.parse(localStorage.getItem('autosave_' + EP_ID) || 'null'); } catch(e) { return; }
+        if (!data || !data.zone || data.zone === 'lock-screen') return;
+        document.getElementById('lock-screen').style.display = 'none';
+        if (data.zone === 'main-content') {
+            document.getElementById('pre-req-screen').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+            document.getElementById('status-text').innerText = "AUTHORIZED";
+            document.getElementById('status-text').style.color = "var(--matrix-green)";
+            traceDone = !!data.traceDone;
+            if (traceDone) {
+                document.getElementById('console-output').innerHTML += '<br><span style="color:#3498db">[INFO] Progression restaurée — IP déjà tracée.</span>';
+            }
+        } else if (data.zone === 'pre-req-screen') {
+            document.getElementById('pre-req-screen').style.display = 'block';
+        }
+        currentZone = data.zone;
+        if (data.inputs) {
+            Object.keys(data.inputs).forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) el.value = data.inputs[id];
+            });
+        }
+        hintsUsed = data.hintsUsed || hintsUsed;
+        episodeScore = (typeof data.episodeScore === 'number') ? data.episodeScore : episodeScore;
+        document.getElementById('hint-score-value').textContent = episodeScore;
+        [1, 2, 3].forEach(function(level) {
+            if (hintsUsed[level]) {
+                document.getElementById('hint-tier-' + level).style.display = 'block';
+                const btn = document.getElementById('hintBtn' + level);
+                if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+        });
+    }
+    function enregistrerIndiceUsage(niveau) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + niveau;
+            debrief.indices[cle] = (debrief.indices[cle] || 0) + 1;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+    function enregistrerErreur(phase, reponseEleve, reponseAttendue) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + phase;
+            if (typeof debrief.erreurs[cle] !== 'object' || debrief.erreurs[cle] === null) {
+                debrief.erreurs[cle] = { compte: (debrief.erreurs[cle] || 0), exemples: [] };
+            }
+            debrief.erreurs[cle].compte++;
+            if (reponseEleve !== undefined && debrief.erreurs[cle].exemples.length < 5) {
+                debrief.erreurs[cle].exemples.push({ reponseEleve: String(reponseEleve).slice(0,100), reponseAttendue: String(reponseAttendue||'').slice(0,100) });
+            }
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+    (function pollSuccess(){
+        const ids = ['success','success-msg','success-final','final-zone','victory-zone','victory-screen','final-step','final-badge'];
+        let recorded = false;
+        setInterval(function(){
+            if (recorded) return;
+            for (const id of ids) {
+                const el = document.getElementById(id);
+                if (el && el.style.display === 'block') { recordEpisodeSuccess(); recorded = true; return; }
+            }
+        }, 500);
+    })();
+</script>
+
+<script>
+    // Matrix Particles
+    const canvas = document.getElementById('effect-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function initApp() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        for (let i = 0; i < 100; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 2,
+                speedX: Math.random() * 0.5 - 0.25,
+                speedY: Math.random() * 0.5 - 0.25
+            });
+        }
+        appliquerModeSobre();
+        if (localStorage.getItem('swiss_shield_mode_sobre') !== '1') animate();
+        document.getElementById('lock-screen').style.display = 'flex';
+        proposerRestaurationAutosave();
+    }
+
+    function appliquerModeSobre() {
+        const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+        document.body.classList.toggle('mode-sobre', actif);
+        const btn = document.getElementById('toggle-sobre-btn');
+        if (btn) btn.textContent = actif ? '🌓 Mode sobre : ON' : '🌓 Mode sobre';
+    }
+
+    function basculerModeSobre() {
+        const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+        localStorage.setItem('swiss_shield_mode_sobre', actif ? '0' : '1');
+        appliquerModeSobre();
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#00ff41';
+        particles.forEach(p => {
+            p.x += p.speedX; p.y += p.speedY;
+            if(p.x < 0 || p.x > canvas.width) p.speedX *= -1;
+            if(p.y < 0 || p.y > canvas.height) p.speedY *= -1;
+            ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill();
+        });
+        requestAnimationFrame(animate);
+    }
+
+    // Logic
+    function validateUnlock() {
+        if (document.getElementById('unlock-key').value.trim() === "VULN-PATCH-COMPLETE") {
+            document.getElementById('lock-screen').style.display = 'none';
+            document.getElementById('pre-req-screen').style.display = 'block';
+            currentZone = 'pre-req-screen';
+            sauvegarderAutomatiquement();
+        } else { enregistrerErreur('entree', document.getElementById('unlock-key').value.trim(), 'VULN-PATCH-COMPLETE'); alert("ACCÈS REFUSÉ"); }
+    }
+
+    function validatePreReq() {
+        const r1 = document.getElementById('pre-req-1').value.trim();
+        const r2 = document.getElementById('pre-req-2').value.trim().toUpperCase();
+        if (r1 === "160" && r2 === "ICMP") {
+            document.getElementById('pre-req-screen').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+            document.getElementById('status-text').innerText = "AUTHORIZED";
+            document.getElementById('status-text').style.color = "var(--matrix-green)";
+            currentZone = 'main-content';
+            sauvegarderAutomatiquement();
+        } else { enregistrerErreur('prerequis', 'art="' + r1 + '", protocole="' + r2 + '"', 'art="160", protocole="ICMP"'); alert("ANALYSE INCORRECTE"); }
+    }
+
+    let traceDone = false;
+    function handleConsole(e) {
+        if (e.key === 'Enter') {
+            const input = document.getElementById('console-input');
+            const cmd = input.value.trim();
+            const output = document.getElementById('console-output');
+            const ip = "141.95.12.88";
+
+            output.innerHTML += `<br><span style="color:#fff">> ${cmd}</span>`;
+
+            if (cmd === `traceroute ${ip}`) {
+                output.innerHTML += `<br>[*] Route identifiée : 10.0.2.1 -> 194.2.0.1 -> ${ip}`;
+                traceDone = true;
+                sauvegarderAutomatiquement();
+            } else if (cmd === `iptables -A OUTPUT -d ${ip} -j DROP`) {
+                if (!traceDone) {
+                    enregistrerErreur('investigation', cmd, `traceroute ${ip} (d'abord)`);
+                    output.innerHTML += `<br><span style="color:red">[!] Erreur : IP non tracée.</span>`;
+                } else {
+                    output.innerHTML += `<br><span style="color:var(--matrix-green)">[+] Flux coupé.</span>`;
+                    document.getElementById('success').style.display = 'block';
+                }
+            } else {
+                enregistrerErreur('investigation', cmd, `traceroute ${ip} / iptables -A OUTPUT -d ${ip} -j DROP`);
+                output.innerHTML += `<br><span style="color:red">Erreur syntaxe ou IP.</span>`;
+            }
+            input.value = '';
+            output.scrollTop = output.scrollHeight;
+        }
+    }
+</script>
+</body>
+</html>

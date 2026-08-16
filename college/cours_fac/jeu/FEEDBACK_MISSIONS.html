@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>SWISS SHIELD - Journal de Feedback Global</title>
+    <style>
+        :root {
+            --red: #d32f2f;
+            --gold: #ffd700;
+            --bg: #0a0a0a;
+            --card-bg: #1a1a1a;
+            --text: #eee;
+            --green: #2ecc71;
+            --blue: #3498db;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            line-height: 1.4;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border: 1px solid #333;
+            border-radius: 8px;
+            margin-bottom: 80px; /* Espace pour les boutons fixes */
+        }
+
+        h1 { color: var(--red); border-bottom: 2px solid var(--red); text-align: center; margin-bottom: 30px; }
+        h2 { background: #333; padding: 10px; color: var(--gold); font-size: 1.1em; border-radius: 4px; margin-top: 40px; }
+        h3 { color: var(--blue); font-size: 0.9em; margin-bottom: 10px; border-left: 3px solid var(--blue); padding-left: 10px; }
+
+        .agent-info {
+            display: flex;
+            gap: 20px;
+            background: #222;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .episode-row {
+            display: grid;
+            grid-template-columns: 150px 1fr 1fr;
+            gap: 15px;
+            padding: 10px 0;
+            border-bottom: 1px solid #222;
+            align-items: center;
+        }
+
+        .episode-label { font-size: 0.85em; font-weight: bold; color: #888; }
+
+        select, textarea, input {
+            background: #000;
+            border: 1px solid #444;
+            color: white;
+            padding: 8px;
+            border-radius: 4px;
+            width: 100%;
+            font-family: inherit;
+        }
+
+        .suggestions-box {
+            margin-top: 15px;
+            background: rgba(52, 152, 219, 0.05);
+            padding: 15px;
+            border: 1px dashed var(--blue);
+        }
+
+        /* --- STYLES DES BOUTONS FIXES --- */
+        .controls-fixed {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+        }
+
+        .btn-print {
+            background: var(--green);
+            color: black;
+            border: none;
+            padding: 15px 25px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            text-transform: uppercase;
+        }
+
+        .btn-home {
+            background: var(--blue);
+            color: white;
+            text-decoration: none;
+            padding: 15px 25px;
+            font-weight: bold;
+            border-radius: 50px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+        }
+
+        .back-link { color: var(--gold); text-decoration: none; margin-bottom: 20px; display: inline-block; }
+
+        @media print {
+            .btn-print, .back-link, .controls-fixed { display: none !important; }
+            body { background: white; color: black; }
+            .container { border: none; width: 100%; max-width: 100%; margin-bottom: 0; }
+            select, textarea, input { border: 1px solid #ccc; color: black; background: white; }
+            h2 { background: #eee; color: black; border: 1px solid #ccc; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="MENU_PRINCIPAL.html" class="back-link"><< RETOUR AU TERMINAL</a>
+
+    <h1>JOURNAL DE BORD : FEEDBACK AGENT</h1>
+
+    <div class="agent-info">
+        <div style="flex:2">
+            <label>NOM DE L'AGENT OU DU BINÔME :</label>
+            <input type="text" placeholder="Ex: Agent Smith / Unité 04">
+        </div>
+        <div style="flex:1">
+            <label>DATE D'EXTRACTION :</label>
+            <input type="text" value="2026-04-29">
+        </div>
+    </div>
+
+    <h2 style="border-left: 5px solid var(--green);">SAISON 0 : GENÈSE [PREQUEL]</h2>
+    <div class="episode-row">
+        <div class="episode-label">S00E00 à E03 (+ Bonus E04)</div>
+        <select>
+            <option>Difficulté Globale...</option>
+            <option>Facile (Maîtrisé)</option>
+            <option>Moyen (Recherches nécessaires)</option>
+            <option>Difficile (Assistance requise)</option>
+        </select>
+        <textarea placeholder="Points forts / Points faibles techniques..."></textarea>
+    </div>
+    <div class="suggestions-box">
+        <h3>💡 Suggestions pour la Saison 0 :</h3>
+        <textarea rows="2" placeholder="Comment améliorer les défis de hacking ?"></textarea>
+    </div>
+
+    <h2 style="border-left: 5px solid var(--red);">SAISON 1 : INTRUSION (Ép. 01-08)</h2>
+    <div class="episode-row">
+        <div class="episode-label">Missions S01</div>
+        <select>
+            <option>Difficulté Globale...</option>
+            <option>⭐⭐ (Simple)</option>
+            <option>⭐⭐⭐ (Équilibré)</option>
+            <option>⭐⭐⭐⭐ (Complexe)</option>
+        </select>
+        <textarea placeholder="Analyse des outils de pistage et IP..."></textarea>
+    </div>
+    <div class="suggestions-box">
+        <h3>💡 Suggestions pour la Saison 1 :</h3>
+        <textarea rows="2" placeholder="Suggestions sur l'investigation technique..."></textarea>
+    </div>
+
+    <h2 style="border-left: 5px solid var(--red);">SAISON 2 : nLPD (Ép. 09-16)</h2>
+    <div class="episode-row">
+        <div class="episode-label">Missions S02</div>
+        <select>
+            <option>Maîtrise de la nLPD...</option>
+            <option>Acquis</option>
+            <option>En cours d'acquisition</option>
+            <option>Besoin de renforcement</option>
+        </select>
+        <textarea placeholder="Ressenti sur la protection des données..."></textarea>
+    </div>
+    <div class="suggestions-box">
+        <h3>💡 Suggestions pour la Saison 2 :</h3>
+        <textarea rows="2" placeholder="Comment rendre le droit plus ludique ?"></textarea>
+    </div>
+
+    <h2 style="border-left: 5px solid var(--red);">SAISON 3 : IA & CRIME (Ép. 17-24)</h2>
+    <div class="episode-row">
+        <div class="episode-label">Missions S03</div>
+        <select>
+            <option>Analyse des risques IA...</option>
+            <option>Pertinent</option>
+            <option>Complexe</option>
+            <option>Très difficile</option>
+        </select>
+        <textarea placeholder="Commentaire sur les Deepfakes / Ransomwares..."></textarea>
+    </div>
+    <div class="suggestions-box">
+        <h3>💡 Suggestions pour la Saison 3 :</h3>
+        <textarea rows="2" placeholder="Idées d'autres cyber-crimes liés à l'IA ?"></textarea>
+    </div>
+
+    <h2 style="border-left: 5px solid var(--red);">SAISON 4 : LE PROCÈS (Ép. 25-35)</h2>
+    <div class="episode-row">
+        <div class="episode-label">Missions S04</div>
+        <select>
+            <option>Expérience Judiciaire...</option>
+            <option>Immersive</option>
+            <option>Un peu longue</option>
+            <option>Incompréhensible</option>
+        </select>
+        <textarea placeholder="Ressenti sur l'audience et le verdict..."></textarea>
+    </div>
+    <div class="suggestions-box">
+        <h3>💡 Suggestions pour la Saison 4 :</h3>
+        <textarea rows="2" placeholder="Que changer au déroulement du procès ?"></textarea>
+    </div>
+
+    <h2 style="background: var(--gold); color: black;">CONCLUSION GÉNÉRALE</h2>
+    <div style="padding: 20px;">
+        <label>Points les plus positifs de l'expérience SWISS SHIELD :</label>
+        <textarea rows="3"></textarea>
+
+        <label style="margin-top:20px; display:block;">Qu'est-ce qui vous a manqué dans cette formation ?</label>
+        <textarea rows="3"></textarea>
+    </div>
+
+    <p style="text-align: center; color: #555; font-size: 0.8em; margin-top: 50px;">
+        DOCUMENT OFFICIEL NCSC - RÉSERVÉ À L'INSTRUCTION
+    </p>
+</div>
+
+<!-- SECTION BOUTONS FIXES -->
+<div class="controls-fixed">
+    <a href="MENU_PRINCIPAL.html" class="btn-home">🏠 MENU PRINCIPAL</a>
+    <button class="btn-print" onclick="window.print()">📥 EXPORTER (PDF)</button>
+</div>
+
+</body>
+</html>

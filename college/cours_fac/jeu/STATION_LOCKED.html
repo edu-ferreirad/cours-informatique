@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>SWISS SHIELD - Station Verrouillée</title>
+    <style>
+        :root {
+            --red: #d32f2f;
+            --bg: #050505;
+            --text: #eee;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .lock-container {
+            border: 2px solid var(--red);
+            padding: 40px;
+            background: rgba(20, 0, 0, 0.6);
+            box-shadow: 0 0 30px rgba(211, 47, 47, 0.3);
+            border-radius: 8px;
+            max-width: 600px;
+            animation: pulse-border 2s infinite alternate;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            letter-spacing: 5px;
+            color: var(--red);
+            margin-top: 0;
+            text-transform: uppercase;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(211, 47, 47, 0.5);
+        }
+
+        .status {
+            font-family: monospace;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border: 1px solid #333;
+            color: #ff9999;
+            display: inline-block;
+            margin: 20px 0;
+            letter-spacing: 1px;
+        }
+
+        p {
+            color: #aaa;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        .blink {
+            animation: blinker 1.5s linear infinite;
+        }
+
+        @keyframes blinker {
+            50% { opacity: 0; }
+        }
+
+        @keyframes pulse-border {
+            from { box-shadow: 0 0 20px rgba(211, 47, 47, 0.2); border-color: #991f1f; }
+            to { box-shadow: 0 0 40px rgba(211, 47, 47, 0.5); border-color: var(--red); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="lock-container">
+        <h1>⚠️ TERMINAL VERROUILLÉ ⚠️</h1>
+
+        <div class="status">
+            STATUT : PROTOCOLE DE SÉCURITÉ INTERMÉDIAIRE ACTIVÉ
+        </div>
+
+        <p>Votre console d'investigation <strong>SWISS SHIELD</strong> a été temporairement suspendue par la centrale de commandement du NCSC.</p>
+
+        <p style="font-size: 0.9em; color: #777; font-style: italic;">
+            Conformément à la nLPD, toutes vos actions et tentatives de contournement restent enregistrées dans le journal de l'agent.
+        </p>
+
+        <p style="color: var(--red); font-weight: bold; margin-top: 30px;" class="blink">
+            &gt; Veuillez vous référer au tableau principal ou solliciter l'instructeur pour obtenir les consignes de déblocage.
+        </p>
+    </div>
+
+</body>
+</html>

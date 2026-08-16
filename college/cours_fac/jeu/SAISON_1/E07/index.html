@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>S01E07 - ÉLÉVATION DE PRIVILÈGES</title>
+    <style>
+        :root {
+            --root-amber: #ff8800;
+            --dark-bg: #050300;
+            --glow: rgba(255, 136, 0, 0.6);
+            --terminal-bg: rgba(0, 0, 0, 0.92);
+        }
+
+        /* --- MODE SOBRE (accessibilité) --- */
+        body.mode-sobre, body.mode-sobre * { animation: none !important; transition: none !important; }
+        body.mode-sobre #binary-canvas { display: none !important; }
+        #toggle-sobre-btn {
+            position: fixed; top: 10px; right: 10px; z-index: 10001;
+            background: #000; color: var(--root-amber); border: 1px solid var(--root-amber);
+            padding: 6px 10px; font-size: 0.7em; cursor: pointer; font-family: inherit; border-radius: 3px;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--root-amber);
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+            margin: 0;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        #binary-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            opacity: 0.4;
+        }
+
+        .terminal {
+            background: var(--terminal-bg);
+            border: 3px solid var(--root-amber);
+            padding: 25px;
+            width: 90%;
+            max-width: 850px;
+            box-shadow: 0 0 60px rgba(255, 136, 0, 0.5);
+            border-radius: 8px;
+            z-index: 10;
+        }
+
+        .header-mission { border-bottom: 2px solid var(--root-amber); margin-bottom: 20px; padding-bottom: 10px; color: #fff; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; }
+
+        .story-context {
+            background: rgba(255, 136, 0, 0.15);
+            border-left: 5px solid var(--root-amber);
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #ffcc99;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        .btn-retour {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: var(--root-amber);
+            text-decoration: none;
+            border: 1px solid var(--root-amber);
+            padding: 5px 10px;
+            font-size: 0.8em;
+        }
+
+        #pre-requisites, #mission-content, #final-zone { display: none; }
+
+        .challenge-box {
+            background: rgba(255, 136, 0, 0.05);
+            padding: 15px;
+            border: 1px solid rgba(255, 136, 0, 0.2);
+            margin: 10px 0;
+        }
+
+        .privilege-box {
+            background: #0a0600;
+            border: 1px solid #331100;
+            padding: 15px;
+            margin: 20px 0;
+            font-family: 'Consolas', monospace;
+            color: #00ff41;
+            font-size: 0.85em;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        input { background: #000; border: 2px solid var(--root-amber); color: var(--root-amber); padding: 12px; width: 300px; font-family: inherit; font-size: 1em; text-align: center; outline: none; margin: 10px 0; }
+        button { background: var(--root-amber); color: #000; border: none; padding: 12px 25px; font-weight: bold; cursor: pointer; transition: 0.3s; text-transform: uppercase; }
+        button:hover { background: #fff; box-shadow: 0 0 20px var(--root-amber); }
+
+        .code-final { color: #ffd700; font-size: 2em; letter-spacing: 5px; margin: 15px 0; display: block; text-shadow: 0 0 20px gold; border: 2px dashed gold; padding: 10px; text-align: center; }
+
+        .btn-aide-rouge { background: #d80000; color: #fff; border: none; padding: 12px 20px; font-weight: bold; cursor: pointer; width: 100%; max-width: 450px; margin-top: 40px; border-radius: 5px; }
+        .aide-box { display: none; background: #fff; color: #333; margin-top: 10px; padding: 20px; width: 100%; max-width: 450px; text-align: left; border-left: 10px solid #d80000; font-family: sans-serif; }
+        .pillar-tag { font-weight: bold; color: #d80000; text-transform: uppercase; font-size: 0.8em; display: block; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <button id="toggle-sobre-btn" onclick="basculerModeSobre()">🌓 Mode sobre</button>
+
+    <canvas id="binary-canvas"></canvas>
+
+    <div class="terminal">
+        <a href="../../MENU_PRINCIPAL.html" class="btn-retour">[ RETOUR MENU ]</a>
+
+        <div id="lock-screen">
+            <div class="header-mission">S01E07 : ÉLÉVATION DE PRIVILÈGES (DFJP)</div>
+            <div class="story-context">
+                "Agent, le système de la Banque Nationale Suisse subit une attaque 'Sudo Baron Samedit'. Un compte invité a obtenu les droits ROOT. Injectez la signature de l'E06 pour synchroniser nos outils forensiques."
+            </div>
+            <div style="text-align: center;">
+                <input type="text" id="passkey" placeholder="SIGNATURE DE SORTIE E06">
+                <br>
+                <button onclick="unlock()">SYNCHRONISER</button>
+            </div>
+        </div>
+
+        <div id="pre-requisites">
+            <div class="header-mission">[SÉCURITÉ] ACCRÉDITATIONS FÉDÉRALES</div>
+            <div class="challenge-box">
+                <p><strong>1. Technique :</strong> Quel est le numéro de l'UID (User ID) associé à l'utilisateur "root" par défaut sur Linux ?</p>
+                <input type="text" id="pre-tech" placeholder="UID numérique" onchange="sauvegarderAutomatiquement()">
+            </div>
+            <div class="challenge-box">
+                <p><strong>2. Juridique :</strong> Quel article du Code Pénal Suisse punit l'<b>utilisation frauduleuse d'un ordinateur</b> (influencer un traitement de données pour un profit illicite) ?</p>
+                <input type="text" id="pre-jur" placeholder="Art. XXX CP" onchange="sauvegarderAutomatiquement()">
+            </div>
+            <div style="text-align: center;">
+                <button onclick="validatePreReq()">VÉRIFIER LES DROITS</button>
+            </div>
+        </div>
+
+        <div id="mission-content">
+            <div class="header-mission">[INVESTIGATION] DUMP MÉMOIRE KERBEROS</div>
+            <div class="story-context">
+                "Le pirate a laissé un jeton (Token) dans les registres. Nous devons calculer l'empreinte de ce jeton pour révoquer ses droits. Analysez la structure C++ ci-dessous."
+            </div>
+
+            <div class="privilege-box">
+// Forensic Dump: Memory Offset 0x00FF2A
+struct SecurityToken {
+    int base_id = 1024;
+    int shift = 8;
+    int salt = 12;
+};
+
+/* Formule de révocation :
+   Token = (base_id / (shift - 4)) + (salt * 3)
+*/
+            </div>
+
+            <div id="action-zone" style="text-align: center;">
+                <p>ENTREZ LE TOKEN DE RÉVOCATION CALCULÉ :</p>
+                <input type="text" id="finalToken" placeholder="VALEUR NUMÉRIQUE">
+                <br>
+                <button onclick="checkFinal()">RÉVOQUER LES ACCÈS ROOT</button>
+            </div>
+
+            <div id="final-zone">
+                <p style="color: #00ff00; font-weight: bold;">[ SUCCESS ] LE SYSTÈME A ÉTÉ REPRIS PAR LA CONFÉDÉRATION.</p>
+                <p>Clé d'exportation pour l'épisode 08 :</p>
+                <span class="code-final">SUDO-ROOT-99</span>
+                <br>
+                <button onclick="window.location.href='../../MENU_PRINCIPAL.html'">MISSION ACCOMPLIE</button>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn-aide-rouge" onclick="toggleAide()">[ 📜 RAPPORT DES TROIS PILIERS ]</button>
+
+    <div id="zoneAide" class="aide-box">
+        <h3 style="color: #d80000; margin-top: 0;">GUIDE OPÉRATIONNEL</h3>
+        <span class="pillar-tag">Informatique</span>
+        <p>L'élévation de privilèges consiste à exploiter un bug (comme CVE-2021-3156) pour passer d'un compte limité à l'utilisateur 0.</p>
+        <span class="pillar-tag">Juridique (Suisse)</span>
+        <p>Alors que le hacking simple (Art. 143 bis CP) punit l'intrusion, un autre article du Code pénal suisse vise spécifiquement l'utilisation frauduleuse d'un système informatique pour détourner des fonds ou des actifs. Cherchez lequel.</p>
+        <span class="pillar-tag">Forensics</span>
+        <p>L'analyse des structures de données en mémoire permet de retrouver les variables utilisées par les exploits pour injecter des droits.</p>
+    </div>
+
+    <div style="margin-top: 30px; border-top: 3px solid #d80000; padding: 20px; background: #fff; font-family: Arial, sans-serif; position: relative; z-index: 100; width: 90%; max-width: 850px; margin-left:auto; margin-right:auto;">
+        <div id="hint-score-badge" style="background:#111;color:#3fb950;padding:8px 15px;font-weight:bold;text-align:center;">🏆 Score de cet épisode : <span id="hint-score-value">5</span> / 5 pts</div>
+        <div style="display:flex; gap:8px; margin:10px 0;">
+            <button id="hintBtn1" onclick="useHint(1)" style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;">💡 Indice 1 (-1 pt)</button>
+            <button id="hintBtn2" onclick="useHint(2)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🎯 Indice 2 (-2 pts)</button>
+            <button id="hintBtn3" onclick="useHint(3)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🆘 Solution (-3 pts)</button>
+        </div>
+
+        <div id="zoneAideScore" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; color: #333;">
+            <p id="hint-tier-1" style="display:none;"><strong>💡 INFO :</strong> Pré-requis : l'UID par défaut de root sous Linux, et l'article du Code pénal suisse (distinct du 143 bis) qui vise l'utilisation frauduleuse d'un ordinateur. Ensuite, appliquez la formule du commentaire C++ avec les valeurs base_id, shift et salt.</p>
+            <p id="hint-tier-2" style="display:none;"><strong>🎯 PISTE :</strong> UID root : 0. Article : 147 CP. Formule : (base_id / (shift − 4)) + (salt × 3) = (1024 / 4) + 36.</p>
+            <p id="hint-tier-3" style="display:none;"><strong>🆘 SOLUTION :</strong> Pré-requis : 0 / 147. Token de révocation : <code>292</code></p>
+        </div>
+    </div>
+
+    <script>
+        // Effet Matrix
+        const canvas = document.getElementById('binary-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const drops = Array(Math.floor(canvas.width/20)).fill(1);
+        function draw() {
+            ctx.fillStyle = 'rgba(5, 3, 0, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#ff8800';
+            ctx.font = '15px monospace';
+            drops.forEach((y, i) => {
+                const text = Math.random() > 0.5 ? "0" : "1";
+                ctx.fillText(text, i * 20, y * 20);
+                if (y * 20 > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            });
+        }
+        if (localStorage.getItem('swiss_shield_mode_sobre') !== '1') setInterval(draw, 50);
+
+        function appliquerModeSobre() {
+            const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+            document.body.classList.toggle('mode-sobre', actif);
+            const btn = document.getElementById('toggle-sobre-btn');
+            if (btn) btn.textContent = actif ? '🌓 Mode sobre : ON' : '🌓 Mode sobre';
+        }
+        function basculerModeSobre() {
+            const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+            localStorage.setItem('swiss_shield_mode_sobre', actif ? '0' : '1');
+            appliquerModeSobre();
+        }
+        appliquerModeSobre();
+
+        // Logique de progression
+        function unlock() {
+            const key = document.getElementById('passkey').value.trim();
+            if (key === 'V7-STABILIZED-2026') {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('pre-requisites').style.display = 'block';
+                currentZone = 'pre-requisites';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('entree', key, 'V7-STABILIZED-2026');
+                alert("ERREUR : CLÉ DE SESSION INVALIDE.");
+            }
+        }
+
+        function validatePreReq() {
+            const tech = document.getElementById('pre-tech').value.trim();
+            const jur = document.getElementById('pre-jur').value.trim();
+            // UID = 0, Article = 147
+            if (tech === '0' && jur === '147') {
+                document.getElementById('pre-requisites').style.display = 'none';
+                document.getElementById('mission-content').style.display = 'block';
+                currentZone = 'mission-content';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('prerequis', 'uid="' + tech + '", article="' + jur + '"', 'uid="0", article="147"');
+                alert("ACCRÉDITATIONS INSUFFISANTES : Vérifiez l'UID (root) et l'article CP sur l'utilisation frauduleuse.");
+            }
+        }
+
+        function checkFinal() {
+            const val = document.getElementById('finalToken').value.trim();
+            if (val === '292') {
+                document.getElementById('action-zone').style.display = 'none';
+                document.getElementById('final-zone').style.display = 'block';
+            } else {
+                enregistrerErreur('investigation', val, '292');
+                alert("ERREUR DE CALCUL : Le jeton de révocation est incorrect.");
+            }
+        }
+
+        function toggleAide() {
+            const x = document.getElementById("zoneAide");
+            x.style.display = (x.style.display === "block") ? "none" : "block";
+        }
+    </script>
+
+    <script>
+        const EP_ID = "S01E07";
+        const HINT_COST = {1:1, 2:2, 3:3};
+        let hintsUsed = {1:false, 2:false, 3:false};
+        let episodeScore = 5;
+        function useHint(level) {
+            if (hintsUsed[level] || (level > 1 && !hintsUsed[level - 1])) return;
+            hintsUsed[level] = true;
+        enregistrerIndiceUsage(level);
+            episodeScore -= HINT_COST[level];
+            document.getElementById('hint-score-value').textContent = episodeScore;
+            document.getElementById('hint-tier-' + level).style.display = 'block';
+            const btn = document.getElementById('hintBtn' + level);
+            btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5';
+            if (level < 3) {
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+            sauvegarderAutomatiquement();
+        }
+        function recordEpisodeSuccess() {
+            let scores = {};
+            try { scores = JSON.parse(localStorage.getItem('swiss_shield_scores') || '{}'); } catch(e) {}
+            if (!(EP_ID in scores) || scores[EP_ID] < episodeScore) scores[EP_ID] = episodeScore;
+            localStorage.setItem('swiss_shield_scores', JSON.stringify(scores));
+            localStorage.removeItem('autosave_' + EP_ID);
+        }
+    let currentZone = 'lock-screen';
+    function sauvegarderAutomatiquement() {
+        try {
+            const inputs = {};
+            ['pre-tech', 'pre-jur', 'finalToken'].forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) inputs[id] = el.value;
+            });
+            localStorage.setItem('autosave_' + EP_ID, JSON.stringify({
+                zone: currentZone,
+                inputs: inputs,
+                hintsUsed: hintsUsed,
+                episodeScore: episodeScore
+            }));
+        } catch(e) {}
+    }
+    function proposerRestaurationAutosave() {
+        let data;
+        try { data = JSON.parse(localStorage.getItem('autosave_' + EP_ID) || 'null'); } catch(e) { return; }
+        if (!data || !data.zone || data.zone === 'lock-screen') return;
+        document.getElementById('lock-screen').style.display = 'none';
+        if (data.zone === 'mission-content') {
+            document.getElementById('pre-requisites').style.display = 'none';
+            document.getElementById('mission-content').style.display = 'block';
+        } else if (data.zone === 'pre-requisites') {
+            document.getElementById('pre-requisites').style.display = 'block';
+        }
+        currentZone = data.zone;
+        if (data.inputs) {
+            Object.keys(data.inputs).forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) el.value = data.inputs[id];
+            });
+        }
+        hintsUsed = data.hintsUsed || hintsUsed;
+        episodeScore = (typeof data.episodeScore === 'number') ? data.episodeScore : episodeScore;
+        document.getElementById('hint-score-value').textContent = episodeScore;
+        [1, 2, 3].forEach(function(level) {
+            if (hintsUsed[level]) {
+                document.getElementById('hint-tier-' + level).style.display = 'block';
+                const btn = document.getElementById('hintBtn' + level);
+                if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+        });
+    }
+    function enregistrerIndiceUsage(niveau) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + niveau;
+            debrief.indices[cle] = (debrief.indices[cle] || 0) + 1;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+    function enregistrerErreur(phase, reponseEleve, reponseAttendue) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + phase;
+            if (typeof debrief.erreurs[cle] !== 'object' || debrief.erreurs[cle] === null) {
+                debrief.erreurs[cle] = { compte: (debrief.erreurs[cle] || 0), exemples: [] };
+            }
+            debrief.erreurs[cle].compte++;
+            if (reponseEleve !== undefined && debrief.erreurs[cle].exemples.length < 5) {
+                debrief.erreurs[cle].exemples.push({ reponseEleve: String(reponseEleve).slice(0,100), reponseAttendue: String(reponseAttendue||'').slice(0,100) });
+            }
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+        (function pollSuccess(){
+            const ids = ['success','success-msg','success-final','final-zone','victory-zone','victory-screen','final-step','final-badge'];
+            let recorded = false;
+            setInterval(function(){
+                if (recorded) return;
+                for (const id of ids) {
+                    const el = document.getElementById(id);
+                    if (el && el.style.display === 'block') { recordEpisodeSuccess(); recorded = true; return; }
+                }
+            }, 500);
+        })();
+        proposerRestaurationAutosave();
+    </script>
+</body>
+</html>

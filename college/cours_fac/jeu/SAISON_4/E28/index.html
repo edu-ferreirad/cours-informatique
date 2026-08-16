@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>S04E28 - SURVEILLANCE SUR LE LIEU DE TRAVAIL</title>
+    <style>
+        /* --- NOUVEL EFFET VISUEL S04 : RED SCANNER CURTAIN --- */
+        #scanner-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            background: #050505;
+        }
+
+        body { color: #ff4d4d; font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; padding: 40px; margin: 0; min-height: 100vh; overflow-x: hidden; }
+        
+        .terminal { 
+            background: rgba(17, 17, 17, 0.9); 
+            border: 2px solid #ff4d4d; 
+            padding: 25px; width: 90%; 
+            max-width: 850px; 
+            box-shadow: 0 0 50px rgba(255, 77, 77, 0.4); 
+            border-radius: 4px; 
+            position: relative;
+            backdrop-filter: blur(5px);
+        }
+
+        /* STYLE CONTEXTE HISTOIRE S04 */
+        .story-context {
+            background: rgba(255, 77, 77, 0.1);
+            border: 1px solid #ff4d4d;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: left;
+            font-size: 0.9em;
+            color: #fff;
+            line-height: 1.4;
+            position: relative;
+        }
+        .story-context::before {
+            content: "CRITICAL_NOTICE";
+            position: absolute;
+            top: -10px; left: 10px;
+            background: #ff4d4d;
+            color: #000;
+            font-size: 0.7em;
+            padding: 2px 5px;
+            font-weight: bold;
+        }
+        .story-context b { color: #ff4d4d; text-shadow: 0 0 5px #ff4d4d; }
+
+        .header-mission { border-bottom: 2px solid #ff4d4d; margin-bottom: 20px; padding-bottom: 10px; color: #fff; font-weight: bold; text-transform: uppercase; display: flex; justify-content: space-between; }
+        
+        .cctv-overlay { color: #ff4d4d; font-size: 0.9em; animation: blink 1s infinite; font-weight: bold; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } }
+
+        #lock-screen { text-align: center; padding: 20px; }
+        #pre-requis-screen { display: none; padding: 20px; }
+        #mission-content { display: none; }
+        
+        .cam-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+        .cam-feed { border: 2px solid #444; background: #000; padding: 15px; position: relative; cursor: pointer; transition: 0.3s; }
+        .cam-feed:hover { border-color: #fff; box-shadow: inset 0 0 15px rgba(255,255,255,0.1); }
+        .cam-label { font-size: 0.75em; color: #888; margin-bottom: 5px; display: block; }
+        .cam-tech-id { font-size: 0.65em; color: #ff4d4d; font-weight: bold; margin-bottom: 10px; display: block; border-bottom: 1px solid #333; }
+        .cam-status { font-weight: bold; text-transform: uppercase; font-size: 0.8em; }
+        
+        .log-metadata { background: #000; border: 1px solid #333; padding: 10px; margin: 10px 0; font-size: 0.75em; color: #aaa; height: 120px; overflow-y: auto; }
+        .log-line { border-left: 2px solid #555; padding-left: 8px; margin-bottom: 6px; }
+        .log-line b { color: #fff; }
+
+        .status-on { color: #4ade80; } 
+        .status-off { color: #444; }    
+
+        .cam-feed.disabled { border-color: #222; opacity: 0.4; pointer-events: none; }
+        
+        input { background: #000; border: 1px solid #ff4d4d; color: #ff4d4d; padding: 12px; width: 300px; font-family: inherit; font-size: 1.1em; text-align: center; outline: none; border-radius: 2px; box-sizing: border-box; }
+        button.main-btn { background: #ff4d4d; color: #000; border: none; padding: 12px 25px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 15px; text-transform: uppercase; width: 300px; letter-spacing: 1px; }
+        button.main-btn:hover { background: #fff; box-shadow: 0 0 20px #ff4d4d; }
+
+        #final-zone { display: none; margin-top: 20px; border-top: 1px solid #ff4d4d; padding-top: 20px; text-align: center; }
+        .code-final { color: #4ade80; font-size: 2.2em; letter-spacing: 5px; margin: 15px 0; display: block; text-shadow: 0 0 10px rgba(74, 222, 128, 0.5); border: 2px solid #4ade80; padding: 10px; }
+
+        .export-report { background: rgba(255, 77, 77, 0.1); padding: 15px; text-align: left; font-size: 0.85em; border: 1px solid #ff4d4d; margin: 20px 0; font-family: monospace; color: #fff; }
+
+        .btn-aide-rouge { background: #d80000; color: #fff; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; width: 100%; max-width: 450px; margin-top: 40px; border-radius: 2px; text-transform: uppercase; }
+        .aide-box { display: none; background: #fff; color: #000; padding: 25px; margin-top: 10px; width: 90%; max-width: 450px; text-align: left; border-top: 5px solid #d80000; font-family: sans-serif; box-shadow: 0 10px 30px rgba(0,0,0,0.5); line-height: 1.4; font-size: 0.9em; z-index: 100; position: relative;}
+
+        /* 4. BOUTON RETOUR DIRECT */
+        .btn-nav-retour { position: absolute; top: 15px; left: 15px; background: #000; border: 1px solid #ff4d4d; color: #ff4d4d; padding: 5px 10px; text-decoration: none; font-size: 0.8em; font-weight: bold; border-radius: 3px; }
+        .btn-nav-retour:hover { background: #ff4d4d; color: #000; }
+
+        /* MULTIPLE LOCK STYLING */
+        .challenge-block { background: #111; border: 1px dashed #ff4d4d; padding: 15px; margin: 15px 0; text-align: left; }
+        .challenge-title { font-weight: bold; color: #fff; text-transform: uppercase; font-size: 0.9em; margin-bottom: 10px; display: block; }
+        .code-window { background: #000; border-left: 3px solid #ff4d4d; padding: 10px; margin: 15px 0; color: #ff9999; font-size: 0.85em; overflow-x: auto; white-space: pre; font-family: monospace; }
+        .investigation-panel { border: 1px solid #ff4d4d; padding: 15px; background: #0a0a0a; margin-top: 25px; }
+
+        /* MODE SOBRE */
+        body.mode-sobre, body.mode-sobre * { animation: none !important; transition: none !important; }
+        body.mode-sobre #scanner-canvas { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <canvas id="scanner-canvas"></canvas>
+
+    <div class="terminal">
+        <a href="../../MENU_PRINCIPAL.html" class="btn-nav-retour">&lt; RETOUR MENU</a>
+        <button id="toggle-sobre-btn" onclick="basculerModeSobre()" style="position:absolute;top:15px;right:15px;width:auto;z-index:10;background:#000;border:1px solid #ff4d4d;color:#ff4d4d;padding:5px 10px;font-size:0.8em;font-weight:bold;border-radius:3px;cursor:pointer;">🌓</button>
+
+        <div id="lock-screen" style="margin-top: 25px;">
+            <div class="cctv-overlay">● SYSTEM OFFLINE</div>
+            <h2>🎥 VMS - INTERFACE D'AUDIT nLPD</h2>
+            
+            <div class="story-context">
+                <b>[ MISSION : DÉTECTION DE SURVEILLANCE ABUSIVE EN ADMINISTRATION FEDERALE ]</b><br>
+                Des soupçons pèsent sur l'infrastructure réseau d'un office de l'Administration fédérale à Berne. Des capteurs biométriques et des enregistreurs de frappes analytiques ont été discrètement déployés dans certains espaces de travail sans base légale ni consultation collective.<br><br>
+                En vertu de l'<b>Art. 26</b> de la nLPD (et en miroir de l'<b>Art. 26 OLT 3</b> du droit du travail suisse), la surveillance du comportement des employés sur leur poste de travail est strictement interdite si elle vise à flouter leur sphère privée ou mesurer leur rendement intrinsèque. Votre mission est d'auditer les flux et de révoquer l'infrastructure non conforme.
+            </div>
+
+            <p>Saisir l'empreinte de conformité (E27) :</p>
+            <input type="text" id="passkey" placeholder="TOKEN DE SÉCURITÉ" onchange="sauvegarderAutomatiquement()">
+            <br>
+            <button class="main-btn" onclick="unlock()">INITIALISER L'INSPECTION</button>
+        </div>
+
+        <div id="pre-requis-screen">
+            <div class="header-mission">
+                <span>[CONTROLE_PRE-REQUIS] SECURITE & CADRE LEGAL</span>
+                <span style="color: #ffcc00;">⚠️ ACCÈS COUPLÉ</span>
+            </div>
+            
+            <div class="challenge-block">
+                <span class="challenge-title">⚖️ Défi Jurisprudence : Ordonnance 3 relative à la loi sur le travail (OLT 3)</span>
+                <p>Quel article spécifique de l'OLT 3 (Droit suisse) stipule l'interdiction d'utiliser des systèmes de surveillance ou de contrôle destinés à surveiller le comportement des travailleurs sur leur lieu de travail ?</p>
+                <input type="text" id="law_ans" placeholder="Exemple de réponse : Art. 12" style="width: 100%; max-width: 400px;" onchange="sauvegarderAutomatiquement()">
+            </div>
+
+            <div class="challenge-block">
+                <span class="challenge-title">🖥️ Défi Technique Shell : Extraction forensics de logs suspects</span>
+                <p>Pour auditer l'empreinte d'un exécutable d'écoute localisé dans <code>/usr/bin/spyware</code> sans l'exécuter, vous devez générer son empreinte cryptographique SHA-256 standard sous Linux. Saisissez la commande complète à utiliser en console :</p>
+                <input type="text" id="shell_ans" placeholder="Exemple de commande unix" style="width: 100%; max-width: 400px; text-align: left; padding-left: 10px;" onchange="sauvegarderAutomatiquement()">
+            </div>
+
+            <center>
+                <button class="main-btn" onclick="verifyPreReq()">FORCER L'OUVERTURE DE L'ENQUÊTE</button>
+            </center>
+        </div>
+
+        <div id="mission-content">
+            <div class="header-mission">
+                <span>[INSPECTOR_MODE] ART_26_STRICT</span>
+                <span class="cctv-overlay">● MONITORING ACTIF</span>
+            </div>
+            
+            <p style="color: #fff;">> <b>Analyse des métadonnées système :</b> Croisez les IDs techniques avec les fonctions actives pour identifier les violations.</p>
+
+            <div class="log-metadata" style="height: 200px;">
+                <div class="log-line">08:02:14 SENSOR <b>TX-88</b> | zone=Rack-Storage | reading=41.2°C | status=nominal</div>
+                <div class="log-line">08:15:41 SENSOR <b>RF-12</b> | zone=Office-Zone | keystrokes_per_min=87 | idle_gap=00:00:12</div>
+                <div class="log-line">09:30:02 SENSOR <b>TX-04</b> | zone=External-Gate | event=badge_scan | result=granted</div>
+                <div class="log-line">10:05:19 SENSOR <b>RF-99</b> | zone=Rest-Area | face_match=true | duration_tracked=00:04:32</div>
+                <div class="log-line">11:12:55 SENSOR <b>TX-88</b> | zone=Rack-Storage | reading=42.8°C | status=nominal</div>
+                <div class="log-line">11:40:03 SENSOR <b>RF-12</b> | zone=Office-Zone | keystrokes_per_min=102 | idle_gap=00:00:04</div>
+                <div class="log-line">13:02:10 SENSOR <b>TX-04</b> | zone=External-Gate | event=badge_scan | result=granted</div>
+                <div class="log-line">14:18:47 SENSOR <b>RF-99</b> | zone=Rest-Area | face_match=true | duration_tracked=00:11:02</div>
+                <div class="log-line">15:03:29 SENSOR <b>RF-12</b> | zone=Office-Zone | keystrokes_per_min=95 | idle_gap=00:00:07</div>
+                <div class="log-line">16:47:02 SENSOR <b>TX-88</b> | zone=Rack-Storage | reading=40.9°C | status=nominal</div>
+                <div class="log-line" style="border-left-color:#ff4d4d;">// Deux capteurs mesurent en continu un comportement individuel (frappe clavier, durée de pause) plutôt qu'un événement de sécurité physique ponctuel — identifiez lesquels.</div>
+            </div>
+
+            <div class="challenge-block">
+                <span class="challenge-title">🧩 MATRICE D'INTERDÉPENDANCE ALGORITHMIQUE</span>
+                <p>Les interrupteurs de flux vidéo sont obfusqués au niveau de l'infrastructure logicielle par une fonction d'exclusion logique XOR. Pour révoquer une caméra illicite sans faire planter le système d'audit, vous devez résoudre l'évaluation de routage suivante avant de cliquer sur les flux vidéo de la grille :</p>
+                
+                <div class="code-window"># COMPOSANT DE SÉCURITÉ : verification_matrice.py
+# Objectif : Déterminer la séquence exacte d'atténuation.
+
+def verifier_coherence():
+    # Déclaration des masques d'états binaires pour l'administration
+    état_systeme = 0b1111
+    masque_legal  = 0b1001  # Canaux légaux requis par la sécurité physique
+    
+    # Le masque d'alerte identifie les flux intrusifs par opération XOR
+    flux_intrusifs = état_systeme ^ masque_legal
+    
+    # Rappel d'interprétation binaire : 
+    # Bit 3 (poids 8) : TX-04  | Bit 2 (poids 4) : RF-99
+    # Bit 1 (poids 2) : RF-12  | Bit 0 (poids 1) : TX-88
+    # Un bit à 1 dans 'flux_intrusifs' désigne un flux violant la nLPD à révoquer d'urgence.
+    return bin(flux_intrusifs)</div>
+                
+                <p style="color: #fff; font-size: 0.85em;">💡 <i>Indice Forensics : Résolvez l'opération binaire issue du script Python ci-dessus. Les deux bits positionnés à `1` vous indiqueront précisément quels TECH_ID (parmi TX-04, RF-99, RF-12, TX-88) constituent une infraction de surveillance comportementale active.</i></p>
+            </div>
+            
+            <div class="investigation-panel">
+                <p style="color: #fff; font-weight: bold; margin-top: 0;">🎛️ GRILLE DIRECTE DES FLUX VIDÉO DE L'OFFICE :</p>
+                <div class="cam-grid">
+                    <div class="cam-feed" id="cam1" onclick="checkLegality('cam1', 'TX-04', true)">
+                        <span class="cam-label">CAM A // PORTAIL NORD</span>
+                        <span class="cam-tech-id">TECH_ID: TX-04</span>
+                        <span id="status-cam1" class="cam-status status-on">● STANDBY</span>
+                    </div>
+                    <div class="cam-feed" id="cam2" onclick="checkLegality('cam2', 'RF-99', false)">
+                        <span class="cam-label">CAM B // ESPACE CAFÉ</span>
+                        <span class="cam-tech-id">TECH_ID: RF-99</span>
+                        <span id="status-cam2" class="cam-status status-on">● STANDBY</span>
+                    </div>
+                    <div class="cam-feed" id="cam3" onclick="checkLegality('cam3', 'RF-12', false)">
+                        <span class="cam-label">CAM C // OPEN-SPACE 01</span>
+                        <span class="cam-tech-id">TECH_ID: RF-12</span>
+                        <span id="status-cam3" class="cam-status status-on">● STANDBY</span>
+                    </div>
+                    <div class="cam-feed" id="cam4" onclick="checkLegality('cam4', 'TX-88', true)">
+                        <span class="cam-label">CAM D // LOCAL SERVEURS</span>
+                        <span class="cam-tech-id">TECH_ID: TX-88</span>
+                        <span id="status-cam4" class="cam-status status-on">● STANDBY</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="final-zone">
+                <p style="color: #4ade80;">✓ CONFORMITÉ RÉTABLIE : Les flux de surveillance comportementale ont été isolés.</p>
+                
+                <div class="export-report">
+                    <b>📝 RAPPORT DE SURVEILLANCE (export_eleves.csv) :</b><br>
+                    S04E28 ; Succès ; Audit Art. 26 validé. Flux RF-12 et RF-99 révoqués pour violation du droit au respect de la personnalité.
+                </div>
+
+                <span class="code-final">PROPORTIONALITY-26</span>
+                <div style="text-align: center; margin-top: 20px;">
+                    <a href="../../MENU_PRINCIPAL.html" style="color: #ff4d4d; text-decoration: none; border: 1px solid #ff4d4d; padding: 10px 20px; font-weight: bold; display: inline-block;">[ DECONNEXION ]</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn-aide-rouge" onclick="toggleAide()">[ 📜 CODE DU TRAVAIL & nLPD ]</button>
+    <div id="zoneAide" class="aide-box">
+        <h3 style="color: #d80000; margin-top: 0; font-family: monospace;">Aide Référentielle - Les 3 Piliers</h3>
+        <p><b>1. Informatique (Concepts logiques) :</b> L'opération bit à bit `XOR` (ou exclusif) compare deux structures binaires. Pour chaque position de bit, le résultat vaut `1` si et seulement si l'un des deux bits d'origine vaut `1`. Exemple : `1 ^ 0 = 1`, mais `1 ^ 1 = 0` et `0 ^ 0 = 0`.</p>
+        <p><b>2. Juridique (Lois et Ordonnances) :</b> Un article de la nLPD protège l'intégrité de la personnalité face au traitement de données. En parallèle direct, le même numéro d'article de l'Ordonnance 3 relative à la loi sur le travail (OLT 3) interdit d'exploiter des dispositifs de surveillance permanente affectant la santé et la liberté d'action des employés de bureau en Suisse. Cherchez ce numéro commun aux deux textes.</p>
+        <p><b>3. Forensics (Analyse empirique) :</b> La collecte d'empreintes cryptographiques par hachage permet d'authentifier l'intégrité d'un fichier système ou d'un processus suspect sans l'exécuter, évitant ainsi le déclenchement de contre-mesures offensives. Cherchez la commande correspondante dans votre mémento Linux.</p>
+    </div>
+
+    <div style="margin-top: 30px; border-top: 3px solid #d80000; padding: 20px; background: #fff; font-family: Arial, sans-serif; position: relative; z-index: 100; width: 90%; max-width: 450px;">
+        <div id="hint-score-badge" style="background:#111;color:#3fb950;padding:8px 15px;font-weight:bold;text-align:center;">🏆 Score de cet épisode : <span id="hint-score-value">5</span> / 5 pts</div>
+        <div style="display:flex; gap:8px; margin:10px 0;">
+            <button id="hintBtn1" onclick="useHint(1)" style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;">💡 Indice 1 (-1 pt)</button>
+            <button id="hintBtn2" onclick="useHint(2)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🎯 Indice 2 (-2 pts)</button>
+            <button id="hintBtn3" onclick="useHint(3)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🆘 Solution (-3 pts)</button>
+        </div>
+
+        <div id="zoneAideScore" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; color: #333;">
+            <p id="hint-tier-1" style="display:none;"><strong>💡 INFO :</strong> Pré-requis : le numéro d'article commun à la nLPD et à l'OLT 3 sur l'interdiction de surveiller le comportement des employés, et la commande pour calculer un hash SHA-256 du fichier <code>/usr/bin/spyware</code>. Ensuite, relisez attentivement la description de chaque caméra dans le journal de métadonnées : deux d'entre elles analysent explicitement le comportement des employés (et non la sécurité physique).</p>
+            <p id="hint-tier-2" style="display:none;"><strong>🎯 PISTE :</strong> Article : 26. Commande : <code>sha256sum /usr/bin/spyware</code>. Calcul : <code>état_systeme (0b1111) XOR masque_legal (0b1001) = 0b0110</code> → bits 2 et 1 activés, correspondant à RF-99 et RF-12.</p>
+            <p id="hint-tier-3" style="display:none;"><strong>🆘 SOLUTION :</strong> Pré-requis : Art. 26 / sha256sum /usr/bin/spyware. Cliquez sur les caméras <code>RF-12</code> et <code>RF-99</code> pour les désactiver (ne cliquez pas sur TX-04 ni TX-88, qui sont légitimes).</p>
+        </div>
+    </div>
+
+    <script>
+        // --- ANIMATION BACKGROUND : RED SCANNER ---
+        const canvas = document.getElementById('scanner-canvas');
+        const ctx = canvas.getContext('2d');
+        let lines = [];
+
+        function initCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            lines = [];
+            for(let i=0; i<15; i++) {
+                lines.push({
+                    y: Math.random() * canvas.height,
+                    speed: 2 + Math.random() * 5,
+                    width: 1 + Math.random() * 3,
+                    alpha: 0.1 + Math.random() * 0.4
+                });
+            }
+        }
+
+        function drawScanner() {
+            if (localStorage.getItem('swiss_shield_mode_sobre') === '1') { return; }
+            ctx.fillStyle = "rgba(5, 5, 5, 0.2)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            lines.forEach(l => {
+                ctx.beginPath();
+                ctx.strokeStyle = `rgba(255, 77, 77, ${l.alpha})`;
+                ctx.lineWidth = l.width;
+                ctx.moveTo(0, l.y);
+                ctx.lineTo(canvas.width, l.y);
+                ctx.stroke();
+
+                l.y += l.speed;
+                if(l.y > canvas.height) {
+                    l.y = -10;
+                    l.speed = 2 + Math.random() * 5;
+                }
+            });
+
+            if(Math.random() > 0.98) {
+                ctx.fillStyle = "rgba(255, 255, 255, 0.05)";
+                ctx.fillRect(0, Math.random()*canvas.height, canvas.width, 2);
+            }
+
+            requestAnimationFrame(drawScanner);
+        }
+
+        window.addEventListener('resize', initCanvas);
+        initCanvas();
+        drawScanner();
+
+        let camsCut = 0;
+        let currentZone = 1;
+
+        function toggleAide() {
+            var x = document.getElementById("zoneAide");
+            x.style.display = (x.style.display === "block") ? "none" : "block";
+        }
+
+        // 1. VERROU DE SESSION S04E28
+        function unlock() {
+            const code = document.getElementById('passkey').value.trim().toUpperCase();
+            if (code === 'REGISTRY-COMPLIANT-2026') {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('pre-requis-screen').style.display = 'block';
+                currentZone = 2;
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('entree', code, 'REGISTRY-COMPLIANT-2026');
+                alert("ERR_INVALID_TOKEN : Registre introuvable.");
+            }
+        }
+
+        // 7. INTERACTIVE DOUBLE VERROU LOGIQUE SANS AFFICHAGE EN CLAIR
+        function verifyPreReq() {
+            const lawInput = document.getElementById('law_ans').value.trim().toLowerCase();
+            const shellInput = document.getElementById('shell_ans').value.trim().toLowerCase();
+
+            // Attendu légal : "art. 26" ou "article 26"
+            const isLawValid = lawInput.includes("26") && (lawInput.includes("art") || lawInput.includes("article"));
+            // Attendu technique : utilisation correcte de la commande "sha256sum" sur le chemin spécifié
+            const isShellValid = shellInput.includes("sha256sum") && shellInput.includes("/usr/bin/spyware");
+
+            if (isLawValid && isShellValid) {
+                document.getElementById('pre-requis-screen').style.display = 'none';
+                document.getElementById('mission-content').style.display = 'block';
+                currentZone = 3;
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('prerequis', 'law:"' + lawInput + '" / shell:"' + shellInput + '"', 'Art. 26 / sha256sum /usr/bin/spyware');
+                alert("VÉRIFICATION ÉCHOUÉE : Les jalons légaux ou les arguments d'empreinte Shell sont incorrects. Autorisation d'audit révoquée par l'hôte.");
+            }
+        }
+
+        // 8. LOGIQUE D'INVESTIGATION FINALE
+        function checkLegality(id, techId, isLegal) {
+            if (isLegal) {
+                enregistrerErreur('investigation', techId, 'ne pas désactiver (canal légal)');
+                alert("SABOTAGE DÉTECTÉ : Vous avez désactivé une protection légale et nécessaire (ID: " + techId + "). Redémarrage de l'agent d'audit...");
+                location.reload();
+            } else {
+                const cam = document.getElementById(id);
+                const status = document.getElementById('status-' + id);
+                
+                if (!cam.classList.contains('disabled')) {
+                    cam.classList.add('disabled');
+                    status.innerText = "● OFFLINE (COMPLIANT)";
+                    status.className = "cam-status status-off";
+                    camsCut++;
+                    sauvegarderAutomatiquement();
+                    
+                    if (camsCut === 2) {
+                        document.getElementById('final-zone').style.display = 'block';
+                    }
+                }
+            }
+        }
+    </script>
+
+    <script>
+        const EP_ID = "S04E28";
+        const HINT_COST = {1:1, 2:2, 3:3};
+        let hintsUsed = {1:false, 2:false, 3:false};
+        let episodeScore = 5;
+        function useHint(level) {
+            if (hintsUsed[level] || (level > 1 && !hintsUsed[level - 1])) return;
+            hintsUsed[level] = true;
+            enregistrerIndiceUsage(level);
+            episodeScore -= HINT_COST[level];
+            document.getElementById('hint-score-value').textContent = episodeScore;
+            document.getElementById('hint-tier-' + level).style.display = 'block';
+            const btn = document.getElementById('hintBtn' + level);
+            btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5';
+            if (level < 3) {
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+            sauvegarderAutomatiquement();
+        }
+        function recordEpisodeSuccess() {
+            let scores = {};
+            try { scores = JSON.parse(localStorage.getItem('swiss_shield_scores') || '{}'); } catch(e) {}
+            if (!(EP_ID in scores) || scores[EP_ID] < episodeScore) scores[EP_ID] = episodeScore;
+            localStorage.setItem('swiss_shield_scores', JSON.stringify(scores));
+            localStorage.removeItem('autosave_' + EP_ID);
+        }
+        function enregistrerErreur(phase, reponseEleve, reponseAttendue) {
+            let debrief = {erreurs:{}, indices:{}};
+            try { debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}'); } catch(e) {}
+            const key = EP_ID + ':' + phase;
+            let entry = debrief.erreurs[key];
+            if (typeof entry === 'number') entry = {compte: entry, exemples: []};
+            if (!entry) entry = {compte: 0, exemples: []};
+            entry.compte++;
+            if (reponseEleve !== undefined && reponseAttendue !== undefined && entry.exemples.length < 5) {
+                entry.exemples.push({reponseEleve: String(reponseEleve), reponseAttendue: String(reponseAttendue)});
+            }
+            debrief.erreurs[key] = entry;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        }
+        function enregistrerIndiceUsage(niveau) {
+            let debrief = {erreurs:{}, indices:{}};
+            try { debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}'); } catch(e) {}
+            const key = EP_ID + ':' + niveau;
+            debrief.indices[key] = (debrief.indices[key] || 0) + 1;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        }
+        function basculerModeSobre() {
+            const actif = document.body.classList.toggle('mode-sobre');
+            localStorage.setItem('swiss_shield_mode_sobre', actif ? '1' : '0');
+            if (!actif) { drawScanner(); }
+        }
+        if (localStorage.getItem('swiss_shield_mode_sobre') === '1') {
+            document.body.classList.add('mode-sobre');
+        }
+        (function pollSuccess(){
+            const ids = ['success','success-msg','success-final','final-zone','step_final','victory-zone','victory-screen','final-step','final-badge'];
+            let recorded = false;
+            setInterval(function(){
+                if (recorded) return;
+                for (const id of ids) {
+                    const el = document.getElementById(id);
+                    if (el && window.getComputedStyle(el).display === 'block') { recordEpisodeSuccess(); recorded = true; return; }
+                }
+            }, 500);
+        })();
+
+        function sauvegarderAutomatiquement() {
+            const disabledCams = [];
+            ['cam1','cam2','cam3','cam4'].forEach(function(id){
+                const c = document.getElementById(id);
+                if (c && c.classList.contains('disabled')) disabledCams.push(id);
+            });
+            const etat = {
+                zone: currentZone,
+                inputs: {
+                    passkey: (document.getElementById('passkey') || {}).value || '',
+                    law_ans: (document.getElementById('law_ans') || {}).value || '',
+                    shell_ans: (document.getElementById('shell_ans') || {}).value || ''
+                },
+                hintsUsed: hintsUsed,
+                episodeScore: episodeScore,
+                camsCut: camsCut,
+                disabledCams: disabledCams
+            };
+            localStorage.setItem('autosave_' + EP_ID, JSON.stringify(etat));
+        }
+
+        function proposerRestaurationAutosave() {
+            let etat;
+            try { etat = JSON.parse(localStorage.getItem('autosave_' + EP_ID)); } catch(e) { return; }
+            if (!etat) return;
+
+            if (etat.inputs) {
+                if (document.getElementById('passkey')) document.getElementById('passkey').value = etat.inputs.passkey || '';
+                if (document.getElementById('law_ans')) document.getElementById('law_ans').value = etat.inputs.law_ans || '';
+                if (document.getElementById('shell_ans')) document.getElementById('shell_ans').value = etat.inputs.shell_ans || '';
+            }
+
+            if (etat.zone >= 2) {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('pre-requis-screen').style.display = 'block';
+                currentZone = 2;
+            }
+            if (etat.zone >= 3) {
+                document.getElementById('pre-requis-screen').style.display = 'none';
+                document.getElementById('mission-content').style.display = 'block';
+                currentZone = 3;
+            }
+
+            if (etat.disabledCams) {
+                etat.disabledCams.forEach(function(id){
+                    const cam = document.getElementById(id);
+                    const status = document.getElementById('status-' + id);
+                    if (cam && status) {
+                        cam.classList.add('disabled');
+                        status.innerText = "● OFFLINE (COMPLIANT)";
+                        status.className = "cam-status status-off";
+                    }
+                });
+            }
+            if (typeof etat.camsCut === 'number') {
+                camsCut = etat.camsCut;
+                if (camsCut === 2) {
+                    document.getElementById('final-zone').style.display = 'block';
+                }
+            }
+
+            if (etat.hintsUsed) {
+                [1,2,3].forEach(function(level){
+                    if (etat.hintsUsed[level]) {
+                        hintsUsed[level] = true;
+                        document.getElementById('hint-tier-' + level).style.display = 'block';
+                        const btn = document.getElementById('hintBtn' + level);
+                        if (btn) { btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5'; }
+                        const next = document.getElementById('hintBtn' + (level + 1));
+                        if (next && level < 3) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+                    }
+                });
+            }
+            if (typeof etat.episodeScore === 'number') {
+                episodeScore = etat.episodeScore;
+                document.getElementById('hint-score-value').textContent = episodeScore;
+            }
+        }
+        proposerRestaurationAutosave();
+    </script>
+</body>
+</html>

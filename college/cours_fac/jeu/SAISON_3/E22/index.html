@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>S03E22 - SUPPLY CHAIN ATTACK</title>
+    <style>
+        /* --- EFFET VISUEL : SCANNING GRID RADAR --- */
+        #radar-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            background: #000;
+        }
+
+        body { background-color: #000; color: #00ff41; font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; padding: 40px; margin: 0; overflow-x: hidden; }
+        
+        .terminal { 
+            background: rgba(0, 0, 0, 0.92); 
+            border: 2px solid #00ff41; 
+            padding: 30px; width: 90%; 
+            max-width: 900px; 
+            box-shadow: 0 0 60px rgba(255, 100, 0, 0.3);
+            position: relative;
+            backdrop-filter: blur(8px);
+        }
+
+        /* CONTEXTE HISTOIRE S3E22 */
+        .story-context {
+            background: rgba(255, 62, 62, 0.1);
+            border: 1px solid #ff3e3e;
+            padding: 20px;
+            margin: 20px 0;
+            color: #ffbaba;
+            font-size: 0.95em;
+            line-height: 1.5;
+            text-align: left;
+        }
+        .story-context b { color: #ff3e3e; text-transform: uppercase; }
+
+        .header-mission { border-bottom: 1px solid #00ff41; margin-bottom: 20px; padding-bottom: 10px; color: #00ff41; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; display: flex; justify-content: space-between; }
+        
+        #lock-screen, #pre-requis-screen, #mission-content { transition: opacity 0.5s; }
+        #pre-requis-screen, #mission-content { display: none; }
+        
+        .supply-box { background: rgba(255, 0, 0, 0.05); border: 1px solid #ff3e3e; padding: 20px; margin: 20px 0; border-radius: 4px; text-align: left; animation: glitch-border 2s infinite; }
+        @keyframes glitch-border { 0% { border-color: #ff3e3e; } 50% { border-color: #aa0000; } 100% { border-color: #ff3e3e; } }
+        
+        .alert-title { color: #ff3e3e; font-weight: bold; text-decoration: underline; margin-bottom: 10px; display: block; text-shadow: 2px 2px #000; }
+        
+        .log-console { background: #050505; color: #008800; padding: 15px; font-size: 0.85em; height: 130px; overflow-y: auto; border: 1px solid #004400; margin: 10px 0; text-align: left; }
+        
+        .input-zone { margin: 30px 0; padding: 20px; border: 1px dashed #00ff41; text-align: center; background: rgba(0, 255, 65, 0.02); }
+        input { background: #000; border: 1px solid #00ff41; color: #00ff41; padding: 12px; width: 320px; font-family: inherit; font-size: 1.1em; text-align: center; outline: none; margin: 10px 0; }
+        input:focus { box-shadow: 0 0 15px #00ff41; }
+        
+        button { background: #00ff41; color: #000; border: none; padding: 12px 30px; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.3s; letter-spacing: 1px; }
+        button:hover { background: #fff; box-shadow: 0 0 20px #fff; transform: scale(1.02); }
+
+        #victory-zone { display: none; text-align: center; border-top: 2px solid #00ff41; margin-top: 20px; padding-top: 20px; }
+        .code-final { color: #fff; font-size: 2.2em; letter-spacing: 5px; margin: 20px 0; display: block; text-shadow: 0 0 15px #00ff41; background: rgba(0, 255, 65, 0.2); padding: 20px; border: 1px solid #00ff41; }
+
+        .btn-aide-rouge { background: #d80000; color: #fff; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; width: 100%; max-width: 450px; margin-top: 40px; border-radius: 2px; }
+        .aide-box { display: none; background: #fff; color: #000; padding: 25px; margin-top: 10px; width: 90%; max-width: 450px; text-align: left; border-top: 5px solid #d80000; font-family: sans-serif; box-shadow: 0 10px 30px rgba(0,0,0,0.5); line-height: 1.5; }
+        
+        .export-report { background: rgba(0, 255, 65, 0.1); padding: 15px; text-align: left; font-size: 0.85em; border: 1px solid #00ff41; margin: 20px 0; }
+
+        /* BOUTON RETOUR MANDATOIRE */
+        .btn-retour-nav { position: absolute; top: 15px; left: 15px; background: #000; border: 1px solid #00ff41; color: #00ff41; padding: 6px 12px; text-decoration: none; font-size: 0.8em; font-weight: bold; border-radius: 4px; z-index: 10; }
+        .btn-retour-nav:hover { background: #00ff41; color: #000; }
+
+        .qcm-section { text-align: left; margin: 15px 0; }
+        .qcm-label { display: block; margin: 10px 0; cursor: pointer; font-size: 0.95em; color: #a3ffa3; }
+        .code-window { background: #030a03; border: 1px solid #00ff41; padding: 15px; border-radius: 4px; margin: 15px 0; font-family: 'Courier New', monospace; font-size: 0.85em; color: #76ff76; text-align: left; overflow-x: auto; white-space: pre; }
+
+        /* AJOUT : TRANSCRIPTION DE L'APPEL AVEC LE PRESTATAIRE (pur habillage narratif) */
+        .btn-transcription { background: #000; border: 1px solid #00ff41; color: #00ff41; padding: 10px 18px; font-size: 0.85em; font-weight: bold; cursor: pointer; text-transform: uppercase; width: 100%; margin: 15px 0; border-radius: 4px; }
+        .btn-transcription:hover { background: #00ff41; color: #000; }
+        .transcription-box { display: none; background: #020c02; border: 1px solid #00ff41; border-radius: 4px; padding: 18px 20px; margin-bottom: 15px; text-align: left; font-size: 0.88em; line-height: 1.7; color: #a3ffa3; }
+        .transcription-box .repli { margin-bottom: 10px; }
+        .transcription-box .locuteur { color: #00ff41; font-weight: bold; }
+        .transcription-box .locuteur.suspect { color: #ff3e3e; }
+        .transcription-box .horodatage { color: #557755; font-size: 0.8em; }
+        .transcription-box .note-analyste { color: #ffcc00; font-style: italic; font-size: 0.85em; border-left: 2px solid #ffcc00; padding-left: 10px; margin-top: 12px; }
+
+        /* MODE SOBRE */
+        body.mode-sobre, body.mode-sobre * { animation: none !important; transition: none !important; }
+        body.mode-sobre #radar-canvas { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <canvas id="radar-canvas"></canvas>
+
+    <div class="terminal">
+        <a href="../../MENU_PRINCIPAL.html" class="btn-retour-nav">⬅ NAV MENU</a>
+        <button id="toggle-sobre-btn" onclick="basculerModeSobre()" style="position:absolute;top:15px;right:15px;z-index:10;background:#000;border:1px solid #00ff41;color:#00ff41;padding:6px 12px;font-size:0.8em;font-weight:bold;border-radius:4px;cursor:pointer;">🌓</button>
+
+        <div id="lock-screen">
+            <h2 style="color: #00ff41;">📦 ACCÈS AUDIT FOURNISSEUR - S03</h2>
+            
+            <div class="story-context">
+                <b>[ CRITICAL THREAT DETECTED ]</b><br>
+                Le Centre national pour la cybersécurité (NCSC) signale une compromission critique via une mise à jour silencieuse de l'éditeur tiers de comptabilité employé par plusieurs départements de la haute administration fédérale à Berne. 
+                <br><br>
+                Ce type d'attaque <b>"Supply Chain"</b> contourne nos périmètres de défense habituels en utilisant des packages signés légitimement, mais falsifiés en amont dans les dépôts de build de l'éditeur. Votre tâche consiste à bloquer l'exfiltration de données étatiques.
+            </div>
+
+            <p>Saisissez la signature de sortie de l'E21 :</p>
+            <input type="text" id="passkey" placeholder="CODE SESSION" onchange="sauvegarderAutomatiquement()">
+            <br>
+            <button onclick="unlock()">INITIALISER L'AUDIT</button>
+        </div>
+
+        <div id="pre-requis-screen">
+            <div class="header-mission">
+                <span>[PRÉ-REQUIS] SÉCURISATION DES PIPELINES</span>
+                <span style="color: #ff3e3e;">CONTRÔLE ADMINISTRATIF</span>
+            </div>
+            <p>> <b>STATUT :</b> Déployez les variables d'environnement réglementaires pour débloquer les logs du serveur d'intégration continue.</p>
+            
+            <div class="qcm-section">
+                <p style="color: #ff3e3e; font-weight: bold;">⚖️ RESPONSABILITÉ JURIDIQUE DES TIERS (Art. 9 nLPD) :</p>
+                <p>En confiant le traitement de données d’un office fédéral à un sous-traitant externe informatique, l’entité étatique reste entièrement responsable envers la loi de la vérification de la sécurité de ce dernier. Quelle condition est cumulativement obligatoire selon l'Art. 9 Al. 1 nLPD ?</p>
+                <label class="qcm-label"><input type="radio" name="lpd_qcm" value="ok_lpd" onchange="sauvegarderAutomatiquement()"> A) Le traitement ne doit être confié que si aucune obligation légale ou contractuelle de secret ne s'y oppose et que la sécurité des données est garantie.</label>
+                <label class="qcm-label"><input type="radio" name="lpd_qcm" value="nok1" onchange="sauvegarderAutomatiquement()"> B) Le sous-traitant doit obligatoirement stocker les clés privées au sein de l'administration fédérale.</label>
+                <label class="qcm-label"><input type="radio" name="lpd_qcm" value="nok2" onchange="sauvegarderAutomatiquement()"> C) Le sous-traitant doit posséder une autorisation explicite du Conseil Fédéral avant toute mise à jour logicielle.</label>
+            </div>
+
+            <div style="text-align: left; margin-top: 20px;">
+                <p style="color: #ff3e3e; font-weight: bold;">🖥️ CONFIGURATION D'ENVIRONNEMENT (UNIX VARIABLE) :</p>
+                <p>Pour authentifier la session de build auprès du serveur fédéral de manière sécurisée sans l'écrire en clair dans les scripts, quelle commande POSIX standard permet de déclarer de façon persistante une variable d'environnement nommée `PIPELINE_TOKEN` avec la valeur secrète `CH-2026-SEC` ?</p>
+                <input type="text" id="tech_cmd" class="analysis-input" placeholder="Commande shell attendue..." style="width: 100%; max-width: 450px; margin: 10px 0;" onchange="sauvegarderAutomatiquement()">
+            </div>
+            <br>
+            <div style="text-align: center;">
+                <button onclick="verifyPreReq()">FORCER L'OUVERTURE DU LOG DE BUILD</button>
+            </div>
+        </div>
+
+        <div id="mission-content">
+            <div class="header-mission">
+                <span>[THREAT-HUNTING] S03E22</span>
+                <span style="color: #ff3e3e;">STATE: COMPROMISED</span>
+            </div>
+            
+            <p>> <u>Alerte Intelligence (2026)</u> : L'éditeur applicatif a été infiltré. Un pipeline malveillant injecte dynamiquement des blocs hexadécimaux frauduleux pour composer le Hash final de la backdoor.</p>
+            
+            <div class="supply-box">
+                <span class="alert-title">ANALYSE DU SCRIPT DE DÉPLOIEMENT AUTOMATISÉ</span>
+                <p>Une fonction de masquage a altéré le processus de compilation. Vous disposez du fragment peut-être central identifié en mémoire vive. Retrouvez les deux blocs manquants (Fragment-1 et Fragment-3) pour obtenir le hash d'isolation complet.</p>
+            </div>
+
+            <button class="btn-transcription" onclick="toggleTranscriptionFournisseur()">🔊 RÉÉCOUTER / LIRE LA TRANSCRIPTION DE L'APPEL AVEC LE PRESTATAIRE</button>
+            <button class="btn-transcription" id="btn-audio-appel-22" onclick="lireAppelFournisseur()" style="border-color:#ff3e3e; color:#ff3e3e;">🎧 ÉCOUTER L'APPEL (synthèse vocale du navigateur)</button>
+            <div class="transcription-box" id="transcription-box-22">
+                <div class="horodatage">[ENREGISTREMENT — 14:22:07 — Ligne de crise NCSC / DevOps prestataire]</div>
+                <div class="repli"><span class="locuteur">Analyste NCSC :</span> On observe un comportement anormal sur votre bibliothèque "jolie-palette-couleurs" déployée chez plusieurs de nos clients fédéraux. Pouvez-vous confirmer la dernière mise à jour publiée ?</div>
+                <div class="repli"><span class="locuteur suspect">Lead DevOps (prestataire) :</span> On... on a bien poussé une 2.4.2 il y a trois semaines. Un de nos anciens contributeurs avait encore un accès de publication qu'on avait oublié de révoquer.</div>
+                <div class="repli"><span class="locuteur">Analyste NCSC :</span> Avez-vous des traces de ce qui a été injecté dans cette version ?</div>
+                <div class="repli"><span class="locuteur suspect">Lead DevOps (prestataire) :</span> Notre équipe forensique a retrouvé un fragment en mémoire sur le serveur de build compromis, identifiant "f4e1" — on n'a pas encore réussi à remonter jusqu'à la clé complète de la charge utile.</div>
+                <div class="repli"><span class="locuteur">Analyste NCSC :</span> Transmettez-nous ce fragment, on va croiser ça avec notre propre extraction du process malveillant.</div>
+                <div class="horodatage">[FIN D'APPEL — 14:26:41]</div>
+                <div class="note-analyste">Note de l'analyste : le fragment "f4e1" cité par le prestataire correspond à l'un des identifiants extraits du process malveillant (voir console d'investigation ci-dessous). Reste à localiser les fragments manquants dans la liste de seeds.</div>
+            </div>
+
+            <div class="log-console" id="console">
+                [SYSTEM] Scanning filesystem...<br>
+                [WARN] Alert: Hidden malicious entry point found.<br>
+                [INFO] Fragment-2 identifié en mémoire : <b>f4e1</b><br>
+                [SYSTEM] Reconstitution du Hash requise pour l'isolation...
+            </div>
+
+            <div class="code-window"># --- PIPELINE LOGIC ANALYSIS (PYTHON 3) ---
+def resolve_supply_chain_hash():
+    # Variables de hachage initiales trouvées dans les configs d'intégration continue
+    seeds = ["36b8", "a7d2", "f4e1", "9e2c"]
+    
+    # Évaluation de la structure de l'arbre d'injection :
+    # Le Fragment-1 correspond au seul élément de la liste 'seeds' qui commence par la lettre 'a'.
+    
+    # Le Fragment-2 correspond à la valeur brute déjà identifiée en RAM ("f4e1").
+    
+    # Le Fragment-3 correspond au tout premier élément de la liste 'seeds', dans son ordre d'origine.
+    
+    # Le format final exigé par la cellule d'isolation réseau est :
+    # FRAGMENT1-FRAGMENT2-FRAGMENT3
+    return "Calcul à valider..."</div>
+
+            <div class="input-zone" id="action-zone">
+                <p>RECONSTITUEZ LE HASH DE COMPROMISSION (Format: xxxx-xxxx-xxxx) :</p>
+                <input type="text" id="hashIn" placeholder="xxxx-xxxx-xxxx" onchange="sauvegarderAutomatiquement()">
+                <br>
+                <button onclick="checkHash()">ISOLER LA MENACE INTERNE</button>
+            </div>
+
+            <div id="victory-zone">
+                <h3 style="color: #00ff41;">✓ INTÉGRITÉ RESTAURÉE (S03)</h3>
+                <p>Code de sortie pour l'épisode 23 :</p>
+                <span class="code-final">VENDOR-RISK-09</span>
+                
+                <div class="export-report">
+                    <b>📝 RAPPORT D'AUDIT (export_eleves.csv) :</b><br>
+                    S03E22 ; Succès ; Hash a7d2-f4e1-36b8 validé. Menace Supply Chain isolée.
+                </div>
+                
+                <a href="../../MENU_PRINCIPAL.html" style="color: #00ff41; text-decoration: none; border: 1px solid #00ff41; padding: 10px 20px; display: inline-block;">⬅ QUITTER LE SYSTÈME</a>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn-aide-rouge" onclick="toggleAide()">[ 📜 RAPPORT DE CONFORMITÉ 2026 ]</button>
+    <div id="zoneAide" class="aide-box">
+        <h3>L'Attaque Supply Chain & Analyse Forensique</h3>
+        <p><b>1. Informatique :</b> Le mécanisme repose sur l'injection de dépendances corrompues. L'application légitime fait confiance à des paquets modifiés qui contiennent des instructions dissimulées malveillantes (Backdoor).</p>
+        <p><b>2. Juridique (Suisse) :</b> Selon l'Art. 9 nLPD, le recours à des prestataires externes ne décharge pas l'entité étatique ou l'entreprise de ses devoirs. L'obligation de contrôle, de choix rigoureux et de surveillance technique du sous-traitant est absolue sous peine de sanctions.</p>
+        <p><b>3. Forensics :</b> Le dépistage d'une attaque de chaîne logistique logicielle nécessite le contrôle systématique des empreintes numériques (Hashes) d'intégrité lors de la compilation pour isoler les déviations de code injecté.</p>
+    </div>
+
+    <div style="margin-top: 30px; border-top: 3px solid #d80000; padding: 20px; background: #fff; font-family: Arial, sans-serif; position: relative; z-index: 100; width: 90%; max-width: 450px;">
+        <div id="hint-score-badge" style="background:#111;color:#3fb950;padding:8px 15px;font-weight:bold;text-align:center;">🏆 Score de cet épisode : <span id="hint-score-value">5</span> / 5 pts</div>
+        <div style="display:flex; gap:8px; margin:10px 0;">
+            <button id="hintBtn1" onclick="useHint(1)" style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;">💡 Indice 1 (-1 pt)</button>
+            <button id="hintBtn2" onclick="useHint(2)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🎯 Indice 2 (-2 pts)</button>
+            <button id="hintBtn3" onclick="useHint(3)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🆘 Solution (-3 pts)</button>
+        </div>
+
+        <div id="zoneAideScore" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; color: #333;">
+            <p id="hint-tier-1" style="display:none;"><strong>💡 INFO :</strong> Pré-requis : le QCM porte sur la condition cumulative de l'Art. 9 al. 1 nLPD pour confier un traitement à un sous-traitant, et la commande POSIX pour exporter une variable d'environnement persistante avec une valeur. Ensuite, reconstituez le hash à partir de la liste <code>seeds</code> et du fragment déjà connu (f4e1).</p>
+            <p id="hint-tier-2" style="display:none;"><strong>🎯 PISTE :</strong> Réponse QCM : A. Commande : <code>export PIPELINE_TOKEN=CH-2026-SEC</code> (sans espaces autour du =). Dans <code>seeds = ["36b8", "a7d2", "f4e1", "9e2c"]</code> : Fragment-1 = seul élément commençant par « a » ; Fragment-2 = confirmé en mémoire (f4e1) ; Fragment-3 = premier élément de la liste dans son ordre d'origine.</p>
+            <p id="hint-tier-3" style="display:none;"><strong>🆘 SOLUTION :</strong> Pré-requis : A / export PIPELINE_TOKEN=CH-2026-SEC. Hash final : <code>a7d2-f4e1-36b8</code></p>
+        </div>
+    </div>
+
+    <script>
+        // --- ANIMATION BACKGROUND : RADAR GRID ---
+        const canvas = document.getElementById('radar-canvas');
+        const ctx = canvas.getContext('2d');
+        let scanLine = 0;
+
+        // AJOUT : bascule pur affichage (aucune logique de jeu)
+        function toggleTranscriptionFournisseur() {
+            var t = document.getElementById("transcription-box-22");
+            t.style.display = (t.style.display === "block") ? "none" : "block";
+        }
+
+        // AJOUT : lecture reelle a voix haute via l'API native du navigateur (aucun fichier audio,
+        // aucun reseau — fonctionne aussi en file:// depuis la cle USB).
+        function lireAppelFournisseur() {
+            if (!('speechSynthesis' in window)) {
+                alert("La lecture audio n'est pas disponible sur ce navigateur. Utilise la transcription écrite ci-dessus.");
+                return;
+            }
+            window.speechSynthesis.cancel();
+            var repliques = [
+                { texte: "On observe un comportement anormal sur votre bibliothèque jolie-palette-couleurs déployée chez plusieurs de nos clients fédéraux. Pouvez-vous confirmer la dernière mise à jour publiée ?", pitch: 1.0 },
+                { texte: "On... on a bien poussé une version 2.4.2 il y a trois semaines. Un de nos anciens contributeurs avait encore un accès de publication qu'on avait oublié de révoquer.", pitch: 0.85 },
+                { texte: "Avez-vous des traces de ce qui a été injecté dans cette version ?", pitch: 1.0 },
+                { texte: "Notre équipe forensique a retrouvé un fragment en mémoire sur le serveur de build compromis, identifiant f4e1. On n'a pas encore réussi à remonter jusqu'à la clé complète de la charge utile.", pitch: 0.85 },
+                { texte: "Transmettez-nous ce fragment, on va croiser ça avec notre propre extraction du process malveillant.", pitch: 1.0 }
+            ];
+            var voix = window.speechSynthesis.getVoices().filter(function(v) { return v.lang && v.lang.indexOf('fr') === 0; });
+            var i = 0;
+            function suivante() {
+                if (i >= repliques.length) return;
+                var u = new SpeechSynthesisUtterance(repliques[i].texte);
+                u.lang = 'fr-FR';
+                u.pitch = repliques[i].pitch;
+                u.rate = 1.0;
+                if (voix.length > 0) u.voice = voix[0];
+                u.onend = function() { i++; suivante(); };
+                window.speechSynthesis.speak(u);
+            }
+            suivante();
+        }
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // MODE SOBRE : init + toggle
+        function basculerModeSobre() {
+            const actif = document.body.classList.toggle('mode-sobre');
+            localStorage.setItem('swiss_shield_mode_sobre', actif ? '1' : '0');
+            if (!actif) { drawRadar(); }
+        }
+        if (localStorage.getItem('swiss_shield_mode_sobre') === '1') {
+            document.body.classList.add('mode-sobre');
+        }
+
+        function drawRadar() {
+            if (localStorage.getItem('swiss_shield_mode_sobre') === '1') { return; }
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.strokeStyle = 'rgba(255, 100, 0, 0.08)';
+            ctx.lineWidth = 1;
+            for(let i=0; i<canvas.width; i+=40) {
+                ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,canvas.height); ctx.stroke();
+            }
+            for(let j=0; j<canvas.height; j+=40) {
+                ctx.beginPath(); ctx.moveTo(0,j); ctx.lineTo(canvas.width,j); ctx.stroke();
+            }
+
+            ctx.strokeStyle = 'rgba(255, 100, 0, 0.3)';
+            ctx.lineWidth = 4;
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = '#ff6400';
+            ctx.beginPath();
+            ctx.moveTo(0, scanLine);
+            ctx.lineTo(canvas.width, scanLine);
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+
+            scanLine += 3;
+            if(scanLine > canvas.height) scanLine = 0;
+
+            requestAnimationFrame(drawRadar);
+        }
+        drawRadar();
+
+        // 1. VERROU DE SESSION
+        function unlock() {
+            const code = document.getElementById('passkey').value.trim().toUpperCase();
+            if (code === 'GHOST-KILL-99') {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('pre-requis-screen').style.display = 'block';
+                currentZone = 'pre-requis-screen';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('entree', code, 'GHOST-KILL-99');
+                alert("SIGNATURE INVALIDE : Accès refusé.");
+            }
+        }
+
+        // 7. DOUBLE VERROU DE PRÉ-REQUIS VALIDATION
+        function verifyPreReq() {
+            const selectedLpd = document.querySelector('input[name="lpd_qcm"]:checked');
+            const techCmd = document.getElementById('tech_cmd').value.trim();
+
+            if (!selectedLpd) {
+                enregistrerErreur('prerequis', 'lpd=(aucune sélection), commande="' + techCmd + '"', 'lpd=ok_lpd, commande="export PIPELINE_TOKEN=CH-2026-SEC"');
+                alert("ERREUR CRITIQUE : Autorisation administrative nLPD manquante.");
+                return;
+            }
+
+            const jurValid = (selectedLpd.value === "ok_lpd");
+            
+            // Nettoyage de la commande pour accepter les syntaxes d'export standard Unix
+            const cleanedCmd = techCmd.replace(/\s+/g, '').replace(/["']/g, '');
+            const techValid = (cleanedCmd === "exportPIPELINE_TOKEN=CH-2026-SEC");
+
+            if (jurValid && techValid) {
+                document.getElementById('pre-requis-screen').style.display = 'none';
+                document.getElementById('mission-content').style.display = 'block';
+                currentZone = 'mission-content';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('prerequis', 'lpd=' + selectedLpd.value + ', commande="' + techCmd + '"', 'lpd=ok_lpd, commande="export PIPELINE_TOKEN=CH-2026-SEC"');
+                alert("ÉCHEC DES PRÉ-REQUIS : Choix contractuel nLPD invalide ou commande d'exportation de variable erronée.");
+            }
+        }
+
+        // 8. VÉRIFICATION DE L'INVESTIGATION
+        function checkHash() {
+            const val = document.getElementById('hashIn').value.trim().toLowerCase();
+            if (val === 'a7d2-f4e1-36b8') {
+                document.getElementById('action-zone').style.display = 'none';
+                document.getElementById('victory-zone').style.display = 'block';
+            } else {
+                enregistrerErreur('investigation', val, 'a7d2-f4e1-36b8');
+                alert("ÉCHEC : Le hash reconstitué ne correspond pas aux contraintes d'arbre du log d'intégration continue.");
+            }
+        }
+
+        function toggleAide() {
+            var x = document.getElementById("zoneAide");
+            x.style.display = (x.style.display === "block") ? "none" : "block";
+        }
+    </script>
+
+    <script>
+        const EP_ID = "S03E22";
+        const HINT_COST = {1:1, 2:2, 3:3};
+        let hintsUsed = {1:false, 2:false, 3:false};
+        let episodeScore = 5;
+        function useHint(level) {
+            if (hintsUsed[level] || (level > 1 && !hintsUsed[level - 1])) return;
+            hintsUsed[level] = true;
+            enregistrerIndiceUsage(level);
+            episodeScore -= HINT_COST[level];
+            document.getElementById('hint-score-value').textContent = episodeScore;
+            document.getElementById('hint-tier-' + level).style.display = 'block';
+            const btn = document.getElementById('hintBtn' + level);
+            btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5';
+            if (level < 3) {
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+            sauvegarderAutomatiquement();
+        }
+        function recordEpisodeSuccess() {
+            let scores = {};
+            try { scores = JSON.parse(localStorage.getItem('swiss_shield_scores') || '{}'); } catch(e) {}
+            if (!(EP_ID in scores) || scores[EP_ID] < episodeScore) scores[EP_ID] = episodeScore;
+            localStorage.setItem('swiss_shield_scores', JSON.stringify(scores));
+            localStorage.removeItem('autosave_' + EP_ID);
+        }
+        let currentZone = 'lock-screen';
+        function sauvegarderAutomatiquement() {
+            try {
+                const inputs = {};
+                ['passkey', 'tech_cmd', 'hashIn'].forEach(function(id) {
+                    const el = document.getElementById(id);
+                    if (el) inputs[id] = el.value;
+                });
+                const lpdChecked = document.querySelector('input[name="lpd_qcm"]:checked');
+                inputs['lpd_qcm'] = lpdChecked ? lpdChecked.value : '';
+                localStorage.setItem('autosave_' + EP_ID, JSON.stringify({
+                    zone: currentZone,
+                    inputs: inputs,
+                    hintsUsed: hintsUsed,
+                    episodeScore: episodeScore
+                }));
+            } catch(e) {}
+        }
+        function proposerRestaurationAutosave() {
+            let data;
+            try { data = JSON.parse(localStorage.getItem('autosave_' + EP_ID) || 'null'); } catch(e) { return; }
+            if (!data || !data.zone || data.zone === 'lock-screen') return;
+            document.getElementById('lock-screen').style.display = 'none';
+            if (data.zone === 'mission-content') {
+                document.getElementById('pre-requis-screen').style.display = 'none';
+                document.getElementById('mission-content').style.display = 'block';
+            } else if (data.zone === 'pre-requis-screen') {
+                document.getElementById('pre-requis-screen').style.display = 'block';
+            }
+            currentZone = data.zone;
+            if (data.inputs) {
+                Object.keys(data.inputs).forEach(function(id) {
+                    if (id === 'lpd_qcm') {
+                        if (data.inputs.lpd_qcm) {
+                            const radio = document.querySelector('input[name="lpd_qcm"][value="' + data.inputs.lpd_qcm + '"]');
+                            if (radio) radio.checked = true;
+                        }
+                        return;
+                    }
+                    const el = document.getElementById(id);
+                    if (el) el.value = data.inputs[id];
+                });
+            }
+            hintsUsed = data.hintsUsed || hintsUsed;
+            episodeScore = (typeof data.episodeScore === 'number') ? data.episodeScore : episodeScore;
+            document.getElementById('hint-score-value').textContent = episodeScore;
+            [1, 2, 3].forEach(function(level) {
+                if (hintsUsed[level]) {
+                    document.getElementById('hint-tier-' + level).style.display = 'block';
+                    const btn = document.getElementById('hintBtn' + level);
+                    if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+                    const next = document.getElementById('hintBtn' + (level + 1));
+                    if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+                }
+            });
+        }
+        function enregistrerErreur(phase, reponseEleve, reponseAttendue) {
+            let debrief = {erreurs:{}, indices:{}};
+            try { debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}'); } catch(e) {}
+            const key = EP_ID + ':' + phase;
+            if (typeof debrief.erreurs[key] !== 'object' || debrief.erreurs[key] === null) {
+                debrief.erreurs[key] = { compte: (debrief.erreurs[key] || 0), exemples: [] };
+            }
+            debrief.erreurs[key].compte++;
+            if (reponseEleve !== undefined && debrief.erreurs[key].exemples.length < 5) {
+                debrief.erreurs[key].exemples.push({ reponseEleve: String(reponseEleve).slice(0,100), reponseAttendue: String(reponseAttendue||'').slice(0,100) });
+            }
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        }
+        function enregistrerIndiceUsage(niveau) {
+            let debrief = {erreurs:{}, indices:{}};
+            try { debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}'); } catch(e) {}
+            const key = EP_ID + ':' + niveau;
+            debrief.indices[key] = (debrief.indices[key] || 0) + 1;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        }
+        (function pollSuccess(){
+            const ids = ['success','success-msg','success-final','final-zone','step_final','victory-zone','victory-screen','final-step','final-badge'];
+            let recorded = false;
+            setInterval(function(){
+                if (recorded) return;
+                for (const id of ids) {
+                    const el = document.getElementById(id);
+                    if (el && window.getComputedStyle(el).display === 'block') { recordEpisodeSuccess(); recorded = true; return; }
+                }
+            }, 500);
+        })();
+        proposerRestaurationAutosave();
+    </script>
+</body>
+</html>

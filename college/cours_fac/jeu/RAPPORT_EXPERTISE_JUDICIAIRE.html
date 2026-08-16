@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>CERTIFICATION FINALE - RAPPORT D'EXPERTISE</title>
+    <style>
+        :root { --gold: #d4af37; --blue: #2980b9; --dark: #1a202c; --danger: #e53e3e; }
+        body { background-color: #f0f2f5; color: var(--dark); font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; padding: 40px; }
+        .report-card { background: white; width: 95%; max-width: 1000px; border-radius: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
+        .header { background: var(--dark); color: white; padding: 30px; text-align: center; border-bottom: 5px solid var(--gold); }
+        .content { padding: 40px; }
+        
+        .section { margin-bottom: 30px; padding: 25px; border: 1px solid #edf2f7; border-radius: 8px; background: #f8fafc; }
+        .section h3 { margin-top: 0; color: var(--blue); border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; display: flex; justify-content: space-between; }
+        
+        .evidence-box { margin: 15px 0; }
+        label { display: block; font-weight: bold; margin-bottom: 8px; font-size: 0.9em; color: #4a5568; }
+        textarea { width: 100%; padding: 12px; border: 1px solid #cbd5e0; border-radius: 5px; font-family: inherit; resize: vertical; min-height: 80px; box-sizing: border-box; }
+        
+        .input-row { display: flex; gap: 20px; align-items: center; margin-top: 10px; background: #ebf8ff; padding: 10px; border-radius: 5px; }
+        input { padding: 10px; border: 2px solid #cbd5e0; border-radius: 5px; text-align: center; font-family: monospace; text-transform: uppercase; width: 200px; }
+        
+        input.valid { border-color: #48bb78; background-color: #f0fff4; }
+        .required-note { font-size: 0.7em; color: var(--danger); font-weight: normal; }
+
+        .seal-zone { text-align: center; display: none; padding: 40px; border-top: 5px double var(--gold); background: #fffaf0; animation: fadeIn 1s; margin-top: 20px; }
+        .seal { width: 180px; height: 180px; border: 6px double var(--gold); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: var(--gold); font-weight: bold; transform: rotate(-10deg); font-size: 1em; text-align: center; line-height: 1.2; }
+        
+        button { background: var(--blue); color: white; border: none; padding: 20px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; font-size: 1.2em; transition: 0.3s; }
+        button:hover { background: var(--dark); transform: scale(1.01); }
+
+        /* Style pour le bouton Menu Principal */
+        .nav-footer { margin-top: 20px; display: flex; justify-content: center; }
+        .btn-menu { 
+            background: #e2e8f0; 
+            color: var(--dark); 
+            text-decoration: none; 
+            padding: 12px 30px; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            transition: 0.3s;
+            border: 1px solid #cbd5e0;
+            text-align: center;
+        }
+        .btn-menu:hover { background: #cbd5e0; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        @media print {
+            .nav-footer, button { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="report-card">
+    <div class="header">
+        <h1>OFFICE DE L'EXPERT JUDICIAIRE</h1>
+        <p>CONSOLIDATION DES PREUVES nLPD - DOSSIER #2026-CH</p>
+    </div>
+
+    <div class="content">
+        <div class="section">
+            <h3>⚖️ VOLLET 1 : RISQUES PÉNAUX & HUMAINS</h3>
+            <div class="evidence-box">
+                <label>Constat d'expertise (Risque de phishing et ingénierie sociale) :</label>
+                <textarea id="text2" placeholder="Décrivez les failles humaines identifiées..."></textarea>
+            </div>
+            <div class="input-row">
+                <label>Code de validation E19 :</label>
+                <input type="text" id="code2" placeholder="VAL-E19">
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>📦 VOLLET 2 : GOUVERNANCE ET TIERS</h3>
+            <div class="evidence-box">
+                <label>Analyse de la Supply Chain (Risques fournisseurs identifiés) :</label>
+                <textarea id="text4" placeholder="Quels sont les dangers liés aux sous-traitants ?"></textarea>
+            </div>
+            <div class="input-row">
+                <label>Code de validation E22 :</label>
+                <input type="text" id="code4" placeholder="VAL-E22">
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>🔍 VOLLET 3 : INVENTAIRE ET TRANSPARENCE</h3>
+            <div class="evidence-box">
+                <label>Registre des activités (Art. 12 nLPD) - État des lieux :</label>
+                <textarea id="text3" placeholder="Pourquoi ce registre était-il indispensable pour l'audit ?"></textarea>
+            </div>
+            <div class="input-row">
+                <label>Code de validation E27 :</label>
+                <input type="text" id="code3" placeholder="VAL-E27">
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>🖋️ VOLLET 4 : AUTHENTIFICATION FINALE</h3>
+            <div class="evidence-box">
+                <label>Résumé de la posture de sécurité finale de l'entreprise :</label>
+                <textarea id="text6" placeholder="Conclusion globale sur la conformité atteinte..."></textarea>
+            </div>
+            <div class="input-row">
+                <label>Code de signature E35 :</label>
+                <input type="text" id="code6" placeholder="VAL-E35">
+            </div>
+        </div>
+
+        <button onclick="validateReport()">SCELLER ET GÉNÉRER LE CERTIFICAT</button>
+
+        <div class="nav-footer">
+            <a href="MENU_PRINCIPAL.html" class="btn-menu">🏠 RETOUR AU MENU PRINCIPAL</a>
+        </div>
+
+        <div id="sealZone" class="seal-zone">
+            <div class="seal">UNITÉ SPÉCIALE<br>CYBER-JUSTICE<br>SUISSE 2026</div>
+            <h2 style="color: var(--gold); margin-top: 25px; letter-spacing: 3px;">RÉSULTAT : CONFORME</h2>
+            <div style="font-family: monospace; font-size: 1.2em; border: 2px solid var(--gold); padding: 15px; display: inline-block;">CERTIFICAT D'EXPERT VALIDÉ</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function validateReport() {
+        // Logique de validation simplifiée pour l'exemple
+        const codes = ['code2', 'code4', 'code3', 'code6'];
+        let allValid = true;
+        
+        codes.forEach(id => {
+            const input = document.getElementById(id);
+            if(input.value.length < 5) allValid = false;
+        });
+
+        if(allValid) {
+            document.getElementById('sealZone').style.display = 'block';
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        } else {
+            alert("Erreur : Tous les volets doivent être validés avec leurs codes respectifs avant le scellement.");
+        }
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>S04E27 - LE REGISTRE DES TRAITEMENTS</title>
+    <style>
+        /* --- NOUVEL EFFET VISUEL S04 : HEX GRID DYNAMIC --- */
+        #hex-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at center, #2e3440 0%, #1a1c23 100%);
+        }
+
+        body { color: #9eb1d1; font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; padding: 40px; margin: 0; min-height: 100vh; overflow-x: hidden; }
+        
+        .terminal { 
+            background: rgba(36, 41, 51, 0.95); 
+            border: 2px solid #5e81ac; 
+            padding: 25px; width: 95%; 
+            max-width: 850px; 
+            box-shadow: 0 0 50px rgba(94, 129, 172, 0.4); 
+            border-radius: 4px; 
+            position: relative;
+            backdrop-filter: blur(8px);
+        }
+
+        /* STYLE CONTEXTE HISTOIRE S04 */
+        .story-context {
+            background: rgba(136, 192, 208, 0.1);
+            border-left: 4px solid #88c0d0;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: left;
+            font-size: 0.95em;
+            color: #eceff4;
+            line-height: 1.5;
+        }
+        .story-context b { color: #88c0d0; text-shadow: 0 0 5px rgba(136, 192, 208, 0.5); }
+
+        .header-mission { border-bottom: 2px solid #5e81ac; margin-bottom: 20px; padding-bottom: 10px; color: #eceff4; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        
+        #lock-screen { text-align: center; padding: 20px; }
+        #double-lock-screen { display: none; padding: 20px; }
+        #mission-content { display: none; }
+        
+        .registry-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.85em; background: #2e3440; }
+        .registry-table th, .registry-table td { border: 1px solid #4c566a; padding: 12px; text-align: left; }
+        .registry-table th { background: #3b4252; color: #88c0d0; }
+        
+        .drop-zone { background: #3b4252; border: 2px dashed #5e81ac; padding: 10px; text-align: center; cursor: pointer; min-width: 150px; color: #5e81ac; transition: 0.3s; }
+        .drop-zone.filled { border-style: solid; color: #a3be8c; border-color: #a3be8c; background: rgba(163, 190, 140, 0.1); }
+        
+        .legal-bases-pool { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
+        .base-card { background: #4c566a; color: #eceff4; padding: 8px 15px; border-radius: 4px; cursor: grab; font-size: 0.9em; border: 1px solid transparent; transition: 0.3s; }
+        .base-card:hover { border-color: #88c0d0; background: #5e81ac; }
+
+        input { background: #2e3440; border: 1px solid #5e81ac; color: #eceff4; padding: 12px; width: 320px; font-family: inherit; font-size: 1.1em; text-align: center; outline: none; border-radius: 4px; }
+        button.main-btn { background: #5e81ac; color: #eceff4; border: none; padding: 12px 25px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 15px; border-radius: 4px; width: 320px; text-transform: uppercase; }
+        button.main-btn:hover { background: #81a1c1; box-shadow: 0 0 15px #5e81ac; }
+
+        #success-msg { display: none; margin-top: 20px; text-align: center; animation: fadeIn 0.5s; }
+        .code-final { color: #a3be8c; font-size: 2.2em; letter-spacing: 5px; margin: 15px 0; display: block; text-shadow: 0 0 10px rgba(163, 190, 140, 0.3); border: 2px solid #a3be8c; padding: 10px; background: rgba(0,0,0,0.3); }
+
+        .export-report { background: rgba(163, 190, 140, 0.1); padding: 15px; text-align: left; font-size: 0.85em; border: 1px solid #a3be8c; margin: 20px 0; font-family: monospace; color: #eceff4; }
+
+        .btn-aide-rouge { background: #d80000; color: #fff; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; width: 100%; max-width: 450px; margin-top: 40px; border-radius: 2px; text-transform: uppercase; }
+        .aide-box { display: none; background: #fff; color: #000; padding: 25px; margin-top: 10px; width: 90%; max-width: 450px; text-align: left; border-top: 5px solid #d80000; font-family: sans-serif; box-shadow: 0 10px 30px rgba(0,0,0,0.5); line-height: 1.4; font-size: 0.9em; position: relative; z-index: 100; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* 4. BOUTON RETOUR NAV OBLIGATOIRE */
+        .btn-retour-principal { position: absolute; top: 15px; left: 15px; background: #3b4252; border: 1px solid #5e81ac; color: #eceff4; padding: 5px 12px; text-decoration: none; font-size: 0.8em; font-weight: bold; border-radius: 4px; transition: 0.3s; }
+        .btn-retour-principal:hover { background: #5e81ac; }
+
+        /* 10. STYLISATION DES ANNEXES ET STRUCTURATION DES DUEL BLOCKS */
+        .challenge-zone { background: rgba(46, 52, 64, 0.8); border: 1px dashed #5e81ac; padding: 20px; margin: 20px 0; border-radius: 4px; }
+        .code-window { background: #1a1c23; border-left: 4px solid #88c0d0; font-family: 'Courier New', monospace; padding: 15px; color: #a3be8c; overflow-x: auto; font-size: 0.85em; margin: 15px 0; white-space: pre; text-align: left; }
+
+        /* MODE SOBRE */
+        body.mode-sobre, body.mode-sobre * { animation: none !important; transition: none !important; }
+        body.mode-sobre #hex-canvas { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <a href="../../MENU_PRINCIPAL.html" class="btn-retour-principal">&lt; MENU PRINCIPAL</a>
+    <button id="toggle-sobre-btn" onclick="basculerModeSobre()" style="position:absolute;top:15px;right:15px;width:auto;z-index:10;background:#3b4252;border:1px solid #5e81ac;color:#eceff4;padding:5px 12px;font-size:0.8em;font-weight:bold;border-radius:4px;cursor:pointer;">🌓</button>
+
+    <canvas id="hex-canvas"></canvas>
+
+    <div class="terminal" style="margin-top: 20px;">
+        
+        <div id="lock-screen">
+            <h2 style="color: #88c0d0;">📋 ARCHIVES DE CONFORMITÉ (S04)</h2>
+            
+            <div class="story-context">
+                <b>[ PROTOCOLE D'INVENTAIRE ART. 12 ]</b><br>
+                La transparence algorithmique est rétablie au sein de la plateforme cloud d'une grande banque d'importance systémique basée à Zurich, mais la structure de notre gouvernance de conformité est altérée. <br><br>
+                Pour finaliser l'audit mené par le Préposé fédéral à la protection des données et à la transparence (PFPDT), vous devez impérativement reconstruire le <b>Registre des Activités de Traitement</b>. Sans ce document légal obligatoire, l'infrastructure bancaire se trouve en violation directe de la nLPD. Reliez chaque traitement à sa base de légitimation correcte pour valider l'intégrité réglementaire.
+            </div>
+
+            <p>Veuillez entrer le code de supervision (Fin E26) :</p>
+            <input type="text" id="passkey" placeholder="CODE E26" onchange="sauvegarderAutomatiquement()">
+            <br>
+            <button class="main-btn" onclick="unlock()">RECONSTITUER LE REGISTRE</button>
+        </div>
+
+        <div id="double-lock-screen">
+            <div class="header-mission">[VÉRIFICATION] DOUBLE VERROU DE COMPÉTENCE JURIDIQUE ET FORENSICS</div>
+            
+            <div class="challenge-zone">
+                <span style="color: #88c0d0; font-weight: bold;">⚖️ ÉPREUVE JURIDIQUE (LPD Suisse)</span>
+                <p style="font-size: 0.9em; margin: 10px 0;">Quel article de la Loi fédérale sur la protection des données (nLPD) régit l'obligation stricte pour les responsables de traitement et les sous-traitants de tenir un registre de leurs activités ? (Répondre sous la forme : <i>Art. X</i>)</p>
+                <input type="text" id="juridique-input" placeholder="Exemple : Art. 5" style="width: 100%; max-width: 400px;" onchange="sauvegarderAutomatiquement()">
+            </div>
+
+            <div class="challenge-zone">
+                <span style="color: #88c0d0; font-weight: bold;">🖥️ ÉPREUVE LIGNE DE COMMANDE (Forensics & Intégrité)</span>
+                <p style="font-size: 0.9em; margin: 10px 0;">Dans le cadre d'un audit de conformité, vous devez extraire l'empreinte de hachage SHA-1 d'un fichier de configuration système localisé sous <code>/etc/audit.conf</code> pour vérifier qu'il n'a pas subi de modification. Saisissez la commande Linux exacte :</p>
+                <input type="text" id="forensics-input" placeholder="Commande shell complète" style="width: 100%; max-width: 400px; text-align: left; padding-left: 10px;" onchange="sauvegarderAutomatiquement()">
+            </div>
+
+            <center>
+                <button class="main-btn" onclick="verifyDoubleLock()">DÉVERROUILLER L'ACCÈS À LA MATRICE</button>
+            </center>
+        </div>
+
+        <div id="mission-content">
+            <div class="header-mission">
+                [DATA-INVENTORY] S04E27 : RECONCILIATION ART. 12
+            </div>
+            
+            <p style="color: #eceff4;">> <b>Anomalie :</b> Les bases légales du registre ont été effacées. <br>> <i>Consigne : Cliquez sur une base légale en bas, puis sur la zone vide correspondante dans le tableau.</i></p>
+            
+            <table class="registry-table">
+                <thead>
+                    <tr>
+                        <th>Traitement</th>
+                        <th>Données</th>
+                        <th>Base Légale</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Prospection Marketing</td>
+                        <td>Email, Historique</td>
+                        <td id="target-1" class="drop-zone" onclick="assignBase(1)">[ VIDE ]</td>
+                    </tr>
+                    <tr>
+                        <td>Scoring de Crédit (IA)</td>
+                        <td>Finance, Profilage</td>
+                        <td id="target-2" class="drop-zone" onclick="assignBase(2)">[ VIDE ]</td>
+                    </tr>
+                    <tr>
+                        <td>Vidéosurveillance (Locaux)</td>
+                        <td>Images, Flux Vidéo</td>
+                        <td id="target-3" class="drop-zone" onclick="assignBase(3)">[ VIDE ]</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="legal-bases-pool" id="pool">
+                <div class="base-card" onclick="selectBase('CONSENTEMENT', this)">CONSENTEMENT</div>
+                <div class="base-card" onclick="selectBase('INTÉRÊT LÉGITIME', this)">INTÉRÊT LÉGITIME</div>
+                <div class="base-card" onclick="selectBase('OBLIGATION LÉGALE', this)">OBLIGATION LÉGALE</div>
+            </div>
+
+            <div class="challenge-zone" style="margin-top: 30px; border-color: #bf616a;">
+                <span style="color: #bf616a; font-weight: bold;">🔬 CODE RECONCILIATION AUDIT (Validation Structurée)</span>
+                <p style="font-size: 0.9em; color: #eceff4;">Un script automatisé de vérification d'indexation compare le nombre total de champs valides requis par la nLPD pour chaque entrée du registre afin d'évaluer la validité globale de la structure.</p>
+                
+                <div class="code-window"># Analyseur de conformité structurelle de l'inventaire
+# Objectif : Déduire le hash d'intégrité système
+
+def calculer_checksum_registre():
+    # Liste ordonnée d'éléments obligatoires manquants ou présents selon l'Art. 12 nLPD
+    # Chaque tuple représente : (Longueur_Champs, Poids_Reglementaire, Est_Actif)
+    metadonnees_registre = [
+        (4, 12, True),   # Identité du responsable
+        (3, 8, True),    # Finalités explicites
+        (6, 15, False),  # Catégories de données sensibles
+        (5, 10, True)    # Délais de conservation / Effacement
+    ]
+    
+    # Règle d'évaluation complexe :
+    # Somme cumulée de (Longueur_Champs * Poids_Reglementaire) uniquement si Est_Actif est True.
+    checksum = sum(item[0] * item[1] for item in metadonnees_registre if item[2])
+    return checksum
+
+# Résultat attendu en entrée de console d'intégrité pour valider la souche.</div>
+
+                <p style="color: #88c0d0; font-size: 0.85em;">💡 <i>Indice Technique Intégré : Calculez mentalement ou via console la valeur arithmétique finale retournée par la fonction `calculer_checksum_registre()`. Introduisez cette valeur numérique exacte ci-dessous pour lier fonctionnellement l'audit et valider les affectations du tableau.</i></p>
+                
+                <input type="number" id="checksum-input" placeholder="Saisir la valeur du Checksum numérique" style="width: 100%; max-width: 400px; margin-top: 10px;" onchange="sauvegarderAutomatiquement()">
+            </div>
+
+            <div id="success-msg">
+                <p style="color: #a3be8c; font-weight: bold;">✓ REGISTRE INTÈGRE ET CONFORME.</p>
+                
+                <span class="code-final">REGISTRY-COMPLIANT-2026</span>
+                
+                <div class="export-report">
+                    <b>📝 RAPPORT D'INVENTAIRE (export_eleves.csv) :</b><br>
+                    S04E27 ; Succès ; Registre Art. 12 reconstitué (Marketing/Consentement, Scoring/Intérêt, Vidéo/Intérêt).
+                </div>
+
+                <a href="../../MENU_PRINCIPAL.html" style="color: #81a1c1; text-decoration: none; font-size: 0.9em; border: 1px solid #81a1c1; padding: 8px 15px; display: inline-block; margin-top: 10px; font-weight: bold;">FERMER L'INVENTAIRE ET EXPORTER</a>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn-aide-rouge" onclick="toggleAide()">[ 📜 RAPPORT TECHNIQUE ART. 12 & PILIERS ]</button>
+    <div id="zoneAide" class="aide-box">
+        <h3 style="color: #d80000; margin-top: 0;">Aide à la Réconciliation — Les 3 Piliers</h3>
+        
+        <p><b>1. Pilier Informatique :</b> L'intégrité structurelle des données d'inventaire est assurée par l'application de masques de validation ou de checksums calculés sur des propriétés booléennes filtrées de listes ou de dictionnaires complexes.</p>
+        
+        <p><b>2. Pilier Juridique :</b> La tenue d'un registre des activités de traitement est une obligation légale explicite en droit suisse de la protection des données (sauf dérogation pour les PME à faible risque) — retrouvez le numéro de l'article de la nLPD qui l'impose. Le traitement doit par ailleurs s'appuyer sur des motifs justificatifs clairs : consentement exprès, intérêt légitime prépondérant, ou obligation légale stricte.</p>
+        
+        <p><b>3. Pilier Forensics :</b> La comparaison d'empreintes cryptographiques uniques (telles que produites par l'algorithme SHA-1 ou SHA-256) permet de certifier instantanément qu'un composant système de journalisation ou un fichier de configuration réglementaire n'a subi aucune altération malveillante.</p>
+    </div>
+
+    <div style="margin-top: 30px; border-top: 3px solid #d80000; padding: 20px; background: #fff; font-family: Arial, sans-serif; position: relative; z-index: 100; width: 90%; max-width: 450px;">
+        <div id="hint-score-badge" style="background:#111;color:#3fb950;padding:8px 15px;font-weight:bold;text-align:center;">🏆 Score de cet épisode : <span id="hint-score-value">5</span> / 5 pts</div>
+        <div style="display:flex; gap:8px; margin:10px 0;">
+            <button id="hintBtn1" onclick="useHint(1)" style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;">💡 Indice 1 (-1 pt)</button>
+            <button id="hintBtn2" onclick="useHint(2)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🎯 Indice 2 (-2 pts)</button>
+            <button id="hintBtn3" onclick="useHint(3)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🆘 Solution (-3 pts)</button>
+        </div>
+
+        <div id="zoneAideScore" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; color: #333;">
+            <p id="hint-tier-1" style="display:none;"><strong>💡 INFO :</strong> Pré-requis : l'article de la nLPD qui impose la tenue d'un registre des activités de traitement, et la commande complète pour calculer le hash SHA-1 du fichier <code>/etc/audit.conf</code>. Ensuite, il faut à la fois relier chaque traitement à sa base légale ET saisir le bon checksum avant que le tableau n'accepte les affectations.</p>
+            <p id="hint-tier-2" style="display:none;"><strong>🎯 PISTE :</strong> Article : Art. 12. Commande : <code>sha1sum /etc/audit.conf</code>. Bases légales : Marketing → Consentement, Scoring de Crédit → Intérêt légitime, Vidéosurveillance → Intérêt légitime. Checksum : (4×12) + (3×8) + (5×10), en excluant la ligne où <code>Est_Actif</code> est False.</p>
+            <p id="hint-tier-3" style="display:none;"><strong>🆘 SOLUTION :</strong> Pré-requis : Art. 12 / sha1sum /etc/audit.conf. Checksum : <code>122</code>. Bases légales : Consentement / Intérêt légitime / Intérêt légitime</p>
+        </div>
+    </div>
+
+    <script>
+        // --- ANIMATION BACKGROUND : HEX GRID ---
+        const canvas = document.getElementById('hex-canvas');
+        const ctx = canvas.getContext('2d');
+        let time = 0;
+
+        function drawHex(x, y, size) {
+            ctx.beginPath();
+            for (let i = 0; i < 6; i++) {
+                ctx.lineTo(x + size * Math.cos(i * Math.PI / 3), y + size * Math.sin(i * Math.PI / 3));
+            }
+            ctx.closePath();
+            ctx.stroke();
+        }
+
+        function animate() {
+            if (localStorage.getItem('swiss_shield_mode_sobre') === '1') { return; }
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const size = 40;
+            const xStep = size * 1.5;
+            const yStep = size * Math.sqrt(3);
+            
+            time += 0.01;
+
+            for (let x = 0; x < canvas.width + size; x += xStep) {
+                for (let y = 0; y < canvas.height + size; y += yStep) {
+                    const xPos = x;
+                    const yPos = (x / xStep % 2 === 0) ? y : y + yStep / 2;
+                    
+                    const dist = Math.hypot(xPos - canvas.width/2, yPos - canvas.height/2);
+                    const pulse = Math.sin(dist * 0.01 - time) * 0.5 + 0.5;
+                    
+                    ctx.strokeStyle = `rgba(136, 192, 208, ${pulse * 0.2})`;
+                    ctx.lineWidth = 1;
+                    drawHex(xPos, yPos, size - 2);
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        let selectedBase = null;
+        let selectedElement = null;
+        let points = 0;
+        let currentZone = 1;
+
+        function toggleAide() {
+            var x = document.getElementById("zoneAide");
+            x.style.display = (x.style.display === "block") ? "none" : "block";
+        }
+
+        // 1. VERROU DE SESSION D'ENTREE
+        function unlock() {
+            const code = document.getElementById('passkey').value.trim().toUpperCase();
+            if (code === 'HUMAN-IN-THE-LOOP') {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('double-lock-screen').style.display = 'block';
+                currentZone = 2;
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('entree', code, 'HUMAN-IN-THE-LOOP');
+                alert("ACCÈS REFUSÉ : Clé de session précédente invalide.");
+            }
+        }
+
+        // 7. DOUBLE VERROU DE PRE-REQUIS
+        function verifyDoubleLock() {
+            const juridiqueAns = document.getElementById('juridique-input').value.trim().toLowerCase();
+            const forensicsAns = document.getElementById('forensics-input').value.trim().toLowerCase();
+
+            // Attendu juridique : Contient explicitement 12 (Art. 12 nLPD)
+            const isJuridiqueCorrect = juridiqueAns.includes('12') && (juridiqueAns.includes('art') || juridiqueAns.includes('article'));
+            // Attendu forensics : sha1sum /etc/audit.conf
+            const isForensicsCorrect = forensicsAns.includes('sha1sum') && forensicsAns.includes('/etc/audit.conf');
+
+            if (isJuridiqueCorrect && isForensicsCorrect) {
+                document.getElementById('double-lock-screen').style.display = 'none';
+                document.getElementById('mission-content').style.display = 'block';
+                currentZone = 3;
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('prerequis', 'juridique:"' + juridiqueAns + '" / forensics:"' + forensicsAns + '"', 'Art. 12 / sha1sum /etc/audit.conf');
+                alert("ÉCHEC DES PRÉ-REQUIS : Les signatures analytiques ou l'article de loi saisi ne correspondent pas aux registres fédéraux.");
+            }
+        }
+
+        function selectBase(base, el) {
+            selectedBase = base;
+            if (selectedElement) selectedElement.style.background = "#4c566a";
+            selectedElement = el;
+            el.style.background = "#88c0d0";
+            el.style.color = "#2e3440";
+        }
+
+        // 6. & 8. LOGIQUE INTERACTIVE ET COMPLEXE SANS REVELATION DIRECTE
+        function assignBase(id) {
+            if (!selectedBase) {
+                enregistrerErreur('investigation');
+                alert("Sélectionnez d'abord une base légale en bas.");
+                return;
+            }
+            
+            const checksumVal = parseInt(document.getElementById('checksum-input').value.trim());
+            
+            // 8. Validation stricte du checksum de code avant acceptation
+            // (4 * 12) + (3 * 8) + (5 * 10) = 48 + 24 + 50 = 122
+            if (isNaN(checksumVal) || checksumVal !== 122) {
+                enregistrerErreur('investigation', document.getElementById('checksum-input').value.trim(), '122');
+                alert("ERREUR LOGIQUE : Le checksum de structure calculé à partir du module Python est incorrect. Le tableau refuse l'injection.");
+                return;
+            }
+            
+            const target = document.getElementById('target-' + id);
+            
+            let isCorrect = false;
+            const attendu = {1:'CONSENTEMENT', 2:'INTÉRÊT LÉGITIME', 3:'INTÉRÊT LÉGITIME'}[id];
+            if (id === 1 && selectedBase === 'CONSENTEMENT') isCorrect = true;
+            if (id === 2 && selectedBase === 'INTÉRÊT LÉGITIME') isCorrect = true;
+            if (id === 3 && selectedBase === 'INTÉRÊT LÉGITIME') isCorrect = true; 
+
+            if (isCorrect && !target.classList.contains('filled')) {
+                target.innerText = selectedBase;
+                target.classList.add('filled');
+                points++;
+                sauvegarderAutomatiquement();
+                if (points === 3) {
+                    document.getElementById('success-msg').style.display = 'block';
+                    document.getElementById('pool').style.display = 'none';
+                }
+            } else if (!isCorrect) {
+                enregistrerErreur('investigation', selectedBase, attendu);
+                alert("Cette base légale ne correspond pas aux critères de légitimation pour ce type de traitement de données.");
+            }
+        }
+    </script>
+
+    <script>
+        const EP_ID = "S04E27";
+        const HINT_COST = {1:1, 2:2, 3:3};
+        let hintsUsed = {1:false, 2:false, 3:false};
+        let episodeScore = 5;
+        function useHint(level) {
+            if (hintsUsed[level] || (level > 1 && !hintsUsed[level - 1])) return;
+            hintsUsed[level] = true;
+            enregistrerIndiceUsage(level);
+            episodeScore -= HINT_COST[level];
+            document.getElementById('hint-score-value').textContent = episodeScore;
+            document.getElementById('hint-tier-' + level).style.display = 'block';
+            const btn = document.getElementById('hintBtn' + level);
+            btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5';
+            if (level < 3) {
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+            sauvegarderAutomatiquement();
+        }
+        function recordEpisodeSuccess() {
+            let scores = {};
+            try { scores = JSON.parse(localStorage.getItem('swiss_shield_scores') || '{}'); } catch(e) {}
+            if (!(EP_ID in scores) || scores[EP_ID] < episodeScore) scores[EP_ID] = episodeScore;
+            localStorage.setItem('swiss_shield_scores', JSON.stringify(scores));
+            localStorage.removeItem('autosave_' + EP_ID);
+        }
+        function enregistrerErreur(phase, reponseEleve, reponseAttendue) {
+            let debrief = {erreurs:{}, indices:{}};
+            try { debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}'); } catch(e) {}
+            const key = EP_ID + ':' + phase;
+            let entry = debrief.erreurs[key];
+            if (typeof entry === 'number') entry = {compte: entry, exemples: []};
+            if (!entry) entry = {compte: 0, exemples: []};
+            entry.compte++;
+            if (reponseEleve !== undefined && reponseAttendue !== undefined && entry.exemples.length < 5) {
+                entry.exemples.push({reponseEleve: String(reponseEleve), reponseAttendue: String(reponseAttendue)});
+            }
+            debrief.erreurs[key] = entry;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        }
+        function enregistrerIndiceUsage(niveau) {
+            let debrief = {erreurs:{}, indices:{}};
+            try { debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}'); } catch(e) {}
+            const key = EP_ID + ':' + niveau;
+            debrief.indices[key] = (debrief.indices[key] || 0) + 1;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        }
+        function basculerModeSobre() {
+            const actif = document.body.classList.toggle('mode-sobre');
+            localStorage.setItem('swiss_shield_mode_sobre', actif ? '1' : '0');
+            if (!actif) { animate(); }
+        }
+        if (localStorage.getItem('swiss_shield_mode_sobre') === '1') {
+            document.body.classList.add('mode-sobre');
+        }
+        (function pollSuccess(){
+            const ids = ['success','success-msg','success-final','final-zone','step_final','victory-zone','victory-screen','final-step','final-badge'];
+            let recorded = false;
+            setInterval(function(){
+                if (recorded) return;
+                for (const id of ids) {
+                    const el = document.getElementById(id);
+                    if (el && window.getComputedStyle(el).display === 'block') { recordEpisodeSuccess(); recorded = true; return; }
+                }
+            }, 500);
+        })();
+
+        function sauvegarderAutomatiquement() {
+            const filled = {};
+            [1,2,3].forEach(function(id){
+                const t = document.getElementById('target-' + id);
+                if (t && t.classList.contains('filled')) filled[id] = t.innerText;
+            });
+            const etat = {
+                zone: currentZone,
+                inputs: {
+                    passkey: (document.getElementById('passkey') || {}).value || '',
+                    juridique: (document.getElementById('juridique-input') || {}).value || '',
+                    forensics: (document.getElementById('forensics-input') || {}).value || '',
+                    checksum: (document.getElementById('checksum-input') || {}).value || ''
+                },
+                hintsUsed: hintsUsed,
+                episodeScore: episodeScore,
+                points: points,
+                filled: filled
+            };
+            localStorage.setItem('autosave_' + EP_ID, JSON.stringify(etat));
+        }
+
+        function proposerRestaurationAutosave() {
+            let etat;
+            try { etat = JSON.parse(localStorage.getItem('autosave_' + EP_ID)); } catch(e) { return; }
+            if (!etat) return;
+
+            if (etat.inputs) {
+                if (document.getElementById('passkey')) document.getElementById('passkey').value = etat.inputs.passkey || '';
+                if (document.getElementById('juridique-input')) document.getElementById('juridique-input').value = etat.inputs.juridique || '';
+                if (document.getElementById('forensics-input')) document.getElementById('forensics-input').value = etat.inputs.forensics || '';
+                if (document.getElementById('checksum-input')) document.getElementById('checksum-input').value = etat.inputs.checksum || '';
+            }
+
+            if (etat.zone >= 2) {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('double-lock-screen').style.display = 'block';
+                currentZone = 2;
+            }
+            if (etat.zone >= 3) {
+                document.getElementById('double-lock-screen').style.display = 'none';
+                document.getElementById('mission-content').style.display = 'block';
+                currentZone = 3;
+            }
+
+            if (etat.filled) {
+                Object.keys(etat.filled).forEach(function(id){
+                    const t = document.getElementById('target-' + id);
+                    if (t) { t.innerText = etat.filled[id]; t.classList.add('filled'); }
+                });
+            }
+            if (typeof etat.points === 'number') {
+                points = etat.points;
+                if (points === 3) {
+                    document.getElementById('success-msg').style.display = 'block';
+                    document.getElementById('pool').style.display = 'none';
+                }
+            }
+
+            if (etat.hintsUsed) {
+                [1,2,3].forEach(function(level){
+                    if (etat.hintsUsed[level]) {
+                        hintsUsed[level] = true;
+                        document.getElementById('hint-tier-' + level).style.display = 'block';
+                        const btn = document.getElementById('hintBtn' + level);
+                        if (btn) { btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5'; }
+                        const next = document.getElementById('hintBtn' + (level + 1));
+                        if (next && level < 3) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+                    }
+                });
+            }
+            if (typeof etat.episodeScore === 'number') {
+                episodeScore = etat.episodeScore;
+                document.getElementById('hint-score-value').textContent = episodeScore;
+            }
+        }
+        proposerRestaurationAutosave();
+    </script>
+</body>
+</html>

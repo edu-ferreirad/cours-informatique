@@ -1,0 +1,132 @@
+<div class="light-table-container">
+    <div class="table-header">
+        <h3>📄 BASE DE DONNÉES CENTRALE : TABLE ASCII (0-127)</h3>
+        <p style="font-size: 0.8em; margin: 5px 0;">Utilisez la barre de recherche pour isoler un caractère ou une valeur DEC.</p>
+        <input type="text" id="asciiSearch" onkeyup="searchTable()" placeholder="Chercher 'A', '80', 'Exclamation'...">
+    </div>
+
+    <div class="scroll-zone">
+        <table id="asciiTable">
+            <thead>
+                <tr>
+                    <th>DEC</th>
+                    <th>CHR</th>
+                    <th>NOM / FONCTION</th>
+                </tr>
+            </thead>
+            <tbody id="asciiBody">
+                </tbody>
+        </table>
+    </div>
+    <div class="table-footer">
+        Système de référence nLPD - Unité Forensics Berne
+    </div>
+</div>
+
+<style>
+    .light-table-container {
+        background: #ffffff;
+        color: #1a1a1a;
+        border: 4px solid #2ecc71;
+        border-radius: 12px;
+        width: 100%;
+        max-width: 700px;
+        margin: 20px auto;
+        font-family: 'Segoe UI', Helvetica, sans-serif;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+        overflow: hidden;
+    }
+
+    .table-header {
+        padding: 20px;
+        background: #f8f9fa;
+        border-bottom: 2px solid #2ecc71;
+        text-align: center;
+    }
+
+    #asciiSearch {
+        width: 90%;
+        padding: 12px;
+        border: 2px solid #dee2e6;
+        border-radius: 25px;
+        font-size: 1em;
+        outline: none;
+        transition: 0.3s;
+    }
+
+    #asciiSearch:focus { border-color: #2ecc71; box-shadow: 0 0 8px rgba(46, 204, 113, 0.3); }
+
+    .scroll-zone { max-height: 500px; overflow-y: auto; background: #fff; }
+
+    #asciiTable { width: 100%; border-collapse: collapse; }
+
+    #asciiTable th {
+        background: #212529;
+        color: #2ecc71;
+        padding: 12px;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        font-size: 0.9em;
+        text-transform: uppercase;
+    }
+
+    #asciiTable td {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+        text-align: center;
+        font-family: 'Courier New', monospace;
+        font-size: 1.1em;
+    }
+
+    .row-special { background: #f1f3f5; color: #6c757d; font-size: 0.8em; }
+    .row-highlight { background: #e8f5e9; font-weight: bold; color: #2e7d32; }
+
+    /* Scrollbar stylisée */
+    .scroll-zone::-webkit-scrollbar { width: 8px; }
+    .scroll-zone::-webkit-scrollbar-track { background: #f1f1f1; }
+    .scroll-zone::-webkit-scrollbar-thumb { background: #2ecc71; border-radius: 10px; }
+</style>
+
+<script>
+    const asciiBody = document.getElementById('asciiBody');
+    const specialChars = {
+        0: "NULL", 1: "SOH", 2: "STX", 3: "ETX", 4: "EOT", 5: "ENQ", 6: "ACK", 7: "BEL",
+        8: "BS", 9: "TAB", 10: "LF", 13: "CR", 27: "ESC", 32: "ESPACE", 127: "DEL"
+    };
+
+    // Génération automatique de la table 0-127
+    for (let i = 0; i <= 127; i++) {
+        let row = document.createElement('tr');
+        let char = specialChars[i] || String.fromCharCode(i);
+        let name = "";
+
+        if (i < 32 || i === 127) {
+            row.className = "row-special";
+            name = "Commande Système";
+        } else if (i >= 48 && i <= 57) {
+            name = "Chiffre";
+        } else if (i >= 65 && i <= 90) {
+            name = "Majuscule";
+            if (["P", "H", "C"].includes(char)) row.className = "row-highlight";
+        } else if (i >= 97 && i <= 122) {
+            name = "Minuscule";
+        } else {
+            name = "Ponctuation / Symbole";
+        }
+
+        row.innerHTML = `<td>${i}</td><td><strong>${char}</strong></td><td>${name}</td>`;
+        asciiBody.appendChild(row);
+    }
+
+    function searchTable() {
+        let input = document.getElementById("asciiSearch");
+        let filter = input.value.toUpperCase();
+        let tr = asciiBody.getElementsByTagName("tr");
+
+        for (let i = 0; i < tr.length; i++) {
+            let text = tr[i].textContent || tr[i].innerText;
+            tr[i].style.display = text.toUpperCase().indexOf(filter) > -1 ? "" : "none";
+        }
+    }
+</script>

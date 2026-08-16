@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>S04E32 - SMART HOME : CONTRÔLE D'ACCÈS</title>
+    <style>
+        /* --- NOUVEL EFFET VISUEL : MATRIX DIGITAL RAIN --- */
+        #matrix-bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            background: #000;
+        }
+
+        body { 
+            background-color: #050505; 
+            color: #00ff41; 
+            font-family: 'Consolas', monospace; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 20px; 
+            margin: 0; 
+            min-height: 100vh; 
+        }
+
+        .terminal { 
+            background: rgba(0, 0, 0, 0.9); 
+            border: 2px solid #00ff41; 
+            padding: 30px; 
+            width: 95%; 
+            max-width: 900px; 
+            box-shadow: 0 0 50px rgba(0, 255, 65, 0.3); 
+            position: relative;
+            backdrop-filter: blur(5px);
+        }
+
+        /* CONTEXTE HISTOIRE S04E32 */
+        .story-context {
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid #00ff41;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+            font-size: 0.95em;
+            color: #fff;
+            line-height: 1.5;
+            box-shadow: inset 0 0 15px rgba(0, 255, 65, 0.2);
+        }
+        .story-context b { color: #00ff41; text-shadow: 0 0 5px #00ff41; }
+        
+        .header-mission { border-bottom: 2px solid #00ff41; margin-bottom: 20px; padding-bottom: 10px; display: flex; justify-content: space-between; font-weight: bold; }
+        
+        #lock-screen { text-align: center; margin-top: 20px; }
+        #pre-requis-screen { display: none; padding: 10px; }
+        #mission-content { display: none; }
+
+        .scan-line { border-left: 3px solid #00ff41; padding-left: 15px; margin: 15px 0; font-size: 0.9em; text-align: left; }
+        
+        .console-box { background: #0a0a0a; border: 1px dashed #00ff41; padding: 15px; margin-top: 20px; }
+        .control-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
+        
+        .action-card { background: #111; border: 1px solid #333; padding: 15px; border-radius: 4px; text-align: left; }
+        .action-card h4 { margin: 0 0 10px 0; font-size: 0.8em; color: #888; }
+        
+        select, input { background: #000; border: 1px solid #00ff41; color: #00ff41; padding: 10px; width: 100%; box-sizing: border-box; font-family: inherit; outline: none; }
+        
+        .btn-cmd { background: #00ff41; color: #000; border: none; padding: 12px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 10px; width: 100%; transition: 0.2s; font-family: inherit; }
+        .btn-cmd:hover { background: #fff; box-shadow: 0 0 30px #00ff41; }
+        .btn-cmd:disabled { background: #111; color: #444; border: 1px solid #444; cursor: not-allowed; }
+
+        .status-badge { display: inline-block; padding: 2px 8px; font-size: 0.7em; font-weight: bold; border-radius: 3px; margin-left: 10px; }
+        .badge-crit { background: #ff3e3e; color: #fff; }
+        .badge-ok { background: #00ff41 !important; color: #000 !important; }
+
+        .export-box { border: 1px double #00ff41; padding: 15px; margin-top: 30px; font-size: 0.8em; background: rgba(0,255,65,0.05); text-align: left; }
+
+        .btn-aide { background: none; border: 1px solid #00ff41; color: #00ff41; padding: 8px 15px; cursor: pointer; margin-top: 30px; font-family: inherit; width: 100%; max-width: 450px; }
+        .aide-content { display: none; background: #fff; color: #000; padding: 25px; margin-top: 15px; width: 90%; max-width: 450px; text-align: left; font-family: sans-serif; box-shadow: 0 0 40px rgba(0,0,0,0.8); font-size: 0.9em; line-height: 1.4; }
+        .pillar { margin-bottom: 15px; }
+        .pillar b { color: #d35400; text-transform: uppercase; display: block; border-bottom: 1px solid #eee; margin-bottom: 5px; font-size: 0.8em; }
+
+        /* BOUTON RETOUR ET COMPOSANTS PEDAGOGIQUES EXIGES */
+        .btn-nav-retour { position: absolute; top: 15px; left: 15px; background: #000; border: 1px solid #00ff41; color: #00ff41; padding: 5px 10px; text-decoration: none; font-size: 0.8em; font-weight: bold; border-radius: 3px; z-index: 10; }
+        .btn-nav-retour:hover { background: #00ff41; color: #000; }
+        .challenge-block { background: #0a0a0a; border: 1px dashed #00ff41; padding: 15px; margin: 15px 0; text-align: left; }
+        .challenge-title { font-weight: bold; color: #fff; text-transform: uppercase; font-size: 0.85em; margin-bottom: 8px; display: block; }
+        .code-window { background: #000; border-left: 3px solid #00ff41; padding: 10px; margin: 15px 0; color: #00ff41; font-size: 0.85em; overflow-x: auto; white-space: pre; font-family: monospace; }
+
+        /* MODE SOBRE */
+        body.mode-sobre, body.mode-sobre * { animation: none !important; transition: none !important; }
+        body.mode-sobre #matrix-bg { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <canvas id="matrix-bg"></canvas>
+
+    <div class="terminal">
+        <a href="../../MENU_PRINCIPAL.html" class="btn-nav-retour">&lt; RETOUR MENU</a>
+        <button id="toggle-sobre-btn" onclick="basculerModeSobre()" style="position:absolute;top:15px;right:15px;width:auto;z-index:10;background:#000;border:1px solid #00ff41;color:#00ff41;padding:5px 10px;font-size:0.8em;font-weight:bold;border-radius:3px;cursor:pointer;">🌓</button>
+
+        <div id="lock-screen" style="margin-top: 25px;">
+            <h2 style="text-shadow: 0 0 10px #00ff41;">[SYSTEM_AUTH_REQUIRED]</h2>
+            
+            <div class="story-context">
+                <b>[ MENACE SUR LES COORDONNÉES DE L'ADMINISTRATION FÉDÉRALE ]</b><br>
+                L'audit de résilience à distance a mis en évidence une faille critique. Votre environnement domestique de télétravail pour le Département fédéral des finances (DFF) est exposé. Un attaquant exploite un micrologiciel obsolète sur l'automate de gestion de votre domicile.<br><br>
+                Le pirate utilise ce pivot IoT résidentiel pour tenter un mouvement latéral vers votre passerelle VPN professionnelle sécurisée. Au sens de l'<b>Art. 8 nLPD</b>, l'intégrité de la zone réseau est compromise. Fournissez votre certificat précédent pour entamer la décontamination.
+            </div>
+
+            <p>Injecter le certificat de résilience S04-E31 :</p>
+            <input type="password" id="passkey" style="width: 250px; text-align: center;" autocomplete="off" onchange="sauvegarderAutomatiquement()">
+            <br><br>
+            <button class="btn-cmd" onclick="unlock()" style="width: 250px;">INITIALISER L'ENVIRONNEMENT</button>
+        </div>
+
+        <div id="pre-requis-screen" style="margin-top: 25px;">
+            <div class="header-mission">
+                <span>[PRÉ-REQUIS] VALIDATION DES PROTOCOLES PÉRIPHÉRIQUES</span>
+                <span style="color: #ff3e3e;">CONTRÔLE STATIQUE</span>
+            </div>
+
+            <div class="challenge-block">
+                <span class="challenge-title">⚖️ Défi Juridique nLPD : Responsabilité Civile et Administrative</span>
+                <p>Lorsqu'un organe fédéral ou une entreprise commet une violation par négligence grave des mesures de sécurité de l'Art. 8 nLPD, quelle autorité fédérale suisse de surveillance indépendante peut ouvrir d'office une enquête et ordonner des mesures d'ajustement immédiates ? (Donner l'acronyme officiel en 4 lettres, ex: SUVA, SECO...)</p>
+                <input type="text" id="law_ans" placeholder="Acronyme en 4 lettres..." style="width: 100%; max-width: 400px;" autocomplete="off" onchange="sauvegarderAutomatiquement()">
+            </div>
+
+            <div class="challenge-block">
+                <span class="challenge-title">🖥️ Défi Technique Réseau : Analyse Forensics Active</span>
+                <p>Pour auditer en temps réel les sockets réseau ouverts et identifier quel processus local est lié au port malveillant de l'appareil IoT, quelle commande Linux universelle permet de lister les fichiers et descripteurs réseau ouverts ? (Indiquer uniquement le nom de l'utilitaire en minuscules, ex: grep, top...)</p>
+                <input type="text" id="shell_ans" placeholder="Nom de l'utilitaire..." style="width: 100%; max-width: 400px;" autocomplete="off" onchange="sauvegarderAutomatiquement()">
+            </div>
+
+            <center>
+                <button class="btn-cmd" onclick="verifyPreReq()" style="max-width: 400px;">ÉVALUER LES CAPACITÉS PÉDAGOGIQUES</button>
+            </center>
+        </div>
+
+        <div id="mission-content" style="margin-top: 25px;">
+            <div class="header-mission">
+                <span>VECTEUR: HOME-NETWORK-04</span>
+                <span id="threat-level" class="badge-crit">MENACE: CRITIQUE</span>
+            </div>
+
+            <div class="scan-line">
+                > Diagnostic réseau : Segment IoT compromis par vulnérabilité <b>CVE-2026-X</b>.<br>
+                > Détection de trafic suspect vers : <code>192.168.1.255 (Broadcast)</code><br>
+                > Risque : Mouvement latéral vers Laptop-PRO-Admin (DFF).
+            </div>
+
+            <div class="challenge-block" id="complex-puzzle-zone">
+                <span class="challenge-title">🧩 Investigation Avancée : Extraction de Payload de Requête Aveugle (Blind SQL)</span>
+                <p>L'attaquant a envoyé une requête forgée sur la base SQLite interne de la passerelle. Déterminez après combien de secondes exactes le serveur répondra lors de l'exécution de l'analyse ci-dessous :</p>
+                
+                <div class="code-window">-- S04E32 : Script de validation d'injection temporelle
+SELECT CASE 
+    WHEN (SUBSTR('LOGINS_DFF', 7, 1) = 'D') THEN 
+        CASE 
+            WHEN (LENGTH('VLAN_20') * 2 = 14) THEN RANDOMBLOB(500000000) -- Délai induit: 8 secondes
+            ELSE RANDOMBLOB(100000) -- Délai négligeable
+        END
+    ELSE 
+        CASE 
+            WHEN (1 + 1 = 3) THEN RANDOMBLOB(500000000)
+            ELSE 0
+        END
+END;</div>
+
+                <p style="color: #888; font-size: 0.85em;">💡 <i>Indices d'analyse structurelle :<br>
+                1. Analysez la fonction `SUBSTR('LOGINS_DFF', 7, 1)`. La chaîne commence à l'index 1. Quel caractère se trouve à la 7ème position ? Attention à la correspondance exacte avec la condition.<br>
+                2. Si la condition externe est vraie, analysez la condition imbriquée `LENGTH('VLAN_20') * 2 = 14`. Calculez la longueur exacte de la chaîne 'VLAN_20'. Multpliez-la par 2. Évaluez sa véracité.<br>
+                3. Si les deux structures imbriquées se vérifient, la réponse prendra la valeur de temporisation lourde (8 secondes), sinon elle renverra une réponse instantanée (0 seconde).</i></p>
+
+                <p>Entrez le délai de temporisation mesuré en secondes :</p>
+                <input type="text" id="logic_checksum" placeholder="Temps de réponse en secondes (chiffre uniquement)" autocomplete="off" onchange="sauvegarderAutomatiquement()">
+            </div>
+
+            <div class="console-box">
+                <div class="control-grid">
+                    <div class="action-card">
+                        <h4>SÉCURITÉ RÉSEAU</h4>
+                        <label>Configuration du VLAN :</label>
+                        <select id="vlan-config" onchange="sauvegarderAutomatiquement()">
+                            <option value="none">Réseau plat (Default)</option>
+                            <option value="isolate">Segmentation IoT (VLAN 20)</option>
+                            <option value="bridge">Pont direct WAN</option>
+                        </select>
+                    </div>
+
+                    <div class="action-card">
+                        <h4>GESTION DU FIRMWARE</h4>
+                        <label>Action sur l'objet compromis :</label>
+                        <select id="patch-action" onchange="sauvegarderAutomatiquement()">
+                            <option value="none">Aucune action</option>
+                            <option value="reboot">Redémarrage simple</option>
+                            <option value="patch">Mise à jour + Hash Verification</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button class="btn-cmd" id="apply-btn" onclick="executeSecurity()">Appliquer les mesures d'urgence</button>
+            </div>
+
+            <div id="success-zone" style="display:none; margin-top: 30px;">
+                <h3 style="color: #00ff41; text-align: center; text-shadow: 0 0 10px #00ff41;">🛡️ INTÉGRITÉ RÉTABLIE</h3>
+                
+                <div class="export-box">
+                    <strong>📄 EXPORT_EVAL_E32.log</strong><br>
+                    - Analyse nLPD Art. 8 complétée.<br>
+                    - Mesure technique : Isolation logique du segment résidentiel.<br>
+                    - Statut : Risque de fuite de données pro neutralisé.
+                </div>
+
+                <div style="text-align: center; padding: 20px; border: 2px dashed #00ff41; margin-top: 15px; background: rgba(0,255,65,0.1);">
+                    <span style="color: #888;">TOKEN DE TRANSITION E33 :</span><br>
+                    <span style="font-size: 1.5em; letter-spacing: 2px; color: #fff; font-weight: bold;">IOT-VLAN-ISOLATED</span>
+                </div>
+
+                <div style="margin-top: 25px; text-align: center;">
+                    <a href="../../MENU_PRINCIPAL.html" style="color: #00ff41; text-decoration: none; font-size: 0.8em; border: 1px solid #00ff41; padding: 5px 10px;">[ RETOUR AU POSTE DE COMMANDE ]</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn-aide" onclick="toggleAide()">[ ACCÉDER AU MANUEL DES TROIS PILIERS ]</button>
+    
+    <div id="zoneAide" class="aide-content">
+        <h3 style="margin-top: 0; border-bottom: 2px solid #00ff41; padding-bottom: 5px;">Aide Tactique : Sécurisation IoT</h3>
+        <div class="pillar">
+            <b>⚖️ Juridique : L'Art. 8 nLPD au Domicile</b>
+            L'obligation légale de garantir la sécurité des données ne s'arrête pas au périmètre physique du bureau de l'Administration fédérale. Le travailleur à domicile doit adapter la protection de son réseau privé (LPD) pour empêcher que des tiers ou des attaquants n'accèdent à des métadonnées de l'État.
+        </div>
+        <div class="pillar">
+            <b>⚙️ Informatique : La Segmentation (VLAN)</b>
+            La technique de défense par cloisonnement consiste à assigner les objets "intelligents" (souvent dépourvus d'agents de sécurité complexes) dans un sous-réseau logique isolé (VLAN 20), coupant structurellement les requêtes ARP/ICMP vers la zone de télétravail.
+        </div>
+        <div class="pillar">
+            <b>🔎 Forensics : Analyse des Flux Multi-vecteurs</b>
+            La surveillance forensic sur les passerelles s'attache à déceler les injections SQL aveugles (Blind SQL) basées sur le temps. L'identification des processus réseau suspects via l'évaluation des descripteurs permet de tracer l'origine exacte du binaire compromis.
+        </div>
+    </div>
+
+    <div style="margin-top: 30px; border-top: 3px solid #d80000; padding: 20px; background: #fff; font-family: Arial, sans-serif; position: relative; z-index: 100; width: 90%; max-width: 450px;">
+        <div id="hint-score-badge" style="background:#111;color:#3fb950;padding:8px 15px;font-weight:bold;text-align:center;">🏆 Score de cet épisode : <span id="hint-score-value">5</span> / 5 pts</div>
+        <div style="display:flex; gap:8px; margin:10px 0;">
+            <button id="hintBtn1" onclick="useHint(1)" style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;">💡 Indice 1 (-1 pt)</button>
+            <button id="hintBtn2" onclick="useHint(2)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🎯 Indice 2 (-2 pts)</button>
+            <button id="hintBtn3" onclick="useHint(3)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🆘 Solution (-3 pts)</button>
+        </div>
+
+        <div id="zoneAideScore" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; color: #333;">
+            <p id="hint-tier-1" style="display:none;"><strong>💡 INFO :</strong> Pré-requis : l'acronyme de l'autorité fédérale suisse de surveillance en protection des données, et la commande Unix pour lister les fichiers/descripteurs réseau ouverts. Ensuite, configurez le VLAN et le firmware sur les options les plus sécurisées, et entrez le délai attendu par le système pour l'injection SQL.</p>
+            <p id="hint-tier-2" style="display:none;"><strong>🎯 PISTE :</strong> Acronyme : PFPDT. Commande : <code>lsof</code>. Configuration : « Segmentation IoT (VLAN 20) » + « Mise à jour + Hash Verification ». Le système attend une réponse instantanée pour le délai de l'injection.</p>
+            <p id="hint-tier-3" style="display:none;"><strong>🆘 SOLUTION :</strong> Pré-requis : PFPDT / lsof. Configuration : Segmentation IoT + Mise à jour avec vérification. Délai : <code>0</code></p>
+        </div>
+    </div>
+
+    <script>
+        // --- ANIMATION BACKGROUND : MATRIX RAIN ---
+        const canvas = document.getElementById('matrix-bg');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$+-*/=%\"'#&_(),.;:?!\\|{}<>[]^~";
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+        const rainDrops = Array.from({ length: columns }).fill(canvas.height);
+
+        function drawMatrix() {
+            if (localStorage.getItem('swiss_shield_mode_sobre') === '1') { return; }
+            ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = "#0F0";
+            ctx.font = fontSize + "px monospace";
+
+            for (let i = 0; i < rainDrops.length; i++) {
+                const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+                ctx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
+
+                if (rainDrops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    rainDrops[i] = 0;
+                }
+                rainDrops[i]++;
+            }
+        }
+        setInterval(drawMatrix, 30);
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // --- LOGIQUE MÉTIER ---
+        let currentZone = 1;
+        function toggleAide() {
+            const x = document.getElementById("zoneAide");
+            x.style.display = (window.getComputedStyle(x).display === "block") ? "none" : "block";
+        }
+
+        function unlock() {
+            const pass = document.getElementById('passkey').value.trim();
+            if (pass === 'BACKUP-SECURE-31') {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('pre-requis-screen').style.display = 'block';
+                currentZone = 2;
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('entree', pass, 'BACKUP-SECURE-31');
+                alert("CERTIFICAT INVALIDE : Accès refusé par le protocole de résilience.");
+            }
+        }
+
+        function verifyPreReq() {
+            const law = document.getElementById('law_ans').value.trim().toUpperCase();
+            const shell = document.getElementById('shell_ans').value.trim().toLowerCase();
+
+            // Attendu: PFPDT (Préposé fédéral à la protection des données) et lsof (list open files)
+            if (law === 'PFPDT' && shell === 'lsof') {
+                document.getElementById('pre-requis-screen').style.display = 'none';
+                document.getElementById('mission-content').style.display = 'block';
+                currentZone = 3;
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('prerequis', 'law:"' + law + '" / shell:"' + shell + '"', 'PFPDT / lsof');
+                alert("CONTRÔLE ÉCHOUÉ : Les autorités de régulation ou les outils de diagnostic ne correspondent pas.");
+            }
+        }
+
+        function executeSecurity() {
+            const vlan = document.getElementById('vlan-config').value;
+            const patch = document.getElementById('patch-action').value;
+            const btn = document.getElementById('apply-btn');
+            const logicAns = document.getElementById('logic_checksum').value.trim();
+
+            // Résolution logique de l'injection : 
+            // SUBSTR('LOGINS_DFF', 7, 1) -> Position 7 = '_' (La lettre à l'index 7 est un underscore, pas 'D')
+            // Donc la condition externe évalue ELSE.
+            // Dans le ELSE : 1 + 1 = 3 est FAUX, donc la réponse tombe dans l'alternative ELSE finale -> 0
+            if (logicAns !== "0") {
+                enregistrerErreur('investigation', logicAns, '0');
+                alert("ERREUR D'INVESTIGATION : Le diagnostic de la charge SQL est erroné. L'automate est bloqué.");
+                return;
+            }
+
+            if (vlan === 'isolate' && patch === 'patch') {
+                btn.innerHTML = "APPLICATION EN COURS...";
+                btn.disabled = true;
+                
+                setTimeout(() => {
+                    const threat = document.getElementById('threat-level');
+                    threat.innerHTML = "MENACE: NEUTRALISÉE";
+                    threat.className = "status-badge badge-ok";
+                    document.getElementById('success-zone').style.display = 'block';
+                    btn.style.display = 'none';
+                }, 1500);
+            } else {
+                enregistrerErreur('investigation', 'vlan:"' + vlan + '" / patch:"' + patch + '"', 'isolate / patch');
+                alert("ERREUR LOGIQUE : Les mesures choisies ne stoppent pas la propagation du malware. Analysez mieux les vecteurs d'attaque !");
+            }
+        }
+    </script>
+
+    <script>
+        const EP_ID = "S04E32";
+        const HINT_COST = {1:1, 2:2, 3:3};
+        let hintsUsed = {1:false, 2:false, 3:false};
+        let episodeScore = 5;
+        function useHint(level) {
+            if (hintsUsed[level] || (level > 1 && !hintsUsed[level - 1])) return;
+            hintsUsed[level] = true;
+            enregistrerIndiceUsage(level);
+            episodeScore -= HINT_COST[level];
+            document.getElementById('hint-score-value').textContent = episodeScore;
+            document.getElementById('hint-tier-' + level).style.display = 'block';
+            const btn = document.getElementById('hintBtn' + level);
+            btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5';
+            if (level < 3) {
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+            sauvegarderAutomatiquement();
+        }
+        function recordEpisodeSuccess() {
+            let scores = {};
+            try { scores = JSON.parse(localStorage.getItem('swiss_shield_scores') || '{}'); } catch(e) {}
+            if (!(EP_ID in scores) || scores[EP_ID] < episodeScore) scores[EP_ID] = episodeScore;
+            localStorage.setItem('swiss_shield_scores', JSON.stringify(scores));
+            localStorage.removeItem('autosave_' + EP_ID);
+        }
+        function enregistrerErreur(phase, reponseEleve, reponseAttendue) {
+            let debrief = {erreurs:{}, indices:{}};
+            try { debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}'); } catch(e) {}
+            const key = EP_ID + ':' + phase;
+            let entry = debrief.erreurs[key];
+            if (typeof entry === 'number') entry = {compte: entry, exemples: []};
+            if (!entry) entry = {compte: 0, exemples: []};
+            entry.compte++;
+            if (reponseEleve !== undefined && reponseAttendue !== undefined && entry.exemples.length < 5) {
+                entry.exemples.push({reponseEleve: String(reponseEleve), reponseAttendue: String(reponseAttendue)});
+            }
+            debrief.erreurs[key] = entry;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        }
+        function enregistrerIndiceUsage(niveau) {
+            let debrief = {erreurs:{}, indices:{}};
+            try { debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}'); } catch(e) {}
+            const key = EP_ID + ':' + niveau;
+            debrief.indices[key] = (debrief.indices[key] || 0) + 1;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        }
+        function basculerModeSobre() {
+            const actif = document.body.classList.toggle('mode-sobre');
+            localStorage.setItem('swiss_shield_mode_sobre', actif ? '1' : '0');
+        }
+        if (localStorage.getItem('swiss_shield_mode_sobre') === '1') {
+            document.body.classList.add('mode-sobre');
+        }
+        (function pollSuccess(){
+            // Cet épisode utilise l'id "success-zone" pour l'écran de succès.
+            const ids = ['success','success-msg','success-final','final-zone','step_final','victory-zone','victory-screen','final-step','final-badge','success-zone'];
+            let recorded = false;
+            setInterval(function(){
+                if (recorded) return;
+                for (const id of ids) {
+                    const el = document.getElementById(id);
+                    if (el && window.getComputedStyle(el).display === 'block') { recordEpisodeSuccess(); recorded = true; return; }
+                }
+            }, 500);
+        })();
+
+        function sauvegarderAutomatiquement() {
+            const etat = {
+                zone: currentZone,
+                inputs: {
+                    passkey: (document.getElementById('passkey') || {}).value || '',
+                    law_ans: (document.getElementById('law_ans') || {}).value || '',
+                    shell_ans: (document.getElementById('shell_ans') || {}).value || '',
+                    vlan: (document.getElementById('vlan-config') || {}).value || '',
+                    patch: (document.getElementById('patch-action') || {}).value || '',
+                    logicChecksum: (document.getElementById('logic_checksum') || {}).value || ''
+                },
+                hintsUsed: hintsUsed,
+                episodeScore: episodeScore
+            };
+            localStorage.setItem('autosave_' + EP_ID, JSON.stringify(etat));
+        }
+
+        function proposerRestaurationAutosave() {
+            let etat;
+            try { etat = JSON.parse(localStorage.getItem('autosave_' + EP_ID)); } catch(e) { return; }
+            if (!etat) return;
+
+            if (etat.inputs) {
+                if (document.getElementById('passkey')) document.getElementById('passkey').value = etat.inputs.passkey || '';
+                if (document.getElementById('law_ans')) document.getElementById('law_ans').value = etat.inputs.law_ans || '';
+                if (document.getElementById('shell_ans')) document.getElementById('shell_ans').value = etat.inputs.shell_ans || '';
+                if (document.getElementById('vlan-config')) document.getElementById('vlan-config').value = etat.inputs.vlan || '';
+                if (document.getElementById('patch-action')) document.getElementById('patch-action').value = etat.inputs.patch || '';
+                if (document.getElementById('logic_checksum')) document.getElementById('logic_checksum').value = etat.inputs.logicChecksum || '';
+            }
+
+            if (etat.zone >= 2) {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('pre-requis-screen').style.display = 'block';
+                currentZone = 2;
+            }
+            if (etat.zone >= 3) {
+                document.getElementById('pre-requis-screen').style.display = 'none';
+                document.getElementById('mission-content').style.display = 'block';
+                currentZone = 3;
+            }
+
+            if (etat.hintsUsed) {
+                [1,2,3].forEach(function(level){
+                    if (etat.hintsUsed[level]) {
+                        hintsUsed[level] = true;
+                        document.getElementById('hint-tier-' + level).style.display = 'block';
+                        const btn = document.getElementById('hintBtn' + level);
+                        if (btn) { btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5'; }
+                        const next = document.getElementById('hintBtn' + (level + 1));
+                        if (next && level < 3) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+                    }
+                });
+            }
+            if (typeof etat.episodeScore === 'number') {
+                episodeScore = etat.episodeScore;
+                document.getElementById('hint-score-value').textContent = episodeScore;
+            }
+        }
+        proposerRestaurationAutosave();
+    </script>
+</body>
+</html>

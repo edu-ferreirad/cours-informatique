@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>S02E12 - DROIT À L'OUBLI</title>
+    <style>
+        /* --- EFFET VISUEL CONSERVÉ : BARRIÈRES DE FEU DIGITAL --- */
+        body {
+            background-color: #000;
+            color: #2ecc71;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .background-fire {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(45deg, #1a0000 25%, #4a0000 50%, #1a0000 75%);
+            background-size: 400% 400%;
+            animation: firePulse 8s ease infinite;
+            z-index: -2;
+        }
+
+        .data-bars {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: repeating-linear-gradient(90deg,
+                transparent,
+                transparent 50px,
+                rgba(231, 76, 60, 0.2) 50px,
+                rgba(231, 76, 60, 0.2) 100px);
+            animation: moveBars 15s linear infinite;
+            z-index: -1;
+            opacity: 0.6;
+        }
+
+        @keyframes firePulse {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes moveBars {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(100%); }
+        }
+
+        .terminal {
+            background: rgba(0, 0, 0, 0.9);
+            border: 4px solid #e74c3c;
+            padding: 40px;
+            width: 90%;
+            max-width: 900px;
+            box-shadow: 0 0 100px rgba(231, 76, 60, 0.6);
+            z-index: 10;
+            position: relative;
+        }
+
+        /* --- MODE SOBRE (accessibilité) --- */
+        body.mode-sobre, body.mode-sobre * { animation: none !important; transition: none !important; }
+        #toggle-sobre-btn {
+            position: fixed; top: 10px; right: 10px; z-index: 10001;
+            background: #000; color: #e74c3c; border: 1px solid #e74c3c;
+            padding: 6px 10px; font-size: 0.7em; cursor: pointer; font-family: inherit; border-radius: 3px;
+        }
+
+        /* NAVIGATION */
+        .btn-retour {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            border: 1px solid #fff;
+            background: #000;
+            padding: 5px 10px;
+            font-size: 0.8em;
+            z-index: 20;
+        }
+
+        .story-alert-banner {
+            background: #e74c3c;
+            color: #fff;
+            padding: 20px;
+            font-size: 1.4em;
+            font-weight: bold;
+            text-align: center;
+            margin: -40px -40px 30px -40px;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+        }
+
+        .story-context {
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 10px solid #f1c40f;
+            padding: 20px;
+            margin-bottom: 30px;
+            color: #fff;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        #lock-screen, #prerequisites, #mission-content, #final-zone { display: none; }
+        .visible { display: block !important; }
+
+        .law-box { border: 2px solid #e74c3c; background: rgba(231, 76, 60, 0.2); padding: 20px; margin: 25px 0; color: #fff; font-weight: bold; }
+
+        /* DB LOG & INVESTIGATION HIDDEN TEXT */
+        .db-log { background: #000; border: 1px solid #e74c3c; padding: 20px; font-size: 1em; color: #ff9a90; margin-bottom: 10px; }
+
+        /* MECANIQUE DE SURLIGNAGE : Texte noir sur fond noir */
+        .secret-param {
+            color: #000;
+            background: #000;
+            border: 1px dashed #444;
+            padding: 0 5px;
+            user-select: all; /* Facilite la sélection */
+        }
+        /* Style de la sélection pour rendre le texte lisible quand surligné */
+        .secret-param::selection {
+            background: #2ecc71;
+            color: #000;
+        }
+
+        .hint-system { background: #1a1a1a; border-left: 4px solid #3498db; padding: 10px; margin: 10px 0; font-size: 0.9em; display: none; }
+
+        input { background: #111; border: 3px solid #f1c40f; color: #f1c40f; padding: 15px; width: 80%; font-size: 1.2em; text-align: center; margin-bottom: 20px; }
+        button { background: #f1c40f; color: #000; border: none; padding: 15px 40px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
+        button:hover { background: #fff; box-shadow: 0 0 30px #f1c40f; }
+
+        .code-final { color: #ffd700; font-size: 2.5em; letter-spacing: 5px; display: block; text-shadow: 0 0 20px #ffd700; background: #000; padding: 20px; border: 2px solid #ffd700; margin: 20px 0; }
+
+        /* TROIS PILIERS */
+        .piliers { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 40px; }
+        .pilier { background: #fff; color: #000; padding: 15px; font-size: 0.8em; border-top: 5px solid #d80000; }
+        .pilier h4 { margin: 0 0 10px 0; color: #d80000; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+    <button id="toggle-sobre-btn" onclick="basculerModeSobre()">🌓 Mode sobre</button>
+
+    <div class="background-fire"></div>
+    <div class="data-bars"></div>
+
+    <div class="terminal">
+        <a href="../../MENU_PRINCIPAL.html" class="btn-retour">⇮ MENU PRINCIPAL</a>
+
+        <div id="lock-screen" class="visible">
+            <div class="story-alert-banner">🚨 ACCÈS RESTREINT - ART. 32 🚨</div>
+            <div class="story-context">
+                <b>SITUATION :</b> Administration Fédérale Suisse. Suite à l'audit Müller, des données marketing périmées ont été localisées sur le serveur <b>SHIEL-DB-ZH-01</b>.
+                <br><br>
+                <b>ORDRE :</b> Utilisez votre clé de session (E11) pour initialiser le protocole de purge.
+            </div>
+            <div style="text-align: center;">
+                <input type="text" id="passkey" placeholder="CLÉ D'ACCÈS S02E11">
+                <br>
+                <button onclick="unlock()">AUTH_CORE_ACCESS</button>
+            </div>
+        </div>
+
+        <div id="prerequisites">
+            <div class="story-alert-banner">VÉRIFICATION DES COMPÉTENCES</div>
+            <div class="story-context">
+                Avant de manipuler la base de données, validez les protocoles de sécurité.
+            </div>
+            <div style="padding: 20px;">
+                <p style="color: #f1c40f;">1. JURIDIQUE : Quel article de la nLPD traite de l'effacement des données ? (Chiffre uniquement)</p>
+                <input type="number" id="pre_jur" placeholder="Art. ??" onchange="sauvegarderAutomatiquement()">
+
+                <p style="color: #f1c40f;">2. TECHNIQUE : En SQL, quel mot-clé permet de supprimer définitivement des ENREGISTREMENTS ?</p>
+                <input type="text" id="pre_tech" placeholder="Mot-clé SQL" onchange="sauvegarderAutomatiquement()">
+
+                <br><br>
+                <button onclick="checkPrerequisites()">VALIDER LES PRÉ-REQUIS</button>
+            </div>
+        </div>
+
+        <div id="mission-content">
+            <div class="story-alert-banner">PURGE DES DONNÉES</div>
+            <div class="law-box">
+                ⚖️ nLPD : Les données doivent être effacées si elles ne sont plus nécessaires ou si la base légale est caduque.
+            </div>
+
+            <div class="db-log">
+                [SYSTEM_SCAN] ... <br>
+                [FOUND] Table: <b>USER_PROFILES</b><br>
+                [QUERY_TYPE] <b>DELETE FROM</b><br>
+                [TARGET_ID] <span class="secret-param">PROFIL_MARKETING</span>
+            </div>
+
+            <div style="margin: 20px 0; border: 1px dashed #f1c40f; padding: 15px;">
+                <p style="color: #fff;"><b>CONSIGNE :</b> Reconstituez la commande de purge complète pour la table <code>USER_PROFILES</code>. Une variable critique est dissimulée dans les logs ci-dessus.</p>
+                <p style="font-size: 0.8em; color: #aaa;">Format attendu : <code>COMMANDE_CIBLE_NOM</code></p>
+                <input type="text" id="sqlCommand" placeholder="SAISIR LA COMMANDE DE PURGE">
+                <br>
+                <button onclick="executePurge()">LANCER LA DESTRUCTION</button>
+                <button onclick="showHint()" style="background: #3498db; margin-left: 10px;">INDICE</button>
+                <div id="hint-investigation" class="hint-system">
+                    <b>INDICE :</b> Le TARGET_ID est invisible à l'œil nu dans le log noir. Utilisez votre curseur pour sélectionner le texte à droite du champ [TARGET_ID] et révéler le paramètre caché.
+                </div>
+            </div>
+        </div>
+
+        <div id="final-zone">
+            <h1 style="color:#2ecc71;">✓ PURGE TERMINÉE</h1>
+            <div class="story-context" style="border-left-color: #2ecc71;">
+                Les données marketing illégales ont été atomisées. Le registre de Shiel-DB est désormais conforme à l'Art. 32.
+            </div>
+            <p style="color: #fff;">VOTRE CLÉ DE SORTIE :</p>
+            <span class="code-final">PURGE-DONE-32</span>
+            <div style="text-align: center; margin-top: 20px;">
+                <a href="../../MENU_PRINCIPAL.html" style="color: #fff; text-decoration: underline;">[ RETOUR AU POSTE DE COMMANDE ]</a>
+            </div>
+        </div>
+
+        <div class="piliers">
+            <div class="pilier">
+                <h4>Informatique</h4>
+                La commande <code>DELETE</code> retire les lignes d'une table, alors que <code>DROP</code> supprime la table entière.
+            </div>
+            <div class="pilier">
+                <h4>Juridique</h4>
+                Art. 32 nLPD : Impose la destruction ou l'anonymisation dès que la finalité est atteinte.
+            </div>
+            <div class="pilier">
+                <h4>Forensics</h4>
+                En analyse de données, des informations peuvent être cachées par manipulation de contraste ou de couleur (stéganographie simple).
+            </div>
+        </div>
+
+        <div style="margin-top: 30px; border-top: 3px solid #d80000; padding: 20px; background: #fff; font-family: Arial, sans-serif; position: relative; z-index: 100;">
+            <div id="hint-score-badge" style="background:#111;color:#3fb950;padding:8px 15px;font-weight:bold;text-align:center;">🏆 Score de cet épisode : <span id="hint-score-value">5</span> / 5 pts</div>
+            <div style="display:flex; gap:8px; margin:10px 0;">
+                <button id="hintBtn1" onclick="useHint(1)" style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;">💡 Indice 1 (-1 pt)</button>
+                <button id="hintBtn2" onclick="useHint(2)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🎯 Indice 2 (-2 pts)</button>
+                <button id="hintBtn3" onclick="useHint(3)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🆘 Solution (-3 pts)</button>
+            </div>
+
+            <div id="zoneAideScore" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; color: #333;">
+                <p id="hint-tier-1" style="display:none;"><strong>💡 INFO :</strong> Pré-requis : l'article de la nLPD sur l'effacement des données, et le mot-clé SQL pour supprimer des enregistrements. Ensuite, une valeur est cachée dans le log noir sur noir — sélectionnez le texte avec votre curseur pour la révéler.</p>
+                <p id="hint-tier-2" style="display:none;"><strong>🎯 PISTE :</strong> Article : 32. Mot-clé SQL : DELETE. La commande de purge attendue suit le format <code>COMMANDE_CIBLE_NOM</code> avec la table <code>USER_PROFILES</code> et le paramètre caché dans le log (sélectionnez le texte à droite de [TARGET_ID]).</p>
+                <p id="hint-tier-3" style="display:none;"><strong>🆘 SOLUTION :</strong> Pré-requis : 32 / DELETE. Commande finale : <code>DELETE_FROM_USER_PROFILES_PROFIL_MARKETING</code></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function appliquerModeSobre() {
+            const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+            document.body.classList.toggle('mode-sobre', actif);
+            const btn = document.getElementById('toggle-sobre-btn');
+            if (btn) btn.textContent = actif ? '🌓 Mode sobre : ON' : '🌓 Mode sobre';
+        }
+        function basculerModeSobre() {
+            const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+            localStorage.setItem('swiss_shield_mode_sobre', actif ? '0' : '1');
+            appliquerModeSobre();
+        }
+        appliquerModeSobre();
+
+        function unlock() {
+            const key = document.getElementById('passkey').value.trim().toUpperCase();
+            if (key === 'ACCESS-RIGHT-30') {
+                document.getElementById('lock-screen').classList.remove('visible');
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('prerequisites').classList.add('visible');
+                currentZone = 'prerequisites';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('entree', key, 'ACCESS-RIGHT-30');
+                alert("CLÉ INCORRECTE");
+            }
+        }
+
+        function checkPrerequisites() {
+            const jur = document.getElementById('pre_jur').value.trim();
+            const tech = document.getElementById('pre_tech').value.trim().toUpperCase();
+
+            if (jur === '32' && tech === 'DELETE') {
+                document.getElementById('prerequisites').style.display = 'none';
+                document.getElementById('mission-content').classList.add('visible');
+                currentZone = 'mission-content';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('prerequis', 'article="' + jur + '", motclé="' + tech + '"', 'article="32", motclé="DELETE"');
+                alert("ERREUR : Accès à la DB refusé.");
+            }
+        }
+
+        function executePurge() {
+            const cmd = document.getElementById('sqlCommand').value.trim().toUpperCase();
+            if (cmd === 'DELETE_FROM_USER_PROFILES_PROFIL_MARKETING') {
+                document.getElementById('mission-content').style.display = 'none';
+                document.getElementById('final-zone').classList.add('visible');
+                document.body.style.background = "#001a00";
+            } else {
+                enregistrerErreur('investigation', cmd, 'DELETE_FROM_USER_PROFILES_PROFIL_MARKETING');
+                alert("SYNTAXE ERROR : Commande de purge incomplète ou variable manquante.");
+            }
+        }
+
+        function showHint() {
+            document.getElementById('hint-investigation').style.display = 'block';
+        }
+    </script>
+
+    <script>
+        const EP_ID = "S02E12";
+        const HINT_COST = {1:1, 2:2, 3:3};
+        let hintsUsed = {1:false, 2:false, 3:false};
+        let episodeScore = 5;
+        function useHint(level) {
+            if (hintsUsed[level] || (level > 1 && !hintsUsed[level - 1])) return;
+            hintsUsed[level] = true;
+        enregistrerIndiceUsage(level);
+            episodeScore -= HINT_COST[level];
+            document.getElementById('hint-score-value').textContent = episodeScore;
+            document.getElementById('hint-tier-' + level).style.display = 'block';
+            const btn = document.getElementById('hintBtn' + level);
+            btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5';
+            if (level < 3) {
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+            sauvegarderAutomatiquement();
+        }
+        function recordEpisodeSuccess() {
+            let scores = {};
+            try { scores = JSON.parse(localStorage.getItem('swiss_shield_scores') || '{}'); } catch(e) {}
+            if (!(EP_ID in scores) || scores[EP_ID] < episodeScore) scores[EP_ID] = episodeScore;
+            localStorage.setItem('swiss_shield_scores', JSON.stringify(scores));
+            localStorage.removeItem('autosave_' + EP_ID);
+        }
+    let currentZone = 'lock-screen';
+    function sauvegarderAutomatiquement() {
+        try {
+            const inputs = {};
+            ['pre_jur', 'pre_tech', 'sqlCommand'].forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) inputs[id] = el.value;
+            });
+            localStorage.setItem('autosave_' + EP_ID, JSON.stringify({
+                zone: currentZone,
+                inputs: inputs,
+                hintsUsed: hintsUsed,
+                episodeScore: episodeScore
+            }));
+        } catch(e) {}
+    }
+    function proposerRestaurationAutosave() {
+        let data;
+        try { data = JSON.parse(localStorage.getItem('autosave_' + EP_ID) || 'null'); } catch(e) { return; }
+        if (!data || !data.zone || data.zone === 'lock-screen') return;
+        document.getElementById('lock-screen').classList.remove('visible');
+        document.getElementById('lock-screen').style.display = 'none';
+        if (data.zone === 'mission-content') {
+            document.getElementById('prerequisites').classList.remove('visible');
+            document.getElementById('prerequisites').style.display = 'none';
+            document.getElementById('mission-content').classList.add('visible');
+        } else if (data.zone === 'prerequisites') {
+            document.getElementById('prerequisites').classList.add('visible');
+        }
+        currentZone = data.zone;
+        if (data.inputs) {
+            Object.keys(data.inputs).forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) el.value = data.inputs[id];
+            });
+        }
+        hintsUsed = data.hintsUsed || hintsUsed;
+        episodeScore = (typeof data.episodeScore === 'number') ? data.episodeScore : episodeScore;
+        document.getElementById('hint-score-value').textContent = episodeScore;
+        [1, 2, 3].forEach(function(level) {
+            if (hintsUsed[level]) {
+                document.getElementById('hint-tier-' + level).style.display = 'block';
+                const btn = document.getElementById('hintBtn' + level);
+                if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+        });
+    }
+    function enregistrerIndiceUsage(niveau) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + niveau;
+            debrief.indices[cle] = (debrief.indices[cle] || 0) + 1;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+    function enregistrerErreur(phase, reponseEleve, reponseAttendue) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + phase;
+            if (typeof debrief.erreurs[cle] !== 'object' || debrief.erreurs[cle] === null) {
+                debrief.erreurs[cle] = { compte: (debrief.erreurs[cle] || 0), exemples: [] };
+            }
+            debrief.erreurs[cle].compte++;
+            if (reponseEleve !== undefined && debrief.erreurs[cle].exemples.length < 5) {
+                debrief.erreurs[cle].exemples.push({ reponseEleve: String(reponseEleve).slice(0,100), reponseAttendue: String(reponseAttendue||'').slice(0,100) });
+            }
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+        (function pollSuccess(){
+            const ids = ['success','success-msg','success-final','final-zone','victory-zone','victory-screen','final-step','final-badge'];
+            let recorded = false;
+            setInterval(function(){
+                if (recorded) return;
+                for (const id of ids) {
+                    const el = document.getElementById(id);
+                    if (el && window.getComputedStyle(el).display === 'block') { recordEpisodeSuccess(); recorded = true; return; }
+                }
+            }, 500);
+        })();
+        proposerRestaurationAutosave();
+    </script>
+</body>
+</html>

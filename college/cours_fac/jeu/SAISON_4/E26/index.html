@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>S04E26 - PROFILAGE ALGORITHMIQUE</title>
+    <style>
+        /* --- EFFET VISUAL FORT : NEURAL MESH BACKGROUND --- */
+        #neural-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at center, #1a0033 0%, #05000d 100%);
+        }
+
+        /* INDICE CSS : Le réviseur humain assigné est "M-MOREL" */
+        body { color: #b026ff; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 40px; margin: 0; min-height: 100vh; overflow-x: hidden; }
+        
+        .terminal { 
+            background: rgba(18, 0, 38, 0.95); 
+            border: 2px solid #b026ff; 
+            padding: 25px; width: 90%; 
+            max-width: 800px; 
+            box-shadow: 0 0 50px rgba(176, 38, 255, 0.4); 
+            border-radius: 8px; 
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+
+        /* BLOC CONTEXTE HISTOIRE S04 */
+        .story-context {
+            background: rgba(176, 38, 255, 0.1);
+            border-left: 4px solid #b026ff;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: left;
+            font-size: 0.95em;
+            color: #e0b0ff;
+            line-height: 1.5;
+        }
+        .story-context b { color: #fff; text-shadow: 0 0 8px #b026ff; }
+
+        .header-mission { border-bottom: 2px solid #b026ff; margin-bottom: 20px; padding-bottom: 10px; color: #fff; font-weight: bold; text-transform: uppercase; display: flex; justify-content: space-between; }
+        
+        #lock-screen { text-align: center; padding: 20px; }
+        #pre-requis-screen, #mission-content { display: none; }
+        
+        .ai-status { background: rgba(176, 38, 255, 0.1); border: 1px dashed #b026ff; padding: 20px; margin: 20px 0; font-family: 'Consolas', monospace; }
+        
+        .search-zone { background: #1a0033; padding: 20px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #b026ff; }
+        .search-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 15px 0; }
+        
+        input { background: #000; border: 1px solid #b026ff; color: #b026ff; padding: 12px; width: 100%; box-sizing: border-box; font-family: inherit; text-align: center; outline: none; border-radius: 4px; }
+        input:focus { box-shadow: 0 0 15px #b026ff; }
+
+        button { background: #b026ff; color: #fff; border: none; padding: 12px 25px; font-weight: bold; cursor: pointer; transition: 0.3s; border-radius: 4px; width: 100%; text-transform: uppercase; letter-spacing: 1px; }
+        button:hover { background: #fff; color: #b026ff; box-shadow: 0 0 20px #b026ff; }
+
+        .code-final { color: #ffd700; font-size: 2.2em; letter-spacing: 5px; margin: 15px 0; display: block; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); text-align: center; border: 1px double #ffd700; padding: 10px; background: rgba(255, 215, 0, 0.05); }
+        
+        .export-report { background: rgba(176, 38, 255, 0.1); padding: 15px; text-align: left; font-size: 0.85em; border: 1px solid #b026ff; margin: 20px 0; font-family: monospace; color: #fff; }
+
+        #victory-screen { display: none; border-top: 2px solid #ffd700; padding-top: 20px; margin-top: 20px; }
+
+        .btn-aide-rouge { background: #d80000; color: #fff; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; width: 100%; max-width: 450px; margin-top: 40px; border-radius: 2px; text-transform: uppercase; }
+        .aide-box { display: none; background: #fff; color: #000; padding: 25px; margin-top: 10px; width: 90%; max-width: 450px; text-align: left; border-top: 5px solid #d80000; font-family: sans-serif; box-shadow: 0 10px 30px rgba(0,0,0,0.5); line-height: 1.4; font-size: 0.9em; position: relative; z-index: 10; }
+
+        /* CRITÈRE 4 : BOUTON NAV RETOUR OBLIGATOIRE */
+        .btn-navigation-retour { position: absolute; top: 15px; left: 15px; background: #000; border: 1px solid #b026ff; color: #b026ff; padding: 5px 12px; text-decoration: none; font-size: 0.8em; font-family: monospace; font-weight: bold; border-radius: 4px; }
+        .btn-navigation-retour:hover { background: #b026ff; color: #000; }
+
+        /* INTERFACE DES VERROUS INTERMÉDIAIRES */
+        .interactive-challenge { text-align: left; margin: 25px 0; font-family: monospace; border-top: 1px dashed #b026ff; padding-top: 20px; }
+        .code-window { background: #09001a; border: 1px solid #ffd700; padding: 15px; border-radius: 5px; margin: 15px 0; font-family: 'Courier New', monospace; font-size: 0.85em; color: #e0b0ff; overflow-x: auto; white-space: pre; text-align: left; }
+
+        /* MODE SOBRE */
+        body.mode-sobre, body.mode-sobre * { animation: none !important; transition: none !important; }
+        body.mode-sobre #neural-canvas { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <canvas id="neural-canvas"></canvas>
+
+    <div class="terminal">
+        <a href="../../MENU_PRINCIPAL.html" class="btn-navigation-retour">⬅ MENU</a>
+        <button id="toggle-sobre-btn" onclick="basculerModeSobre()" style="position:absolute;top:15px;right:15px;width:auto;z-index:10;background:#000;border:1px solid #b026ff;color:#b026ff;padding:5px 12px;font-size:0.8em;font-family:monospace;font-weight:bold;border-radius:4px;cursor:pointer;">🌓</button>
+
+        <div id="lock-screen">
+            <h2 style="color: #b026ff; margin-top: 20px;" data-algo="SCORING-V4">🧠 AUDIT ALGORITHMIQUE</h2>
+            
+            <div class="story-context">
+                <b>[ CONTEXTE NARRATIF SUISSE // INFRASTRUCTURES BANCAIRES DE GENÈVE ]</b><br>
+                L'infrastructure de surveillance de la <b>nLPD</b> détecte un traitement opaque au sein d'un grand établissement bancaire de la place genevoise. Un citoyen suisse s'est vu refuser un crédit de construction immobilière par un outil de profilage automatisé sans aucune intervention humaine.<br><br>
+                Conformément à l'<b>Art. 21 nLPD</b>, vous devez forcer l'audit du système décisionnel pour identifier les paramètres critiques et rétablir le droit à une révision par une personne physique. Entrez la clé de fin de l'épisode précédent (S04E25) pour monter le système de fichiers.
+            </div>
+
+            <p>Veuillez entrer le code d'exportation (Code de fin E25) :</p>
+            <input type="text" id="passkey" placeholder="CODE E25" onchange="sauvegarderAutomatiquement()">
+            <br><br>
+            <button onclick="unlock()">DÉBUTER L'ANALYSE DÉCISIONNELLE</button>
+        </div>
+
+        <div id="pre-requis-screen">
+            <div class="header-mission">
+                <span>[VERROUS INTERMÉDIAIRES DE CONFORMITÉ]</span>
+                <span>STAGE D'ACCÈS NIVEAU 2</span>
+            </div>
+            
+            <div class="interactive-challenge">
+                <p style="color: #fff; font-weight: bold;">⚖️ DÉFI I - SÛRETÉ JURIDIQUE (DÉCISION AUTOMATISÉE) :</p>
+                <p>Selon l'Art. 21 al. 2 nLPD, si le responsable du traitement informe la personne d'une décision automatisée, quelle action la personne concernée peut-elle exiger en plus d'exprimer son point de vue ? Répondez par l'expression légale exacte : "que la décision soit..."</p>
+                <input type="text" id="law_input" placeholder="Expression légale exacte (ex: ...revue par une personne physique)" style="max-width: 100%;" onchange="sauvegarderAutomatiquement()">
+            </div>
+
+            <div class="interactive-challenge">
+                <p style="color: #fff; font-weight: bold;">🖥️ DÉFI II - LIGNE DE COMMANDE (AUDIT PROCESSUS UNIX) :</p>
+                <p>Le binaire de notation bancaire tourne en tâche de fond. Quelle commande native Linux, combinée à un commutateur, permet d'afficher en temps réel l'arbre des processus (`PID` et liens de parenté) filtré spécifiquement pour le compte utilisateur système lié à la banque (`bankadmin`) ?</p>
+                <input type="text" id="tech_cmd" placeholder="Indiquez la commande d'arbre de processus (ex: pstree...)" style="max-width: 400px;" onchange="sauvegarderAutomatiquement()">
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <button onclick="verifyPreReq()">VALIDER LES COMPÉTENCES D'AUDIT</button>
+            </div>
+        </div>
+
+        <div id="mission-content">
+            <div class="header-mission">
+                <span>[ALGO-AUDIT] S04E26 : PROFILAGE À RISQUE ÉLEVÉ</span>
+                <span>nLPD Art. 21</span>
+            </div>
+            
+            <p>> <b>Alerte Art. 21 :</b> Une décision automatisée a été prise sur un dossier de crédit. Le client conteste l'opacité du scoring.</p>
+            <p>> <i>Action : Analysez l'arbre de logique floue inversé ci-dessous. Retrouvez l'ordre séquentiel des variables en passant outre l'obfuscation de pile.</i></p>
+
+            <p style="color: #fff; font-weight: bold;">🧩 CODE SOURCE INTERNE - PARSING DU POOL D'ÉVALUATION :</p>
+            <div class="code-window"># --- ALGORITHME DE PROFILAGE SOURCE DÉCOMPILÉ ---
+# Le système utilise un dictionnaire de hachage inversé pour attribuer les rôles.
+# Suivez pas à pas la transformation du dictionnaire pour trouver la clé de validation.
+
+def extract_system_signature():
+    # Variables obfusquées injectées dans la mémoire d'exécution
+    pool = {
+        "alpha": "M-MOREL",
+        "beta": "CRITICAL",
+        "gamma": "SCORING-V4"
+    }
+    
+    # Transformation de l'index de pile
+    register = list(pool.values())
+    register.reverse() # Inversion physique des blocs mémoire
+    
+    # L'ordre d'interrogation pour le tableau de transparence est :
+    # Index 0 -> ID ALGO
+    # Index 1 -> NIVEAU RISQUE
+    # Index 2 -> RÉVISEUR ASSIGNÉ
+    return register
+
+# INDICE DE TRACE FORENSICS :
+# register[0] contient la valeur issue du tag 'data-algo' du DOM.
+# register[1] est extrait de la constante de journalisation JS.
+# register[2] correspond à la directive de style css commentée en haut de page.</div>
+
+            <div class="search-zone">
+                <div class="search-grid">
+                    <input type="text" id="v1" placeholder="ID ALGO (register[0])" onchange="sauvegarderAutomatiquement()">
+                    <input type="text" id="v2" placeholder="RISQUE (register[1])" onchange="sauvegarderAutomatiquement()">
+                    <input type="text" id="v3" placeholder="RÉVISEUR (register[2])" onchange="sauvegarderAutomatiquement()">
+                </div>
+                <button onclick="verifyTransparency()">FORCER LA TRANSPARENCE DU SYSTÈME</button>
+            </div>
+
+            <div id="victory-screen">
+                <div class="ai-status">
+                    <p><b>Statut :</b> Transparence établie. Audit Art. 21 validé.</p>
+                    <p><b>Résultat :</b> Le profilage à risque élevé a été détecté. Le droit à une intervention humaine est désormais activé.</p>
+                </div>
+
+                <div class="export-report">
+                    <b>📝 RAPPORT D'AUDIT (export_eleves.csv) :</b><br>
+                    S04E26 ; Succès ; Audit Art. 21 (Algo: SCORING-V4, Risque: CRITICAL, Réviseur: M-MOREL). Intervention humaine activée.
+                </div>
+
+                <p style="text-align: center;">Code d'accès pour l'épisode 27 :</p>
+                <span class="code-final">HUMAN-IN-THE-LOOP</span>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <a href="../../MENU_PRINCIPAL.html" style="color: #b026ff; text-decoration: none; border: 1px solid #b026ff; padding: 10px 20px; font-weight: bold; display: inline-block;">[ TERMINER L'AUDIT ]</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn-aide-rouge" onclick="toggleAide()">[ 📜 RAPPORT D'AUDIT ALGORITHMIQUE ]</button>
+    <div id="zoneAide" class="aide-box">
+        <h3 style="color: #d80000; margin-top: 0; font-family: monospace;">Modèle Éducatif des 3 Piliers</h3>
+        <p><b>1. Informatique :</b> Le profilage s'appuie sur des structures de données (dictionnaires, listes) ordonnées en mémoire. En inversant une liste (`.reverse()`), le dernier élément inséré devient le premier pointeur accessible de la pile.</p>
+        <p><b>2. Juridique :</b> L'<b>Art. 21 nLPD</b> protège le citoyen contre l'arbitraire algorithmique. Il impose au responsable d'annoncer la décision automatisée et d'offrir la possibilité d'exiger qu'un être capable de jugement — et non l'algorithme seul — réexamine le dossier.</p>
+        <p><b>3. Forensics :</b> Un utilitaire Unix permet de remonter la lignée d'un processus suspect (<code>PPID</code>) jusqu'à son utilisateur d'origine, en affichant l'arborescence des processus, pour auditer les privilèges systèmes associés. Cherchez son nom dans votre mémento.</p>
+    </div>
+
+    <div style="margin-top: 30px; border-top: 3px solid #d80000; padding: 20px; background: #fff; font-family: Arial, sans-serif; position: relative; z-index: 100; width: 90%; max-width: 450px;">
+        <div id="hint-score-badge" style="background:#111;color:#3fb950;padding:8px 15px;font-weight:bold;text-align:center;">🏆 Score de cet épisode : <span id="hint-score-value">5</span> / 5 pts</div>
+        <div style="display:flex; gap:8px; margin:10px 0;">
+            <button id="hintBtn1" onclick="useHint(1)" style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;">💡 Indice 1 (-1 pt)</button>
+            <button id="hintBtn2" onclick="useHint(2)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🎯 Indice 2 (-2 pts)</button>
+            <button id="hintBtn3" onclick="useHint(3)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🆘 Solution (-3 pts)</button>
+        </div>
+
+        <div id="zoneAideScore" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; color: #333;">
+            <p id="hint-tier-1" style="display:none;"><strong>💡 INFO :</strong> Pré-requis : l'expression légale exacte (Art. 21 al. 2 nLPD) sur la révision d'une décision automatisée, et la commande d'arbre de processus filtrée sur l'utilisateur bankadmin. Ensuite, les 3 valeurs à trouver sont cachées respectivement dans un attribut HTML, un commentaire JS, et un commentaire CSS.</p>
+            <p id="hint-tier-2" style="display:none;"><strong>🎯 PISTE :</strong> Réponse juridique : « que la décision soit revue par une personne physique (humaine) ». Commande : <code>pstree bankadmin</code>. ID ALGO : attribut <code>data-algo</code> du titre. NIVEAU RISQUE : constante commentée en bas du script JS. RÉVISEUR : commentaire tout en haut du CSS.</p>
+            <p id="hint-tier-3" style="display:none;"><strong>🆘 SOLUTION :</strong> Pré-requis : revue par une personne physique / pstree bankadmin. Valeurs : ID ALGO <code>SCORING-V4</code>, RISQUE <code>CRITICAL</code>, RÉVISEUR <code>M-MOREL</code></p>
+        </div>
+    </div>
+
+    <script>
+        // --- ANIMATION BACKGROUND : NEURAL MESH ---
+        const canvas = document.getElementById('neural-canvas');
+        const ctx = canvas.getContext('2d');
+        let points = [];
+
+        function initCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            points = [];
+            for(let i=0; i<60; i++) {
+                points.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 1.5,
+                    vy: (Math.random() - 0.5) * 1.5
+                });
+            }
+        }
+
+        function draw() {
+            if (localStorage.getItem('swiss_shield_mode_sobre') === '1') { return; }
+            ctx.clearRect(0,0,canvas.width, canvas.height);
+            ctx.strokeStyle = "rgba(176, 38, 255, 0.2)";
+            ctx.fillStyle = "#b026ff";
+
+            points.forEach((p, i) => {
+                p.x += p.vx;
+                p.y += p.vy;
+
+                if(p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                if(p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 2, 0, Math.PI*2);
+                ctx.fill();
+
+                for(let j=i+1; j<points.length; j++) {
+                    let p2 = points[j];
+                    let dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+                    if(dist < 200) {
+                        ctx.lineWidth = 1 - dist/200;
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.stroke();
+                    }
+                }
+            });
+            requestAnimationFrame(draw);
+        }
+
+        window.addEventListener('resize', initCanvas);
+        initCanvas();
+        draw();
+
+        function toggleAide() {
+            var x = document.getElementById("zoneAide");
+            x.style.display = (x.style.display === "block") ? "none" : "block";
+        }
+
+        // 1. VÉRIFICATION DU CODE DE VERROU DE SESSION S04
+        function unlock() {
+            const code = document.getElementById('passkey').value.trim().toUpperCase();
+            if (code === 'EXPORT-JSON-28') {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('pre-requis-screen').style.display = 'block';
+                currentZone = 'pre-requis-screen';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('entree', code, 'EXPORT-JSON-28');
+                alert("ACCÈS REFUSÉ : Code de l'épisode précédent requis.");
+            }
+        }
+
+        // 7. LABELS ET LOGIQUE DE SÉCURITÉ CONVERGENTE (SANS SÉCURITÉ EN CLAIR)
+        function verifyPreReq() {
+            const lawInput = document.getElementById('law_input').value.trim().toLowerCase();
+            const techCmd = document.getElementById('tech_cmd').value.trim().toLowerCase();
+
+            // Attendu juridique : Contient "revue" et "personne physique" ou "humaine"
+            const lawValid = (lawInput.includes("revue") && (lawInput.includes("physique") || lawInput.includes("humaine")));
+            // Attendu technique : pstree avec option -u ou filtrage de compte (ex: pstree bankadmin ou pstree -u bankadmin)
+            const techValid = (techCmd.includes("pstree") && techCmd.includes("bankadmin"));
+
+            if (lawValid && techValid) {
+                document.getElementById('pre-requis-screen').style.display = 'none';
+                document.getElementById('mission-content').style.display = 'block';
+                currentZone = 'mission-content';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('prerequis', 'loi="' + lawInput + '", commande="' + techCmd + '"', 'loi contient revue+physique/humaine, commande contient pstree+bankadmin');
+                alert("ÉCHEC DES SÛRETÉS : L'autorité de contrôle fédérale bloque l'accès aux tables de l'algorithme.");
+            }
+        }
+
+        // 8. INVESTIGATION ALGORITHMIQUE FINALE VÉRIFIÉE
+        function verifyTransparency() {
+            const val1 = document.getElementById('v1').value.trim().toUpperCase();
+            const val2 = document.getElementById('v2').value.trim().toUpperCase();
+            const val3 = document.getElementById('v3').value.trim().toUpperCase();
+
+            if (val1 === 'SCORING-V4' && val2 === 'CRITICAL' && val3 === 'M-MOREL') {
+                document.getElementById('victory-screen').style.display = 'block';
+                document.querySelector('.search-zone').style.opacity = '0.3';
+                document.querySelector('.search-zone').style.pointerEvents = 'none';
+            } else {
+                enregistrerErreur('investigation', 'v1="' + val1 + '", v2="' + val2 + '", v3="' + val3 + '"', 'v1=SCORING-V4, v2=CRITICAL, v3=M-MOREL');
+                alert("ÉCHEC : Les paramètres de pile ne concordent pas. L'ordre mémoire de l'audit est invalide.");
+            }
+        }
+
+        /* LOG SYSTÈME D'INFRASTRUCTURE (Constante de journalisation obfusquée) :
+           ALERTE : Le niveau de risque algorithmique détecté est enregistré sous le symbole : CRITICAL
+        */
+    </script>
+
+    <script>
+        const EP_ID = "S04E26";
+        const HINT_COST = {1:1, 2:2, 3:3};
+        let hintsUsed = {1:false, 2:false, 3:false};
+        let episodeScore = 5;
+        function useHint(level) {
+            if (hintsUsed[level] || (level > 1 && !hintsUsed[level - 1])) return;
+            hintsUsed[level] = true;
+            enregistrerIndiceUsage(level);
+            episodeScore -= HINT_COST[level];
+            document.getElementById('hint-score-value').textContent = episodeScore;
+            document.getElementById('hint-tier-' + level).style.display = 'block';
+            const btn = document.getElementById('hintBtn' + level);
+            btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5';
+            if (level < 3) {
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+            sauvegarderAutomatiquement();
+        }
+        function recordEpisodeSuccess() {
+            let scores = {};
+            try { scores = JSON.parse(localStorage.getItem('swiss_shield_scores') || '{}'); } catch(e) {}
+            if (!(EP_ID in scores) || scores[EP_ID] < episodeScore) scores[EP_ID] = episodeScore;
+            localStorage.setItem('swiss_shield_scores', JSON.stringify(scores));
+            localStorage.removeItem('autosave_' + EP_ID);
+        }
+        let currentZone = 'lock-screen';
+        function sauvegarderAutomatiquement() {
+            try {
+                const inputs = {};
+                ['passkey', 'law_input', 'tech_cmd', 'v1', 'v2', 'v3'].forEach(function(id) {
+                    const el = document.getElementById(id);
+                    if (el) inputs[id] = el.value;
+                });
+                localStorage.setItem('autosave_' + EP_ID, JSON.stringify({
+                    zone: currentZone,
+                    inputs: inputs,
+                    hintsUsed: hintsUsed,
+                    episodeScore: episodeScore
+                }));
+            } catch(e) {}
+        }
+        function proposerRestaurationAutosave() {
+            let data;
+            try { data = JSON.parse(localStorage.getItem('autosave_' + EP_ID) || 'null'); } catch(e) { return; }
+            if (!data || !data.zone || data.zone === 'lock-screen') return;
+            document.getElementById('lock-screen').style.display = 'none';
+            if (data.zone === 'mission-content') {
+                document.getElementById('pre-requis-screen').style.display = 'none';
+                document.getElementById('mission-content').style.display = 'block';
+            } else if (data.zone === 'pre-requis-screen') {
+                document.getElementById('pre-requis-screen').style.display = 'block';
+            }
+            currentZone = data.zone;
+            if (data.inputs) {
+                Object.keys(data.inputs).forEach(function(id) {
+                    const el = document.getElementById(id);
+                    if (el) el.value = data.inputs[id];
+                });
+            }
+            hintsUsed = data.hintsUsed || hintsUsed;
+            episodeScore = (typeof data.episodeScore === 'number') ? data.episodeScore : episodeScore;
+            document.getElementById('hint-score-value').textContent = episodeScore;
+            [1, 2, 3].forEach(function(level) {
+                if (hintsUsed[level]) {
+                    document.getElementById('hint-tier-' + level).style.display = 'block';
+                    const btn = document.getElementById('hintBtn' + level);
+                    if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+                    const next = document.getElementById('hintBtn' + (level + 1));
+                    if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+                }
+            });
+        }
+        function enregistrerErreur(phase, reponseEleve, reponseAttendue) {
+            let debrief = {erreurs:{}, indices:{}};
+            try { debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}'); } catch(e) {}
+            const key = EP_ID + ':' + phase;
+            if (typeof debrief.erreurs[key] !== 'object' || debrief.erreurs[key] === null) {
+                debrief.erreurs[key] = { compte: (debrief.erreurs[key] || 0), exemples: [] };
+            }
+            debrief.erreurs[key].compte++;
+            if (reponseEleve !== undefined && debrief.erreurs[key].exemples.length < 5) {
+                debrief.erreurs[key].exemples.push({ reponseEleve: String(reponseEleve).slice(0,100), reponseAttendue: String(reponseAttendue||'').slice(0,100) });
+            }
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        }
+        function enregistrerIndiceUsage(niveau) {
+            let debrief = {erreurs:{}, indices:{}};
+            try { debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}'); } catch(e) {}
+            const key = EP_ID + ':' + niveau;
+            debrief.indices[key] = (debrief.indices[key] || 0) + 1;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        }
+        function basculerModeSobre() {
+            const actif = document.body.classList.toggle('mode-sobre');
+            localStorage.setItem('swiss_shield_mode_sobre', actif ? '1' : '0');
+            if (!actif) { draw(); }
+        }
+        if (localStorage.getItem('swiss_shield_mode_sobre') === '1') {
+            document.body.classList.add('mode-sobre');
+        }
+        (function pollSuccess(){
+            const ids = ['success','success-msg','success-final','final-zone','step_final','victory-zone','victory-screen','final-step','final-badge'];
+            let recorded = false;
+            setInterval(function(){
+                if (recorded) return;
+                for (const id of ids) {
+                    const el = document.getElementById(id);
+                    if (el && window.getComputedStyle(el).display === 'block') { recordEpisodeSuccess(); recorded = true; return; }
+                }
+            }, 500);
+        })();
+        proposerRestaurationAutosave();
+    </script>
+</body>
+</html>

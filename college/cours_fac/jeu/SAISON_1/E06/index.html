@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>S01E06 - CORRUPTION CRITIQUE</title>
+    <style>
+        :root {
+            --alert-red: #ff3333;
+            --dark-red: #1a0000;
+            --terminal-bg: rgba(10, 0, 0, 0.95);
+            --gold: #ffd700;
+        }
+
+        /* --- MODE SOBRE (accessibilité) --- */
+        body.mode-sobre, body.mode-sobre * { animation: none !important; transition: none !important; }
+        body.mode-sobre::before, body.mode-sobre::after { animation: none !important; }
+        #toggle-sobre-btn {
+            position: fixed; top: 10px; right: 10px; z-index: 10001;
+            background: #000; color: var(--alert-red); border: 1px solid var(--alert-red);
+            padding: 6px 10px; font-size: 0.7em; cursor: pointer; font-family: inherit; border-radius: 3px;
+        }
+
+        body {
+            background-color: #000;
+            color: var(--alert-red);
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Scan Radar & Laser */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(255, 0, 0, 0) 50%, rgba(255, 0, 0, 0.1) 50%),
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(255, 0, 0, 0.02));
+            background-size: 100% 4px, 4px 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            top: -100%; left: 0; width: 100%; height: 100px;
+            background: linear-gradient(to bottom, transparent, var(--alert-red), transparent);
+            opacity: 0.2;
+            z-index: -1;
+            animation: laser-scan 4s linear infinite;
+        }
+
+        @keyframes laser-scan {
+            0% { top: -100px; }
+            100% { top: 100%; }
+        }
+
+        .terminal {
+            background: var(--terminal-bg);
+            border: 3px solid var(--alert-red);
+            padding: 25px;
+            width: 95%;
+            max-width: 900px;
+            box-shadow: 0 0 50px rgba(255, 0, 0, 0.3);
+            border-radius: 5px;
+            position: relative;
+            animation: flicker 0.3s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.98; }
+            100% { opacity: 1; transform: skew(0.05deg); }
+        }
+
+        .btn-retour {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #fff;
+            text-decoration: none;
+            border: 1px solid var(--alert-red);
+            padding: 5px 10px;
+            font-size: 0.8em;
+            background: rgba(255,0,0,0.2);
+        }
+
+        .header-mission { border-bottom: 2px solid var(--alert-red); margin-bottom: 20px; padding-bottom: 10px; color: #fff; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+
+        .story-context {
+            background: var(--dark-red);
+            border: 1px dashed var(--alert-red);
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #ff9999;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        #pre-requisites, #mission-content, #final-zone { display: none; }
+
+        .annex-code {
+            background: #050000;
+            border: 1px solid #440000;
+            padding: 15px;
+            margin: 20px 0;
+            font-family: 'Consolas', monospace;
+            color: #00ff41;
+            font-size: 0.8em;
+            white-space: pre;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .annex-title {
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            background: var(--alert-red);
+            color: #000;
+            padding: 2px 8px;
+            font-size: 0.7em;
+            font-weight: bold;
+        }
+
+        .challenge-box {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+
+        input { background: #000; border: 2px solid var(--alert-red); color: var(--alert-red); padding: 10px; width: 300px; font-family: inherit; font-size: 1em; text-align: center; outline: none; margin: 10px 0; }
+        button { background: var(--alert-red); color: #fff; border: none; padding: 12px 30px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; text-transform: uppercase; }
+        button:hover { background: #fff; color: #000; box-shadow: 0 0 20px white; }
+
+        .code-final { color: var(--gold); font-size: 2em; letter-spacing: 5px; margin: 15px 0; display: block; text-shadow: 0 0 15px gold; border: 2px dashed var(--gold); padding: 10px; text-align: center; }
+
+        .btn-aide-rouge { background: #440000; color: #ff3333; border: 1px solid #ff3333; padding: 10px 20px; font-weight: bold; cursor: pointer; margin-top: 40px; border-radius: 5px; width: 100%; max-width: 400px; }
+        .aide-box { display: none; background: #fff; color: #333; margin-top: 10px; padding: 20px; width: 100%; max-width: 500px; text-align: left; border-left: 10px solid #d80000; font-family: sans-serif; }
+
+        .pillar-tag { font-weight: bold; color: #d80000; text-transform: uppercase; font-size: 0.8em; display: block; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <button id="toggle-sobre-btn" onclick="basculerModeSobre()">🌓 Mode sobre</button>
+
+    <div class="terminal">
+        <a href="../../MENU_PRINCIPAL.html" class="btn-retour">[ RETOUR MENU ]</a>
+
+        <div id="lock-screen">
+            <div class="header-mission">S01E06 : ACCÈS AU NOEUD DE COLOGNY</div>
+            <div class="story-context">
+                "Agent, nous sommes au cœur des infrastructures de l'Administration fédérale des finances. Le serveur de backup à Cologny est infecté. Pour reprendre le contrôle du Kernel, injectez la clé d'exportation de l'E05."
+            </div>
+            <p style="text-align:center;">Clé d'entrée (Code final E05) :</p>
+            <div style="text-align:center;">
+                <input type="text" id="passkey" placeholder="IDENTIFIANT S01E05">
+                <br>
+                <button onclick="unlock()">DÉCHIFFRER LE KERNEL</button>
+            </div>
+        </div>
+
+        <div id="pre-requisites">
+            <div class="header-mission">[SÉCURITÉ] PROTOCOLES FORENSIQUES RÉGALIENS</div>
+            <div class="story-context">
+                "Le système de protection de la Confédération exige une double validation. Répondez aux directives fédérales avant toute intervention sur les processus."
+            </div>
+
+            <div class="challenge-box">
+                <p><strong>1. Technique :</strong> Quel utilitaire Linux permet d'afficher les fichiers ouverts par un processus (souvent utilisé pour repérer des backdoors cachées) ?</p>
+                <input type="text" id="pre-tech" placeholder="Commande (5 lettres)" onchange="sauvegarderAutomatiquement()">
+            </div>
+
+            <div class="challenge-box">
+                <p><strong>2. Juridique (LPD) :</strong> En Suisse, selon la nouvelle LPD, comment appelle-t-on le principe qui impose de configurer les systèmes pour minimiser d'emblée la collecte de données ?</p>
+                <input type="text" id="pre-jur" placeholder="Privacy by ..." onchange="sauvegarderAutomatiquement()">
+            </div>
+
+            <div style="text-align:center;">
+                <button onclick="validatePreReq()">VÉRIFIER LES ACCRÉDITATIONS</button>
+            </div>
+        </div>
+
+        <div id="mission-content">
+            <div class="header-mission">[ANALYSE] ÉRADICATION DU PROCESSUS FANTÔME</div>
+            <div class="story-context">
+                "Le virus utilise une mutation polymorphe. Il s'est logé dans une structure de données Python. L'ID de session malveillant est chiffré.
+                Consigne : Trouvez la valeur finale de 'session_id' après l'exécution de cette fonction de décryptage."
+            </div>
+
+            <div class="annex-code">
+                <div class="annex-title">FORENSICS_REPORT_06.PY</div>
+data_nodes = [
+    {"node": "A", "val": 15, "op": "add"},
+    {"node": "B", "val": 3, "op": "mul"},
+    {"node": "C", "val": 12, "op": "sub"}
+]
+
+def calculate_backdoor_pid(nodes):
+    result = 5  # Valeur initiale du registre
+    for n in nodes:
+        if n["op"] == "add":
+            result += n["val"]
+        elif n["op"] == "mul":
+            result *= n["val"]
+        elif n["op"] == "sub":
+            result -= n["val"]
+    return result
+
+# Le PID est égal à (calculate_backdoor_pid(data_nodes) / 2) + 144
+            </div>
+
+            <div id="action-zone" style="text-align: center;">
+                <p>CALCULEZ LE PID RÉEL POUR L'ÉRADICATION :</p>
+                <input type="text" id="finalPID" placeholder="ENTREZ LE PID CALCULÉ">
+                <br>
+                <button onclick="checkFinal()">KILL -9 --FORCE</button>
+            </div>
+
+            <div id="final-zone">
+                <p style="color: var(--gold); font-weight: bold;">✓ ANALYSE TERMINÉE : NOEUD DE COLOGNY SÉCURISÉ.</p>
+                <p>Clé d'exportation pour l'épisode 07 :</p>
+                <span class="code-final">V7-STABILIZED-2026</span>
+                <br>
+                <button onclick="window.location.href='../../MENU_PRINCIPAL.html'">RETOUR AU HUB</button>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn-aide-rouge" onclick="toggleAide()">[ 📜 RAPPORT D'ANALYSE DES TROIS PILIERS ]</button>
+
+    <div id="zoneAide" class="aide-box">
+        <h3 style="color: #d80000; margin-top: 0; border-bottom: 2px solid #d80000;">GUIDE DE RÉPONSE</h3>
+
+        <span class="pillar-tag">Informatique (Concepts)</span>
+        <p>Un utilitaire Unix classique permet de voir quel processus utilise une connexion réseau ou un fichier système suspect. Cherchez son nom dans votre mémento Linux (rubrique "fichiers ouverts").</p>
+
+        <span class="pillar-tag">Juridique (Suisse)</span>
+        <p>La LPD consacre un principe selon lequel le réglage le plus protecteur pour la vie privée doit s'appliquer automatiquement, sans action de l'utilisateur. Comment appelle-t-on ce principe (en anglais, deux mots) ?</p>
+
+        <span class="pillar-tag">Forensics (Logique)</span>
+        <p>Suivez le registre :
+        1. Départ : 5.
+        2. Node A (+15) = 20.
+        3. Node B (*3) = 60.
+        4. Node C (-12) = 48.
+        Appliquez ensuite la formule finale mentionnée dans le commentaire Python : (48/2) + 144.</p>
+    </div>
+
+    <div style="margin-top: 30px; border-top: 3px solid #d80000; padding: 20px; background: #fff; font-family: Arial, sans-serif; position: relative; z-index: 100; width: 90%; max-width: 900px; margin-left:auto; margin-right:auto;">
+        <div id="hint-score-badge" style="background:#111;color:#3fb950;padding:8px 15px;font-weight:bold;text-align:center;">🏆 Score de cet épisode : <span id="hint-score-value">5</span> / 5 pts</div>
+        <div style="display:flex; gap:8px; margin:10px 0;">
+            <button id="hintBtn1" onclick="useHint(1)" style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;">💡 Indice 1 (-1 pt)</button>
+            <button id="hintBtn2" onclick="useHint(2)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🎯 Indice 2 (-2 pts)</button>
+            <button id="hintBtn3" onclick="useHint(3)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🆘 Solution (-3 pts)</button>
+        </div>
+
+        <div id="zoneAideScore" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; color: #333;">
+            <p id="hint-tier-1" style="display:none;"><strong>💡 INFO :</strong> Pré-requis : un utilitaire Linux (5 lettres) pour voir les fichiers ouverts par un processus, et le principe LPD (deux mots anglais) qui applique par défaut le réglage le plus protecteur. Ensuite, suivez le registre Python pas à pas puis appliquez la formule du commentaire.</p>
+            <p id="hint-tier-2" style="display:none;"><strong>🎯 PISTE :</strong> Commande : <code>lsof</code>. Principe LPD : « privacy by default ». Registre : 5 +15=20, ×3=60, −12=48. Formule finale : (48/2) + 144.</p>
+            <p id="hint-tier-3" style="display:none;"><strong>🆘 SOLUTION :</strong> Pré-requis : lsof / privacy by default. PID final : <code>168</code></p>
+        </div>
+    </div>
+
+    <script>
+        function appliquerModeSobre() {
+            const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+            document.body.classList.toggle('mode-sobre', actif);
+            const btn = document.getElementById('toggle-sobre-btn');
+            if (btn) btn.textContent = actif ? '🌓 Mode sobre : ON' : '🌓 Mode sobre';
+        }
+        function basculerModeSobre() {
+            const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+            localStorage.setItem('swiss_shield_mode_sobre', actif ? '0' : '1');
+            appliquerModeSobre();
+        }
+        appliquerModeSobre();
+
+        function unlock() {
+            const key = document.getElementById('passkey').value.trim().toUpperCase();
+            if (key === 'INTERNAL-99') {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('pre-requisites').style.display = 'block';
+                currentZone = 'pre-requisites';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('entree', key, 'INTERNAL-99');
+                alert("ACCÈS REFUSÉ : Vérifiez votre clé S01E05.");
+            }
+        }
+
+        function validatePreReq() {
+            const tech = document.getElementById('pre-tech').value.trim().toLowerCase();
+            const jur = document.getElementById('pre-jur').value.trim().toLowerCase();
+
+            if (tech === 'lsof' && (jur.includes('default'))) {
+                document.getElementById('pre-requisites').style.display = 'none';
+                document.getElementById('mission-content').style.display = 'block';
+                currentZone = 'mission-content';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('prerequis', 'technique="' + tech + '", juridique="' + jur + '"', 'technique="lsof", juridique contient "default"');
+                alert("ERREUR DE PROTOCOLE : Les réponses aux pré-requis sont incorrectes.");
+            }
+        }
+
+        function checkFinal() {
+            const val = document.getElementById('finalPID').value.trim();
+            if (val === '168') {
+                document.getElementById('action-zone').style.display = 'none';
+                document.getElementById('final-zone').style.display = 'block';
+            } else {
+                enregistrerErreur('investigation', val, '168');
+                alert("DÉNI : PID incorrect. Le virus continue de se propager.");
+            }
+        }
+
+        function toggleAide() {
+            const x = document.getElementById("zoneAide");
+            x.style.display = (x.style.display === "block") ? "none" : "block";
+        }
+    </script>
+
+    <script>
+        const EP_ID = "S01E06";
+        const HINT_COST = {1:1, 2:2, 3:3};
+        let hintsUsed = {1:false, 2:false, 3:false};
+        let episodeScore = 5;
+        function useHint(level) {
+            if (hintsUsed[level] || (level > 1 && !hintsUsed[level - 1])) return;
+            hintsUsed[level] = true;
+        enregistrerIndiceUsage(level);
+            episodeScore -= HINT_COST[level];
+            document.getElementById('hint-score-value').textContent = episodeScore;
+            document.getElementById('hint-tier-' + level).style.display = 'block';
+            const btn = document.getElementById('hintBtn' + level);
+            btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5';
+            if (level < 3) {
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+            sauvegarderAutomatiquement();
+        }
+        function recordEpisodeSuccess() {
+            let scores = {};
+            try { scores = JSON.parse(localStorage.getItem('swiss_shield_scores') || '{}'); } catch(e) {}
+            if (!(EP_ID in scores) || scores[EP_ID] < episodeScore) scores[EP_ID] = episodeScore;
+            localStorage.setItem('swiss_shield_scores', JSON.stringify(scores));
+            localStorage.removeItem('autosave_' + EP_ID);
+        }
+    let currentZone = 'lock-screen';
+    function sauvegarderAutomatiquement() {
+        try {
+            const inputs = {};
+            ['pre-tech', 'pre-jur', 'finalPID'].forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) inputs[id] = el.value;
+            });
+            localStorage.setItem('autosave_' + EP_ID, JSON.stringify({
+                zone: currentZone,
+                inputs: inputs,
+                hintsUsed: hintsUsed,
+                episodeScore: episodeScore
+            }));
+        } catch(e) {}
+    }
+    function proposerRestaurationAutosave() {
+        let data;
+        try { data = JSON.parse(localStorage.getItem('autosave_' + EP_ID) || 'null'); } catch(e) { return; }
+        if (!data || !data.zone || data.zone === 'lock-screen') return;
+        document.getElementById('lock-screen').style.display = 'none';
+        if (data.zone === 'mission-content') {
+            document.getElementById('pre-requisites').style.display = 'none';
+            document.getElementById('mission-content').style.display = 'block';
+        } else if (data.zone === 'pre-requisites') {
+            document.getElementById('pre-requisites').style.display = 'block';
+        }
+        currentZone = data.zone;
+        if (data.inputs) {
+            Object.keys(data.inputs).forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) el.value = data.inputs[id];
+            });
+        }
+        hintsUsed = data.hintsUsed || hintsUsed;
+        episodeScore = (typeof data.episodeScore === 'number') ? data.episodeScore : episodeScore;
+        document.getElementById('hint-score-value').textContent = episodeScore;
+        [1, 2, 3].forEach(function(level) {
+            if (hintsUsed[level]) {
+                document.getElementById('hint-tier-' + level).style.display = 'block';
+                const btn = document.getElementById('hintBtn' + level);
+                if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+        });
+    }
+    function enregistrerIndiceUsage(niveau) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + niveau;
+            debrief.indices[cle] = (debrief.indices[cle] || 0) + 1;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+    function enregistrerErreur(phase, reponseEleve, reponseAttendue) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + phase;
+            if (typeof debrief.erreurs[cle] !== 'object' || debrief.erreurs[cle] === null) {
+                debrief.erreurs[cle] = { compte: (debrief.erreurs[cle] || 0), exemples: [] };
+            }
+            debrief.erreurs[cle].compte++;
+            if (reponseEleve !== undefined && debrief.erreurs[cle].exemples.length < 5) {
+                debrief.erreurs[cle].exemples.push({ reponseEleve: String(reponseEleve).slice(0,100), reponseAttendue: String(reponseAttendue||'').slice(0,100) });
+            }
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+        (function pollSuccess(){
+            const ids = ['success','success-msg','success-final','final-zone','victory-zone','victory-screen','final-step','final-badge'];
+            let recorded = false;
+            setInterval(function(){
+                if (recorded) return;
+                for (const id of ids) {
+                    const el = document.getElementById(id);
+                    if (el && el.style.display === 'block') { recordEpisodeSuccess(); recorded = true; return; }
+                }
+            }, 500);
+        })();
+        proposerRestaurationAutosave();
+    </script>
+</body>
+</html>

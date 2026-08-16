@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>S04E31 - CYBER-RÉSILIENCE CRITIQUE</title>
+    <style>
+        /* --- EFFET VISUEL : CYBER TUNNEL & GRID --- */
+        #cyber-bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            background: #000;
+        }
+
+        body { 
+            color: #58a6ff; 
+            font-family: 'Courier New', monospace; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 40px; 
+            margin: 0; 
+            min-height: 100vh; 
+            overflow-x: hidden;
+        }
+
+        .terminal { 
+            background: rgba(9, 12, 16, 0.9); 
+            border: 2px solid #388bfd; 
+            padding: 25px; 
+            width: 95%; 
+            max-width: 900px; 
+            box-shadow: 0 0 50px rgba(56, 139, 253, 0.4), inset 0 0 20px rgba(56, 139, 253, 0.1); 
+            border-radius: 6px;
+            backdrop-filter: blur(8px);
+            position: relative;
+        }
+
+        /* CONTEXTE HISTOIRE S04E31 */
+        .story-context {
+            background: rgba(56, 139, 253, 0.1);
+            border-left: 4px solid #388bfd;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+            font-size: 0.95em;
+            color: #f0f6fc;
+            line-height: 1.6;
+        }
+        .story-context b { color: #388bfd; text-transform: uppercase; }
+
+        .header-mission { border-bottom: 1px solid #30363d; margin-bottom: 20px; padding-bottom: 10px; color: #f0f6fc; font-weight: bold; display: flex; justify-content: space-between; }
+        
+        #lock-screen { text-align: center; padding: 20px; }
+        #pre-requis-screen { display: none; padding: 20px; }
+        #mission-content { display: none; }
+        
+        .log-stream { background: #000; height: 150px; overflow-y: auto; padding: 10px; font-size: 0.85em; border: 1px solid #1f6feb; margin-bottom: 20px; color: #3fb950; text-align: left; }
+        
+        .setup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; border: 1px solid #30363d; padding: 20px; background: #161b22; }
+        .config-item { display: flex; flex-direction: column; gap: 10px; text-align: left; }
+        
+        label { font-size: 0.8em; color: #8b949e; text-transform: uppercase; }
+        select, input { background: #0d1117; border: 1px solid #388bfd; color: #fff; padding: 8px; font-family: inherit; outline: none; }
+
+        .restore-bar { width: 100%; background: #21262d; height: 12px; border-radius: 6px; margin: 20px 0; overflow: hidden; }
+        .progress { width: 0%; height: 100%; background: #1f6feb; transition: width 0.4s ease; box-shadow: 0 0 15px #388bfd; }
+
+        .btn-action { background: #1f6feb; color: white; border: none; padding: 12px; cursor: pointer; font-weight: bold; text-transform: uppercase; border-radius: 4px; transition: 0.3s; font-family: inherit; }
+        .btn-action:hover { background: #388bfd; box-shadow: 0 0 20px #388bfd; }
+        .btn-action:disabled { background: #30363d; cursor: not-allowed; box-shadow: none; }
+
+        .export-report { background: rgba(31, 111, 235, 0.1); padding: 15px; text-align: left; font-size: 0.85em; border: 1px solid #1f6feb; margin: 20px 0; font-family: monospace; color: #fff; }
+
+        .btn-aide-blue { background: #1f6feb; color: #fff; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; width: 100%; max-width: 450px; margin-top: 40px; text-transform: uppercase; border-radius: 2px; font-family: inherit; }
+        .aide-box { display: none; background: #fff; color: #000; padding: 25px; margin-top: 10px; width: 90%; max-width: 450px; text-align: left; border-top: 5px solid #1f6feb; font-family: sans-serif; box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-size: 0.9em; line-height: 1.4; }
+        .pillar { margin-bottom: 12px; border-left: 3px solid #1f6feb; padding-left: 10px; }
+        .pillar b { color: #1f6feb; text-transform: uppercase; font-size: 0.75em; display: block; margin-bottom: 2px; }
+
+        /* BOUTON RETOUR ET BLOCS D'INVESTIGATION ET CODE REQUIS */
+        .btn-nav-retour { position: absolute; top: 15px; left: 15px; background: #0d1117; border: 1px solid #388bfd; color: #388bfd; padding: 5px 10px; text-decoration: none; font-size: 0.8em; font-weight: bold; border-radius: 3px; z-index: 10; }
+        .btn-nav-retour:hover { background: #388bfd; color: #000; }
+        .challenge-block { background: #161b22; border: 1px dashed #388bfd; padding: 15px; margin: 15px 0; text-align: left; }
+        .challenge-title { font-weight: bold; color: #fff; text-transform: uppercase; font-size: 0.9em; margin-bottom: 8px; display: block; }
+        .code-window { background: #000; border-left: 3px solid #388bfd; padding: 10px; margin: 15px 0; color: #a5d6ff; font-size: 0.85em; overflow-x: auto; white-space: pre; font-family: monospace; }
+
+        /* MODE SOBRE */
+        body.mode-sobre, body.mode-sobre * { animation: none !important; transition: none !important; }
+        body.mode-sobre #cyber-bg { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <canvas id="cyber-bg"></canvas>
+
+    <div class="terminal">
+        <a href="../../MENU_PRINCIPAL.html" class="btn-nav-retour">&lt; MENU PRINCIPAL</a>
+        <button id="toggle-sobre-btn" onclick="basculerModeSobre()" style="position:absolute;top:15px;right:15px;width:auto;z-index:10;background:#0d1117;border:1px solid #388bfd;color:#388bfd;padding:5px 10px;font-size:0.8em;font-weight:bold;border-radius:3px;cursor:pointer;">🌓</button>
+
+        <div id="lock-screen" style="margin-top: 25px;">
+            <h2 style="color: #58a6ff; text-shadow: 0 0 15px #388bfd;">[S04E31] - PROTOCOLE DE RÉSILIENCE</h2>
+            
+            <div class="story-context">
+                <b>[ ÉTAT D'URGENCE : INFRASTRUCTURE BANCAIRE SUISSE ]</b><br>
+                Juste après la clôture de l'audit fédéral, une panne matérielle en cascade frappe le nœud de stockage principal de la Banque Cantonale de Genève. Les grands livres de transactions de secours sont temporairement inaccessibles.<br><br>
+                L'<b>Art. 8 de la nLPD</b> (sécurité des données) est formel : vous devez garantir sans délai la <b>disponibilité</b> et l'<b>intégrité</b> des données critiques du système financier. Sans un plan de restauration immuable validé, la FINMA ordonnera la suspension des compensations interbancaires. Activez les protocoles d'urgence.
+            </div>
+
+            <p>Veuillez saisir le certificat MASTER de l'épisode précédent (Code E30) :</p>
+            <input type="text" id="passkey" placeholder="Code de certification requis..." autocomplete="off" onchange="sauvegarderAutomatiquement()">
+            <br><br>
+            <button class="btn-action" onclick="unlock()">DÉVERROUILLER LES SYSTÈMES</button>
+        </div>
+
+        <div id="pre-requis-screen" style="margin-top: 25px;">
+            <div class="header-mission">
+                <span>[PRÉ-REQUIS] SÉCURISATION DU CANAL DE REPRISE</span>
+                <span style="color: #ffcc00;">VÉRIFICATION COGNITIVE</span>
+            </div>
+
+            <div class="challenge-block">
+                <span class="challenge-title">⚖️ Défi Cadre Légal : Secret Professionnel des Banques (LB)</span>
+                <p>Si la panne cause une fuite accidentelle ou une corruption par négligence mettant en péril les secrets des clients, quel est l'article de la Loi fédérale sur les banques (LB) qui réprime pénalement la violation du secret professionnel bancaire ? (Indiquer uniquement le numéro de l'article, ex: 24 ou 47)</p>
+                <input type="text" id="law_ans" placeholder="Exemple : 39" style="width: 100%; max-width: 400px;" autocomplete="off" onchange="sauvegarderAutomatiquement()">
+            </div>
+
+            <div class="challenge-block">
+                <span class="challenge-title">🖥️ Défi Analyse Forensic : Diagnostic de l'Espace de Restauration</span>
+                <p>Avant d'extraire les archives de sauvegarde, vous devez vérifier l'espace disponible sur les partitions Linux montées. Quelle commande Unix standard affiche la quantité d'espace disque disponible sur tous les systèmes de fichiers en format lisible par l'homme (Human-Readable) ? (Indiquez la commande stricte avec ses arguments condensés, ex: 'cmd -xyz')</p>
+                <input type="text" id="shell_ans" placeholder="Exemple : command -args" style="width: 100%; max-width: 400px;" autocomplete="off" onchange="sauvegarderAutomatiquement()">
+            </div>
+
+            <center>
+                <button class="main-btn btn-action" onclick="verifyPreReq()">VÉRIFIER LES COMPÉTENCES OPÉRATIONNELLES</button>
+            </center>
+        </div>
+
+        <div id="mission-content" style="margin-top: 25px;">
+            <div class="header-mission">
+                <span>RECOVERY_MODE / ALPHA-V3</span>
+                <span id="sync-status">STATION : GENÈVE-01</span>
+            </div>
+
+            <div class="log-stream" id="logs">
+                > [CRITICAL] DATA_LOST: Incident technique de stockage sur nœud critique.<br>
+                > [WARNING] Art. 8 nLPD : Risque immédiat de rupture de disponibilité.<br>
+                > [WAIT] En attente de configuration conforme du Plan de Reprise...
+            </div>
+
+            <div class="setup-grid">
+                <div class="config-item">
+                    <label>RTO (Délai de rétablissement)</label>
+                    <select id="rto" onchange="sauvegarderAutomatiquement()">
+                        <option value="">-- Choisir --</option>
+                        <option value="fail">48 Heures (Inacceptable)</option>
+                        <option value="ok">4 Heures (Conforme)</option>
+                    </select>
+                </div>
+                <div class="config-item">
+                    <label>RPO (Perte de données max)</label>
+                    <select id="rpo" onchange="sauvegarderAutomatiquement()">
+                        <option value="">-- Choisir --</option>
+                        <option value="fail">1 Semaine (Critique)</option>
+                        <option value="ok">15 Minutes (Réplication)</option>
+                    </select>
+                </div>
+                <div class="config-item">
+                    <label>Infrastructure</label>
+                    <select id="backup" onchange="sauvegarderAutomatiquement()">
+                        <option value="">-- Choisir --</option>
+                        <option value="fail">Serveur local simple</option>
+                        <option value="ok">Stockage Immuable (Anti-Ransomware)</option>
+                    </select>
+                </div>
+                <div class="config-item">
+                    <label>Tests de restauration / an</label>
+                    <input type="number" id="test-freq" placeholder="Nb de tests" onchange="sauvegarderAutomatiquement()">
+                </div>
+            </div>
+
+            <div class="challenge-block" id="logic-puzzle-zone" style="margin-top: 20px;">
+                <span class="challenge-title">🧩 Investigation Technique : Résolution des Dépendances de Restauration</span>
+                <p>Pour rebâtir l'index du système de fichiers sans écraser les pointeurs d'intégrité, examinez l'algorithme Python d'analyse de grappe ci-dessous :</p>
+                
+                <div class="code-window"># S04E31 - Cartographie des blocs de redondance
+def valider_graphe_restauration():
+    # Liste de blocs d'index ordonnés
+    noeuds = {"A": 12, "B": 8, "C": 15, "D": 5}
+    ordre_execution = ["B", "D", "A", "C"]
+    
+    accumulateur = 0
+    for rang, cle in enumerate(ordre_execution):
+        facteur = (rang + 1)
+        if noeuds[cle] % 2 == 0:
+            accumulateur += (noeuds[cle] // 2) * facteur
+        else:
+            accumulateur += (noeuds[cle] * 2) - facteur
+            
+    return accumulateur</div>
+
+                <p style="color: #f0f6fc; font-size: 0.85em;">💡 <i>Indices d'analyse structurelle :<br>
+                1. Au rang 0 (index de boucle 0, donc facteur = 1) : On évalue la clé "B". La valeur est 8. Elle est paire. Calculez (8 // 2) * 1.<br>
+                2. Au rang 1 (facteur = 2) : Clé "D" (valeur 5, impaire). Appliquez l'alternative : (5 * 2) - 2.<br>
+                3. Au rang 2 (facteur = 3) : Clé "A" (valeur 12, paire). Appliquez la formule paire associée au facteur 3.<br>
+                4. Au rang 3 (facteur = 4) : Clé "C" (valeur 15, impaire). Résolvez l'expression impaire avec le facteur 4, puis faites la somme totale.</i></p>
+
+                <p>Saisir l'empreinte numérique de l'index calculé :</p>
+                <input type="text" id="logic_checksum" placeholder="VALEUR DU RÉSIDU" style="width: 100%; max-width: 300px;" autocomplete="off" onchange="sauvegarderAutomatiquement()">
+            </div>
+
+            <div class="restore-bar"><div id="progress-bar" class="progress"></div></div>
+            
+            <button class="btn-action" id="restore-btn" onclick="startRecovery()" style="width: 100%;">LANCER LA RESTAURATION DES ARCHIVES</button>
+
+            <div id="final-zone" style="display:none; text-align: center; margin-top: 20px;">
+                <h3 style="color: #3fb950;">✔ DISPONIBILITÉ ET SÉCURITÉ RÉTABLIES</h3>
+                
+                <div class="export-report">
+                    <b>📝 RAPPORT DE RÉSILIENCE (export_eleves.csv) :</b><br>
+                    S04E31 ; Succès ; Art. 8 respecté. PRA validé avec RTO &lt; 4h et RPO &lt; 15 min sur stockage immuable.
+                </div>
+
+                <p>Code de fin de mission (à exporter) :</p>
+                <code style="font-size: 2.2em; border: 2px dashed #3fb950; padding: 10px; display: block; margin: 10px 0; background: rgba(0,0,0,0.5); color: #3fb950; letter-spacing: 3px;">BACKUP-SECURE-31</code>
+                <div style="margin-top: 20px;">
+                    <a href="../../MENU_PRINCIPAL.html" style="color: #8b949e; text-decoration: none; font-size: 0.8em; border: 1px solid #30363d; padding: 5px 10px;">[ TERMINER L'AUDIT TECHNIQUE ]</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn-aide-blue" onclick="toggleAide()">[ 📜 SECTION PÉDAGOGIQUE : LES TROIS PILIERS ]</button>
+    
+    <div id="zoneAide" class="aide-box">
+        <h3 style="margin-top:0; color: #1f6feb;">Référentiel de Compétences Cyber</h3>
+        <div class="pillar">
+            <b>⚖️ PILIER 1 : JURIDIQUE (LPD & LB)</b>
+            L'Art. 8 nLPD régit la sécurité et la disponibilité des ensembles de données. Toute perte d'accès prolongée à des données personnelles est qualifiée d'infraction. Parallèlement, l'art. 47 de la Loi sur les banques (LB) punit sévèrement la révélation par négligence ou malveillance de secrets confiés.
+        </div>
+        <div class="pillar">
+            <b>⚙️ PILIER 2 : INFORMATIQUE (Logique et Algorithmique)</b>
+            L'analyse des priorités de traitement via des structures de listes et de dictionnaires permet d'ordonnancer la restauration système de manière déterministe. Les opérateurs de division entière (`//`) et de modulo (`%`) protègent les calculs d'indexation d'éventuels débordements de mémoire.
+        </div>
+        <div class="pillar">
+            <b>🔎 PILIER 3 : FORENSICS (Traces et Volumétrie)</b>
+            L'analyse forensique post-incident s'appuie sur la vérification des métadonnées des disques et le contrôle des géométries de volumes à l'aide d'outils d'évaluation de bas niveau (`df`), garantissant qu'aucune altération ou secteur défectueux caché ne corrompe le processus d'écriture de secours.
+        </div>
+    </div>
+
+    <div style="margin-top: 30px; border-top: 3px solid #d80000; padding: 20px; background: #fff; font-family: Arial, sans-serif; position: relative; z-index: 100; width: 90%; max-width: 450px;">
+        <div id="hint-score-badge" style="background:#111;color:#3fb950;padding:8px 15px;font-weight:bold;text-align:center;">🏆 Score de cet épisode : <span id="hint-score-value">5</span> / 5 pts</div>
+        <div style="display:flex; gap:8px; margin:10px 0;">
+            <button id="hintBtn1" onclick="useHint(1)" style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;">💡 Indice 1 (-1 pt)</button>
+            <button id="hintBtn2" onclick="useHint(2)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🎯 Indice 2 (-2 pts)</button>
+            <button id="hintBtn3" onclick="useHint(3)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🆘 Solution (-3 pts)</button>
+        </div>
+
+        <div id="zoneAideScore" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; color: #333;">
+            <p id="hint-tier-1" style="display:none;"><strong>💡 INFO :</strong> Pré-requis : l'article de la Loi sur les banques (LB) qui réprime la violation du secret professionnel bancaire, et la commande Unix pour afficher l'espace disque disponible en format lisible. Ensuite, choisissez les options « conformes » du plan de reprise (RTO, RPO, infrastructure, ≥2 tests/an), et calculez l'algorithme de restauration pas à pas.</p>
+            <p id="hint-tier-2" style="display:none;"><strong>🎯 PISTE :</strong> Article : 47 LB. Commande : <code>df -h</code>. Configuration : RTO 4h, RPO 15 min, Stockage Immuable, et au moins 2 tests/an. Calcul : (8//2)×1=4, (5×2)−2=8, (12//2)×3=18, (15×2)−4=26 → somme.</p>
+            <p id="hint-tier-3" style="display:none;"><strong>🆘 SOLUTION :</strong> Pré-requis : 47 / df -h. Configuration : 4 Heures / 15 Minutes / Stockage Immuable / 2 tests ou plus. Empreinte : <code>56</code></p>
+        </div>
+    </div>
+
+    <script>
+        // --- ANIMATION BACKGROUND : CYBER TUNNEL ---
+        const canvas = document.getElementById('cyber-bg');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function initCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = (Math.random() - 0.5) * canvas.width;
+                this.y = (Math.random() - 0.5) * canvas.height;
+                this.z = Math.random() * canvas.width;
+                this.px = 0; this.py = 0;
+            }
+            update() {
+                this.z -= 10;
+                if (this.z <= 0) this.reset();
+            }
+            draw() {
+                let x = this.x / (this.z / canvas.width) + canvas.width/2;
+                let y = this.y / (this.z / canvas.width) + canvas.height/2;
+                
+                if (this.px !== 0) {
+                    ctx.strokeStyle = `rgba(56, 139, 253, ${1 - this.z/canvas.width})`;
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+                    ctx.lineTo(this.px, this.py);
+                    ctx.stroke();
+                }
+                this.px = x; this.py = y;
+            }
+        }
+
+        for(let i=0; i<150; i++) particles.push(new Particle());
+
+        function animate() {
+            if (localStorage.getItem('swiss_shield_mode_sobre') === '1') { return; }
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', initCanvas);
+        initCanvas();
+        animate();
+
+        // --- LOGIQUE MÉTIER ET SÉCURITÉS ---
+        let currentZone = 1;
+        function toggleAide() {
+            const x = document.getElementById("zoneAide");
+            x.style.display = (window.getComputedStyle(x).display === "none") ? "block" : "none";
+        }
+
+        // VERROU DE SESSION ÉPISODE PRÉCÉDENT
+        function unlock() {
+            const pass = document.getElementById('passkey').value.trim().toUpperCase();
+            if (pass === 'FEDERAL-MASTER-30') {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('pre-requis-screen').style.display = 'block';
+                currentZone = 2;
+                sauvegarderAutomatiquement();
+            } else { 
+                enregistrerErreur('entree', pass, 'FEDERAL-MASTER-30');
+                alert("ÉCHEC D'AUTHENTIFICATION : Certificat MASTER E30 invalide."); 
+            }
+        }
+
+        // DOUBLE VERROU DE PRÉ-REQUIS CONTRE LES TRICHERIES
+        function verifyPreReq() {
+            const law = document.getElementById('law_ans').value.trim();
+            const shell = document.getElementById('shell_ans').value.trim().toLowerCase();
+
+            // Réponses exactes attendues : Article 47 et commande df -h
+            if (law === "47" && (shell === "df -h" || shell === "df -lh")) {
+                document.getElementById('pre-requis-screen').style.display = 'none';
+                document.getElementById('mission-content').style.display = 'block';
+                currentZone = 3;
+                addLog("Canal sécurisé initialisé. Prêt pour l'exécution du PRA.");
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('prerequis', 'LB:"' + law + '" / shell:"' + shell + '"', '47 / df -h');
+                alert("ÉCHEC COGNITIF : Connaissances législatives bancaires ou commandes d'analyse disque incorrectes.");
+            }
+        }
+
+        function addLog(msg) {
+            const logs = document.getElementById('logs');
+            logs.innerHTML += `> ${msg}<br>`;
+            logs.scrollTop = logs.scrollHeight;
+        }
+
+        function startRecovery() {
+            const rto = document.getElementById('rto').value;
+            const rpo = document.getElementById('rpo').value;
+            const backup = document.getElementById('backup').value;
+            const freq = parseInt(document.getElementById('test-freq').value);
+            const logicAns = document.getElementById('logic_checksum').value.trim();
+
+            // Algorithme de vérification complexe : 
+            // Rang 0 ("B", v=8, pair)   -> (8 // 2) * 1 = 4
+            // Rang 1 ("D", v=5, impair) -> (5 * 2) - 2  = 8
+            // Rang 2 ("A", v=12, pair)  -> (12 // 2) * 3 = 18
+            // Rang 3 ("C", v=15, impair)-> (15 * 2) - 4 = 26
+            // Total = 4 + 8 + 18 + 26 = 56
+            if (logicAns !== "56") {
+                enregistrerErreur('investigation', logicAns, '56');
+                addLog("[ERROR] Empreinte de l'index invalide. Échec structurel de l'arborescence.");
+                alert("ERREUR : L'empreinte de reconstruction calculée est fausse. Restauration impossible.");
+                return;
+            }
+
+            if (rto === 'ok' && rpo === 'ok' && backup === 'ok' && freq >= 2) {
+                document.getElementById('restore-btn').disabled = true;
+                addLog("Validation de la conformité réglementaire Art. 8 nLPD...");
+                addLog("Montage sécurisé des volumes cryptographiques distants...");
+                
+                let p = 0;
+                let interval = setInterval(() => {
+                    p += 2;
+                    document.getElementById('progress-bar').style.width = p + "%";
+                    if (p % 20 === 0) addLog(`Extraction et reconstruction logique de l'index : ${p}%...`);
+                    
+                    if (p >= 100) {
+                        clearInterval(interval);
+                        addLog("✓ SUCCESS: Constat d'intégrité validé au registre fédéral.");
+                        document.getElementById('final-zone').style.display = 'block';
+                    }
+                }, 50);
+            } else {
+                enregistrerErreur('investigation', 'RTO:' + rto + '/RPO:' + rpo + '/Backup:' + backup + '/Freq:' + freq, 'RTO:ok/RPO:ok/Backup:ok/Freq:>=2');
+                addLog("[ERROR] Paramètres de résilience hors-normes. Risque d'amende FINMA.");
+                alert("ERREUR : Configuration non résiliente face aux obligations légales de disponibilité.");
+            }
+        }
+    </script>
+
+    <script>
+        const EP_ID = "S04E31";
+        const HINT_COST = {1:1, 2:2, 3:3};
+        let hintsUsed = {1:false, 2:false, 3:false};
+        let episodeScore = 5;
+        function useHint(level) {
+            if (hintsUsed[level] || (level > 1 && !hintsUsed[level - 1])) return;
+            hintsUsed[level] = true;
+            enregistrerIndiceUsage(level);
+            episodeScore -= HINT_COST[level];
+            document.getElementById('hint-score-value').textContent = episodeScore;
+            document.getElementById('hint-tier-' + level).style.display = 'block';
+            const btn = document.getElementById('hintBtn' + level);
+            btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5';
+            if (level < 3) {
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+            sauvegarderAutomatiquement();
+        }
+        function recordEpisodeSuccess() {
+            let scores = {};
+            try { scores = JSON.parse(localStorage.getItem('swiss_shield_scores') || '{}'); } catch(e) {}
+            if (!(EP_ID in scores) || scores[EP_ID] < episodeScore) scores[EP_ID] = episodeScore;
+            localStorage.setItem('swiss_shield_scores', JSON.stringify(scores));
+            localStorage.removeItem('autosave_' + EP_ID);
+        }
+        function enregistrerErreur(phase, reponseEleve, reponseAttendue) {
+            let debrief = {erreurs:{}, indices:{}};
+            try { debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}'); } catch(e) {}
+            const key = EP_ID + ':' + phase;
+            let entry = debrief.erreurs[key];
+            if (typeof entry === 'number') entry = {compte: entry, exemples: []};
+            if (!entry) entry = {compte: 0, exemples: []};
+            entry.compte++;
+            if (reponseEleve !== undefined && reponseAttendue !== undefined && entry.exemples.length < 5) {
+                entry.exemples.push({reponseEleve: String(reponseEleve), reponseAttendue: String(reponseAttendue)});
+            }
+            debrief.erreurs[key] = entry;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        }
+        function enregistrerIndiceUsage(niveau) {
+            let debrief = {erreurs:{}, indices:{}};
+            try { debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}'); } catch(e) {}
+            const key = EP_ID + ':' + niveau;
+            debrief.indices[key] = (debrief.indices[key] || 0) + 1;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        }
+        function basculerModeSobre() {
+            const actif = document.body.classList.toggle('mode-sobre');
+            localStorage.setItem('swiss_shield_mode_sobre', actif ? '1' : '0');
+            if (!actif) { animate(); }
+        }
+        if (localStorage.getItem('swiss_shield_mode_sobre') === '1') {
+            document.body.classList.add('mode-sobre');
+        }
+        (function pollSuccess(){
+            const ids = ['success','success-msg','success-final','final-zone','step_final','victory-zone','victory-screen','final-step','final-badge'];
+            let recorded = false;
+            setInterval(function(){
+                if (recorded) return;
+                for (const id of ids) {
+                    const el = document.getElementById(id);
+                    if (el && window.getComputedStyle(el).display === 'block') { recordEpisodeSuccess(); recorded = true; return; }
+                }
+            }, 500);
+        })();
+
+        function sauvegarderAutomatiquement() {
+            const etat = {
+                zone: currentZone,
+                inputs: {
+                    passkey: (document.getElementById('passkey') || {}).value || '',
+                    law_ans: (document.getElementById('law_ans') || {}).value || '',
+                    shell_ans: (document.getElementById('shell_ans') || {}).value || '',
+                    rto: (document.getElementById('rto') || {}).value || '',
+                    rpo: (document.getElementById('rpo') || {}).value || '',
+                    backup: (document.getElementById('backup') || {}).value || '',
+                    testFreq: (document.getElementById('test-freq') || {}).value || '',
+                    logicChecksum: (document.getElementById('logic_checksum') || {}).value || ''
+                },
+                hintsUsed: hintsUsed,
+                episodeScore: episodeScore
+            };
+            localStorage.setItem('autosave_' + EP_ID, JSON.stringify(etat));
+        }
+
+        function proposerRestaurationAutosave() {
+            let etat;
+            try { etat = JSON.parse(localStorage.getItem('autosave_' + EP_ID)); } catch(e) { return; }
+            if (!etat) return;
+
+            if (etat.inputs) {
+                if (document.getElementById('passkey')) document.getElementById('passkey').value = etat.inputs.passkey || '';
+                if (document.getElementById('law_ans')) document.getElementById('law_ans').value = etat.inputs.law_ans || '';
+                if (document.getElementById('shell_ans')) document.getElementById('shell_ans').value = etat.inputs.shell_ans || '';
+                if (document.getElementById('rto')) document.getElementById('rto').value = etat.inputs.rto || '';
+                if (document.getElementById('rpo')) document.getElementById('rpo').value = etat.inputs.rpo || '';
+                if (document.getElementById('backup')) document.getElementById('backup').value = etat.inputs.backup || '';
+                if (document.getElementById('test-freq')) document.getElementById('test-freq').value = etat.inputs.testFreq || '';
+                if (document.getElementById('logic_checksum')) document.getElementById('logic_checksum').value = etat.inputs.logicChecksum || '';
+            }
+
+            if (etat.zone >= 2) {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('pre-requis-screen').style.display = 'block';
+                currentZone = 2;
+            }
+            if (etat.zone >= 3) {
+                document.getElementById('pre-requis-screen').style.display = 'none';
+                document.getElementById('mission-content').style.display = 'block';
+                currentZone = 3;
+            }
+
+            if (etat.hintsUsed) {
+                [1,2,3].forEach(function(level){
+                    if (etat.hintsUsed[level]) {
+                        hintsUsed[level] = true;
+                        document.getElementById('hint-tier-' + level).style.display = 'block';
+                        const btn = document.getElementById('hintBtn' + level);
+                        if (btn) { btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5'; }
+                        const next = document.getElementById('hintBtn' + (level + 1));
+                        if (next && level < 3) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+                    }
+                });
+            }
+            if (typeof etat.episodeScore === 'number') {
+                episodeScore = etat.episodeScore;
+                document.getElementById('hint-score-value').textContent = episodeScore;
+            }
+        }
+        proposerRestaurationAutosave();
+    </script>
+</body>
+</html>

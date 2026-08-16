@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>S04E30 - AUDIT GLOBAL nLPD (MI-SAISON)</title>
+    <style>
+        /* --- NOUVEL EFFET VISUEL : CYBER STREAM --- */
+        #audit-bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at center, #1a0f00 0%, #000 100%);
+        }
+
+        body { color: #e67e22; font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; padding: 40px; margin: 0; min-height: 100vh; overflow-x: hidden; }
+        
+        .terminal { 
+            background: rgba(20, 20, 20, 0.95); 
+            border: 2px solid #e67e22; 
+            padding: 25px; width: 95%; 
+            max-width: 900px; 
+            box-shadow: 0 0 40px rgba(230, 126, 34, 0.3), inset 0 0 20px rgba(0,0,0,1); 
+            border-radius: 4px;
+            backdrop-filter: blur(5px);
+            position: relative;
+        }
+
+        /* CONTEXTE HISTOIRE S04E30 */
+        .story-context {
+            background: rgba(0, 0, 0, 0.7);
+            border-left: 4px solid #e67e22;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+            font-size: 0.95em;
+            color: #fff;
+            line-height: 1.6;
+        }
+        .story-context b { color: #e67e22; text-transform: uppercase; letter-spacing: 1px; }
+
+        .header-mission { border-bottom: 2px solid #e67e22; margin-bottom: 20px; padding-bottom: 10px; color: #fff; font-weight: bold; text-transform: uppercase; display: flex; justify-content: space-between; }
+        
+        #lock-screen { text-align: center; padding: 20px; }
+        #pre-requis-screen { display: none; padding: 20px; }
+        #mission-content { display: none; }
+        
+        .audit-zone { background: rgba(0,0,0,0.8); border: 1px solid #333; padding: 20px; margin-bottom: 20px; min-height: 200px; }
+        .question-text { color: #fff; font-size: 1.1em; margin-bottom: 20px; line-height: 1.4; }
+        .options-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        
+        .btn-opt { background: #222; color: #fff; border: 1px solid #e67e22; padding: 15px; cursor: pointer; font-family: inherit; text-align: left; transition: 0.3s; font-size: 1em; }
+        .btn-opt:hover { background: #e67e22; color: #000; box-shadow: 0 0 15px #e67e22; }
+
+        input { background: #000; border: 1px solid #e67e22; color: #e67e22; padding: 12px; width: 300px; font-family: inherit; font-size: 1.1em; text-align: center; outline: none; margin-bottom: 10px; }
+        button.main-btn { background: #e67e22; color: #000; border: none; padding: 12px 30px; font-weight: bold; cursor: pointer; transition: 0.3s; text-transform: uppercase; }
+        button.main-btn:hover { background: #fff; box-shadow: 0 0 20px #e67e22; }
+
+        #final-zone { display: none; margin-top: 20px; border-top: 2px solid #2ecc71; padding-top: 20px; text-align: center; }
+        .code-final { color: #2ecc71; font-size: 2.2em; letter-spacing: 5px; margin: 15px 0; display: block; border: 2px solid #2ecc71; padding: 10px; background: rgba(46, 204, 113, 0.1); }
+
+        .export-report { background: rgba(46, 204, 113, 0.1); padding: 15px; text-align: left; font-size: 0.85em; border: 1px solid #2ecc71; margin: 20px 0; font-family: monospace; color: #fff; }
+
+        .btn-aide-orange { background: #d35400; color: #fff; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; width: 100%; max-width: 450px; margin-top: 40px; border-radius: 2px; text-transform: uppercase; }
+        .aide-box { display: none; background: #fff; color: #000; padding: 25px; margin-top: 10px; width: 90%; max-width: 450px; text-align: left; border-top: 5px solid #d35400; font-family: sans-serif; box-shadow: 0 10px 30px rgba(0,0,0,0.5); line-height: 1.4; font-size: 0.9em; }
+        .pillar { margin-bottom: 12px; border-left: 3px solid #d35400; padding-left: 10px; }
+        .pillar b { color: #d35400; text-transform: uppercase; font-size: 0.8em; display: block; }
+
+        /* AJOUTS REQUIS : BOUTON RETOUR NAV ET BLOCS INTERACTIFS */
+        .btn-nav-retour { position: absolute; top: 15px; left: 15px; background: #000; border: 1px solid #e67e22; color: #e67e22; padding: 5px 10px; text-decoration: none; font-size: 0.8em; font-weight: bold; border-radius: 3px; z-index: 10; }
+        .btn-nav-retour:hover { background: #e67e22; color: #000; }
+        .challenge-block { background: #111; border: 1px dashed #e67e22; padding: 15px; margin: 15px 0; text-align: left; }
+        .challenge-title { font-weight: bold; color: #fff; text-transform: uppercase; font-size: 0.9em; margin-bottom: 8px; display: block; }
+        .code-window { background: #000; border-left: 3px solid #e67e22; padding: 10px; margin: 15px 0; color: #ffcc99; font-size: 0.85em; overflow-x: auto; white-space: pre; font-family: monospace; }
+
+        /* MODE SOBRE */
+        body.mode-sobre, body.mode-sobre * { animation: none !important; transition: none !important; }
+        body.mode-sobre #audit-bg { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <canvas id="audit-bg"></canvas>
+
+    <div class="terminal">
+        <a href="../../MENU_PRINCIPAL.html" class="btn-nav-retour">&lt; MENU PRINCIPAL</a>
+        <button id="toggle-sobre-btn" onclick="basculerModeSobre()" style="position:absolute;top:15px;right:15px;width:auto;z-index:10;background:#000;border:1px solid #e67e22;color:#e67e22;padding:5px 10px;font-size:0.8em;font-weight:bold;border-radius:3px;cursor:pointer;">🌓</button>
+
+        <div id="lock-screen" style="margin-top: 25px;">
+            <h2 style="color: #fff; text-shadow: 0 0 10px #e67e22;">🇨🇭 INSPECTION FÉDÉRALE : AUDIT GLOBAL</h2>
+            
+            <div class="story-context">
+                <b>[ SITUATION CRITIQUE : INFRASTRUCTURE HOSPITALIÈRE SUISSE ]</b><br>
+                Les purges massives effectuées lors de l'incident précédent ont attiré l'attention des autorités de régulation à Berne. Le <b>Préposé fédéral à la protection des données et à la transparence (PFPDT)</b> exige un audit immédiat de vos processus d'accès aux bases de données du réseau hospitalier universitaire suisse. <br><br>
+                Vous faites face à un <b>audit de mi-saison</b>. Si vous échouez à valider la conformité de l'infrastructure face aux exigences strictes de la <b>nLPD</b>, l'intégralité du réseau d'interconnexion médicale sera mise sous scellés, entraînant des pénalités pénales majeures. Prouvez votre maîtrise opérationnelle.
+            </div>
+
+            <p>Saisir le certificat de purge (Code E29) :</p>
+            <input type="text" id="passkey" placeholder="TOKEN E29" onchange="sauvegarderAutomatiquement()">
+            <br>
+            <button class="main-btn" onclick="unlock()">LANCER L'AUDIT DE CONFORMITÉ</button>
+        </div>
+
+        <div id="pre-requis-screen" style="margin-top: 25px;">
+            <div class="header-mission">
+                <span>[PRÉ-REQUIS] AUTHENTIFICATION DE L'AUDITEUR</span>
+                <span style="color: #ffcc00;">NIVEAU MATURITÉ</span>
+            </div>
+
+            <div class="challenge-block">
+                <span class="challenge-title">⚖️ Défi Cadre Légal : Protection des Bases de Données (LDA)</span>
+                <p>En Suisse, l'extraction illicite de données structurées peut enfreindre la Loi fédérale sur le droit d'auteur. Selon l'art. 4c LDA, les structures de données reçoivent une protection explicite. Quel terme de 3 mots (au singulier, séparés par des espaces, ex: "structure de base") désigne juridiquement ces créations protégées en tant que collections organisées ?</p>
+                <input type="text" id="law_ans" placeholder="Exemple : structure de donnees" style="width: 100%; max-width: 400px;" onchange="sauvegarderAutomatiquement()">
+            </div>
+
+            <div class="challenge-block">
+                <span class="challenge-title">🖥️ Défi Analyse Réseau : Filtrage Dynamique de Logs d'Audit</span>
+                <p>Lors d'une investigation forensics sur un serveur Linux compromis, vous devez isoler en temps réel les lignes de logs contenant le mot "DENIED" au fur et à mesure de l'écriture du fichier <code>/var/log/audit.log</code>. Quel outil standard Unix, associé à l'argument de suivi <code>-f</code>, permet de réaliser cette surveillance continue par un tube (pipeline) vers grep ? Indiquez uniquement le nom de l'utilitaire principal.</p>
+                <input type="text" id="shell_ans" placeholder="Exemple : utilitaire" style="width: 100%; max-width: 400px;" onchange="sauvegarderAutomatiquement()">
+            </div>
+
+            <center>
+                <button class="main-btn" onclick="verifyPreReq()">VALIDER LES SÉCURITÉS PRÉALABLES</button>
+            </center>
+        </div>
+
+        <div id="mission-content" style="margin-top: 25px;">
+            <div class="header-mission">
+                <span>[FEDERAL-AUDIT] v4.0</span>
+                <span id="step-counter">POINT : 1 / 4</span>
+            </div>
+            
+            <div class="audit-zone">
+                <div class="question-text" id="q-text">Initialisation...</div>
+                <div class="options-grid" id="q-options"></div>
+            </div>
+
+            <div class="challenge-block" id="complex-zone" style="display: none;">
+                <span class="challenge-title">🧩 CODE INVESTIGATION : VÉRIFICATION CRITIQUE DU SEL DE HACHAGE</span>
+                <p>Pour authentifier la signature finale envoyée au PFPDT, vous devez calculer le résidu d'intégrité généré par le script Python d'isolation d'adresses IP compromises extrait des logs de pare-feu :</p>
+                
+                <div class="code-window"># S04E30 - Verification d'integrite algorithmique
+def verifier_cle_audit():
+    # Coordonnees de masquage
+    valeurs = [14, 25, 31]
+    cle = 0
+    
+    # Traitement bitwise alterné
+    for i, x in enumerate(valeurs):
+        if i % 2 == 0:
+            cle += (x ^ 3)  # Operation XOR logique
+        else:
+            cle += (x & 7)  # Masquage par ET logique
+            
+    return cle</div>
+                
+                <p style="color: #fff; font-size: 0.85em;">💡 <i>Indices de calcul :<br>
+                1. Pour index 0 (pair), appliquez un XOR binaire entre 14 (1110) et 3 (0011).<br>
+                2. Pour index 1 (impair), conservez uniquement les 3 bits de poids faible de 25 via l'opération bitwise AND avec 7.<br>
+                3. Pour index 2 (pair), appliquez un XOR binaire entre 31 (11111) et 3 (00011). Mettez ensuite la somme totale au clair.</i></p>
+                
+                <p>Entrer le code de contrôle généré par l'algorithme :</p>
+                <input type="text" id="checksum_final" placeholder="RÉSULTAT DU CALCUL" style="width: 100%; max-width: 300px;" onchange="sauvegarderAutomatiquement()">
+                <br><br>
+                <center>
+                    <button class="main-btn" style="background: #2ecc71; color: #000;" onclick="finaliserAudit()">TRANSMETTRE LA SIGNATURE DE CONFORMITÉ</button>
+                </center>
+            </div>
+
+            <div id="final-zone">
+                <p style="color: #2ecc71;">✓ AUDIT TERMINÉ. Certification de mi-saison validée.</p>
+                
+                <div class="export-report">
+                    <b>📝 CERTIFICAT D'AUDIT (export_eleves.csv) :</b><br>
+                    S04E30 ; Succès ; Audit Global de mi-saison validé (4/4). Maîtrise des principes de risque élevé, sanction DPO, transparence et Privacy by Default.
+                </div>
+
+                <span class="code-final">FEDERAL-MASTER-30</span>
+                <div style="text-align: center; margin-top: 20px;">
+                    <a href="../../MENU_PRINCIPAL.html" style="color: #fff; text-decoration: none; border: 1px solid #2ecc71; padding: 10px 20px; background: rgba(46, 204, 113, 0.2);">[ MISSION ACCOMPLIE ]</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn-aide-orange" onclick="toggleAide()">[ 📜 CONTEXTUALISATION DES 3 PILIERS ]</button>
+    <div id="zoneAide" class="aide-box">
+        <h3 style="margin-top:0; color:#d35400;">Référentiel Académique Suisse</h3>
+        <div class="pillar">
+            <b>⚖️ Juridique (LPD / CP / LDA)</b>
+            L'Art. 4c de la LDA protège spécifiquement certains recueils de données, à condition qu'ils constituent une création intellectuelle par le choix ou la disposition de leur contenu — la loi les désigne par une expression précise, à deux mots. Par ailleurs, la nLPD astreint les infrastructures critiques à documenter tout incident d'accès direct et à maintenir des registres d'activités stricts.
+        </div>
+        <div class="pillar">
+            <b>⚙️ Informatique (Logique et Masques Binaires)</b>
+            L'opérateur binaire XOR (`^`) inverse les bits correspondants si le masque possède un bit à 1. L'opérateur AND (`&`) applique un filtre qui isole les lignes de données en annulant les bits hors-gabarit.
+        </div>
+        <div class="pillar">
+            <b>🔎 Forensics (Traces Métriques)</b>
+            Le suivi en temps réel des flux d'événements couplé à des filtres textuels permet aux auditeurs de repérer instantanément des anomalies structurelles ou des patterns de requêtes malveillantes. Cherchez l'outil Unix qui affiche la fin d'un fichier journal en continu.
+        </div>
+        <div class="pillar" style="border-left: 3px solid #666;">
+            <b>💡 Directives d'Audit Actuel</b>
+            <span id="h-jur">Sélectionnez une question pour charger la documentation spécifique à la ligne.</span><br>
+            <span id="h-tech">...</span><br>
+            <span id="h-eth">...</span>
+        </div>
+    </div>
+
+    <div style="margin-top: 30px; border-top: 3px solid #d80000; padding: 20px; background: #fff; font-family: Arial, sans-serif; position: relative; z-index: 100; width: 90%; max-width: 450px;">
+        <div id="hint-score-badge" style="background:#111;color:#3fb950;padding:8px 15px;font-weight:bold;text-align:center;">🏆 Score de cet épisode : <span id="hint-score-value">5</span> / 5 pts</div>
+        <div style="display:flex; gap:8px; margin:10px 0;">
+            <button id="hintBtn1" onclick="useHint(1)" style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;">💡 Indice 1 (-1 pt)</button>
+            <button id="hintBtn2" onclick="useHint(2)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🎯 Indice 2 (-2 pts)</button>
+            <button id="hintBtn3" onclick="useHint(3)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🆘 Solution (-3 pts)</button>
+        </div>
+
+        <div id="zoneAideScore" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; color: #333;">
+            <p id="hint-tier-1" style="display:none;"><strong>💡 INFO :</strong> Pré-requis : le terme désignant juridiquement une collection organisée d'œuvres protégée par la LDA (Art. 4c), et la commande Unix pour suivre un fichier log en continu. Ensuite, l'audit comporte 4 questions vrai/faux à la suite (registre PME, sanction DPO, surveillance email, Privacy by Default), puis un calcul bitwise final.</p>
+            <p id="hint-tier-2" style="display:none;"><strong>🎯 PISTE :</strong> Réponse juridique : « recueil d'œuvres ». Commande : <code>tail</code>. Pour les 4 questions : le registre reste obligatoire malgré <250 employés si risque élevé ; le DPO peut être visé personnellement si faute intentionnelle ; la surveillance email nécessite toujours transparence préalable ; Privacy by Default s'applique aussi aux systèmes hérités. Calcul final : (14^3) + (25&7) + (31^3) = 13+1+28.</p>
+            <p id="hint-tier-3" style="display:none;"><strong>🆘 SOLUTION :</strong> Pré-requis : recueil d'œuvres / tail. Réponses : Non / Oui / Non / Oui (dans l'ordre des 4 questions). Checksum final : <code>42</code></p>
+        </div>
+    </div>
+
+    <script>
+        // --- ANIMATION BACKGROUND : CYBER STREAM ---
+        const canvas = document.getElementById('audit-bg');
+        const ctx = canvas.getContext('2d');
+        let symbols = [];
+        const chars = ['📄', '🔒', '⚖️', '✖', '✔'];
+
+        function initCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        class Symbol {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.z = Math.random() * 2 + 0.5;
+                this.speed = this.z * 1.5;
+                this.char = chars[Math.floor(Math.random() * chars.length)];
+                this.opacity = this.z / 2.5;
+            }
+            draw() {
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = this.char === '✖' ? '#ff3e3e' : '#00f2ff';
+                ctx.font = (this.z * 15) + "px Courier New";
+                ctx.fillText(this.char, this.x, this.y);
+            }
+            update() {
+                this.y += this.speed;
+                if (this.y > canvas.height) {
+                    this.y = -20;
+                    this.x = Math.random() * canvas.width;
+                }
+            }
+        }
+
+        for(let i=0; i<80; i++) symbols.push(new Symbol());
+
+        function animate() {
+            if (localStorage.getItem('swiss_shield_mode_sobre') === '1') { return; }
+            ctx.clearRect(0,0, canvas.width, canvas.height);
+            symbols.forEach(s => { s.update(); s.draw(); });
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', initCanvas);
+        initCanvas();
+        animate();
+
+        // --- LOGIQUE METIER & BASE DE DONNÉES DE L'AUDIT ---
+        const auditData = [
+            {
+                q: "Une PME ou un organisme médical de 150 employés peut-il se passer du registre des activités si elle traite des données à risque élevé ?",
+                opts: ["Oui, car elle a moins de 250 employés.", "Non, le risque élevé rend le registre obligatoire."],
+                ans: 1,
+                h: ["L'Art. 12 nLPD dispense les PME de moins de 250 employés, SAUF si le traitement présente un risque de sécurité élevé.", "Techniquement, le registre permet de cartographier les flux critiques.", "La transparence est due à l'utilisateur, peu importe la taille de l'entreprise."]
+            },
+            {
+                q: "L'amende nLPD de 250'000 CHF peut-elle viser directement le DPO ou le conseiller interne à la sécurité ?",
+                opts: ["Oui, si la faute ou la violation est intentionnelle de sa part.", "Non, seul le chef de l'administration ou de l'entité est responsable."],
+                ans: 0,
+                h: ["La sanction pénale vise toute personne physique ayant pris la décision fautive de manière intentionnelle.", "Assurez-vous que chaque processus a un responsable identifié.", "La responsabilité individuelle incite à une vigilance accrue."]
+            },
+            {
+                q: "Peut-on surveiller la boîte mail d'un collaborateur ou d'un médecin sans information préalable stricte ?",
+                opts: ["Oui, pour vérifier son rendement ou par suspicion simple.", "Non, l'information préalable et la transparence sont obligatoires."],
+                ans: 1,
+                h: ["Le principe de transparence (Art. 19) et la protection de la personnalité interdisent la surveillance secrète.", "Utilisez des outils de monitoring anonymisés si nécessaire.", "Le respect de la sphère privée est la base de la confiance employeur-employé."]
+            },
+            {
+                q: "Le principe de 'Privacy by Default' s'applique-t-il également aux anciens progiciels ou systèmes hérités ?",
+                opts: ["Oui, la mise en conformité technologique doit être globale.", "Non, cela ne concerne exclusivement que les nouveaux outils déployés."],
+                ans: 0,
+                h: ["L'Art. 25 impose que tout système utilisé garantisse par défaut la protection maximale.", "Il faut parfois reconfigurer ou patcher les systèmes hérités (legacy).", "La sécurité n'est pas une option rétroactive, c'est un état permanent."]
+            }
+        ];
+
+        let currentStep = 0;
+        let currentZone = 1;
+
+        function toggleAide() {
+            const x = document.getElementById("zoneAide");
+            x.style.display = (x.style.display === "block") ? "none" : "block";
+        }
+
+        // VERROU DE SESSION ÉPISODE PRÉCÉDENT
+        function unlock() {
+            const code = document.getElementById('passkey').value.trim().toUpperCase();
+            if (code === 'PURGE-COMPLETE-2026') {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('pre-requis-screen').style.display = 'block';
+                currentZone = 2;
+                sauvegarderAutomatiquement();
+            } else { 
+                enregistrerErreur('entree', code, 'PURGE-COMPLETE-2026');
+                alert("CODE INCORRECT (Utilisez la clé de l'épisode précédent E29)"); 
+            }
+        }
+
+        // DOUBLE VERROU DE PRÉ-REQUIS MODIFIÉ
+        function verifyPreReq() {
+            const law = document.getElementById('law_ans').value.trim().toLowerCase();
+            const shell = document.getElementById('shell_ans').value.trim().toLowerCase();
+
+            // Réponses attendues : "recueil d'oeuvres" (ou variantes acceptées) et "tail"
+            const validLaw = (law === "recueil d'oeuvres" || law === "recueil d'œuvres" || law === "recueil d œuvres");
+            const validShell = (shell === "tail");
+
+            if (validLaw && validShell) {
+                document.getElementById('pre-requis-screen').style.display = 'none';
+                document.getElementById('mission-content').style.display = 'block';
+                currentZone = 3;
+                loadStep();
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('prerequis', 'LDA:"' + law + '" / shell:"' + shell + '"', "recueil d'œuvres / tail");
+                alert("ÉCHEC COMPORTEMENTAL : Références juridiques (LDA) ou commandes de filtrage de log invalides.");
+            }
+        }
+
+        function loadStep() {
+            const data = auditData[currentStep];
+            document.getElementById('q-text').innerText = data.q;
+            document.getElementById('step-counter').innerText = "POINT : " + (currentStep + 1) + " / " + auditData.length;
+            
+            document.getElementById('h-jur').innerText = "Loi : " + data.h[0];
+            document.getElementById('h-tech').innerText = "Tech : " + data.h[1];
+            document.getElementById('h-eth').innerText = "Éthique : " + data.h[2];
+
+            const optsGrid = document.getElementById('q-options');
+            optsGrid.innerHTML = "";
+            data.opts.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = "btn-opt";
+                btn.innerText = opt;
+                btn.onclick = () => checkAns(index);
+                optsGrid.appendChild(btn);
+            });
+        }
+
+        function checkAns(idx) {
+            if (idx === auditData[currentStep].ans) {
+                currentStep++;
+                if (currentStep < auditData.length) {
+                    loadStep();
+                    sauvegarderAutomatiquement();
+                } else {
+                    document.querySelector('.audit-zone').style.display = 'none';
+                    document.getElementById('complex-zone').style.display = 'block';
+                    sauvegarderAutomatiquement();
+                }
+            } else {
+                const donnee = auditData[currentStep].opts[idx];
+                const attendue = auditData[currentStep].opts[auditData[currentStep].ans];
+                enregistrerErreur('investigation', donnee, attendue);
+                alert("ERREUR D'AUDIT : Non-conformité détectée aux directives fédérales. Réinitialisation.");
+                location.reload();
+            }
+        }
+
+        function finaliserAudit() {
+            const chk = document.getElementById('checksum_final').value.trim();
+            if (chk === "42") {
+                document.getElementById('complex-zone').style.display = 'none';
+                document.getElementById('final-zone').style.display = 'block';
+            } else {
+                enregistrerErreur('investigation', chk, '42');
+                alert("SIGNATURE ERRONÉE : La valeur de contrôle d'audit calculée est fausse.");
+            }
+        }
+    </script>
+
+    <script>
+        const EP_ID = "S04E30";
+        const HINT_COST = {1:1, 2:2, 3:3};
+        let hintsUsed = {1:false, 2:false, 3:false};
+        let episodeScore = 5;
+        function useHint(level) {
+            if (hintsUsed[level] || (level > 1 && !hintsUsed[level - 1])) return;
+            hintsUsed[level] = true;
+            enregistrerIndiceUsage(level);
+            episodeScore -= HINT_COST[level];
+            document.getElementById('hint-score-value').textContent = episodeScore;
+            document.getElementById('hint-tier-' + level).style.display = 'block';
+            const btn = document.getElementById('hintBtn' + level);
+            btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5';
+            if (level < 3) {
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+            sauvegarderAutomatiquement();
+        }
+        function recordEpisodeSuccess() {
+            let scores = {};
+            try { scores = JSON.parse(localStorage.getItem('swiss_shield_scores') || '{}'); } catch(e) {}
+            if (!(EP_ID in scores) || scores[EP_ID] < episodeScore) scores[EP_ID] = episodeScore;
+            localStorage.setItem('swiss_shield_scores', JSON.stringify(scores));
+            localStorage.removeItem('autosave_' + EP_ID);
+        }
+        function enregistrerErreur(phase, reponseEleve, reponseAttendue) {
+            let debrief = {erreurs:{}, indices:{}};
+            try { debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}'); } catch(e) {}
+            const key = EP_ID + ':' + phase;
+            let entry = debrief.erreurs[key];
+            if (typeof entry === 'number') entry = {compte: entry, exemples: []};
+            if (!entry) entry = {compte: 0, exemples: []};
+            entry.compte++;
+            if (reponseEleve !== undefined && reponseAttendue !== undefined && entry.exemples.length < 5) {
+                entry.exemples.push({reponseEleve: String(reponseEleve), reponseAttendue: String(reponseAttendue)});
+            }
+            debrief.erreurs[key] = entry;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        }
+        function enregistrerIndiceUsage(niveau) {
+            let debrief = {erreurs:{}, indices:{}};
+            try { debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}'); } catch(e) {}
+            const key = EP_ID + ':' + niveau;
+            debrief.indices[key] = (debrief.indices[key] || 0) + 1;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        }
+        function basculerModeSobre() {
+            const actif = document.body.classList.toggle('mode-sobre');
+            localStorage.setItem('swiss_shield_mode_sobre', actif ? '1' : '0');
+            if (!actif) { animate(); }
+        }
+        if (localStorage.getItem('swiss_shield_mode_sobre') === '1') {
+            document.body.classList.add('mode-sobre');
+        }
+        (function pollSuccess(){
+            const ids = ['success','success-msg','success-final','final-zone','step_final','victory-zone','victory-screen','final-step','final-badge'];
+            let recorded = false;
+            setInterval(function(){
+                if (recorded) return;
+                for (const id of ids) {
+                    const el = document.getElementById(id);
+                    if (el && window.getComputedStyle(el).display === 'block') { recordEpisodeSuccess(); recorded = true; return; }
+                }
+            }, 500);
+        })();
+
+        function sauvegarderAutomatiquement() {
+            const etat = {
+                zone: currentZone,
+                inputs: {
+                    passkey: (document.getElementById('passkey') || {}).value || '',
+                    law_ans: (document.getElementById('law_ans') || {}).value || '',
+                    shell_ans: (document.getElementById('shell_ans') || {}).value || '',
+                    checksum_final: (document.getElementById('checksum_final') || {}).value || ''
+                },
+                hintsUsed: hintsUsed,
+                episodeScore: episodeScore,
+                currentStep: currentStep
+            };
+            localStorage.setItem('autosave_' + EP_ID, JSON.stringify(etat));
+        }
+
+        function proposerRestaurationAutosave() {
+            let etat;
+            try { etat = JSON.parse(localStorage.getItem('autosave_' + EP_ID)); } catch(e) { return; }
+            if (!etat) return;
+
+            if (etat.inputs) {
+                if (document.getElementById('passkey')) document.getElementById('passkey').value = etat.inputs.passkey || '';
+                if (document.getElementById('law_ans')) document.getElementById('law_ans').value = etat.inputs.law_ans || '';
+                if (document.getElementById('shell_ans')) document.getElementById('shell_ans').value = etat.inputs.shell_ans || '';
+                if (document.getElementById('checksum_final')) document.getElementById('checksum_final').value = etat.inputs.checksum_final || '';
+            }
+
+            if (etat.zone >= 2) {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('pre-requis-screen').style.display = 'block';
+                currentZone = 2;
+            }
+            if (etat.zone >= 3) {
+                document.getElementById('pre-requis-screen').style.display = 'none';
+                document.getElementById('mission-content').style.display = 'block';
+                currentZone = 3;
+
+                if (typeof etat.currentStep === 'number') {
+                    currentStep = etat.currentStep;
+                    if (currentStep >= auditData.length) {
+                        document.querySelector('.audit-zone').style.display = 'none';
+                        document.getElementById('complex-zone').style.display = 'block';
+                    } else {
+                        loadStep();
+                    }
+                }
+            }
+
+            if (etat.hintsUsed) {
+                [1,2,3].forEach(function(level){
+                    if (etat.hintsUsed[level]) {
+                        hintsUsed[level] = true;
+                        document.getElementById('hint-tier-' + level).style.display = 'block';
+                        const btn = document.getElementById('hintBtn' + level);
+                        if (btn) { btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5'; }
+                        const next = document.getElementById('hintBtn' + (level + 1));
+                        if (next && level < 3) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+                    }
+                });
+            }
+            if (typeof etat.episodeScore === 'number') {
+                episodeScore = etat.episodeScore;
+                document.getElementById('hint-score-value').textContent = episodeScore;
+            }
+        }
+        proposerRestaurationAutosave();
+    </script>
+</body>
+</html>

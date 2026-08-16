@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>S02E13 - PRIVACY BY DESIGN (AUDIT NIV. 2)</title>
+    <style>
+        /* --- DESIGN CYBER CONSERVÉ --- */
+        body {
+            background-color: #000;
+            color: #2ecc71;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            perspective: 1000px;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0; left: -50%;
+            width: 200%; height: 200%;
+            background-image:
+                linear-gradient(rgba(46, 204, 113, 0.3) 2px, transparent 2px),
+                linear-gradient(90deg, rgba(46, 204, 113, 0.3) 2px, transparent 2px);
+            background-size: 60px 60px;
+            transform: rotateX(60deg) translateY(-20%);
+            animation: gridMove 5s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes gridMove {
+            0% { transform: rotateX(60deg) translateY(0); }
+            100% { transform: rotateX(60deg) translateY(60px); }
+        }
+
+        /* --- MODE SOBRE (accessibilité) --- */
+        body.mode-sobre, body.mode-sobre * { animation: none !important; transition: none !important; }
+        body.mode-sobre::before { animation: none !important; }
+        #toggle-sobre-btn {
+            position: fixed; top: 10px; right: 10px; z-index: 10001;
+            background: #000; color: #2ecc71; border: 1px solid #2ecc71;
+            padding: 6px 10px; font-size: 0.7em; cursor: pointer; font-family: inherit; border-radius: 3px;
+        }
+
+        .terminal {
+            background: rgba(0, 15, 0, 0.95);
+            border: 5px solid #2ecc71;
+            padding: 40px;
+            width: 95%;
+            max-width: 900px;
+            box-shadow: 0 0 60px #2ecc71;
+            z-index: 10;
+            position: relative;
+        }
+
+        .btn-retour {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #fff;
+            text-decoration: none;
+            border: 1px solid #fff;
+            background: #000;
+            padding: 5px 10px;
+            font-size: 0.8em;
+            z-index: 20;
+        }
+
+        .story-alert {
+            background: #2ecc71;
+            color: #000;
+            padding: 20px;
+            margin: -40px -40px 30px -40px;
+            font-size: 1.5em;
+            font-weight: 900;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .story-context-box {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px dashed #f1c40f;
+            padding: 25px;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        #lock-screen, #prerequis-zone, #mission-content, #final-zone { display: none; }
+        .active-section { display: block !important; }
+
+        .code-audit {
+            background: #000;
+            border: 2px solid #2ecc71;
+            padding: 20px;
+            margin: 20px 0;
+            color: #2ecc71;
+            font-size: 0.9em;
+        }
+
+        .vuln { color: #e74c3c; font-weight: bold; border-bottom: 1px solid #e74c3c; }
+
+        /* ANNEXES STYLISÉES */
+        .annexe-window {
+            background: #111;
+            border: 1px solid #f1c40f;
+            margin: 10px 0;
+            padding: 15px;
+            font-size: 0.8em;
+            color: #ccc;
+        }
+        .annexe-title { color: #f1c40f; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; border-bottom: 1px solid #333; }
+
+        .piliers-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .pilier-card {
+            background: rgba(46, 204, 113, 0.05);
+            border: 1px solid #2ecc71;
+            padding: 10px;
+            font-size: 0.8em;
+        }
+        .pilier-card h4 { margin: 0 0 5px 0; color: #f1c40f; font-size: 0.9em; }
+
+        input { background: #000; border: 2px solid #f1c40f; color: #f1c40f; padding: 12px; width: 70%; font-family: 'Courier New', monospace; margin-bottom: 10px; outline: none; }
+        button { background: #f1c40f; color: #000; border: none; padding: 15px 30px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
+
+        .code-final { color: #ffd700; font-size: 2.5em; letter-spacing: 8px; margin: 20px 0; display: block; text-shadow: 0 0 20px #ffd700; border: 3px double #ffd700; padding: 15px; text-align: center; }
+    </style>
+</head>
+<body>
+    <button id="toggle-sobre-btn" onclick="basculerModeSobre()">🌓 Mode sobre</button>
+
+    <div class="terminal">
+        <a href="../../MENU_PRINCIPAL.html" class="btn-retour">⇮ MENU_PRINCIPAL</a>
+
+        <div id="lock-screen" class="active-section">
+            <div class="story-alert">⚠️ ACCÈS ARCHITECTE NIV. 2 ⚠️</div>
+            <div class="story-context-box">
+                <b>INFRASTRUCTURE :</b> Registre Fédéral (CH).<br>
+                <b>SITUATION :</b> Audit pré-déploiement. L'<b>Art. 7 nLPD</b> (Protection des données dès la conception) n'est pas respecté dans le module <code>User_Storage</code>.<br>
+                <b>AUTHENTIFICATION :</b> Code de purge E12 requis.
+            </div>
+            <input type="text" id="passkey" placeholder="CODE DE PURGE S02E12">
+            <br>
+            <button onclick="unlockSession()">DÉCRYPTER LES SOURCES</button>
+        </div>
+
+        <div id="prerequis-zone">
+            <div class="header-mission">PROTOCOLES DE CONFORMITÉ</div>
+
+            <div class="annexe-window">
+                <div class="annexe-title">📜 EXTRAIT LPD ART. 7</div>
+                "Le responsable du traitement est tenu de prendre, dès la conception, les mesures techniques et organisationnelles appropriées... pour que le traitement réponde aux principes de la présente loi."
+            </div>
+
+            <div style="margin: 20px 0;">
+                <p><b>DÉFI JURIDIQUE :</b> En droit suisse, quel principe oblige à configurer les systèmes pour qu'ils collectent le minimum de données par défaut ?</p>
+                <input type="text" id="q_jur" placeholder="P______ __ D______" onchange="sauvegarderAutomatiquement()">
+            </div>
+
+            <div style="margin: 20px 0;">
+                <p><b>DÉFI SYSTÈME :</b> Identifiez l'option de commande UNIX pour modifier les permissions de manière récursive (dossiers et sous-dossiers).</p>
+                <input type="text" id="q_tech" placeholder="-?" onchange="sauvegarderAutomatiquement()">
+            </div>
+            <button onclick="checkPrerequis()">VALIDER PROTOCOLES</button>
+        </div>
+
+        <div id="mission-content">
+            <div class="story-alert">AUDIT : VULNÉRABILITÉ STORAGE_ENGINE</div>
+
+            <div class="annexe-window">
+                <div class="annexe-title">📂 ANNEXE A : RAPPORT DE VULNÉRABILITÉ</div>
+                - Algorithme détecté : MD5 (Obsolète depuis 2004, sensible aux collisions).<br>
+                - Menace : Rainbow Tables (Attaque par dictionnaire de hashs pré-calculés).<br>
+                - Correction : Passer sur la famille <b>SHA-2</b> et ajouter une <b>donnée aléatoire</b> avant hachage.
+            </div>
+
+            <div class="code-audit">
+                <span style="color:#555"># Module critique : security_hash.py</span><br>
+                def secure_id(nom, ssn):<br>
+                &nbsp;&nbsp;# Faille 1 : Algorithme insuffisant<br>
+                &nbsp;&nbsp;h = hashlib.<b>md5</b>(nom + ssn)<br><br>
+                &nbsp;&nbsp;# Faille 2 : Absence de protection contre les Rainbow Tables<br>
+                &nbsp;&nbsp;return h.hexdigest()
+            </div>
+
+            <div class="story-context-box">
+                <b>MISSION :</b> Identifiez le nouveau standard de hachage (bits) et le nom du concept technique qui consiste à "pimenter" ou "saler" la donnée pour la rendre unique.
+                <br><br>
+                <b>Format :</b> <code>ALGORITHME_NOMDUCONCEPT</code>
+            </div>
+
+            <div style="text-align: center;">
+                <input type="text" id="securityTerm" placeholder="EXEMPLES : SHA512_CHIFFREMENT">
+                <br>
+                <button onclick="applyDesign()">APPLIQUER CORRECTIFS ART. 7</button>
+            </div>
+
+            <div class="piliers-container">
+                <div class="pilier-card">
+                    <h4>Informatique</h4>
+                    Le hachage transforme une donnée en empreinte fixe. Pour éviter que deux noms identiques produisent la même empreinte, on utilise un <b>Salt</b>.
+                </div>
+                <div class="pilier-card">
+                    <h4>Juridique</h4>
+                    L'Art. 7 impose l'<b>état de la technique</b>. Utiliser un vieil algorithme comme MD5 ou SHA-1 est une négligence coupable.
+                </div>
+                <div class="pilier-card">
+                    <h4>Forensics</h4>
+                    Un analyste utilise des outils comme <i>John the Ripper</i>. Sans protection "aléatoire", le craquage est instantané.
+                </div>
+            </div>
+        </div>
+
+        <div id="final-zone">
+            <h2 style="color:#ffd700;">✅ ARCHITECTURE SÉCURISÉE</h2>
+            <div class="story-context-box" style="border-color:#2ecc71;">
+                Le système est désormais conforme à l'Art. 7 nLPD. La protection est native (Privacy by Design).
+            </div>
+            <span class="code-final">DESIGN-SEC-07</span>
+            <div style="text-align:center; color:#888;">Code de fin S02E13 validé.</div>
+        </div>
+
+        <div style="margin-top: 30px; border-top: 3px solid #d80000; padding: 20px; background: #fff; font-family: Arial, sans-serif; position: relative; z-index: 100;">
+            <div id="hint-score-badge" style="background:#111;color:#3fb950;padding:8px 15px;font-weight:bold;text-align:center;">🏆 Score de cet épisode : <span id="hint-score-value">5</span> / 5 pts</div>
+            <div style="display:flex; gap:8px; margin:10px 0;">
+                <button id="hintBtn1" onclick="useHint(1)" style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;">💡 Indice 1 (-1 pt)</button>
+                <button id="hintBtn2" onclick="useHint(2)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🎯 Indice 2 (-2 pts)</button>
+                <button id="hintBtn3" onclick="useHint(3)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🆘 Solution (-3 pts)</button>
+            </div>
+
+            <div id="zoneAideScore" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; color: #333;">
+                <p id="hint-tier-1" style="display:none;"><strong>💡 INFO :</strong> Pré-requis : le principe suisse (deux mots) qui impose une collecte minimale de données par défaut, et l'option UNIX pour rendre récursif un changement de permissions. Ensuite, corrigez les deux failles de <code>security_hash.py</code> : algorithme et protection anti-rainbow-table.</p>
+                <p id="hint-tier-2" style="display:none;"><strong>🎯 PISTE :</strong> Principe : « privacy by default ». Option : <code>-R</code>. Correctif : remplacer MD5 par la famille SHA-2 (SHA256) et ajouter un salage (salt/salage) avant le hachage.</p>
+                <p id="hint-tier-3" style="display:none;"><strong>🆘 SOLUTION :</strong> Pré-requis : privacy by default / -R. Terme final : <code>SHA256_SALAGE</code></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function appliquerModeSobre() {
+            const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+            document.body.classList.toggle('mode-sobre', actif);
+            const btn = document.getElementById('toggle-sobre-btn');
+            if (btn) btn.textContent = actif ? '🌓 Mode sobre : ON' : '🌓 Mode sobre';
+        }
+        function basculerModeSobre() {
+            const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+            localStorage.setItem('swiss_shield_mode_sobre', actif ? '0' : '1');
+            appliquerModeSobre();
+        }
+        appliquerModeSobre();
+
+        function unlockSession() {
+            const code = document.getElementById('passkey').value.trim().toUpperCase();
+            if (code === 'PURGE-DONE-32') {
+                document.getElementById('lock-screen').classList.remove('active-section');
+                document.getElementById('prerequis-zone').classList.add('active-section');
+                currentZone = 'prerequis-zone';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('entree', code, 'PURGE-DONE-32');
+                alert("ACCÈS REFUSÉ.");
+            }
+        }
+
+        function checkPrerequis() {
+            const jur = document.getElementById('q_jur').value.trim().toLowerCase();
+            const tech = document.getElementById('q_tech').value.trim().toUpperCase();
+
+            // Privacy by Default / -R
+            if (jur.includes("default") && tech === "-R") {
+                document.getElementById('prerequis-zone').classList.remove('active-section');
+                document.getElementById('mission-content').classList.add('active-section');
+                currentZone = 'mission-content';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('prerequis', 'principe="' + jur + '", option="' + tech + '"', 'principe contient "default", option="-R"');
+                alert("PROTOCOLES DE SÉCURITÉ INCORRECTS.");
+            }
+        }
+
+        function applyDesign() {
+            const val = document.getElementById('securityTerm').value.trim().toUpperCase();
+            // Solution attendue : SHA256_SALAGE (ou variantes proches)
+            if (val.includes('SHA256') && (val.includes('SALAGE') || val.includes('SALT'))) {
+                document.getElementById('mission-content').classList.remove('active-section');
+                document.getElementById('final-zone').classList.add('active-section');
+                document.body.style.boxShadow = "inset 0 0 200px #ffd700";
+            } else {
+                enregistrerErreur('investigation', val, 'SHA256_SALAGE');
+                alert("ÉCHEC DE L'AUDIT : La solution proposée ne résout pas les failles de l'Annexe A.");
+            }
+        }
+    </script>
+
+    <script>
+        const EP_ID = "S02E13";
+        const HINT_COST = {1:1, 2:2, 3:3};
+        let hintsUsed = {1:false, 2:false, 3:false};
+        let episodeScore = 5;
+        function useHint(level) {
+            if (hintsUsed[level] || (level > 1 && !hintsUsed[level - 1])) return;
+            hintsUsed[level] = true;
+        enregistrerIndiceUsage(level);
+            episodeScore -= HINT_COST[level];
+            document.getElementById('hint-score-value').textContent = episodeScore;
+            document.getElementById('hint-tier-' + level).style.display = 'block';
+            const btn = document.getElementById('hintBtn' + level);
+            btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5';
+            if (level < 3) {
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+            sauvegarderAutomatiquement();
+        }
+        function recordEpisodeSuccess() {
+            let scores = {};
+            try { scores = JSON.parse(localStorage.getItem('swiss_shield_scores') || '{}'); } catch(e) {}
+            if (!(EP_ID in scores) || scores[EP_ID] < episodeScore) scores[EP_ID] = episodeScore;
+            localStorage.setItem('swiss_shield_scores', JSON.stringify(scores));
+            localStorage.removeItem('autosave_' + EP_ID);
+        }
+    let currentZone = 'lock-screen';
+    function sauvegarderAutomatiquement() {
+        try {
+            const inputs = {};
+            ['q_jur', 'q_tech', 'securityTerm'].forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) inputs[id] = el.value;
+            });
+            localStorage.setItem('autosave_' + EP_ID, JSON.stringify({
+                zone: currentZone,
+                inputs: inputs,
+                hintsUsed: hintsUsed,
+                episodeScore: episodeScore
+            }));
+        } catch(e) {}
+    }
+    function proposerRestaurationAutosave() {
+        let data;
+        try { data = JSON.parse(localStorage.getItem('autosave_' + EP_ID) || 'null'); } catch(e) { return; }
+        if (!data || !data.zone || data.zone === 'lock-screen') return;
+        document.getElementById('lock-screen').classList.remove('active-section');
+        if (data.zone === 'mission-content') {
+            document.getElementById('prerequis-zone').classList.remove('active-section');
+            document.getElementById('mission-content').classList.add('active-section');
+        } else if (data.zone === 'prerequis-zone') {
+            document.getElementById('prerequis-zone').classList.add('active-section');
+        }
+        currentZone = data.zone;
+        if (data.inputs) {
+            Object.keys(data.inputs).forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) el.value = data.inputs[id];
+            });
+        }
+        hintsUsed = data.hintsUsed || hintsUsed;
+        episodeScore = (typeof data.episodeScore === 'number') ? data.episodeScore : episodeScore;
+        document.getElementById('hint-score-value').textContent = episodeScore;
+        [1, 2, 3].forEach(function(level) {
+            if (hintsUsed[level]) {
+                document.getElementById('hint-tier-' + level).style.display = 'block';
+                const btn = document.getElementById('hintBtn' + level);
+                if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+        });
+    }
+    function enregistrerIndiceUsage(niveau) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + niveau;
+            debrief.indices[cle] = (debrief.indices[cle] || 0) + 1;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+    function enregistrerErreur(phase, reponseEleve, reponseAttendue) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + phase;
+            if (typeof debrief.erreurs[cle] !== 'object' || debrief.erreurs[cle] === null) {
+                debrief.erreurs[cle] = { compte: (debrief.erreurs[cle] || 0), exemples: [] };
+            }
+            debrief.erreurs[cle].compte++;
+            if (reponseEleve !== undefined && debrief.erreurs[cle].exemples.length < 5) {
+                debrief.erreurs[cle].exemples.push({ reponseEleve: String(reponseEleve).slice(0,100), reponseAttendue: String(reponseAttendue||'').slice(0,100) });
+            }
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+        (function pollSuccess(){
+            const ids = ['success','success-msg','success-final','final-zone','victory-zone','victory-screen','final-step','final-badge'];
+            let recorded = false;
+            setInterval(function(){
+                if (recorded) return;
+                for (const id of ids) {
+                    const el = document.getElementById(id);
+                    if (el && window.getComputedStyle(el).display === 'block') { recordEpisodeSuccess(); recorded = true; return; }
+                }
+            }, 500);
+        })();
+        proposerRestaurationAutosave();
+    </script>
+</body>
+</html>

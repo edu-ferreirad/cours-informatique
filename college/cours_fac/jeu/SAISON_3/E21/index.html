@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>S03E21 - LE SERVEUR FANTÔME</title>
+    <style>
+        /* --- NOUVEL EFFET VISUEL : VOID-GLITCH DISTORTION --- */
+        #glitch-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            background: #0a0510;
+        }
+
+        /* --- MODE SOBRE (accessibilité) --- */
+        body.mode-sobre, body.mode-sobre * { animation: none !important; transition: none !important; }
+        body.mode-sobre #glitch-canvas { display: none !important; }
+        #toggle-sobre-btn {
+            position: fixed; top: 10px; right: 10px; z-index: 10001;
+            background: #000; color: #bc13fe; border: 1px solid #bc13fe;
+            padding: 6px 10px; font-size: 0.7em; cursor: pointer; font-family: inherit; border-radius: 3px;
+        }
+
+        body { color: #bc13fe; font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; padding: 40px; margin: 0; overflow-x: hidden; }
+        
+        .terminal { 
+            background: rgba(0, 0, 0, 0.9); 
+            border: 2px solid #bc13fe; 
+            padding: 25px; width: 90%; 
+            max-width: 850px; 
+            box-shadow: 0 0 40px rgba(188, 19, 254, 0.2); 
+            border-radius: 5px; 
+            position: relative;
+            backdrop-filter: blur(5px);
+        }
+
+        /* STYLE CONTEXTE HISTOIRE S3E21 */
+        .story-context {
+            background: rgba(26, 10, 37, 0.8);
+            border-left: 4px solid #ff0055;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+            font-size: 0.9em;
+            color: #e0b0ff;
+            line-height: 1.6;
+        }
+
+        .header-mission { border-bottom: 1px solid #bc13fe; margin-bottom: 20px; padding-bottom: 10px; color: #fff; font-weight: bold; display: flex; justify-content: space-between; }
+        
+        #lock-screen { text-align: center; padding: 40px; }
+        #pre-requis-screen, #mission-content { display: none; }
+        
+        .legacy-box { background: #1a0a25; border: 1px dashed #bc13fe; padding: 20px; margin: 15px 0; font-size: 0.85em; position: relative; text-align: left; }
+        .warning-text { color: #ff0055; font-weight: bold; animation: blink 1.5s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        
+        .hidden-metadata { color: #1a0a25; user-select: none; font-size: 1px; } 
+
+        .analysis-input { background: #000; border: 1px solid #bc13fe; color: #bc13fe; padding: 12px; width: 350px; font-family: inherit; font-size: 1em; text-align: center; outline: none; margin: 10px 0; }
+        button { background: #bc13fe; color: #000; border: none; padding: 12px 35px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; text-transform: uppercase; border-radius: 2px; }
+        button:hover { background: #fff; box-shadow: 0 0 20px #bc13fe; }
+
+        #victory-zone { display: none; text-align: center; border-top: 2px double #bc13fe; margin-top: 20px; padding-top: 20px; }
+        .code-final { color: #ffd700; font-size: 2.2em; letter-spacing: 5px; margin: 15px 0; display: block; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+
+        .btn-aide-rouge { background: #d80000; color: #fff; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; width: 100%; max-width: 450px; margin-top: 40px; border-radius: 3px; }
+        .aide-box { display: none; background: #fff; color: #333; margin-top: 10px; padding: 20px; width: 90%; max-width: 450px; text-align: left; border-radius: 5px; border-top: 5px solid #d80000; font-family: sans-serif; line-height: 1.5; }
+
+        .nav-link { color: #bc13fe; text-decoration: none; font-weight: bold; border: 1px solid #bc13fe; padding: 10px 20px; display: inline-block; margin-top: 20px; transition: 0.3s; }
+        .nav-link:hover { background: #bc13fe; color: #000; }
+
+        /* BOUTON RETOUR MANDATOIRE */
+        .btn-retour-nav { position: absolute; top: 15px; left: 15px; background: #000; border: 1px solid #bc13fe; color: #bc13fe; padding: 6px 12px; text-decoration: none; font-size: 0.8em; font-weight: bold; border-radius: 4px; z-index: 10; }
+        .btn-retour-nav:hover { background: #bc13fe; color: #000; }
+
+        .qcm-section { text-align: left; margin: 15px 0; }
+        .qcm-label { display: block; margin: 10px 0; cursor: pointer; font-size: 0.95em; color: #e0b0ff; }
+        .code-window { background: #050208; border: 1px solid #bc13fe; padding: 15px; border-radius: 4px; margin: 15px 0; font-family: 'Courier New', monospace; font-size: 0.85em; color: #d088ff; text-align: left; overflow-x: auto; white-space: pre; }
+    </style>
+</head>
+<body>
+    <button id="toggle-sobre-btn" onclick="basculerModeSobre()">🌓 Mode sobre</button>
+
+    <canvas id="glitch-canvas"></canvas>
+
+    <div class="terminal">
+        <a href="../../MENU_PRINCIPAL.html" class="btn-retour-nav">⬅ NAV MENU</a>
+
+        <div id="lock-screen">
+            <h2 style="color: #bc13fe; text-shadow: 0 0 10px rgba(188,19,254,0.5);">⚠️ DÉTECTION LEGACY-SYSTEM</h2>
+            
+            <div class="story-context">
+                <b>[ DOSSIER : VOC-GHOST-RECOVERY ]</b><br>
+                La signature OMNIPOTENCE a révélé un point d'ombre : le serveur de secours caché <b>GLACIER-ZERO</b>. Dissimulé au sein d'une infrastructure obsolète dans un bunker de l'Armée suisse désaffecté en Argovie, ce système non répertorié héberge la matrice originale du Deepfake vocal ayant servi à la fraude financière.<br><br>
+                Vous devez infiltrer l'archive et neutraliser la fréquence pour couper définitivement le flux biométrique illégal.
+            </div>
+
+            <p>Veuillez entrer la signature de maître (Code E20) :</p>
+            <input type="text" id="passkey" class="analysis-input" placeholder="CODE SESSION E20" onchange="sauvegarderAutomatiquement()">
+            <br>
+            <button onclick="unlock()">SCANNER L'ARCHIVE</button>
+        </div>
+
+        <div id="pre-requis-screen">
+            <div class="header-mission">
+                <span>[PRÉ-REQUIS] VALIDATION DE L'INTRUSION</span>
+                <span style="color: #ff0055;">CONTRÔLE RÉGLEMENTAIRE</span>
+            </div>
+            <p>> <b>STATUT :</b> L'accès aux infrastructures d'archives nécessite une double confirmation de légitimité.</p>
+            
+            <div class="qcm-section">
+                <p style="color: #ff0055; font-weight: bold;">⚖️ CADRE LÉGAL (Nouvelle LPD Suisse) :</p>
+                <p>Le traitement massif et automatisé de signatures biométriques (comme les empreintes vocales) sans informer explicitement les personnes concernées viole en premier lieu quel principe fondamental de la LPD (Art. 6) ?</p>
+                <label class="qcm-label"><input type="radio" name="cp_qcm" value="lpd_transparence" onchange="sauvegarderAutomatiquement()"> A) Le principe de transparence (la collecte doit être reconnaissable)</label>
+                <label class="qcm-label"><input type="radio" name="cp_qcm" value="lpd_territorialite" onchange="sauvegarderAutomatiquement()"> B) Le principe de territorialité des serveurs d'hébergement</label>
+                <label class="qcm-label"><input type="radio" name="cp_qcm" value="lpd_utilite" onchange="sauvegarderAutomatiquement()"> C) Le principe d'utilité publique des bases de données</label>
+            </div>
+
+            <div style="text-align: left; margin-top: 20px;">
+                <p style="color: #ff0055; font-weight: bold;">🖥️ ANALYSE DES FLUX RÉSEAU :</p>
+                <p>Quelle commande réseau standard (utilisable sous Linux/Unix) permet de tracer la route des paquets IP vers le serveur fantôme afin d'identifier les routeurs intermédiaires en Suisse ?</p>
+                <input type="text" id="tech_cmd" class="analysis-input" placeholder="Commande attendue (ex: ping)" style="width: 100%; max-width: 350px; margin: 10px 0;" onchange="sauvegarderAutomatiquement()">
+            </div>
+            <br>
+            <div style="text-align: center;">
+                <button onclick="verifyPreReq()">INITIALISER L'INJECTEUR D'ANALYSE</button>
+            </div>
+        </div>
+
+        <div id="mission-content">
+            <div class="header-mission">
+                <span>[DEEP-SCAN] S03E21</span>
+                <span style="color: #ff0055;">ENQUÊTE BIOMÉTRIQUE</span>
+            </div>
+            
+            <p>> Un serveur fantôme héberge les preuves de l'appel Deepfake.</p>
+            <p>> <b>INSTRUCTION :</b> Analysez la logique de la fonction d'extraction ci-dessous pour reconstituer le jeton de neutralisation.</p>
+            
+            <div class="legacy-box">
+                <p class="warning-text">[STATUT : VOLUMES NON SÉCURISÉS]</p>
+                <b>Archive :</b> VOC_DUMP_04.bin <br>
+                <b>Origine :</b> <span style="cursor:help; border-bottom: 1px dotted;" title="GLACIER-ZERO">IDENTIFIANT_CACHÉ (Survolez)</span><br>
+                <b>Note forensique :</b> La clé finale dépend de la validation des conditions logiques du parseur de métadonnées audio.<br>
+                <b style="color:#ff0055;">⚠ Attention :</b> le parseur ci-dessous génère un jeton générique se terminant par le mot <code>PROXY</code>. Ce mot est un espace réservé technique : dans le jeton final à soumettre, il doit être remplacé par l'identifiant réel du serveur fantôme, celui que vous avez découvert dans ce dossier (champ "Origine" ci-dessus).
+            </div>
+
+            <div class="code-window" style="max-height: 200px; overflow-y: auto;">$ strings -n 6 VOC_DUMP_04.bin | grep -i SERVER_HANDLE
+SERVER_HANDLE=RELAY-NORTH-07
+SERVER_HANDLE=BACKUP-CACHE-12
+SERVER_HANDLE=GLACIER-ZERO
+SERVER_HANDLE=STAGING-TEMP-99
+SERVER_HANDLE=RELAY-NORTH-07
+SERVER_HANDLE=DECOY-MIRROR-21
+
+// 6 identifiants trouvés dans le binaire. Un seul correspond au serveur non répertorié
+// mentionné dans le dossier VOC-GHOST-RECOVERY (voir aussi le champ "Origine" ci-dessous).</div>
+
+            <div class="code-window"># --- PARSEUR DE SÉCURITÉ AUDIO (PYTHON 3) ---
+def extraire_parametres_synthese():
+    # Métadonnées extraites de l'en-tête du fichier conteneur RIFF/WAVE
+    frequence_echantillonnage = 22000  # Résidu en Hz
+    stabilite_harmonique = 99.9        # Seuil synthétique
+    moteur_version = "V2"              # Version détectée par analyse spectrale
+
+    # --- ARBRE DE LOGIQUE FORENSIQUE ---
+    # Indice 1 : Évaluez chaque bloc conditionnel du haut vers le bas.
+    # Indice 2 : La valeur finale de 'code_freq' dépend de la condition remplie.
+    
+    if frequence_echantillonnage == 44100 and stabilite_harmonique < 90:
+        code_freq = "441"
+        moteur_version = "V1"
+    elif frequence_echantillonnage == 22000 or stabilite_harmonique == 100:
+        # Note : Le format de sortie exige la concaténation de la fréquence simplifiée et de la version validée
+        if stabilite_harmonique > 95:
+            code_freq = "110"
+            moteur_version = "V3"  # Réécriture dynamique du cache
+        else:
+            code_freq = "220"
+    else:
+        code_freq = "000"
+
+    # Format attendu pour le jeton : FREQ-VERSION-PROXY
+    return f"{code_freq}-{moteur_version}-PROXY"</div>
+
+            <div id="action-zone" style="text-align: center;">
+                <p>Jeton de neutralisation — remplacez le mot <code>PROXY</code> par l'identifiant réel du serveur (Format: FREQ-VERSION-IDENTIFIANT) :</p>
+                <input type="text" id="tokenIn" class="analysis-input" placeholder="XXX-VX-XXXXXXX-XXXX" onchange="sauvegarderAutomatiquement()">
+                <br>
+                <button onclick="checkToken()">FORCER L'EXTINCTION DU SERVEUR</button>
+            </div>
+
+            <div id="victory-zone">
+                <h3 style="color: #3fb950;">✓ SERVEUR FANTÔME NEUTRALISÉ</h3>
+                <p>Violation des réglementations sur les données biométriques confirmée. Données isolées.</p>
+                <p>Code de déploiement pour l'épisode suivant :</p>
+                <span class="code-final">GHOST-KILL-99</span>
+                
+                <div style="background: #1a0a25; padding: 15px; text-align: left; font-size: 0.8em; border: 1px solid #bc13fe; margin-bottom: 20px;">
+                    <b>📝 export_eleves.csv :</b><br>
+                    S03E21 ; Succès ; Serveur GLACIER-ZERO déconnecté. Preuves biométriques sécurisées.
+                </div>
+
+                <a href="../../MENU_PRINCIPAL.html" class="nav-link">⬅ RETOUR AU MENU PRINCIPAL</a>
+            </div>
+        </div>
+
+        <div style="margin-top: 30px; text-align: center; border-top: 1px solid #333; padding-top: 10px;">
+            <a href="../../MENU_PRINCIPAL.html" style="color: #444; text-decoration: none; font-size: 0.7em;">[ DÉCONNEXION DU SYSTÈME ]</a>
+        </div>
+    </div>
+
+    <button class="btn-aide-rouge" onclick="toggleAide()">[ 📜 ANALYSE DES 3 PILIERS - E21 ]</button>
+    <div id="zoneAide" class="aide-box">
+        <h3 style="margin-top: 0; color: #d80000;">Dossier de Cyber-Forensique</h3>
+        <p><b>1. Informatique :</b> Une empreinte vocale humaine naturelle montre des fluctuations chaotiques. Une stabilité spectrale maintenue artificiellement à 99.9% démontre un flux généré par un réseau de neurones (Deepfake).</p>
+        <p><b>2. Juridique :</b> La LPD suisse pose plusieurs principes encadrant le traitement de données sensibles comme la biométrie. Parmi les trois options proposées, une seule correspond à un principe réellement consacré par l'Art. 6 LPD — relisez chaque option avec attention.</p>
+        <p><b>3. Forensics :</b> L'extraction des conteneurs audio permet de pister les caractéristiques de quantification. Les résidus à 22kHz indiquent l'utilisation de structures d'échantillonnage de modèles génératifs anciens.</p>
+    </div>
+
+    <div style="margin-top: 30px; border-top: 3px solid #d80000; padding: 20px; background: #fff; font-family: Arial, sans-serif; position: relative; z-index: 100; width: 90%; max-width: 450px;">
+        <div id="hint-score-badge" style="background:#111;color:#3fb950;padding:8px 15px;font-weight:bold;text-align:center;">🏆 Score de cet épisode : <span id="hint-score-value">5</span> / 5 pts</div>
+        <div style="display:flex; gap:8px; margin:10px 0;">
+            <button id="hintBtn1" onclick="useHint(1)" style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;">💡 Indice 1 (-1 pt)</button>
+            <button id="hintBtn2" onclick="useHint(2)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🎯 Indice 2 (-2 pts)</button>
+            <button id="hintBtn3" onclick="useHint(3)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🆘 Solution (-3 pts)</button>
+        </div>
+
+        <div id="zoneAideScore" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; color: #333;">
+            <p id="hint-tier-1" style="display:none;"><strong>💡 INFO :</strong> Pré-requis : le QCM porte sur le principe de l'Art. 6 LPD violé par une collecte biométrique non déclarée, et la commande pour tracer la route des paquets IP. Ensuite, suivez l'arbre conditionnel Python (fréquence 22000, stabilité 99.9) puis remplacez PROXY par l'identifiant du serveur trouvé au survol du champ « Origine ».</p>
+            <p id="hint-tier-2" style="display:none;"><strong>🎯 PISTE :</strong> Réponse QCM : A (transparence). Commande : <code>traceroute</code>. Dans le code : la 1ère condition est fausse (fréquence ≠ 44100), la 2e est vraie (fréquence = 22000), et comme stabilité > 95 → code_freq="110", moteur_version="V3". L'identifiant caché (survolez le texte) est <code>GLACIER-ZERO</code>.</p>
+            <p id="hint-tier-3" style="display:none;"><strong>🆘 SOLUTION :</strong> Pré-requis : A / traceroute. Jeton final : <code>110-V3-GLACIER-ZERO</code></p>
+        </div>
+    </div>
+
+    <script>
+        // --- ANIMATION BACKGROUND : VOID GLITCH ---
+        const canvas = document.getElementById('glitch-canvas');
+        const ctx = canvas.getContext('2d');
+        let shards = [];
+
+        function init() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            shards = [];
+            for(let i=0; i<30; i++) {
+                shards.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    w: Math.random() * 100 + 50,
+                    h: Math.random() * 2 + 1,
+                    v: Math.random() * 2 + 0.5
+                });
+            }
+        }
+
+        function drawGlitch() {
+            ctx.fillStyle = 'rgba(10, 5, 16, 0.2)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            shards.forEach(s => {
+                ctx.fillStyle = Math.random() > 0.9 ? '#ff0055' : '#bc13fe';
+                ctx.globalAlpha = Math.random() * 0.5;
+                ctx.fillRect(s.x, s.y, s.w, s.h);
+                
+                s.x += s.v * (Math.random() > 0.5 ? 1 : -1);
+                if(s.x > canvas.width) s.x = 0;
+                if(s.x < -s.w) s.x = canvas.width;
+            });
+
+            if(Math.random() > 0.98) {
+                ctx.fillStyle = 'rgba(188, 19, 254, 0.05)';
+                ctx.fillRect(0, Math.random()*canvas.height, canvas.width, 10);
+            }
+
+            requestAnimationFrame(drawGlitch);
+        }
+
+        window.addEventListener('resize', init);
+        init();
+        function appliquerModeSobre() {
+            const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+            document.body.classList.toggle('mode-sobre', actif);
+            const btn = document.getElementById('toggle-sobre-btn');
+            if (btn) btn.textContent = actif ? '🌓 Mode sobre : ON' : '🌓 Mode sobre';
+        }
+        function basculerModeSobre() {
+            const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+            localStorage.setItem('swiss_shield_mode_sobre', actif ? '0' : '1');
+            appliquerModeSobre();
+        }
+        appliquerModeSobre();
+        if (localStorage.getItem('swiss_shield_mode_sobre') !== '1') drawGlitch();
+
+        // 1. VERROU DE SESSION
+        function unlock() {
+            const code = document.getElementById('passkey').value.trim().toUpperCase();
+            if (code === 'OMNIPOTENCE-2026') {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('pre-requis-screen').style.display = 'block';
+                currentZone = 'pre-requis-screen';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('entree', code, 'OMNIPOTENCE-2026');
+                alert("ACCÈS REFUSÉ : Signature de maître invalide.");
+            }
+        }
+
+        // 7. VÉRIFICATION DU DOUBLE VERROU (MISE À JOUR DE LA VALEUR CORRECTE SUR A)
+        function verifyPreReq() {
+            const selectedCp = document.querySelector('input[name="cp_qcm"]:checked');
+            const techCmd = document.getElementById('tech_cmd').value.trim().toLowerCase();
+
+            if (!selectedCp) {
+                enregistrerErreur('prerequis', 'qcm=(aucune sélection), commande="' + techCmd + '"', 'qcm=lpd_transparence, commande=traceroute/tracepath');
+                alert("ERREUR SYSTÈME : Validation réglementaire manquante.");
+                return;
+            }
+
+            const jurValid = (selectedCp.value === "lpd_transparence");
+            const techValid = (techCmd === "traceroute" || techCmd === "tracepath");
+
+            if (jurValid && techValid) {
+                document.getElementById('pre-requis-screen').style.display = 'none';
+                document.getElementById('mission-content').style.display = 'block';
+                currentZone = 'mission-content';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('prerequis', 'qcm=' + selectedCp.value + ', commande="' + techCmd + '"', 'qcm=lpd_transparence, commande=traceroute/tracepath');
+                alert("ÉCHEC DES PRÉ-REQUIS : Droits juridiques ou commande de traçage invalides.");
+            }
+        }
+
+        // 8. VÉRIFICATION DE LA SIGNATURE COMPLEXE
+        function checkToken() {
+            const val = document.getElementById('tokenIn').value.trim().toUpperCase();
+            if (val === '110-V3-GLACIER-ZERO') {
+                document.getElementById('action-zone').style.display = 'none';
+                document.getElementById('victory-zone').style.display = 'block';
+            } else {
+                enregistrerErreur('investigation', val, '110-V3-GLACIER-ZERO');
+                alert("JETON INVALIDE : La structure logique décodée ne correspond pas aux contraintes de la fonction.");
+            }
+        }
+
+        function toggleAide() {
+            var x = document.getElementById("zoneAide");
+            x.style.display = (x.style.display === "block") ? "none" : "block";
+        }
+    </script>
+
+    <script>
+        const EP_ID = "S03E21";
+        const HINT_COST = {1:1, 2:2, 3:3};
+        let hintsUsed = {1:false, 2:false, 3:false};
+        let episodeScore = 5;
+        function useHint(level) {
+            if (hintsUsed[level] || (level > 1 && !hintsUsed[level - 1])) return;
+            hintsUsed[level] = true;
+        enregistrerIndiceUsage(level);
+            episodeScore -= HINT_COST[level];
+            document.getElementById('hint-score-value').textContent = episodeScore;
+            document.getElementById('hint-tier-' + level).style.display = 'block';
+            const btn = document.getElementById('hintBtn' + level);
+            btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5';
+            if (level < 3) {
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+            sauvegarderAutomatiquement();
+        }
+        function recordEpisodeSuccess() {
+            let scores = {};
+            try { scores = JSON.parse(localStorage.getItem('swiss_shield_scores') || '{}'); } catch(e) {}
+            if (!(EP_ID in scores) || scores[EP_ID] < episodeScore) scores[EP_ID] = episodeScore;
+            localStorage.setItem('swiss_shield_scores', JSON.stringify(scores));
+            localStorage.removeItem('autosave_' + EP_ID);
+        }
+    let currentZone = 'lock-screen';
+    function sauvegarderAutomatiquement() {
+        try {
+            const inputs = {};
+            ['passkey', 'tech_cmd', 'tokenIn'].forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) inputs[id] = el.value;
+            });
+            const cpChecked = document.querySelector('input[name="cp_qcm"]:checked');
+            inputs['cp_qcm'] = cpChecked ? cpChecked.value : '';
+            localStorage.setItem('autosave_' + EP_ID, JSON.stringify({
+                zone: currentZone,
+                inputs: inputs,
+                hintsUsed: hintsUsed,
+                episodeScore: episodeScore
+            }));
+        } catch(e) {}
+    }
+    function proposerRestaurationAutosave() {
+        let data;
+        try { data = JSON.parse(localStorage.getItem('autosave_' + EP_ID) || 'null'); } catch(e) { return; }
+        if (!data || !data.zone || data.zone === 'lock-screen') return;
+        document.getElementById('lock-screen').style.display = 'none';
+        if (data.zone === 'mission-content') {
+            document.getElementById('pre-requis-screen').style.display = 'none';
+            document.getElementById('mission-content').style.display = 'block';
+        } else if (data.zone === 'pre-requis-screen') {
+            document.getElementById('pre-requis-screen').style.display = 'block';
+        }
+        currentZone = data.zone;
+        if (data.inputs) {
+            Object.keys(data.inputs).forEach(function(id) {
+                if (id === 'cp_qcm') {
+                    if (data.inputs.cp_qcm) {
+                        const radio = document.querySelector('input[name="cp_qcm"][value="' + data.inputs.cp_qcm + '"]');
+                        if (radio) radio.checked = true;
+                    }
+                    return;
+                }
+                const el = document.getElementById(id);
+                if (el) el.value = data.inputs[id];
+            });
+        }
+        hintsUsed = data.hintsUsed || hintsUsed;
+        episodeScore = (typeof data.episodeScore === 'number') ? data.episodeScore : episodeScore;
+        document.getElementById('hint-score-value').textContent = episodeScore;
+        [1, 2, 3].forEach(function(level) {
+            if (hintsUsed[level]) {
+                document.getElementById('hint-tier-' + level).style.display = 'block';
+                const btn = document.getElementById('hintBtn' + level);
+                if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+        });
+    }
+    function enregistrerIndiceUsage(niveau) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + niveau;
+            debrief.indices[cle] = (debrief.indices[cle] || 0) + 1;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+    function enregistrerErreur(phase, reponseEleve, reponseAttendue) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + phase;
+            if (typeof debrief.erreurs[cle] !== 'object' || debrief.erreurs[cle] === null) {
+                debrief.erreurs[cle] = { compte: (debrief.erreurs[cle] || 0), exemples: [] };
+            }
+            debrief.erreurs[cle].compte++;
+            if (reponseEleve !== undefined && debrief.erreurs[cle].exemples.length < 5) {
+                debrief.erreurs[cle].exemples.push({ reponseEleve: String(reponseEleve).slice(0,100), reponseAttendue: String(reponseAttendue||'').slice(0,100) });
+            }
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+        (function pollSuccess(){
+            const ids = ['success','success-msg','success-final','final-zone','step_final','victory-zone','victory-screen','final-step','final-badge'];
+            let recorded = false;
+            setInterval(function(){
+                if (recorded) return;
+                for (const id of ids) {
+                    const el = document.getElementById(id);
+                    if (el && window.getComputedStyle(el).display === 'block') { recordEpisodeSuccess(); recorded = true; return; }
+                }
+            }, 500);
+        })();
+        proposerRestaurationAutosave();
+    </script>
+</body>
+</html>

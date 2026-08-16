@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>S02E11 - DROIT D'ACCÈS</title>
+    <style>
+        /* --- DESIGN CONSERVÉ --- */
+        body {
+            background-color: #050505;
+            color: #2ecc71;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* --- MODE SOBRE (accessibilité) --- */
+        body.mode-sobre, body.mode-sobre * { animation: none !important; transition: none !important; }
+        body.mode-sobre .background-effect { display: none !important; }
+        #toggle-sobre-btn {
+            position: fixed; top: 10px; right: 10px; z-index: 10001;
+            background: #000; color: #2ecc71; border: 1px solid #2ecc71;
+            padding: 6px 10px; font-size: 0.7em; cursor: pointer; font-family: inherit; border-radius: 3px;
+        }
+
+        .background-effect {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background:
+                linear-gradient(transparent 0%, rgba(46, 204, 113, 0.2) 2%, transparent 5%),
+                linear-gradient(90deg, transparent 0%, rgba(52, 152, 219, 0.2) 2%, transparent 5%);
+            background-size: 50px 50px;
+            perspective: 500px;
+            transform: perspective(500px) rotateX(60deg);
+            z-index: -1;
+            animation: moveGrid 2s linear infinite;
+        }
+
+        @keyframes moveGrid {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 50px; }
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, transparent 30%, black 100%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .terminal {
+            background: rgba(17, 17, 17, 0.95);
+            border: 2px solid #2ecc71;
+            padding: 30px;
+            width: 90%;
+            max-width: 850px;
+            box-shadow: 0 0 40px rgba(52, 152, 219, 0.3);
+            border-radius: 12px;
+            z-index: 10;
+            position: relative;
+        }
+
+        .header-mission { border-bottom: 2px solid #2ecc71; margin-bottom: 25px; padding-bottom: 10px; color: #fff; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; text-align: center;}
+
+        .story-alert {
+            background: rgba(52, 152, 219, 0.1);
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            margin-bottom: 25px;
+            color: #bdc3c7;
+            line-height: 1.6;
+        }
+
+        .back-btn { position: absolute; top: 20px; left: 20px; color: #2ecc71; text-decoration: none; border: 1px solid #2ecc71; padding: 5px 10px; font-size: 0.8em; z-index: 100; }
+
+        #lock-screen, #prerequisites, #mission-content, #final-zone { display: none; }
+        .active { display: block !important; }
+
+        .law-extract { background: rgba(241, 196, 15, 0.1); border-left: 4px solid #f1c40f; padding: 15px; margin: 20px 0; color: #f1c40f; font-style: italic; }
+
+        /* Annexes stylisées */
+        .annexe-code { background: #000; border: 1px solid #444; padding: 15px; color: #2ecc71; font-size: 0.85em; margin: 15px 0; border-radius: 4px; overflow-x: auto; border-left: 3px solid #3498db;}
+
+        .hint-box { border: 1px dashed #e67e22; padding: 10px; color: #e67e22; font-size: 0.8em; margin: 10px 0; display: none; }
+
+        .piliers-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 30px; border-top: 1px solid #444; padding-top: 20px; }
+        .pilier { background: rgba(46, 204, 113, 0.05); border: 1px solid #2ecc71; padding: 10px; font-size: 0.75em; border-radius: 4px; color: #bdc3c7; }
+        .pilier h4 { margin: 0 0 5px 0; color: #2ecc71; text-transform: uppercase; font-size: 0.9em; }
+
+        input { background: #000; border: 1px solid #2ecc71; color: #2ecc71; padding: 12px; width: 300px; font-family: inherit; margin: 10px 0; text-align: center; border-radius: 4px; }
+        button { background: #2ecc71; color: #000; border: none; padding: 12px 25px; font-weight: bold; cursor: pointer; border-radius: 4px; text-transform: uppercase; margin-top: 10px; }
+        button:hover { background: #fff; box-shadow: 0 0 20px #2ecc71; }
+
+        .code-final { color: #ffd700; font-size: 2em; letter-spacing: 5px; display: block; text-align: center; padding: 15px; border: 1px dashed #ffd700; background: rgba(255,215,0,0.1); margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <button id="toggle-sobre-btn" onclick="basculerModeSobre()">🌓 Mode sobre</button>
+
+    <a href="../../MENU_PRINCIPAL.html" class="back-btn">< RETOUR TERMINAL</a>
+    <div class="background-effect"></div>
+
+    <div class="terminal">
+        <div id="lock-screen" class="active">
+            <h2 style="color: #3498db; text-align: center;">🛡️ ACCÈS AU PORTAIL CITOYEN - S02E11</h2>
+            <div class="story-alert">
+                <b>CONTEXTE :</b> Suite à l'incident de Berne (S02E10), la pression monte. M. Müller exige de savoir quelles données l'administration détient sur lui. La <b>nLPD</b> est stricte : le droit d'accès est inaliénable.
+                <br><br>Identifiez-vous avec la clé de classification de l'épisode précédent.
+            </div>
+            <div style="text-align: center;">
+                <input type="text" id="passkey" placeholder="CLÉ S02E10">
+                <br>
+                <button onclick="unlock()">INITIALISER LA REQUÊTE</button>
+            </div>
+        </div>
+
+        <div id="prerequisites">
+            <div class="header-mission">VÉRIFICATION DES PROTOCOLES D'ACCÈS</div>
+            <div class="story-alert">Confirmez la maîtrise des sanctions et des outils avant de traiter la demande d'accès.</div>
+
+            <div style="margin-bottom: 20px;">
+                <p><strong>[QCM JURIDIQUE]</strong> Quel est le montant maximal de l'amende (en CHF) encourue par une personne privée pour violation intentionnelle du droit d'accès (Art. 60 nLPD) ?</p>
+                <input type="text" id="pre1" placeholder="Montant en chiffres" onchange="sauvegarderAutomatiquement()">
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <p><strong>[COMMAND LINE]</strong> Quel outil réseau permet d'afficher le chemin (les sauts) emprunté par un paquet jusqu'au serveur <code>shiel-db.ch</code> ?</p>
+                <input type="text" id="pre2" placeholder="Commande shell..." onchange="sauvegarderAutomatiquement()">
+            </div>
+            <div style="text-align:center;"><button onclick="checkPrereq()">OUVRIR LE MODULE ART. 25</button></div>
+        </div>
+
+        <div id="mission-content">
+            <div class="header-mission">INVESTIGATION : CALCUL DU DÉLAI LÉGAL</div>
+            <div class="law-extract">
+                "Art. 25 nLPD : Le responsable du traitement doit fournir les renseignements demandés dans un délai de 30 jours."
+            </div>
+
+            <div class="story-alert">
+                <b>SITUATION :</b> Le serveur utilise un encodage hexadécimal pour ses fenêtres de réponse. Vous devez confirmer que le paquet intercepté respecte bien le délai légal suisse.
+            </div>
+
+            <div class="annexe-code">
+                // Interception du paquet de réponse Citoyen<br>
+                HEADERS {<br>
+                &nbsp;&nbsp;"Status": "Pending",<br>
+                &nbsp;&nbsp;"Access_Token": "MULLER_CERT_2026",<br>
+                &nbsp;&nbsp;"Response_Window": <b>0x1E</b><br>
+                }
+            </div>
+
+            <button onclick="showHint()" style="background: #e67e22; font-size: 0.7em; padding: 5px 10px;">AFFICHER LES INDICES D'ANALYSE</button>
+            <div id="hintArea" class="hint-box">
+                <b>ANALYSE FORENSIQUE :</b><br>
+                1. Identifiez la valeur hexadécimale après le préfixe <code>0x</code>.<br>
+                2. Position 1 (Gauche) : Multipliez par 16.<br>
+                3. Position 2 (Droite) : Convertissez la lettre (A=10... F=15) et additionnez.<br>
+                4. Le résultat doit correspondre au délai légal (Art. 25).
+            </div>
+
+            <div style="text-align: center; background: rgba(0,0,0,0.5); padding: 20px; border: 1px solid #3498db; margin-top: 20px;">
+                <p>Convertissez <b>0x1E</b> en décimal :</p>
+                <input type="number" id="daysInput" placeholder="Résultat final">
+                <br>
+                <button onclick="validateRequest()">SCELLER LE DOSSIER</button>
+            </div>
+        </div>
+
+        <div id="final-zone">
+            <h2 style="color:#ffd700; text-align:center;">✔ CONFORMITÉ VALIDÉE</h2>
+            <div class="story-alert" style="border-left-color: #ffd700;">
+                Le calcul de 30 jours est exact. Le dossier Müller est prêt pour transmission. L'intégrité du droit d'accès est préservée.
+            </div>
+            <p style="text-align:center;">CODE D'EXPORTATION (S02E11) :</p>
+            <span class="code-final">ACCESS-RIGHT-30</span>
+            <div style="text-align: center;">
+                <button onclick="location.href='../../MENU_PRINCIPAL.html'">RETOUR AU MENU</button>
+            </div>
+        </div>
+
+        <div class="piliers-container">
+            <div class="pilier">
+                <h4>Informatique</h4>
+                L'Hexadécimal (Base 16) permet de représenter des octets complexes. 0x1E est un format courant dans les headers HTTP personnalisés.
+            </div>
+            <div class="pilier">
+                <h4>Juridique</h4>
+                Art. 60 nLPD : Le refus de renseigner ou le renseignement inexact lors d'un droit d'accès est passible d'amende.
+            </div>
+            <div class="pilier">
+                <h4>Forensics</h4>
+                En analyse de paquets, la conversion Hex->Dec est primordiale pour interpréter les drapeaux (flags) et les délais (timeouts).
+            </div>
+        </div>
+
+        <div style="margin-top: 30px; border-top: 3px solid #d80000; padding: 20px; background: #fff; font-family: Arial, sans-serif; position: relative; z-index: 100;">
+            <div id="hint-score-badge" style="background:#111;color:#3fb950;padding:8px 15px;font-weight:bold;text-align:center;">🏆 Score de cet épisode : <span id="hint-score-value">5</span> / 5 pts</div>
+            <div style="display:flex; gap:8px; margin:10px 0;">
+                <button id="hintBtn1" onclick="useHint(1)" style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;">💡 Indice 1 (-1 pt)</button>
+                <button id="hintBtn2" onclick="useHint(2)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🎯 Indice 2 (-2 pts)</button>
+                <button id="hintBtn3" onclick="useHint(3)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🆘 Solution (-3 pts)</button>
+            </div>
+
+            <div id="zoneAideScore" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; color: #333;">
+                <p id="hint-tier-1" style="display:none;"><strong>💡 INFO :</strong> Pré-requis : le montant maximal de l'amende (Art. 60 nLPD) en CHF, et l'outil réseau qui affiche les sauts d'un paquet. Ensuite, convertissez 0x1E de l'hexadécimal au décimal.</p>
+                <p id="hint-tier-2" style="display:none;"><strong>🎯 PISTE :</strong> Amende : 250'000 CHF. Outil : <code>traceroute</code>. Conversion : 0x1E = (1×16) + 14 (E=14).</p>
+                <p id="hint-tier-3" style="display:none;"><strong>🆘 SOLUTION :</strong> Pré-requis : 250000 / traceroute. Délai en jours : <code>30</code></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function appliquerModeSobre() {
+            const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+            document.body.classList.toggle('mode-sobre', actif);
+            const btn = document.getElementById('toggle-sobre-btn');
+            if (btn) btn.textContent = actif ? '🌓 Mode sobre : ON' : '🌓 Mode sobre';
+        }
+        function basculerModeSobre() {
+            const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+            localStorage.setItem('swiss_shield_mode_sobre', actif ? '0' : '1');
+            appliquerModeSobre();
+        }
+        appliquerModeSobre();
+
+        function unlock() {
+            const pass = document.getElementById('passkey').value.trim().toUpperCase();
+            if (pass === "ART-5-SENSITIVE") {
+                document.getElementById('lock-screen').classList.remove('active');
+                document.getElementById('prerequisites').classList.add('active');
+                currentZone = 'prerequisites';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('entree', pass, 'ART-5-SENSITIVE');
+                alert("CODE SESSION INVALIDE");
+            }
+        }
+
+        function checkPrereq() {
+            const r1 = document.getElementById('pre1').value.trim();
+            const r2 = document.getElementById('pre2').value.trim().toLowerCase();
+
+            // Sanction nLPD : 250000 CHF | Commande : traceroute (ou mtr)
+            if (r1 === "250000" && (r2 === "traceroute" || r2 === "tracert")) {
+                document.getElementById('prerequisites').classList.remove('active');
+                document.getElementById('mission-content').classList.add('active');
+                currentZone = 'mission-content';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('prerequis', 'amende="' + r1 + '", outil="' + r2 + '"', 'amende="250000", outil="traceroute"');
+                alert("IDENTIFICATION ÉCHOUÉE : Relisez l'Art. 60 nLPD ou vérifiez vos commandes réseau.");
+            }
+        }
+
+        function showHint() {
+            document.getElementById('hintArea').style.display = 'block';
+        }
+
+        function validateRequest() {
+            const val = document.getElementById('daysInput').value;
+            if (val === '30') {
+                document.getElementById('mission-content').classList.remove('active');
+                document.getElementById('final-zone').classList.add('active');
+            } else {
+                enregistrerErreur('investigation', val, '30');
+                alert("ERREUR : La valeur décimale ne correspond pas au protocole.");
+            }
+        }
+    </script>
+
+    <script>
+        const EP_ID = "S02E11";
+        const HINT_COST = {1:1, 2:2, 3:3};
+        let hintsUsed = {1:false, 2:false, 3:false};
+        let episodeScore = 5;
+        function useHint(level) {
+            if (hintsUsed[level] || (level > 1 && !hintsUsed[level - 1])) return;
+            hintsUsed[level] = true;
+        enregistrerIndiceUsage(level);
+            episodeScore -= HINT_COST[level];
+            document.getElementById('hint-score-value').textContent = episodeScore;
+            document.getElementById('hint-tier-' + level).style.display = 'block';
+            const btn = document.getElementById('hintBtn' + level);
+            btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5';
+            if (level < 3) {
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+            sauvegarderAutomatiquement();
+        }
+        function recordEpisodeSuccess() {
+            let scores = {};
+            try { scores = JSON.parse(localStorage.getItem('swiss_shield_scores') || '{}'); } catch(e) {}
+            if (!(EP_ID in scores) || scores[EP_ID] < episodeScore) scores[EP_ID] = episodeScore;
+            localStorage.setItem('swiss_shield_scores', JSON.stringify(scores));
+            localStorage.removeItem('autosave_' + EP_ID);
+        }
+    let currentZone = 'lock-screen';
+    function sauvegarderAutomatiquement() {
+        try {
+            const inputs = {};
+            ['pre1', 'pre2', 'daysInput'].forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) inputs[id] = el.value;
+            });
+            localStorage.setItem('autosave_' + EP_ID, JSON.stringify({
+                zone: currentZone,
+                inputs: inputs,
+                hintsUsed: hintsUsed,
+                episodeScore: episodeScore
+            }));
+        } catch(e) {}
+    }
+    function proposerRestaurationAutosave() {
+        let data;
+        try { data = JSON.parse(localStorage.getItem('autosave_' + EP_ID) || 'null'); } catch(e) { return; }
+        if (!data || !data.zone || data.zone === 'lock-screen') return;
+        document.getElementById('lock-screen').classList.remove('active');
+        if (data.zone === 'mission-content') {
+            document.getElementById('prerequisites').classList.remove('active');
+            document.getElementById('mission-content').classList.add('active');
+        } else if (data.zone === 'prerequisites') {
+            document.getElementById('prerequisites').classList.add('active');
+        }
+        currentZone = data.zone;
+        if (data.inputs) {
+            Object.keys(data.inputs).forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) el.value = data.inputs[id];
+            });
+        }
+        hintsUsed = data.hintsUsed || hintsUsed;
+        episodeScore = (typeof data.episodeScore === 'number') ? data.episodeScore : episodeScore;
+        document.getElementById('hint-score-value').textContent = episodeScore;
+        [1, 2, 3].forEach(function(level) {
+            if (hintsUsed[level]) {
+                document.getElementById('hint-tier-' + level).style.display = 'block';
+                const btn = document.getElementById('hintBtn' + level);
+                if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+        });
+    }
+    function enregistrerIndiceUsage(niveau) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + niveau;
+            debrief.indices[cle] = (debrief.indices[cle] || 0) + 1;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+    function enregistrerErreur(phase, reponseEleve, reponseAttendue) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + phase;
+            if (typeof debrief.erreurs[cle] !== 'object' || debrief.erreurs[cle] === null) {
+                debrief.erreurs[cle] = { compte: (debrief.erreurs[cle] || 0), exemples: [] };
+            }
+            debrief.erreurs[cle].compte++;
+            if (reponseEleve !== undefined && debrief.erreurs[cle].exemples.length < 5) {
+                debrief.erreurs[cle].exemples.push({ reponseEleve: String(reponseEleve).slice(0,100), reponseAttendue: String(reponseAttendue||'').slice(0,100) });
+            }
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+        (function pollSuccess(){
+            const ids = ['success','success-msg','success-final','final-zone','victory-zone','victory-screen','final-step','final-badge'];
+            let recorded = false;
+            setInterval(function(){
+                if (recorded) return;
+                for (const id of ids) {
+                    const el = document.getElementById(id);
+                    if (el && window.getComputedStyle(el).display === 'block') { recordEpisodeSuccess(); recorded = true; return; }
+                }
+            }, 500);
+        })();
+        proposerRestaurationAutosave();
+    </script>
+</body>
+</html>

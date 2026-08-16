@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>S04E29 - DESTRUCTION SÉCURISÉE</title>
+    <style>
+        /* --- NOUVEL EFFET VISUEL S04 : PLASMA INCENDIE --- */
+        #fire-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            background: #0d0600; /* Fond noir ambré */
+        }
+
+        body { color: #e67e22; font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; padding: 40px; margin: 0; min-height: 100vh; overflow-x: hidden; }
+        
+        .terminal { 
+            background: rgba(15, 15, 15, 0.9); 
+            border: 2px solid #e67e22; 
+            padding: 25px; width: 95%; 
+            max-width: 900px; 
+            box-shadow: 0 0 50px rgba(230, 126, 34, 0.4); 
+            border-radius: 4px; 
+            position: relative;
+            backdrop-filter: blur(8px);
+        }
+
+        /* CONTEXTE HISTOIRE S04E29 */
+        .story-context {
+            background: rgba(230, 126, 34, 0.1);
+            border: 1px solid #e67e22;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+            font-size: 0.95em;
+            color: #fff;
+            line-height: 1.5;
+            position: relative;
+        }
+        .story-context b { color: #e67e22; text-shadow: 0 0 5px #e67e22; }
+        .story-context::before {
+            content: "ORDRE DE DESTRUCTION IMMEDIATE";
+            position: absolute;
+            top: -12px; left: 15px;
+            background: #e67e22;
+            color: #000;
+            font-size: 0.7em;
+            padding: 2px 8px;
+            font-weight: bold;
+        }
+
+        .header-mission { border-bottom: 2px solid #e67e22; margin-bottom: 20px; padding-bottom: 10px; color: #fff; font-weight: bold; text-transform: uppercase; display: flex; justify-content: space-between; }
+        
+        #lock-screen { text-align: center; padding: 20px; }
+        #pre-requis-screen { display: none; padding: 20px; }
+        #mission-content { display: none; }
+        
+        .archive-list { background: #000; border: 1px solid #333; margin-bottom: 20px; max-height: 450px; overflow-y: auto; }
+        .file-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #222; }
+        .file-info { font-size: 0.8em; line-height: 1.4; color: #ccc; }
+        .file-info b { color: #fff; display: block; margin-bottom: 3px; }
+        
+        .btn-purge { background: #222; color: #666; border: 1px solid #444; padding: 8px 15px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-purge:hover { background: #d35400; color: #fff; }
+        .btn-purge.selected { background: #e67e22; color: #000; border-color: #fff; box-shadow: 0 0 10px #e67e22; }
+
+        .shredder-box { background: #000; border: 1px dashed #e67e22; padding: 15px; text-align: center; margin-top: 20px; font-size: 0.9em; color: #e67e22; font-weight: bold; }
+        
+        input { background: #000; border: 1px solid #e67e22; color: #e67e22; padding: 12px; width: 300px; font-family: inherit; font-size: 1.1em; text-align: center; outline: none; margin-bottom: 10px; }
+        button.main-btn { background: #e67e22; color: #000; border: none; padding: 12px 30px; font-weight: bold; cursor: pointer; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px; }
+        button.main-btn:hover { background: #fff; box-shadow: 0 0 20px #e67e22; }
+
+        #final-zone { display: none; margin-top: 20px; border-top: 2px solid #2ecc71; padding-top: 20px; text-align: center; }
+        .code-final { color: #2ecc71; font-size: 2.2em; letter-spacing: 5px; margin: 15px 0; display: block; border: 2px solid #2ecc71; padding: 10px; background: rgba(46, 204, 113, 0.1); }
+
+        .export-report { background: rgba(46, 204, 113, 0.1); padding: 15px; text-align: left; font-size: 0.85em; border: 1px solid #2ecc71; margin: 20px 0; font-family: monospace; color: #fff; }
+
+        .btn-aide-orange { background: #d35400; color: #fff; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; width: 100%; max-width: 450px; margin-top: 40px; border-radius: 2px; text-transform: uppercase; }
+        .aide-box { display: none; background: #fff; color: #000; padding: 25px; margin-top: 10px; width: 90%; max-width: 450px; text-align: left; border-top: 5px solid #d35400; font-family: sans-serif; box-shadow: 0 10px 30px rgba(0,0,0,0.5); line-height: 1.4; font-size: 0.9em; z-index: 100; position: relative;}
+        .pillar { margin-bottom: 10px; border-left: 3px solid #d35400; padding-left: 10px; }
+        .pillar b { color: #d35400; text-transform: uppercase; font-size: 0.8em; display: block; }
+
+        .btn-nav-retour { position: absolute; top: 15px; left: 15px; background: #000; border: 1px solid #e67e22; color: #e67e22; padding: 5px 10px; text-decoration: none; font-size: 0.8em; font-weight: bold; border-radius: 3px; z-index: 10; }
+        .btn-nav-retour:hover { background: #e67e22; color: #000; }
+
+        .challenge-block { background: #141414; border: 1px dashed #e67e22; padding: 15px; margin: 15px 0; text-align: left; }
+        .challenge-title { font-weight: bold; color: #fff; text-transform: uppercase; font-size: 0.9em; margin-bottom: 10px; display: block; }
+        .code-window { background: #000; border-left: 3px solid #e67e22; padding: 10px; margin: 15px 0; color: #ffcc99; font-size: 0.85em; overflow-x: auto; white-space: pre; font-family: monospace; }
+
+        /* MODE SOBRE */
+        body.mode-sobre, body.mode-sobre * { animation: none !important; transition: none !important; }
+        body.mode-sobre #fire-canvas { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <canvas id="fire-canvas"></canvas>
+
+    <div class="terminal">
+        <a href="../../MENU_PRINCIPAL.html" class="btn-nav-retour">&lt; RETOUR MENU</a>
+        <button id="toggle-sobre-btn" onclick="basculerModeSobre()" style="position:absolute;top:15px;right:15px;width:auto;z-index:10;background:#000;border:1px solid #e67e22;color:#e67e22;padding:5px 10px;font-size:0.8em;font-weight:bold;border-radius:3px;cursor:pointer;">🌓</button>
+
+        <div id="lock-screen" style="margin-top: 25px;">
+            <h2 style="color: #fff;">🔥 PROTOCOLE DE PURGE nLPD</h2>
+            
+            <div class="story-context">
+                <b>[ HISTORIQUE : LA MÉMOIRE MORTE ]</b><br>
+                L'audit de surveillance au sein des serveurs de l'administration cantonale a révélé que la structure stocke des données obsolètes depuis des décennies. En vertu de l'<b>Art. 6 de la nLPD</b>, les données personnelles doivent être détruites dès qu'elles ne sont plus nécessaires à leur but initial. <br><br>
+                Votre mission est d'identifier les archives qui violent le principe de <b>limitation de la conservation</b> et de les envoyer au broyeur thermique. Attention : ne détruisez pas ce qui est légalement requis par les réglementations fédérales !
+            </div>
+
+            <p>Saisir le jeton de conformité (Code E28) :</p>
+            <input type="text" id="passkey" placeholder="TOKEN" onchange="sauvegarderAutomatiquement()">
+            <br>
+            <button class="main-btn" onclick="unlock()">SCANNER LES ARCHIVES</button>
+        </div>
+
+        <div id="pre-requis-screen" style="margin-top: 25px;">
+            <div class="header-mission">
+                <span>[CONTRÔLE_D'ACCÈS] BASE JURIDIQUE ET PROTOCOLE SYSADMIN</span>
+                <span style="color: #ffcc00;">⚠️ DISPOSITIFS COUPLÉS</span>
+            </div>
+            
+            <div class="challenge-block">
+                <span class="challenge-title">⚖️ Défi Code des Obligations (CO) : Prescription Comptable</span>
+                <p>Selon l'article spécifique du Code des Obligations suisse régissant les règles de comptabilité commerciale, pendant combien d'années au minimum une entité doit-elle conserver ses livres de comptes et ses pièces justificatives (factures fournisseurs) ?</p>
+                <input type="text" id="law_ans" placeholder="Indiquez uniquement la valeur numérique (ex: 5)" style="width: 100%; max-width: 400px;" onchange="sauvegarderAutomatiquement()">
+            </div>
+
+            <div class="challenge-block">
+                <span class="challenge-title">🖥️ Défi Technique Shell : Purge de bas niveau</span>
+                <p>Pour détruire de manière sécurisée et irréversible le fichier temporaire suspect situé dans <code>/tmp/leak.log</code> en écrasant ses blocs plusieurs fois avant suppression sous Linux, quelle commande native (shred) devez-vous exécuter avec l'argument de suppression immédiate après traitement ?</p>
+                <input type="text" id="shell_ans" placeholder="Exemple de commande unix complète" style="width: 100%; max-width: 400px; text-align: left; padding-left: 10px;" onchange="sauvegarderAutomatiquement()">
+            </div>
+
+            <center>
+                <button class="main-btn" onclick="verifyPreReq()">FORCER L'OUVERTURE DU COMPARTIMENT</button>
+            </center>
+        </div>
+
+        <div id="mission-content">
+            <div class="header-mission">
+                <span>[DATABASE-CLEANER] v4.0</span>
+                <span style="color: #e67e22;">STRICT COMPLIANCE MODE</span>
+            </div>
+            
+            <p style="color: #fff;">> <b>SÉLECTION DE PURGE :</b> Identifiez les dossiers violant l'Art. 6 nLPD.</p>
+
+            <div class="archive-list">
+                <div class="file-item">
+                    <div class="file-info"><b>ARCH-01 : CV & Candidatures</b> Refusés en 2019 (Pas de consentement de garde).</div>
+                    <button class="btn-purge" id="purge-1" onclick="toggleSelection(this, 'illegal')">SÉLECTIONNER</button>
+                </div>
+                <div class="file-item">
+                    <div class="file-info"><b>ARCH-02 : Factures Fournisseurs</b> 2020-2024 (Obligation légale de conservation).</div>
+                    <button class="btn-purge" id="purge-2" onclick="toggleSelection(this, 'legal')">SÉLECTIONNER</button>
+                </div>
+                <div class="file-item">
+                    <div class="file-info"><b>ARCH-03 : Blâmes & Sanctions</b> Employés ayant quitté la boîte en 1998.</div>
+                    <button class="btn-purge" id="purge-3" onclick="toggleSelection(this, 'illegal')">SÉLECTIONNER</button>
+                </div>
+                <div class="file-item">
+                    <div class="file-info"><b>ARCH-04 : Vidéo Surveillance</b> Enregistrements de la cantine (Mars 2023).</div>
+                    <button class="btn-purge" id="purge-4" onclick="toggleSelection(this, 'illegal')">SÉLECTIONNER</button>
+                </div>
+            </div>
+
+            <div class="challenge-block">
+                <span class="challenge-title">🧩 DÉFI LOGIQUE : INTÉGRITÉ DE L'INCINÉRATEUR (Niveau 17 ans)</span>
+                <p>Le système de purge exige le hash de contrôle du conteneur de données pour valider le lancement du processus thermique. Analysez l'algorithme d'isolation suivant :</p>
+                
+                <div class="code-window"># ANALYSEUR DE BLOCS : integrity_check.py
+def generer_checksum_purge():
+    # Blocs d'archivage representes par leur id d'indexation
+    # ARCH-01 = 10, ARCH-02 = 20, ARCH-03 = 30, ARCH-04 = 40
+    blocs_non_conformes = [10, 30, 40]
+    
+    # Calcul de la signature logicielle par accumulation de decalages
+    accumulateur = 0
+    for val in blocs_non_conformes:
+        accumulateur += (val >> 1)
+        
+    # Le resultat final attendu pour armer l'incinerateur thermique
+    return accumuluateur</div>
+                
+                <p style="color: #fff; font-size: 0.85em;">💡 <i>Indice Forensics : Exécutez mentalement ou sur papier l'opération binaire de décalage de bits vers la droite (>> 1 équivaut à une division entière par 2) appliquée à chacun des index des blocs ciblés pour destruction, puis faites-en la somme.</i></p>
+                
+                <p>Saisir la signature numérique d'armement calculée :</p>
+                <input type="text" id="checksum_final" placeholder="VALEUR NUMÉRIQUE" style="width: 100%; max-width: 300px;" onchange="sauvegarderAutomatiquement()">
+            </div>
+
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="main-btn" style="background: #c0392b; color: white;" onclick="executePurge()">LANCER LA PURGE DÉFINITIVE</button>
+            </center>
+
+            <div class="shredder-box" id="status-display" style="margin-top: 20px;">EN ATTENTE DE COMPILATION ET DE SÉLECTION...</div>
+
+            <div id="final-zone">
+                <p style="color: #2ecc71;">✓ PURGE RÉUSSIE. Le registre est nettoyé.</p>
+                
+                <div class="export-report">
+                    <b>📝 RAPPORT DE DESTRUCTION (export_eleves.csv) :</b><br>
+                    S04E29 ; Succès ; Purge Art. 6 effectuée. Archives ARCH-01, 03 et 04 détruites selon protocole sécurisé.
+                </div>
+
+                <span class="code-final">PURGE-COMPLETE-2026</span>
+                <div style="text-align: center; margin-top: 20px;">
+                    <a href="../../MENU_PRINCIPAL.html" style="color: #fff; text-decoration: none; border: 1px solid #e67e22; padding: 10px 20px; font-weight: bold; display: inline-block; background: #000;">[ DECONNEXION SYSTEME ]</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn-aide-orange" onclick="toggleAide()">[ 📜 PROTOCOLE DE RÉTENTION & TROIS PILIERS ]</button>
+    <div id="zoneAide" class="aide-box">
+        <div class="pillar">
+            <b>⚖️ Juridique (Base légale suisse)</b>
+            L'Art. 6 nLPD impose la destruction dès que la finalité est atteinte. Cependant, le Code des Obligations (Art. 958f CO) prime en imposant un seuil de conservation minimal obligatoire, exprimé en années, pour les pièces comptables d'une société ou d'une administration publique. Recherchez ce chiffre exact.
+        </div>
+        <div class="pillar">
+            <b>⚙️ Informatique (Logique et décalage)</b>
+            Le décalage de bit à droite (opérateur binaire >>) rejette le bit de poids faible. Décaler une valeur entière de 1 bit vers la droite (x >> 1) revient géométriquement à effectuer une division entière par 2 (tronquée).
+        </div>
+        <div class="pillar">
+            <b>🔎 Forensics (Destruction propre)</b>
+            En forensic de stockage, une simple commande "rm" détruit le pointeur mais laisse la donnée brute intacte sur le support. L'utilisation d'un outil d'écrasement de bas niveau (qui porte le même nom que l'action de "déchiqueter" en anglais) est indispensable pour interdire toute reconstruction de données sensibles.
+        </div>
+    </div>
+
+    <div style="margin-top: 30px; border-top: 3px solid #d80000; padding: 20px; background: #fff; font-family: Arial, sans-serif; position: relative; z-index: 100; width: 90%; max-width: 450px;">
+        <div id="hint-score-badge" style="background:#111;color:#3fb950;padding:8px 15px;font-weight:bold;text-align:center;">🏆 Score de cet épisode : <span id="hint-score-value">5</span> / 5 pts</div>
+        <div style="display:flex; gap:8px; margin:10px 0;">
+            <button id="hintBtn1" onclick="useHint(1)" style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;">💡 Indice 1 (-1 pt)</button>
+            <button id="hintBtn2" onclick="useHint(2)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🎯 Indice 2 (-2 pts)</button>
+            <button id="hintBtn3" onclick="useHint(3)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">🆘 Solution (-3 pts)</button>
+        </div>
+
+        <div id="zoneAideScore" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; color: #333;">
+            <p id="hint-tier-1" style="display:none;"><strong>💡 INFO :</strong> Pré-requis : le nombre d'années de conservation minimale des pièces comptables (Art. 958f CO), et la commande shred avec l'option de suppression immédiate sur <code>/tmp/leak.log</code>. Ensuite, identifiez les 3 archives à détruire (celles sans base légale) et calculez la somme des décalages binaires de leurs index.</p>
+            <p id="hint-tier-2" style="display:none;"><strong>🎯 PISTE :</strong> Durée : 10 ans. Commande : <code>shred -u /tmp/leak.log</code>. Archives à détruire : ARCH-01, ARCH-03, ARCH-04 (index 10, 30, 40) — ARCH-02 doit rester (obligation légale). Calcul : (10>>1) + (30>>1) + (40>>1) = 5+15+20.</p>
+            <p id="hint-tier-3" style="display:none;"><strong>🆘 SOLUTION :</strong> Pré-requis : 10 / shred -u /tmp/leak.log. Sélectionnez ARCH-01, ARCH-03, ARCH-04 (pas ARCH-02). Checksum : <code>40</code></p>
+        </div>
+    </div>
+
+    <script>
+        // --- ANIMATION BACKGROUND : PLASMA ORANGE ---
+        const canvas = document.getElementById('fire-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function initCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + Math.random() * 100;
+                this.size = Math.random() * 5 + 2;
+                this.speedY = Math.random() * 3 + 1;
+                this.color = `rgba(230, 126, 34, ${Math.random() * 0.5})`;
+            }
+            update() {
+                this.y -= this.speedY;
+                if (this.y < -10) {
+                    this.y = canvas.height + 10;
+                    this.x = Math.random() * canvas.width;
+                }
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 100; i++) {
+            particles.push(new Particle());
+        }
+
+        function animate() {
+            if (localStorage.getItem('swiss_shield_mode_sobre') === '1') { return; }
+            ctx.fillStyle = "rgba(13, 6, 0, 0.2)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', initCanvas);
+        initCanvas();
+        animate();
+
+        let currentZone = 1;
+
+        // --- LOGIQUE DU JEU ---
+        function toggleAide() {
+            var x = document.getElementById("zoneAide");
+            x.style.display = (x.style.display === "block") ? "none" : "block";
+        }
+
+        // 1. VERROU DE SESSION S04E29
+        function unlock() {
+            const code = document.getElementById('passkey').value.trim().toUpperCase();
+            if (code === 'PROPORTIONALITY-26') {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('pre-requis-screen').style.display = 'block';
+                currentZone = 2;
+                sauvegarderAutomatiquement();
+            } else { 
+                enregistrerErreur('entree', code, 'PROPORTIONALITY-26');
+                alert("TOKEN INVALIDE : Vérifiez le code de l'épisode précédent."); 
+            }
+        }
+
+        // 2. DOUBLE VERROU INTERMÉDIAIRE
+        function verifyPreReq() {
+            const lawInput = document.getElementById('law_ans').value.trim();
+            const shellInput = document.getElementById('shell_ans').value.trim().toLowerCase();
+
+            const isLawValid = (lawInput === "10");
+            const isShellValid = shellInput.includes("shred") && shellInput.includes("-u") && shellInput.includes("/tmp/leak.log");
+
+            if (isLawValid && isShellValid) {
+                document.getElementById('pre-requis-screen').style.display = 'none';
+                document.getElementById('mission-content').style.display = 'block';
+                currentZone = 3;
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('prerequis', 'CO:"' + lawInput + '" / shell:"' + shellInput + '"', '10 / shred -u /tmp/leak.log');
+                alert("VÉRIFICATION INTERMÉDIAIRE ÉCHOUÉE : Les exigences légales Suisses ou la syntaxe de la commande de destruction n'ont pas été validées.");
+            }
+        }
+
+        function toggleSelection(btn, type) {
+            btn.classList.toggle('selected');
+            btn.innerText = btn.classList.contains('selected') ? "À DÉTRUIRE" : "SÉLECTIONNER";
+            sauvegarderAutomatiquement();
+        }
+
+        // 3. ENQUÊTE ET LOGIQUE COMPLEXE FINALE
+        function executePurge() {
+            const btns = document.querySelectorAll('.btn-purge');
+            const chkInput = document.getElementById('checksum_final').value.trim();
+            let error = false;
+            let successCount = 0;
+
+            btns.forEach(btn => {
+                const isSelected = btn.classList.contains('selected');
+                const isIllegal = btn.getAttribute('onclick').includes('illegal');
+                
+                if (isSelected && !isIllegal) error = true; 
+                if (!isSelected && isIllegal) error = true;
+                if (isSelected && isIllegal) successCount++;
+            });
+
+            // L'algorithme attend 10>>1 (5) + 30>>1 (15) + 40>>1 (20) = 40
+            if (chkInput !== "40") {
+                enregistrerErreur('investigation', chkInput, '40');
+                alert("ERREUR SIGNATURE : Le checksum d'intégrité de la matrice de purge calculé est incorrect. Refus d'exécution.");
+                return;
+            }
+
+            if (error || successCount !== 3) {
+                enregistrerErreur('investigation', 'sélection erronée', 'ARCH-01, ARCH-03, ARCH-04 uniquement (pas ARCH-02)');
+                alert("ERREUR CRITIQUE : Vous avez tenté de détruire des archives obligatoires sous législation CO ou oublié des données illégales ! Violation nLPD.");
+                location.reload();
+            } else {
+                document.getElementById('status-display').innerText = "TERMINÉ : INCINÉRATION NUMÉRIQUE CONFIRMÉE ET TERMINÉE (DIN 66399).";
+                document.getElementById('final-zone').style.display = 'block';
+            }
+        }
+    </script>
+
+    <script>
+        const EP_ID = "S04E29";
+        const HINT_COST = {1:1, 2:2, 3:3};
+        let hintsUsed = {1:false, 2:false, 3:false};
+        let episodeScore = 5;
+        function useHint(level) {
+            if (hintsUsed[level] || (level > 1 && !hintsUsed[level - 1])) return;
+            hintsUsed[level] = true;
+            enregistrerIndiceUsage(level);
+            episodeScore -= HINT_COST[level];
+            document.getElementById('hint-score-value').textContent = episodeScore;
+            document.getElementById('hint-tier-' + level).style.display = 'block';
+            const btn = document.getElementById('hintBtn' + level);
+            btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5';
+            if (level < 3) {
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+            sauvegarderAutomatiquement();
+        }
+        function recordEpisodeSuccess() {
+            let scores = {};
+            try { scores = JSON.parse(localStorage.getItem('swiss_shield_scores') || '{}'); } catch(e) {}
+            if (!(EP_ID in scores) || scores[EP_ID] < episodeScore) scores[EP_ID] = episodeScore;
+            localStorage.setItem('swiss_shield_scores', JSON.stringify(scores));
+            localStorage.removeItem('autosave_' + EP_ID);
+        }
+        function enregistrerErreur(phase, reponseEleve, reponseAttendue) {
+            let debrief = {erreurs:{}, indices:{}};
+            try { debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}'); } catch(e) {}
+            const key = EP_ID + ':' + phase;
+            let entry = debrief.erreurs[key];
+            if (typeof entry === 'number') entry = {compte: entry, exemples: []};
+            if (!entry) entry = {compte: 0, exemples: []};
+            entry.compte++;
+            if (reponseEleve !== undefined && reponseAttendue !== undefined && entry.exemples.length < 5) {
+                entry.exemples.push({reponseEleve: String(reponseEleve), reponseAttendue: String(reponseAttendue)});
+            }
+            debrief.erreurs[key] = entry;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        }
+        function enregistrerIndiceUsage(niveau) {
+            let debrief = {erreurs:{}, indices:{}};
+            try { debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}'); } catch(e) {}
+            const key = EP_ID + ':' + niveau;
+            debrief.indices[key] = (debrief.indices[key] || 0) + 1;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        }
+        function basculerModeSobre() {
+            const actif = document.body.classList.toggle('mode-sobre');
+            localStorage.setItem('swiss_shield_mode_sobre', actif ? '1' : '0');
+            if (!actif) { animate(); }
+        }
+        if (localStorage.getItem('swiss_shield_mode_sobre') === '1') {
+            document.body.classList.add('mode-sobre');
+        }
+        (function pollSuccess(){
+            const ids = ['success','success-msg','success-final','final-zone','step_final','victory-zone','victory-screen','final-step','final-badge'];
+            let recorded = false;
+            setInterval(function(){
+                if (recorded) return;
+                for (const id of ids) {
+                    const el = document.getElementById(id);
+                    if (el && window.getComputedStyle(el).display === 'block') { recordEpisodeSuccess(); recorded = true; return; }
+                }
+            }, 500);
+        })();
+
+        function sauvegarderAutomatiquement() {
+            const selected = {};
+            ['purge-1','purge-2','purge-3','purge-4'].forEach(function(id){
+                const b = document.getElementById(id);
+                if (b) selected[id] = b.classList.contains('selected');
+            });
+            const etat = {
+                zone: currentZone,
+                inputs: {
+                    passkey: (document.getElementById('passkey') || {}).value || '',
+                    law_ans: (document.getElementById('law_ans') || {}).value || '',
+                    shell_ans: (document.getElementById('shell_ans') || {}).value || '',
+                    checksum_final: (document.getElementById('checksum_final') || {}).value || ''
+                },
+                hintsUsed: hintsUsed,
+                episodeScore: episodeScore,
+                selected: selected
+            };
+            localStorage.setItem('autosave_' + EP_ID, JSON.stringify(etat));
+        }
+
+        function proposerRestaurationAutosave() {
+            let etat;
+            try { etat = JSON.parse(localStorage.getItem('autosave_' + EP_ID)); } catch(e) { return; }
+            if (!etat) return;
+
+            if (etat.inputs) {
+                if (document.getElementById('passkey')) document.getElementById('passkey').value = etat.inputs.passkey || '';
+                if (document.getElementById('law_ans')) document.getElementById('law_ans').value = etat.inputs.law_ans || '';
+                if (document.getElementById('shell_ans')) document.getElementById('shell_ans').value = etat.inputs.shell_ans || '';
+                if (document.getElementById('checksum_final')) document.getElementById('checksum_final').value = etat.inputs.checksum_final || '';
+            }
+
+            if (etat.zone >= 2) {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('pre-requis-screen').style.display = 'block';
+                currentZone = 2;
+            }
+            if (etat.zone >= 3) {
+                document.getElementById('pre-requis-screen').style.display = 'none';
+                document.getElementById('mission-content').style.display = 'block';
+                currentZone = 3;
+            }
+
+            if (etat.selected) {
+                Object.keys(etat.selected).forEach(function(id){
+                    const b = document.getElementById(id);
+                    if (b && etat.selected[id]) {
+                        b.classList.add('selected');
+                        b.innerText = "À DÉTRUIRE";
+                    }
+                });
+            }
+
+            if (etat.hintsUsed) {
+                [1,2,3].forEach(function(level){
+                    if (etat.hintsUsed[level]) {
+                        hintsUsed[level] = true;
+                        document.getElementById('hint-tier-' + level).style.display = 'block';
+                        const btn = document.getElementById('hintBtn' + level);
+                        if (btn) { btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5'; }
+                        const next = document.getElementById('hintBtn' + (level + 1));
+                        if (next && level < 3) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+                    }
+                });
+            }
+            if (typeof etat.episodeScore === 'number') {
+                episodeScore = etat.episodeScore;
+                document.getElementById('hint-score-value').textContent = episodeScore;
+            }
+        }
+        proposerRestaurationAutosave();
+    </script>
+</body>
+</html>
