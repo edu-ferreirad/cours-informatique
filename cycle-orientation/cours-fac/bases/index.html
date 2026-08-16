@@ -1,1 +1,183 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Espace Collège</title>
+    <style>
+        body { 
+            font-family: 'Courier New', Courier, monospace; 
+            text-align: center; 
+            margin: 0; 
+            padding-top: 50px; 
+            background-color: #090000; 
+            color: white;
+            overflow-x: hidden;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        h1, p {
+            position: relative;
+            z-index: 10;
+            text-shadow: 0 0 10px #ff0000;
+        }
+        .btn { 
+            display: block; 
+            width: 220px; 
+            margin: 15px auto; 
+            padding: 15px; 
+            background-color: rgba(20, 0, 5, 0.9); 
+            color: #ff0055; 
+            text-decoration: none; 
+            border: 1px solid #ff0055;
+            border-radius: 5px; 
+            font-weight: bold;
+            transition: all 0.3s;
+            position: relative;
+            z-index: 10;
+            cursor: pointer;
+        }
+        .btn:hover { 
+            background-color: #ff0055; 
+            color: white;
+            box-shadow: 0 0 20px #ff0055;
+        }
+        .back-link {
+            color: #ff69b4;
+            text-decoration: none;
+            position: relative;
+            z-index: 10;
+        }
+        /* Style pour la zone d'affichage des défis */
+        #defi-container {
+            margin: 20px auto;
+            max-width: 600px;
+            padding: 20px;
+            background-color: rgba(20, 0, 5, 0.85);
+            border: 1px dashed #ff0055;
+            border-radius: 8px;
+            position: relative;
+            z-index: 10;
+            display: none; /* Masqué par défaut */
+            box-shadow: 0 0 15px rgba(255, 0, 85, 0.3);
+        }
+        #defi-container h3 {
+            color: #ff6688;
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix"></canvas>
 
+    <h1>Espace Collège</h1>
+    <p>Choisissez votre niveau ou tirez un défi :</p>
+    
+    <a class="btn" href="1ere/">1ère année</a>
+    <a class="btn" href="2eme/">2ème année</a>
+    <a class="btn" href="3eme/">3ème année</a>
+    <a class="btn" href="4eme/">4ème année</a>
+    <a class="btn" href="cours_fac/">Cours fac</a>
+    
+    <hr style="width: 50%; border-color: #ff0055; margin: 30px auto; position: relative; z-index: 10;">
+
+    <!-- Boutons interactifs pour les défis par niveau -->
+    <button class="btn" onclick="afficherDefi('facile')">🎲 Défi Facile</button>
+    <button class="btn" onclick="afficherDefi('moyen')">🎲 Défi Moyen</button>
+    <button class="btn" onclick="afficherDefi('avance')">🎲 Défi Avancé</button>
+
+    <!-- Zone où le défi sera affiché dynamiquement -->
+    <div id="defi-container">
+        <h3 id="defi-titre">Défi Aléatoire</h3>
+        <p id="defi-texte"></p>
+    </div>
+    
+    <br><br>
+    <a class="back-link" href="../index.html">⬅ Retour à l'accueil général</a>
+
+    <script>
+        // Classement complet des 10 défis par niveau extraits des documents
+        const defisParNiveau = {
+            facile: [
+                "<strong>01. THE CALLIGRAPHIST (LE CALLIGRAPHE)</strong> : Pose une grande feuille sur la table ou sur le sol, prends un stylo et place-le dans le trou de Thymio. Maintenant, essaie d’écrire ton nom en guidant ton robot avec sa télécommande[cite: 3].",
+                "<strong>02. PENALTY KICK (TIR AU BUT)</strong> : Crée un but avec deux obstacles et avec une balle essaie de marquer un goal en guidant Thymio avec la télécommande[cite: 3].",
+                "<strong>03. THE ADVENTURER (L’AVENTURIER)</strong> : Crée un labyrinthe avec des obstacles et place une cible au centre. Cherche le bon comportement pour que Thymio arrive à destination[cite: 3].",
+                "<strong>04. THE SPIDER (L’ARAIGNÉE)</strong> : Déguise Thymio en araignée. Équipe-le d’un stylo et amuse-toi à dessiner des toiles d’araignées[cite: 3].",
+                "<strong>05. THE WAITER (LE SERVEUR)</strong> : Prends la piste Thymio Racetrack et pose une assiette sur Thymio. Tu peux ainsi créer ton premier buffet robotisé[cite: 3].",
+                "<strong>06. THE CLEANER (LE DOMESTIQUE)</strong> : Fais faire le ménage à Thymio ! Attache un chiffon au crochet de Thymio avec une ficelle et essaie de trouver le meilleur comportement pour qu’il enlève un maximum de poussière et de miettes[cite: 3].",
+                "<strong>01. THE WATCHDOG (LE CHIEN DE GARDE)</strong> : Programme Thymio pour qu’il se transforme en chien de garde et qu’il fasse du bruit dès qu’il voit quelque chose s’approcher de lui[cite: 3].",
+                "<strong>02. THE STUBBORN MULE (LA TÊTE DE MULE)</strong> : Fais en sorte que Thymio t’obéisse, mais à l’envers ! Appuie sur « avant », il recule ; appuie sur « gauche », il va à droite, etc.[cite: 3]",
+                "<strong>03. THE CAREFUL DRIVER (LE BON CONDUCTEUR)</strong> : Prends la piste « Thymio Racetrack » et programme Thymio pour qu’il suive la ligne noire large. Il faut qu’il s’arrête s’il voit un obstacle devant lui[cite: 3].",
+                "<strong>04. THE CHAMELEON (LE CAMÉLÉON)</strong> : Thymio a 7 capteurs de proximité horizontaux : 5 devant, 2 derrière. Fais-le s’allumer de différentes couleurs lorsqu’il voit quelque chose autour de lui[cite: 3]."
+            ],
+            moyen: [
+                "<strong>07. THE COPYIST (LE COPISTE)</strong> : Essaie d’écrire tes initiales en guidant Thymio avec tes mains. Prends une grande feuille de papier afin que ce soit plus simple[cite: 3].",
+                "<strong>08. THE ATTENTIVE PRINTER (L’IMPRIMEUR À L’ÉCOUTE)</strong> : Redessine les formes pointillées en équipant Thymio d’un stylo et guide-le en tapant dans tes mains[cite: 3].",
+                "<strong>09. THE MOONWALKER (À L’ENVERS)</strong> : Crée un labyrinthe avec des obstacles et place une cible au centre. Ton but est de contourner les obstacles en marche arrière et d’arriver jusqu’à la cible[cite: 3].",
+                "<strong>10. THE LIGHT PAINTER (LE PEINTRE DE LUMIÈRE)</strong> : Prends la piste Thymio Racetrack ou crée une nouvelle piste. Éteins toutes les lumières, ferme les rideaux et prends une photo longue exposition pour faire des dessins de lumière[cite: 3].",
+                "<strong>03. THE FIVE-COLOUR BUTTON (LE BOUTON AUX CINQ COULEURS)</strong> : Fais changer Thymio de couleur pour qu’il passe du rouge au vert, puis au bleu, puis au jaune, puis au violet et à nouveau au rouge, avec un seul bouton[cite: 3].",
+                "<strong>08. THE BACKWARDS FOLLOWER (LES YEUX DANS LE DOS)</strong> : Programme Thymio pour que Thymio te suive, mais avec ses capteurs arrière[cite: 3].",
+                "<strong>09. THE BUZZER (LE BUZZER)</strong> : Transforme Thymio en buzzer et utilise-le dans un quiz avec tes proches ! Programme-le pour qu’il s’allume et joue une mélodie dès qu’il reçoit une tape[cite: 3].",
+                "<strong>01. THE CRASH PREVENTING SYSTEM (LE FREINAGE EN DOUCEUR)</strong> : Programme Thymio pour qu’il avance vite tant qu’il ne voit rien et qu’il ralentisse dès qu’il aperçoit l’obstacle[cite: 3].",
+                "<strong>02. THE DARTS (LES FLÉCHETTES)</strong> : Place Thymio à 40 cm de la cible de fléchettes et programme-le pour qu’il avance et s’arrête au plus près du centre lorsque tu appuies sur le bouton avant[cite: 3]."
+            ],
+            avance: [
+                "<strong>10. THE TELEGRAPH (LE TÉLÉGRAPHE)</strong> : Utilise Thymio pour faire deviner des mots en utilisant un code Morse simplifié. Associe un capteur à une lettre pour que Thymio la joue quand tu mets ton doigt devant[cite: 3].",
+                "<strong>04. THE DANCER (LE DANSEUR)</strong> : Crée une chorégraphie avec Thymio en combinant les blocs de timers, d’états et de moteurs ! Ajoute de la couleur et fais une vidéo[cite: 3].",
+                "<strong>05. THE AMBULANCE (L’AMBULANCE)</strong> : Crée ta propre ambulance Thymio télécommandée. Elle doit avancer doucement ou aller très vite en allumant son gyrophare et sa sirène[cite: 3].",
+                "<strong>06. THE EQUILIBRIST (LE FUNAMBULE)</strong> : Crée une balance avec un plateau posé sur un axe. Programme Thymio pour qu’il maintienne son équilibre en se déplaçant s’il bascule en avant ou en arrière[cite: 3].",
+                "<strong>07. TOM THUMB (LE PETIT POUCET)</strong> : Utilise plusieurs cibles et dépose-les par terre. Place Thymio devant la première et programme-le pour qu’il se déplace d’une cible à l’autre automatiquement[cite: 3].",
+                "<strong>08. THE AUTOMATIC TELEGRAPH (LE TÉLÉGRAPHE AUTOMATIQUE)</strong> : Programme Thymio pour que lorsque tu appuies sur un bouton, il joue un mot en code Morse[cite: 3].",
+                "<strong>09. THE MAD CLEANER (LE BALAYEUR FOU)</strong> : Place des obstacles au hasard sur une table avec Thymio. Programme-le pour qu’il trouve les obstacles et les pousse hors de la table sans tomber ![cite: 3]",
+                "<strong>10. THE BULLDOZER (LE BULLDOZER)</strong> : Pose des obstacles sur la piste Racetrack. Programme ensuite Thymio pour qu’il suive la piste et pousse les obstacles hors de cette dernière[cite: 3]."
+            ]
+        };
+
+        function afficherDefi(niveau) {
+            const liste = defisParNiveau[niveau];
+            const randomIndex = Math.floor(Math.random() * liste.length);
+            const defiChoisi = liste[randomIndex];
+
+            const container = document.getElementById('defi-container');
+            const titreElement = document.getElementById('defi-titre');
+            const texteElement = document.getElementById('defi-texte');
+            
+            titreElement.innerHTML = `Défi Aléatoire (Niveau ${niveau.toUpperCase()})`;
+            texteElement.innerHTML = defiChoisi;
+            container.style.display = 'block';
+        }
+
+        // Animation Matrix en arrière-plan
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize);
+        resize();
+
+        const chars = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ';
+        const fontSize = 16;
+        let drops = Array(Math.floor(canvas.width / fontSize)).fill(1);
+
+        function draw() {
+            ctx.fillStyle = 'rgba(9, 0, 5, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.font = fontSize + 'px monospace';
+            
+            drops.forEach((drop, i) => {
+                const colors = ['#ff6688', '#ff0055', '#880022'];
+                ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+                ctx.fillText(chars.charAt(Math.floor(Math.random() * chars.length)), i * fontSize, drop * fontSize);
+                
+                if (drop * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            });
+        }
+        setInterval(draw, 50);
+    </script>
+</body>
+</html>
