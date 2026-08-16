@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWISS SHIELD - Lexique Opérationnel Complet</title>
+    <style>
+        :root {
+            --matrix-green: #00ff41;
+            --legal-blue: #3498db;
+            --warn-red: #d32f2f;
+            --gold: #d4af37;
+            --bg: #050505;
+            --card-bg: #111;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: #ccc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 40px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px solid var(--matrix-green);
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            color: var(--matrix-green);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin: 0;
+        }
+
+        .grid-lexique {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 30px;
+            margin-bottom: 100px;
+        }
+
+        .category-box {
+            background: var(--card-bg);
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            transition: 0.3s;
+        }
+
+        .category-box:hover {
+            border-color: var(--matrix-green);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.1);
+        }
+
+        h2 {
+            margin-top: 0;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #222;
+        }
+
+        .cat-code { color: var(--matrix-green); }
+        .cat-forensic { color: var(--warn-red); }
+        .cat-droit { color: var(--legal-blue); }
+        .cat-inst { color: var(--gold); }
+
+        dl { margin: 0; }
+        dt {
+            font-weight: bold;
+            color: #fff;
+            margin-top: 15px;
+            font-family: 'Courier New', Courier, monospace;
+            background: rgba(255,255,255,0.05);
+            padding: 2px 8px;
+            display: inline-block;
+            border-radius: 4px;
+        }
+        dd {
+            margin-left: 0;
+            font-size: 0.9em;
+            color: #aaa;
+            border-left: 2px solid #444;
+            padding-left: 10px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+
+        /* Navigation */
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.9);
+            padding: 20px 0;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border-top: 1px solid #333;
+        }
+
+        .btn-menu {
+            background: rgba(0, 255, 65, 0.1);
+            color: var(--matrix-green);
+            text-decoration: none;
+            padding: 12px 40px;
+            border: 1px solid var(--matrix-green);
+            border-radius: 50px;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+
+        .btn-menu:hover {
+            background: var(--matrix-green);
+            color: #000;
+            box-shadow: 0 0 20px var(--matrix-green);
+        }
+
+        .search-box {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        #searchInput {
+            background: #111;
+            border: 1px solid #444;
+            color: white;
+            padding: 12px;
+            width: 400px;
+            border-radius: 4px;
+            outline: none;
+            font-size: 1em;
+        }
+
+        #searchInput:focus { border-color: var(--matrix-green); }
+
+        @media print {
+            .nav-bar { display: none; }
+            body { background: white; color: black; padding: 20px; }
+            .category-box { border: 1px solid #ccc; page-break-inside: avoid; margin-bottom: 20px;}
+            dt { color: black; background: #eee; }
+            dd { color: #333; border-left-color: #ccc; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <img src="images/logo_ncsc.png" width="60" alt="NCSC" onerror="this.style.display='none'"><br>
+        <h1>BASE DE DONNÉES TERMINOLOGIQUE</h1>
+        <p style="color: #666; font-size: 0.8em;">UNITÉ SWISS SHIELD — OPÉRATION COLLECTIF PROMÉTHÉE</p>
+    </header>
+
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Rechercher un terme (ex: nLPD, Buffer, IP...)" onkeyup="filterLexique()">
+    </div>
+
+    <div class="grid-lexique" id="lexiqueContent">
+
+        <section class="category-box">
+            <h2 class="cat-code">💻 CODAGE & SYSTÈME</h2>
+            <dl>
+                <dt>Table ASCII</dt>
+                <dd>Code standard associant à chaque caractère (lettre, chiffre, symbole) un nombre entre 0 et 127. Pour décoder du binaire : découper en blocs de 8 bits, convertir chaque bloc en décimal, puis chercher ce nombre dans la table pour obtenir la lettre. Exemple : 01001000 = 72 = la lettre H. <em>🎯 Utile pour : Télécom</em></dd>
+
+                <dt>Hexadécimal</dt>
+                <dd>Système à 16 symboles (0-9 puis A-F pour 10-15). Pour décoder une chaîne hexadécimale en texte : découper en paires de 2 caractères (dans le jeu, la chaîne est collée, sans espaces), convertir chaque paire en décimal (1er symbole × 16 + 2e symbole), puis chercher ce nombre dans la Table ASCII. Exemple : 48 = 4×16+8 = 72 = la lettre H. <em>🎯 Utile pour : ONU</em></dd>
+
+                <dt>Buffer Overflow</dt>
+                <dd>Dépassement de tampon. Erreur de programmation permettant d'écrire hors de la mémoire allouée pour exécuter du code malveillant. Résolu en remplaçant les fonctions non sécurisées par des copies bornées (ex: strncpy).</dd>
+
+                <dt>IDE</dt>
+                <dd>Environnement de Développement Intégré. Logiciel pour coder, tester et compiler des programmes (ex: VS Code).</dd>
+
+                <dt>Stack (Pile)</dt>
+                <dd>Structure de données en mémoire vive (RAM) gérant les variables locales. Sa corruption est la clé de nombreux exploits.</dd>
+
+                <dt>Strcpy / Strncpy</dt>
+                <dd>Fonctions C de copie de chaîne. Strcpy est "unsafe" (dangereuse), Strncpy est "safe" (sécurisée) car elle vérifie et borne la taille du conteneur récepteur.</dd>
+
+                <dt>Zéro-Day</dt>
+                <dd>Faille de sécurité critique inconnue des développeurs, n'ayant aucun correctif disponible au moment de l'attaque.</dd>
+
+                <dt>Compilateur</dt>
+                <dd>Outil transformant le code humain (C++, Java) en langage machine (0 et 1) compréhensible par le processeur.</dd>
+
+                <dt>EIP (Extended Instruction Pointer)</dt>
+                <dd>Registre CPU crucial qui pointe sur l'adresse de la prochaine instruction à exécuter. Son détournement permet de contrôler le flux d'exécution lors d'un débordement de tampon.</dd>
+
+                <dt>UID (User Identifier)</dt>
+                <dd>Identifiant numérique unique d'un utilisateur sous Unix/Linux. L'UID par défaut du super-utilisateur (root) est toujours égal à 0.</dd>
+
+                <dt>SHA256 & Salage</dt>
+                <dd>Standard robuste de hachage de la famille SHA-2 (256 bits) combiné à l'injection d'une donnée secrète ou aléatoire complémentaire (le Sel/Salt) avant hachage, protégeant l'infrastructure contre les collisions et les Rainbow Tables.</dd>
+
+                <dt>MD5</dt>
+                <dd>Fonction de hachage obsolète et cryptographiquement vulnérable aux collisions, dénuée de protection native contre les attaques par dictionnaire.</dd>
+
+                <dt>SHOW COLUMNS</dt>
+                <dd>Syntaxe SQL de base permettant d'inspecter et de lister la structure technique des colonnes d'une table de base de données.</dd>
+
+                <dt>DELETE</dt>
+                <dd>Mot-clé en langage SQL permettant de supprimer définitivement un ou plusieurs enregistrements spécifiques au sein d'une table.</dd>
+            </dl>
+        </section>
+
+        <section class="category-box">
+            <h2 class="cat-forensic">🔍 INVESTIGATION NUMÉRIQUE & RÉSEAU</h2>
+            <dl>
+                <dt>AES-256</dt>
+                <dd>Algorithme de chiffrement symétrique utilisé par le gouvernement. Quasi impossible à casser par "force brute".</dd>
+
+                <dt>Adresse IP</dt>
+                <dd>Identifiant unique d'une machine sur un réseau. Elle permet de remonter jusqu'à la source géographique d'une attaque.</dd>
+
+                <dt>Logs (Journaux)</dt>
+                <dd>Fichiers traçant chaque action sur un système. Portant généralement l'extension .log sous Linux, ils constituent la preuve principale lors d'une expertise judiciaire.</dd>
+
+                <dt>Métadonnées</dt>
+                <dd>Données cachées (EXIF, Propriétés) révélant l'auteur, la date, la volumétrie ou les coordonnées GPS d'un document ou d'une extraction de base de données.</dd>
+
+                <dt>Hameçonnage (Phishing)</dt>
+                <dd>Attaque par ingénierie sociale utilisant des emails frauduleux pour voler des accès ou des identifiants.</dd>
+
+                <dt>Analyse Forensique</dt>
+                <dd>Méthode scientifique de récupération, d'isolement et d'analyse de preuves numériques (comme l'examen d'un memory.dump) sans altérer l'original.</dd>
+
+                <dt>ICMP (Internet Control Message Protocol)</dt>
+                <dd>Protocole réseau de diagnostic et de contrôle utilisé par les outils d'infrastructure pour vérifier la connectivité ou tracer les routes de paquets.</dd>
+
+                <dt>Traceroute / Tracert</dt>
+                <dd>Commande d'investigation et de diagnostic réseau (traceroute sous Linux, tracert sous Windows) permettant de cartographier pas à pas tous les sauts de paquets et de suivre la route vers un hôte distant.</dd>
+
+                <dt>Iptables</dt>
+                <dd>Outil d'administration et pare-feu natif sous Linux permettant d'appliquer des règles de filtrage (ex: DROP) pour couper ou bloquer de manière permanente le trafic réseau malveillant.</dd>
+
+                <dt>ARP (Address Resolution Protocol)</dt>
+                <dd>Protocole de communication (couches 2/3) assurant la résolution et la correspondance entre une adresse réseau logique (IP) et une adresse physique locale (MAC).</dd>
+
+                <dt>Lsof</dt>
+                <dd>Utilitaire système Linux ("List Open Files") permettant de lister de façon exhaustive tous les fichiers, processus et connexions réseau actuellement ouverts sur la machine.</dd>
+
+                <dt>Tail</dt>
+                <dd>Commande Linux d'investigation permettant d'afficher en temps réel les dernières lignes d'un fichier, outil indispensable pour surveiller la fin des fichiers de logs.</dd>
+
+                <dt>Ss / Netstat</dt>
+                <dd>Commandes Linux d'analyse réseau permettant d'inspecter, de lister et d'afficher l'intégralité des sockets réseau actifs et des ports d'écoute du système.</dd>
+
+                <dt>Couches OSI (3 et 4)</dt>
+                <dd>La Couche 3 (Réseau) gère l'adressage et le routage des paquets IP. La Couche 4 (Transport) héberge et administre les protocoles d'échange de données tels que TCP ou UDP.</dd>
+
+                <dt>Adresse de Broadcast</dt>
+                <dd>Adresse de diffusion réseau permettant de transmettre un paquet de données à l'intégralité des hôtes d'un même sous-réseau simultanément.</dd>
+
+                <dt>Port 443</dt>
+                <dd>Numéro de port d'écoute standardisé à l'échelle mondiale pour les communications Web sécurisées via le protocole HTTPS.</dd>
+                <dt>MFT (Master File Table)</dt>
+                <dd>Table centrale du système de fichiers NTFS (Windows) qui garde la trace des métadonnées de tous les fichiers, y compris ceux récemment supprimés dont le contenu disque a été marqué "libre" mais dont l'entrée peut encore exister. <em>🎯 Utile pour : SIG</em></dd>
+                <dt>Base64</dt>
+                <dd>Méthode d'encodage (non chiffré) de données binaires en texte lisible (lettres, chiffres, parfois "="). Se décode facilement, contrairement à un vrai chiffrement. <em>🎯 Utile pour : ONU</em></dd>
+                <dt>RFC 1918 (Adresses IP privées)</dt>
+                <dd>Norme définissant les 3 plages d'adresses IP réservées aux réseaux internes non routables sur Internet : 10.0.0.0/8, 172.16.0.0/12 et 192.168.0.0/16. Attention aux bornes exactes de la plage 172.x ! <em>🎯 Utile pour : HUG</em></dd>
+                <dt>OUI (Organizationally Unique Identifier)</dt>
+                <dd>Les 3 premiers octets d'une adresse MAC, attribués par l'IEEE à un fabricant. Permettent d'identifier le type d'appareil connecté à un réseau sans accès à son système. <em>🎯 Utile pour : Aéroport (GVA)</em></dd>
+            </dl>
+        </section>
+
+        <section class="category-box">
+            <h2 class="cat-droit">⚖️ DROIT & CONFORMITÉ SUISSE</h2>
+            <dl>
+                <dt>nLPD (Loi sur la Protection des Données)</dt>
+                <dd>Cadre légal suisse révisé (v.2023) protégeant la personnalité et la vie privée des citoyens, imposant des obligations strictes de sécurité et de conformité.</dd>
+
+                <dt>Art. 5 nLPD (Données sensibles)</dt>
+                <dd>Disposition légale définissant la qualification juridique des "données particulièrement sensibles" (opinions politiques, convictions religieuses, mesures d'aide sociale, données de santé, etc.).</dd>
+
+                <dt>Art. 7 nLPD (Design & Default)</dt>
+                <dd>Exigence légale imposant l'intégration technique de la protection des données dès la conception (Privacy by Design) ainsi qu'une configuration d'usine minimisant la collecte native (Privacy by Default).</dd>
+
+                <dt>Art. 12 nLPD</dt>
+                <dd>Obligation légale pour les entreprises et organisations de tenir un registre précis et à jour de l'ensemble de leurs activités de traitement de données personnelles.</dd>
+
+                <dt>Art. 25 nLPD (Droit d'accès)</dt>
+                <dd>Droit citoyen imposant à une organisation un délai légal maximal strict de 30 jours pour honorer et répondre de manière transparente à une demande de droit d'accès.</dd>
+
+                <dt>Art. 32 nLPD (Droit à l'oubli)</dt>
+                <dd>Cadre réglementaire fixant l'obligation légale d'effacement, de rectification ou de destruction définitive des données personnelles devenues caduques ou obsolètes.</dd>
+
+                <dt>Art. 60 nLPD (Risque Pénal)</dt>
+                <dd>Responsabilité pénale entraînant des amendes de poursuite pouvant s'élever jusqu'à 250'000 CHF à la charge directe de la personne physique responsable de la violation délibérée.</dd>
+
+                <dt>Art. 143 CP (Soustraction de données)</dt>
+                <dd>Article du Code pénal suisse réprimant l'acquisition illicite de données électroniques stockées ou transmises de manière sécurisée.</dd>
+
+                <dt>Art. 143 bis CP (Accès indu / Hacking)</dt>
+                <dd>Infraction pénale (communément appelée piratage informatique ou hacking) sanctionnant quiconque s'introduit sans droit dans un système informatique verrouillé. Passible d'une peine privative de liberté de 3 ans au plus.</dd>
+
+                <dt>Art. 143 ter CP</dt>
+                <dd>Disposition du Code pénal suisse complétant les infractions de soustraction indue de données informatiques.</dd>
+
+                <dt>Art. 144 bis CP (Détérioration de données)</dt>
+                <dd>Fondement pénal sanctionnant les altérations, modifications, blocages ou destructions non autorisés de données numériques.</dd>
+
+                <dt>Art. 147 CP (Utilisation frauduleuse d'un ordinateur)</dt>
+                <dd>Sanction pénale visant l'utilisation de données de manière incorrecte ou incomplète pour influer sur un traitement électronique dans le but d'obtenir un transfert d'actifs.</dd>
+
+                <dt>Art. 160 CP (Recel de données)</dt>
+                <dd>Fondement légal suisse réprimant le fait d'obtenir, de détenir, de masquer ou de négocier des données dont on sait qu'elles ont été acquises au moyen d'une infraction.</dd>
+
+                <dt>Art. 2 LDA (Protection du code)</dt>
+                <dd>Article de la Loi fédérale sur le droit d'auteur protégeant explicitement le code source informatique et les programmes en tant qu'œuvres de l'esprit.</dd>
+
+                <dt>DRM (Digital Rights Management)</dt>
+                <dd>Mesures techniques de protection réglementées par la LDA suisse visant à empêcher l'utilisation ou la copie non autorisée d'œuvres numériques.</dd>
+
+                <dt>Supply Chain Risk</dt>
+                <dd>Risque lié aux sous-traitants. Si un fournisseur est une "passoire" sécuritaire, toute l'entreprise est menacée.</dd>
+
+                <dt>DPO (Data Protection Officer)</dt>
+                <dd>Conseiller à la protection des données chargé de veiller au respect de la loi au sein d'une organisation.</dd>
+                <dt>RGPD (Règlement Général sur la Protection des Données)</dt>
+                <dd>Réglementation européenne sur la protection des données personnelles. Peut s'appliquer à une entreprise hors UE dès qu'elle traite les données de résidents d'un pays membre (effet extraterritorial, Art. 3 RGPD). <em>🎯 Utile pour : Secteur Financier</em></dd>
+                <dt>Convention de Vienne sur les relations diplomatiques (1961)</dt>
+                <dd>Traité international protégeant l'inviolabilité des locaux et archives des missions diplomatiques contre toute perquisition sans le consentement du chef de mission. <em>🎯 Utile pour : ONU</em></dd>
+                <dt>Convention de Budapest (2001)</dt>
+                <dd>Premier traité international harmonisant les législations contre la cybercriminalité entre États signataires.</dd>
+            </dl>
+        </section>
+
+        <section class="category-box">
+            <h2 class="cat-inst">🏢 INSTITUTIONS & MENACES</h2>
+            <dl>
+                <dt>NCSC (Suisse)</dt>
+                <dd>Centre National pour la Cybersécurité. L'autorité nationale compétente et de référence en Suisse pour la détection et la réponse aux menaces numériques.</dd>
+
+                <dt>S.S.P. (Swiss Shield Protocol)</dt>
+                <dd>Nom de code de votre unité d'intervention d'élite au sein du jeu.</dd>
+
+                <dt>Deepfake</dt>
+                <dd>Technique d'IA créant des faux contenus (voix, vidéo) extrêmement réalistes pour la fraude ou la désinformation.</dd>
+
+                <dt>Ransomware (Rançongiciel)</dt>
+                <dd>Malware chiffrant les données et exigeant une rançon en cryptomonnaies pour fournir la clé.</dd>
+
+                <dt>Ingénierie Sociale</dt>
+                <dd>Manipulation psychologique visant à tromper un humain pour qu'il contourne les barrières de sécurité.</dd>
+
+                <dt>OFJ</dt>
+                <dd>Office Fédéral de la Justice, superviseur des cadres légaux liés à la cybercriminalité en Suisse.</dd>
+
+                <dt>IFPDT</dt>
+                <dd>Préposé Fédéral à la Protection des Données et à la Transparence. Autorité fédérale suisse chargée du contrôle de la nLPD auprès de laquelle les fuites et exfiltrations de données certifiées doivent être notifiées d'urgence.</dd>
+
+                <dt>Menace Interne (Insider Threat)</dt>
+                <dd>Compromission de sécurité provoquée par un membre légitime de l'organisation (employé, complice) détournant ou élevant ses privilèges système à des fins malveillantes. Neutralisé via des commandes d'administration restrictives (ex: usermod -L).</dd>
+            </dl>
+        </section>
+
+    </div>
+</div>
+
+<div class="nav-bar">
+    <button onclick="fermerOnglet()" class="btn-menu" style="border:none; cursor:pointer; font-family: inherit;">🏠 FERMER ET REVENIR À LA MISSION</button>
+</div>
+
+<script>
+    function fermerOnglet() {
+        window.close();
+        setTimeout(() => {
+            alert("Impossible de fermer automatiquement cet onglet depuis ce navigateur.\nFermez-le simplement (Ctrl+W ou Cmd+W) pour revenir à votre mission en cours. Une sauvegarde automatique protège votre progression, mais mieux vaut fermer cet onglet plutôt que de recharger CARTE_INTERACTIVE.html sans raison.");
+        }, 300);
+    }
+
+    function filterLexique() {
+        let input = document.getElementById('searchInput').value.toLowerCase();
+        let sections = document.getElementsByClassName('category-box');
+
+        for (let section of sections) {
+            let dts = section.getElementsByTagName('dt');
+            let dds = section.getElementsByTagName('dd');
+            let hasMatchInSection = false;
+
+            for (let i = 0; i < dts.length; i++) {
+                let term = dts[i].innerText.toLowerCase();
+                let def = dds[i].innerText.toLowerCase();
+
+                if (term.includes(input) || def.includes(input)) {
+                    dts[i].style.display = "";
+                    dds[i].style.display = "";
+                    hasMatchInSection = true;
+                } else {
+                    dts[i].style.display = "none";
+                    dds[i].style.display = "none";
+                }
+            }
+            // Affiche/Cache la section entière si aucun terme ne correspond
+            section.style.display = hasMatchInSection ? "" : "none";
+        }
+    }
+
+    // Arrivée directe depuis une phase de la carte (ex: LEXIQUE.html?terme=MFT) :
+    // pré-remplit la recherche, filtre automatiquement, et amène la fiche à l'écran.
+    window.addEventListener('DOMContentLoaded', function() {
+        const params = new URLSearchParams(window.location.search);
+        const terme = params.get('terme');
+        if (terme) {
+            const champ = document.getElementById('searchInput');
+            champ.value = terme;
+            filterLexique();
+            let cible = null;
+            document.querySelectorAll('.category-box dt').forEach(dt => {
+                if (!cible && dt.style.display !== 'none') cible = dt;
+            });
+            if (cible) {
+                cible.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                cible.style.outline = '2px solid var(--matrix-green, #00ff41)';
+                cible.style.borderRadius = '3px';
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
