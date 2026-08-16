@@ -140,35 +140,69 @@
 
     <div class="container" id="main-content" style="display: none;">
         <h1>La parole est une voie</h1>
-        <p><a class="back-btn" href="../index.html" style="text-decoration:none; color:white; background:#007bff; padding:10px; border-radius:5px;">⬅ Retour aux projets</a></p>
 
-        <!-- Section Slam -->
-        <div class="cours-card">
-            <div class="cours-title">📄 Slam - L’IA rend paresseux-CO Drize_2.pdf</div>
-            <div class="pdf-container"><iframe src="Slam - L’IA rend paresseux-CO Drize.pdf"></iframe></div>
-        </div>
-
-        <!-- Section Sujets Débats -->
-        <div class="cours-card">
-            <div class="cours-title">📝 Sujets de débats (IA, Uniforme, etc.)</div>
-            <p><a class="doc-link" href="sujets_debats.txt" download>Télécharger sujets_debats.txt</a></p>
-        </div>
-
-        <!-- Autres documents existants -->
         <div class="cours-card">
             <div class="cours-title">📄 Critères de correction-pour autres élèves.pdf</div>
             <div class="pdf-container"><iframe src="Critères de correction-pour autres élèves.pdf"></iframe></div>
+        </div>
+        <div class="cours-card">
+            <div class="cours-title">📄 Formulaire_evenements_scolaires_2024.pdf</div>
+            <div class="pdf-container"><iframe src="Formulaire_evenements_scolaires_2024.pdf"></iframe></div>
+        </div>
+
+        <!-- Section Slam -->
+        <div class="cours-card">
+            <div class="cours-title">📄 Slam sur 1 seule feuille</div>
+            <div class="pdf-container"><iframe src="Slam sur 1 seule feuille.pdf"></iframe></div>
+            <p style="margin-top: 20px;">
+                <a class="doc-link" href="Slam sur 1 seule feuille.pdf" download>Télécharger le PDF</a>
+            </p>
+        </div>
+
+        <div class="cours-card">
+            <div class="cours-title">📄 Slam - L’IA rend paresseux (CO Drize)</div>
+            <div class="pdf-container"><iframe src="Slam - L’IA rend paresseux-CO Drize.pdf"></iframe></div>
+            <p style="margin-top: 20px;">
+                <a class="doc-link" href="Slam - L’IA rend paresseux-CO Drize.pdf" download>Télécharger le PDF</a>
+            </p>
+        </div>
+
+        <div class="cours-card">
+            <div class="cours-title">📝 Texte du Slam</div>
+            <p><a class="doc-link" href="sujets_debats.txt" download>Télécharger le fichier .txt</a></p>
+        </div>
+
+        <div class="cours-card">
+            <div class="cours-title">📄 films art oratoire.pdf</div>
+            <div class="pdf-container"><iframe src="films art oratoire.pdf"></iframe></div>
+        </div>
+        <div class="cours-card">
+            <div class="cours-title">📊 01 - Cours A.pptx</div>
+            <p><a class="doc-link" href="01 - Cours A.pptx" download>Télécharger 01 - Cours A.pptx</a></p>
+        </div>
+        <div class="cours-card">
+            <div class="cours-title">📊 04 - Plan de durée.xlsx</div>
+            <p><a class="doc-link" href="04 - Plan de durée.xlsx" download>Télécharger 04 - Plan de durée.xlsx</a></p>
+        </div>
+        <div class="cours-card">
+            <div class="cours-title">📝 03 - Notes de cours.docx</div>
+            <p><a class="doc-link" href="03 - Notes de cours.docx" download>Télécharger 03 - Notes de cours.docx</a></p>
+        </div>
+        <div class="cours-card">
+            <div class="cours-title">📊 02 - Cours B.pptx</div>
+            <p><a class="doc-link" href="02 - Cours B.pptx" download>Télécharger 02 - Cours B.pptx</a></p>
         </div>
 
         <div class="cours-card">
             <div class="cours-title">🌐 Liens utiles</div>
             <p><a class="doc-link" href="https://edu.ge.ch/enseignement/francais/ressource/11ct-la-parole-est-une-voie-2415" target="_blank">Site Officiel</a></p>
+            <p><a class="doc-link" href="https://www.youtube.com/watch?v=6r8I0Co6IIw" target="_blank">Vidéo Art Oratoire</a></p>
         </div>
     </div>
 
     <script>
         function checkPassword() {
-            if (document.getElementById('password-input').value === 'lpeuv26') {
+            if (document.getElementById('password-input').value === 'jrple26') {
                 document.getElementById('password-overlay').style.display = 'none';
                 document.getElementById('main-content').style.display = 'block';
             } else {
@@ -176,7 +210,6 @@
             }
         }
         
-        // Matrix effect
         const canvas = document.getElementById('matrix');
         const ctx = canvas.getContext('2d');
         function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
