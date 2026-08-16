@@ -2,14 +2,14 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Espace Collège</title>
+    <title>Espace Cycle</title>
     <style>
         body { 
             font-family: 'Courier New', Courier, monospace; 
             text-align: center; 
             margin: 0; 
             padding-top: 50px; 
-            background-color: #090000; 
+            background-color: #000309; 
             color: white;
             overflow-x: hidden;
         }
@@ -24,17 +24,17 @@
         h1, p {
             position: relative;
             z-index: 10;
-            text-shadow: 0 0 10px #ff0000;
+            text-shadow: 0 0 10px #0055ff;
         }
         .btn { 
             display: block; 
             width: 220px; 
             margin: 15px auto; 
             padding: 15px; 
-            background-color: rgba(20, 0, 5, 0.9); 
-            color: #ff0055; 
+            background-color: rgba(0, 5, 20, 0.9); 
+            color: #0055ff; 
             text-decoration: none; 
-            border: 1px solid #ff0055;
+            border: 1px solid #0055ff;
             border-radius: 5px; 
             font-weight: bold;
             transition: all 0.3s;
@@ -43,12 +43,12 @@
             cursor: pointer;
         }
         .btn:hover { 
-            background-color: #ff0055; 
+            background-color: #0055ff; 
             color: white;
-            box-shadow: 0 0 20px #ff0055;
+            box-shadow: 0 0 20px #0055ff;
         }
         .back-link {
-            color: #ff69b4;
+            color: #69b4ff;
             text-decoration: none;
             position: relative;
             z-index: 10;
@@ -58,16 +58,16 @@
             margin: 20px auto;
             max-width: 600px;
             padding: 20px;
-            background-color: rgba(20, 0, 5, 0.85);
-            border: 1px dashed #ff0055;
+            background-color: rgba(0, 5, 20, 0.85);
+            border: 1px dashed #0055ff;
             border-radius: 8px;
             position: relative;
             z-index: 10;
             display: none; /* Masqué par défaut */
-            box-shadow: 0 0 15px rgba(255, 0, 85, 0.3);
+            box-shadow: 0 0 15px rgba(0, 85, 255, 0.3);
         }
         #defi-container h3 {
-            color: #ff6688;
+            color: #6688ff;
             margin-top: 0;
         }
     </style>
@@ -75,16 +75,15 @@
 <body>
     <canvas id="matrix"></canvas>
 
-    <h1>Espace Collège</h1>
-    <p>Choisissez votre niveau ou tirez un défi :</p>
+    <h1>Espace Cycle</h1>
+    <p>Choisissez votre fiche d'apprentissage ou tirez un défi :</p>
     
     <a class="btn" href="1ere/">1ère année</a>
     <a class="btn" href="2eme/">2ème année</a>
     <a class="btn" href="3eme/">3ème année</a>
     <a class="btn" href="4eme/">4ème année</a>
-    <a class="btn" href="cours_fac/">Cours fac</a>
     
-    <hr style="width: 50%; border-color: #ff0055; margin: 30px auto; position: relative; z-index: 10;">
+    <hr style="width: 50%; border-color: #0055ff; margin: 30px auto; position: relative; z-index: 10;">
 
     <!-- Boutons interactifs pour les défis par niveau -->
     <button class="btn" onclick="afficherDefi('facile')">🎲 Défi Facile</button>
@@ -152,7 +151,7 @@
             container.style.display = 'block';
         }
 
-        // Animation Matrix en arrière-plan
+        // Animation Matrix en arrière-plan (bleue)
         const canvas = document.getElementById('matrix');
         const ctx = canvas.getContext('2d');
         function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
@@ -164,12 +163,12 @@
         let drops = Array(Math.floor(canvas.width / fontSize)).fill(1);
 
         function draw() {
-            ctx.fillStyle = 'rgba(9, 0, 5, 0.08)';
+            ctx.fillStyle = 'rgba(0, 3, 9, 0.08)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.font = fontSize + 'px monospace';
             
             drops.forEach((drop, i) => {
-                const colors = ['#ff6688', '#ff0055', '#880022'];
+                const colors = ['#6688ff', '#0055ff', '#002288'];
                 ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
                 ctx.fillText(chars.charAt(Math.floor(Math.random() * chars.length)), i * fontSize, drop * fontSize);
                 
