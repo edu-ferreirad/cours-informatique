@@ -1,1 +1,160 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>HAC Party</title>
+    <style>
+        body {
+            background-color: #050914;
+            color: #00ffff;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding-top: 30px;
+            overflow-x: hidden;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        h1, p {
+            position: relative;
+            z-index: 10;
+            color: #ffffff;
+            text-shadow: 0 0 10px #00bfff, 0 0 20px #0044ff;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+            padding-bottom: 50px;
+        }
+        .cours-card {
+            background: rgba(5, 15, 35, 0.85);
+            border: 1px solid #00ffff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+            border-radius: 8px;
+            margin: 25px auto;
+            padding: 40px 20px;
+            width: 90%;
+        }
+        .cours-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #00ffff;
+            text-shadow: 0 0 5px #00bfff;
+        }
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #00ffff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        #password-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 9, 20, 0.95);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .login-box {
+            background: rgba(5, 15, 35, 0.95);
+            border: 1px solid #00ffff;
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.4);
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .login-box input {
+            padding: 10px;
+            font-size: 1em;
+            background: #000;
+            border: 1px solid #0044ff;
+            color: #00ffff;
+            border-radius: 5px;
+            margin-top: 15px;
+            outline: none;
+            text-align: center;
+        }
+        .login-box button {
+            padding: 10px 20px;
+            margin-top: 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 10px #007bff;
+            display: block;
+            width: 100%;
+        }
+        #error-msg { color: #ff4444; margin-top: 10px; font-size: 0.9em; display: none; }
+    </style>
+</head>
+<body>
+    <div id="password-overlay">
+        <div class="login-box">
+            <h2>Accès Protégé</h2>
+            <input type="password" id="password-input" placeholder="Mot de passe">
+            <button onclick="checkPassword()">Valider</button>
+            <div id="error-msg">Mot de passe incorrect</div>
+        </div>
+    </div>
 
+    <canvas id="matrix"></canvas>
+
+    <div class="container" id="main-content" style="display: none;">
+        <p><a class="back-btn" href="../index.html">⬅ Retour aux projets</a></p>
+        <h1>HAC Party</h1>
+
+        <div class="cours-card">
+            <div class="cours-title">⏳ Contenu à venir</div>
+        </div>
+    </div>
+
+    <script>
+        function checkPassword() {
+            if (document.getElementById('password-input').value === 'hpd26') {
+                document.getElementById('password-overlay').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+            } else {
+                document.getElementById('error-msg').style.display = 'block';
+            }
+        }
+        
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        const chars = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ<>/\\{}[]*&é"\'(-)=+';
+        const fontSize = 16;
+        let drops = Array(Math.floor(canvas.width / fontSize)).fill(1);
+        function draw() {
+            ctx.fillStyle = 'rgba(5, 9, 20, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.font = fontSize + 'px monospace';
+            drops.forEach((drop, i) => {
+                ctx.fillStyle = ['#00ffff', '#00bfff', '#0044ff'][Math.floor(Math.random()*3)];
+                ctx.fillText(chars.charAt(Math.floor(Math.random() * chars.length)), i * fontSize, drop * fontSize);
+                if (drop * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            });
+        }
+        setInterval(draw, 50);
+    </script>
+</body>
+</html>
