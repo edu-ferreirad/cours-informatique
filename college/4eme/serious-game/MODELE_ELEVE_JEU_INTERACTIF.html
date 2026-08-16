@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[NOM DE VOTRE JEU] — Modèle élève</title>
+<style>
+/* ============================================================================
+   THÈME VISUEL — vous pouvez changer les couleurs, mais gardez la structure
+   ============================================================================ */
+:root {
+    --red: #d32f2f;
+    --green: #00ff41;
+    --bg: #050505;
+    --card-bg: #111111;
+    --text: #e0e0e0;
+    --blue: #3498db;
+    --amber: #f39c12;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', Tahoma, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+}
+
+/* ---------- Écran d'accueil ---------- */
+#welcome-screen {
+    position: fixed; inset: 0; background: #000; z-index: 999;
+    display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+.welcome-box {
+    max-width: 760px; max-height: 90vh; overflow-y: auto;
+    background: rgba(17,17,17,0.95); border: 2px solid var(--green);
+    border-radius: 6px; padding: 30px; font-family: monospace;
+    box-shadow: 0 0 30px rgba(0,255,65,0.2);
+}
+.welcome-box h1 {
+    color: var(--red); text-align: center; text-transform: uppercase;
+    letter-spacing: 2px; border-bottom: 2px solid var(--green); padding-bottom: 10px;
+}
+.welcome-box p { line-height: 1.5; color: #fff; }
+.todo {
+    background: rgba(243,156,18,0.12); border-left: 4px solid var(--amber);
+    padding: 10px 14px; margin: 14px 0; border-radius: 4px; color: #ffd27a;
+    font-size: 0.92em;
+}
+.btn {
+    display: inline-block; padding: 12px 20px; border: none; border-radius: 4px;
+    background: var(--green); color: #000; font-weight: bold; cursor: pointer;
+    text-transform: uppercase; letter-spacing: 1px; font-family: inherit;
+}
+.btn:hover { filter: brightness(1.15); }
+.btn-secondary { background: var(--blue); color: #fff; }
+.btn-danger { background: var(--red); color: #fff; }
+
+/* ---------- HUD ---------- */
+#hud {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 18px; background: var(--card-bg); border-bottom: 1px solid #333;
+    position: sticky; top: 0; z-index: 50;
+}
+#hud .title { color: var(--green); font-family: monospace; font-weight: bold; letter-spacing: 1px; }
+#hud .score { color: var(--amber); font-family: monospace; }
+
+/* ---------- Carte ---------- */
+#map-wrap { padding: 20px; }
+#map-container {
+    position: relative; width: 100%; max-width: 1000px; margin: 0 auto;
+    aspect-ratio: 16/10; background: repeating-linear-gradient(0deg, #0a0a0a, #0a0a0a 39px, #161616 40px),
+                          repeating-linear-gradient(90deg, #0a0a0a, #0a0a0a 39px, #161616 40px);
+    border: 2px solid #333; border-radius: 6px; overflow: hidden;
+}
+#map-container .map-hint {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    color: #444; font-family: monospace; text-align: center; padding: 20px; pointer-events: none;
+}
+.map-node {
+    position: absolute; transform: translate(-50%, -50%); cursor: pointer;
+    width: 46px; height: 46px; border-radius: 50%;
+    background: var(--card-bg); border: 3px solid var(--blue);
+    display: flex; align-items: center; justify-content: center; font-size: 1.3em;
+    box-shadow: 0 0 12px rgba(52,152,219,0.5); transition: transform 0.15s;
+}
+.map-node:hover { transform: translate(-50%, -50%) scale(1.12); }
+.map-node.done { border-color: var(--green); box-shadow: 0 0 14px rgba(0,255,65,0.6); }
+.map-node .label {
+    position: absolute; top: 52px; left: 50%; transform: translateX(-50%);
+    font-size: 0.72em; white-space: nowrap; background: rgba(0,0,0,0.7);
+    padding: 2px 6px; border-radius: 3px; font-family: monospace;
+}
+
+/* ---------- Modale de nœud ---------- */
+.modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 200;
+    display: none; align-items: center; justify-content: center; padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+    background: var(--card-bg); border: 2px solid var(--blue); border-radius: 6px;
+    max-width: 620px; width: 100%; max-height: 88vh; overflow-y: auto; padding: 24px;
+}
+.modal-box h2 { color: var(--blue); margin-top: 0; font-family: monospace; }
+.modal-box .category-tag {
+    display: inline-block; font-size: 0.7em; text-transform: uppercase;
+    padding: 3px 8px; border-radius: 3px; margin-bottom: 10px; letter-spacing: 1px;
+}
+.tag-forensique { background: rgba(0,255,65,0.15); color: var(--green); }
+.tag-juridique { background: rgba(52,152,219,0.15); color: var(--blue); }
+.tag-gouvernance { background: rgba(211,47,47,0.15); color: var(--red); }
+.progress-line { font-family: monospace; color: #888; font-size: 0.85em; margin-bottom: 12px; }
+textarea, input[type=text] {
+    width: 100%; padding: 10px; background: #0a0a0a; color: var(--text);
+    border: 1px solid #444; border-radius: 4px; font-family: inherit; font-size: 1em;
+}
+.choice-btn {
+    display: block; width: 100%; text-align: left; padding: 10px 14px; margin: 6px 0;
+    background: #1a1a1a; border: 1px solid #444; border-radius: 4px; color: var(--text);
+    cursor: pointer; font-family: inherit;
+}
+.choice-btn:hover { border-color: var(--blue); }
+.choice-btn.correct { border-color: var(--green); background: rgba(0,255,65,0.1); }
+.choice-btn.incorrect { border-color: var(--red); background: rgba(211,47,47,0.1); }
+#feedback-area { margin-top: 14px; padding: 10px; border-radius: 4px; display: none; font-size: 0.95em; }
+#feedback-area.ok { display: block; background: rgba(0,255,65,0.1); border-left: 3px solid var(--green); }
+#feedback-area.ko { display: block; background: rgba(211,47,47,0.1); border-left: 3px solid var(--red); }
+#hint-area { margin-top: 10px; font-size: 0.88em; color: var(--amber); }
+.modal-actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+#timeline-timer { font-family: monospace; color: var(--red); font-weight: bold; float: right; }
+
+/* ---------- Terminal (invite de commandes) ---------- */
+.terminal-box {
+    background: #000; border: 1px solid var(--green); border-radius: 6px;
+    padding: 12px; margin-top: 10px; font-family: 'Consolas', monospace;
+}
+.terminal-output {
+    color: var(--green); font-size: 0.9em; line-height: 1.5; min-height: 24px;
+    max-height: 220px; overflow-y: auto; white-space: pre-wrap; margin-bottom: 8px;
+}
+.terminal-line { display: flex; align-items: center; gap: 6px; }
+.terminal-prompt { color: var(--green); font-family: 'Consolas', monospace; }
+.terminal-input {
+    flex: 1; background: #000; color: var(--green); border: 1px solid var(--green);
+    border-radius: 4px; padding: 8px; font-family: 'Consolas', monospace; font-size: 0.9em;
+}
+.terminal-input:focus { outline: none; box-shadow: 0 0 6px rgba(0,255,65,0.5); }
+.btn-terminal { background: var(--green); color: #000; }
+
+/* ---------- Synthèse / export ---------- */
+#synthese-box { font-size: 0.92em; line-height: 1.5; background: #0a0a0a; padding: 14px; border-radius: 4px; white-space: pre-wrap; }
+
+/* ---------- Panneau enseignant ---------- */
+#teacher-toggle {
+    position: fixed; bottom: 12px; right: 12px; opacity: 0.25; font-size: 0.75em;
+    background: none; border: 1px solid #444; color: #888; padding: 4px 8px; border-radius: 3px; cursor: pointer;
+}
+#teacher-toggle:hover { opacity: 1; }
+#teacher-panel {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 300;
+    display: none; align-items: center; justify-content: center;
+}
+#teacher-panel.open { display: flex; }
+#teacher-panel .box { background: var(--card-bg); border: 2px solid var(--red); border-radius: 6px; padding: 24px; max-width: 640px; width: 90%; max-height: 85vh; overflow-y: auto; }
+#teacher-panel table { width: 100%; border-collapse: collapse; font-size: 0.85em; margin-top: 10px; }
+#teacher-panel td, #teacher-panel th { border: 1px solid #333; padding: 6px 8px; text-align: left; }
+
+@media print {
+    body * { visibility: hidden; }
+    #print-area, #print-area * { visibility: visible; }
+    #print-area { position: absolute; top: 0; left: 0; width: 100%; padding: 30px; color: #000; background: #fff; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================================
+     ÉCRAN D'ACCUEIL — à personnaliser : nom du jeu, nom de votre ville/commune,
+     pitch du scénario, noms du groupe.
+     ============================================================================ -->
+<div id="welcome-screen">
+    <div class="welcome-box">
+        <h1>🔧 [NOM DE VOTRE JEU] 🔧</h1>
+        <p>[Écrivez ici en 4-6 phrases le scénario général : qui attaque votre ville,
+        pourquoi, et ce que les joueurs doivent accomplir. Inspirez-vous de vraies
+        infrastructures de votre commune : hôpital, réseau électrique, école,
+        administration communale, transports, etc.]</p>
+        <div class="todo">
+            🔧 À COMPLÉTER : nom de la ville/commune choisie, noms des membres du groupe,
+            date/contexte fictif de l'incident.
+        </div>
+        <p style="color:#888; font-size:0.85em;">Ce fichier est un <b>modèle de départ</b>.
+        Trois nœuds sont déjà entièrement construits pour vous montrer les trois types
+        d'épreuves possibles (forensique numérique, résolution juridique, scénario de
+        gouvernance/crise). Étudiez-les, puis dupliquez leur structure dans le bloc
+        <code>NODES</code> du code pour créer les vôtres.</p>
+        <button class="btn" onclick="closeWelcome()">Démarrer ▶</button>
+    </div>
+</div>
+
+<!-- ---------- HUD ---------- -->
+<div id="hud">
+    <div class="title">🛰 [NOM DE VOTRE JEU]</div>
+    <div class="score">Score : <span id="score-display">0</span> pts — Nœuds résolus : <span id="progress-display">0</span>/<span id="total-display">3</span></div>
+</div>
+
+<!-- ---------- Carte ---------- -->
+<div id="map-wrap">
+    <div id="map-container">
+        <!-- 🔧 À COMPLÉTER : remplacez ce fond quadrillé par une image de votre ville :
+             <img src="images/ma_carte.png" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover;">
+             Les nœuds ci-dessous sont positionnés en % (top/left) : ajustez-les pour
+             qu'ils tombent sur les bons bâtiments de votre carte. -->
+        <div class="map-hint">[Remplacez ce fond par une carte/plan de votre ville]<br>Les 3 nœuds-exemples ci-dessous sont cliquables.</div>
+        <!-- Les pastilles de nœuds sont générées automatiquement par renderMap() à partir de NODES -->
+    </div>
+</div>
+
+<!-- ---------- Modale de résolution de nœud ---------- -->
+<div class="modal-overlay" id="node-modal">
+    <div class="modal-box" id="node-modal-content"></div>
+</div>
+
+<!-- ---------- Modale de synthèse / export ---------- -->
+<div class="modal-overlay" id="synthese-modal">
+    <div class="modal-box">
+        <h2>📄 Synthèse du nœud</h2>
+        <div id="synthese-box"></div>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" onclick="exporterSynthese()">Exporter en PDF</button>
+            <button class="btn" onclick="fermerSynthese()">Fermer</button>
+        </div>
+    </div>
+</div>
+
+<!-- Zone invisible utilisée uniquement au moment de l'impression PDF -->
+<div id="print-area" style="display:none;"></div>
+
+<!-- ---------- Panneau enseignant (protégé par mot de passe) ---------- -->
+<button id="teacher-toggle" onclick="ouvrirPanneauEnseignant()">panel</button>
+<div id="teacher-panel">
+    <div class="box">
+        <h2 style="color:var(--red);">Panneau enseignant</h2>
+        <div id="teacher-login">
+            <p>Mot de passe :</p>
+            <input type="text" id="teacher-pwd">
+            <button class="btn btn-danger" style="margin-top:10px;" onclick="verifierMotDePasse()">Entrer</button>
+        </div>
+        <div id="teacher-content" style="display:none;">
+            <p>Réponses attendues et mots-clés de correction, pour vérification rapide :</p>
+            <table id="teacher-table"></table>
+        </div>
+        <button class="btn" style="margin-top:16px;" onclick="fermerPanneauEnseignant()">Fermer</button>
+    </div>
+</div>
+
+<script>
+/* ============================================================================
+   MODÈLE DE JEU — STRUCTURE À COMPLÉTER
+   ============================================================================
+   Ce fichier reproduit le moteur du jeu "SWISS SHIELD" en version simplifiée,
+   pour que vous puissiez construire votre propre histoire dans votre propre
+   ville. Trois nœuds-exemples sont déjà écrits et fonctionnels :
+
+     1. "forensique"   → combine réponse libre (décodage ASCII, corrigée de façon
+                          tolérante aux accents/synonymes) ET une invite de
+                          commandes façon terminal, pour montrer les deux styles
+                          d'investigation possibles.
+     2. "juridique"     → l'élève choisit parmi plusieurs options (QCM) et reçoit
+                          un retour explicatif pour chaque choix.
+     3. "gouvernance"   → scénario de crise en plusieurs étapes chronométrées,
+                          avec une étape d'attribution de rôle très tolérante
+                          (toute réponse d'au moins 2 mots cohérente est acceptée).
+
+   Pour ajouter votre 4e, 5e, 6e nœud : copiez le bloc "GABARIT VIDE" tout en bas
+   de l'objet NODES et remplissez-le avec votre propre histoire.
+   ============================================================================ */
+
+// 🔧 MOT DE PASSE DU PANNEAU ENSEIGNANT — changez-le avant de rendre le travail
+const MOT_DE_PASSE_ENSEIGNANT = "CHANGE_CE_MOT_DE_PASSE";
+
+/* ----------------------------------------------------------------------------
+   SCHÉMA D'UN NŒUD :
+   {
+     title: "Titre affiché",
+     category: "forensique" | "juridique" | "gouvernance",
+     icon: "emoji affiché sur la carte",
+     position: { top: "40%", left: "30%" },   // position de la pastille sur la carte
+     briefing: "texte d'introduction du nœud",
+     steps: [ ... voir les 3 types d'étapes ci-dessous ... ],
+     synthese: "texte affiché/exportable une fois le nœud terminé"
+   }
+
+   TYPES D'ÉTAPES POSSIBLES DANS "steps":
+
+   a) Réponse libre (tolérante aux fautes/accents/synonymes) :
+      {
+        type: "input",
+        prompt: "Question posée à l'élève",
+        keywords: ["mot-clé1", "mot-clé2"],   // un seul suffit pour valider
+        hints: ["indice 1", "indice 2"],
+        points: 10,
+        feedbackCorrect: "...",
+        feedbackIncorrect: "..."
+      }
+
+   b) Choix multiple :
+      {
+        type: "choice",
+        prompt: "Question posée",
+        options: [
+          { text: "Option A", correct: false, feedback: "Pourquoi c'est faux" },
+          { text: "Option B", correct: true,  feedback: "Pourquoi c'est juste" }
+        ],
+        points: 10
+      }
+
+   c) Attribution de rôle (ultra-tolérante : toute réponse de 2 mots ou plus
+      compte comme correcte — on évalue la démarche, pas la formulation exacte) :
+      {
+        type: "role",
+        prompt: "Qui prévenez-vous en premier, et pourquoi (une phrase) ?",
+        points: 10,
+        timerSeconds: 60   // optionnel : ajoute un compte à rebours de crise
+      }
+
+   d) Invite de commandes / terminal (façon investigation forensique) :
+      L'élève tape des commandes dans un faux terminal. Chaque commande définie
+      renvoie un texte de réponse ; une ou plusieurs peuvent être marquées
+      "success: true" pour valider automatiquement l'étape dès qu'elles sont
+      tapées. "help" liste automatiquement les commandes disponibles (sans
+      révéler laquelle est la bonne) — inutile de la définir vous-même.
+      {
+        type: "terminal",
+        prompt: "Contexte affiché au-dessus du terminal...",
+        commands: {
+          "mft_analyse": { output: "🔍 Trace trouvée...", success: true },
+          "scan_ram":    { output: "❌ Erreur : RAM volatile, données perdues." }
+                                              // pas de "success" = fausse piste,
+                                              // le terminal reste ouvert
+        },
+        hints: ["...", "..."],
+        points: 10,
+        feedbackCorrect: "..."
+      }
+---------------------------------------------------------------------------- */
+
+const NODES = {
+
+    // ==========================================================================
+    // NŒUD-EXEMPLE 1 — TYPE "FORENSIQUE NUMÉRIQUE"
+    // ==========================================================================
+    serveur_commune: {
+        title: "Le serveur de la Commune de Rivemont",
+        category: "forensique",
+        icon: "🖥️",
+        position: { top: "35%", left: "28%" },
+        briefing: "Le service informatique de la commune fictive de Rivemont signale un ralentissement anormal du serveur de l'état civil. Un journal de connexion suspect a été retrouvé. Analysez-le.",
+        steps: [
+            {
+                type: "input",
+                prompt: "Le journal contient la ligne suivante, retrouvée dans les logs d'accès :\n\n01001000 01101111 01110011 01110100\n\nCe code binaire encode un mot en ASCII. Quel est ce mot (il désigne le rôle de la machine qui s'est connectée) ?",
+                keywords: ["host"],
+                hints: [
+                    "Chaque groupe de 8 chiffres (0 et 1) correspond à une lettre en ASCII.",
+                    "Le premier groupe, 01001000, correspond à la lettre H."
+                ],
+                points: 10,
+                feedbackCorrect: "Exact : « Host », c'est-à-dire une machine hôte inconnue du réseau interne.",
+                feedbackIncorrect: "Ce n'est pas encore ça : reconvertissez chaque octet de 8 bits en lettre ASCII."
+            },
+            {
+                type: "terminal",
+                prompt: "La machine \"Host\" s'est déconnectée avant votre arrivée, mais un fichier suspect (intrusion.log) a été supprimé juste après sur le serveur. Ouvrez le terminal ci-dessous et tapez « help » pour voir vos outils d'investigation.",
+                commands: {
+                    "mft_analyse": {
+                        output: "🔍 Analyse terminée : le fichier « intrusion.log » a été localisé dans la MFT (Master File Table). Trace de suppression trouvée à 03h16, deux minutes après la connexion suspecte.",
+                        success: true
+                    },
+                    "scan_ram": {
+                        output: "❌ Erreur : la RAM est une mémoire volatile, son contenu a été effacé au redémarrage du serveur ce matin."
+                    }
+                },
+                hints: [
+                    "Un fichier supprimé perd son contenu, mais pas forcément les métadonnées qui le décrivent (nom, taille, dates). Cherchez une commande qui analyse ces métadonnées plutôt que la mémoire vive.",
+                    "La MFT (Master File Table) est une structure système NTFS bien connue en informatique forensique : tapez une commande qui y fait référence."
+                ],
+                points: 10,
+                feedbackCorrect: "Bien joué : même supprimé, un fichier laisse une trace dans la MFT, ce qui permet de dater précisément l'intrusion."
+            },
+            {
+                type: "input",
+                prompt: "Cette machine \"Host\" inconnue s'est connectée à 03h14 du matin, hors des heures de bureau. Quel est le premier réflexe professionnel à avoir face à une machine suspecte encore active sur le réseau ?",
+                keywords: ["isoler", "deconnecter", "couper"],
+                hints: ["Pensez à ce que l'on fait à un appareil malade pour éviter la contagion.", "Le mot commence par la même idée que « mettre en quarantaine »."],
+                points: 10,
+                feedbackCorrect: "Oui : isoler/déconnecter la machine du réseau empêche la propagation, avant toute analyse plus poussée.",
+                feedbackIncorrect: "Réfléchissez en termes de confinement du danger avant l'analyse."
+            }
+        ],
+        synthese: "NŒUD : Serveur de la Commune de Rivemont (forensique numérique)\n\nUne connexion anormale (« Host ») a été détectée hors des heures de bureau. L'analyse de la MFT (Master File Table) a permis de dater précisément la suppression du fichier intrusion.log à 03h16, deux minutes après la connexion. La bonne pratique face à un indicateur de compromission est d'isoler la machine concernée avant toute investigation plus poussée, afin d'éviter la propagation de l'incident. Cette démarche correspond aux premières étapes classiques de la réponse à incident (détection → confinement → analyse → remédiation)."
+    },
+
+    // ==========================================================================
+    // NŒUD-EXEMPLE 2 — TYPE "RÉSOLUTION JURIDIQUE"
+    // ==========================================================================
+    fuite_donnees: {
+        title: "Fuite de données à la Préfecture",
+        category: "juridique",
+        icon: "⚖️",
+        position: { top: "60%", left: "55%" },
+        briefing: "Un fichier contenant des données de citoyens de Rivemont (noms, adresses, données de santé) a été rendu accessible publiquement pendant plusieurs heures suite à une erreur de configuration.",
+        steps: [
+            {
+                type: "choice",
+                prompt: "Quelle loi fédérale suisse encadre en priorité cette situation ?",
+                options: [
+                    { text: "Le Code pénal suisse (CP)", correct: false, feedback: "Le CP peut s'appliquer en cas d'infraction pénale associée, mais ce n'est pas le texte de référence pour la protection des données elles-mêmes." },
+                    { text: "La Loi fédérale sur la protection des données (LPD)", correct: true, feedback: "Correct : la LPD encadre le traitement des données personnelles par les organes fédéraux, cantonaux et communaux, ainsi que les entreprises." },
+                    { text: "La Loi sur la transparence (LTrans)", correct: false, feedback: "La LTrans concerne l'accès aux documents officiels, pas la protection des données personnelles en tant que telle." }
+                ],
+                points: 10
+            },
+            {
+                type: "input",
+                prompt: "Selon la LPD, en cas de violation de la sécurité des données pouvant entraîner un risque élevé pour les personnes concernées, quelle autorité fédérale la commune doit-elle informer ?",
+                keywords: ["pfpdt", "prepose", "protection des donnees"],
+                hints: ["C'est l'autorité de surveillance fédérale en matière de protection des données.", "Son sigle est PFPDT (Préposé fédéral à la protection des données et à la transparence)."],
+                points: 10,
+                feedbackCorrect: "Exact : le PFPDT doit être informé dans les meilleurs délais en cas de violation présentant un risque élevé.",
+                feedbackIncorrect: "Pensez à l'autorité fédérale chargée de surveiller l'application de la LPD."
+            }
+        ],
+        synthese: "NŒUD : Fuite de données à la Préfecture (résolution juridique)\n\nLa Loi fédérale sur la protection des données (LPD) encadre ce type d'incident pour les organes publics et privés suisses. En cas de violation de la sécurité des données présentant un risque élevé pour les personnes concernées, la LPD prévoit une obligation d'annoncer l'incident au Préposé fédéral à la protection des données et à la transparence (PFPDT) dans les meilleurs délais."
+    },
+
+    // ==========================================================================
+    // NŒUD-EXEMPLE 3 — TYPE "SCÉNARIO DE GOUVERNANCE / CRISE"
+    // ==========================================================================
+    cellule_crise_hopital: {
+        title: "Cellule de crise — Hôpital de Rivemont",
+        category: "gouvernance",
+        icon: "🏥",
+        position: { top: "72%", left: "20%" },
+        briefing: "Le système de dossiers patients de l'hôpital de Rivemont est bloqué par un rançongiciel (ransomware). Une cellule de crise doit être mise en place en urgence.",
+        steps: [
+            {
+                type: "role",
+                prompt: "En tant que responsable informatique, qui prévenez-vous en priorité, et pourquoi ? (une phrase suffit)",
+                points: 10,
+                timerSeconds: 60
+            },
+            {
+                type: "choice",
+                prompt: "Les postes de travail affichent une demande de rançon. Quelle est la meilleure première décision de la cellule de crise ?",
+                options: [
+                    { text: "Payer immédiatement la rançon pour débloquer les dossiers patients", correct: false, feedback: "Payer ne garantit pas la récupération des données et finance les attaquants ; ce n'est jamais la première réaction recommandée." },
+                    { text: "Isoler les systèmes touchés et activer le plan de continuité (dossiers papier, sauvegardes)", correct: true, feedback: "Correct : on confine d'abord l'incident et on active les procédures de continuité prévues, avant d'envisager toute autre option." },
+                    { text: "Ne rien faire et attendre que le système reparte seul", correct: false, feedback: "L'inaction laisse le rançongiciel se propager et retarde la prise en charge des patients." }
+                ],
+                points: 10
+            }
+        ],
+        synthese: "NŒUD : Cellule de crise — Hôpital de Rivemont (gouvernance)\n\nFace à une cyberattaque par rançongiciel, la priorité est d'alerter rapidement les bonnes personnes (direction, RSSI, autorités compétentes) et d'activer le plan de continuité d'activité : isolement des systèmes touchés, bascule sur des procédures dégradées (dossiers papier), recours aux sauvegardes. Payer la rançon n'est ni recommandé ni une garantie de récupération des données."
+    }
+
+    // ==========================================================================
+    // 🔧 GABARIT VIDE — dupliquez ce bloc pour ajouter votre propre nœud.
+    // Retirez les /* et */ pour l'activer, et n'oubliez pas la virgule après
+    // le nœud précédent.
+    // ==========================================================================
+    /*
+    ,mon_nouveau_noeud: {
+        title: "Titre de mon nœud",
+        category: "forensique",   // ou "juridique" ou "gouvernance"
+        icon: "🔎",
+        position: { top: "50%", left: "50%" },
+        briefing: "Contexte de la situation...",
+        steps: [
+            {
+                type: "input",
+                prompt: "...",
+                keywords: ["..."],
+                hints: ["...", "..."],
+                points: 10,
+                feedbackCorrect: "...",
+                feedbackIncorrect: "..."
+            }
+        ],
+        synthese: "Texte de synthèse pédagogique de ce nœud."
+    }
+    */
+};
+
+/* ============================================================================
+   MOTEUR DU JEU — vous n'avez normalement pas besoin de modifier ce qui suit,
+   sauf si vous voulez ajouter de nouvelles mécaniques.
+   ============================================================================ */
+
+let currentNodeKey = null;
+let currentStepIndex = 0;
+let hintsUsed = 0;
+let score = 0;
+let completedNodes = {};
+let timelineInterval = null;
+
+function closeWelcome() {
+    document.getElementById('welcome-screen').style.display = 'none';
+}
+
+// ---------- Carte ----------
+function renderMap() {
+    const container = document.getElementById('map-container');
+    Object.entries(NODES).forEach(([key, node]) => {
+        const el = document.createElement('div');
+        el.className = 'map-node';
+        el.id = 'node-' + key;
+        el.style.top = node.position.top;
+        el.style.left = node.position.left;
+        el.innerHTML = node.icon + '<span class="label">' + node.title + '</span>';
+        el.onclick = () => openNode(key);
+        container.appendChild(el);
+    });
+    document.getElementById('total-display').textContent = Object.keys(NODES).length;
+}
+
+// ---------- Correction tolérante (accents, casse, racines simples) ----------
+function sansAccents(str) {
+    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
+function normalise(str) {
+    return sansAccents(str.toLowerCase()).trim();
+}
+
+// Racine très simple : on tronque la fin du mot pour absorber pluriels/conjugaisons
+function racine(mot) {
+    return mot.length > 5 ? mot.slice(0, mot.length - 2) : mot;
+}
+
+function reponseContientMotCle(reponseUser, motCle) {
+    const r = normalise(reponseUser);
+    const m = normalise(motCle);
+    // Si le mot-clé est une expression de plusieurs mots, on cherche l'inclusion directe
+    if (m.includes(' ')) return r.includes(m);
+    return r.includes(racine(m));
+}
+
+function estReponseInputValide(step, reponseUser) {
+    return step.keywords.some(k => reponseContientMotCle(reponseUser, k));
+}
+
+// Étape "role" : ultra-tolérante — on valorise la démarche, pas la formulation exacte
+function estReponseRoleValide(reponseUser) {
+    const mots = normalise(reponseUser).split(/\s+/).filter(w => w.length > 0);
+    return mots.length >= 2;
+}
+
+// ---------- Ouverture / fermeture d'un nœud ----------
+function openNode(key) {
+    currentNodeKey = key;
+    currentStepIndex = 0;
+    hintsUsed = 0;
+    document.getElementById('node-modal').classList.add('open');
+    renderStep();
+}
+
+function closeNode() {
+    document.getElementById('node-modal').classList.remove('open');
+    clearTimelineTimer();
+}
+
+function renderStep() {
+    const node = NODES[currentNodeKey];
+    const step = node.steps[currentStepIndex];
+    const box = document.getElementById('node-modal-content');
+    clearTimelineTimer();
+
+    let html = '<span class="category-tag tag-' + node.category + '">' + node.category + '</span>';
+    html += '<h2>' + node.title + '</h2>';
+    if (currentStepIndex === 0) html += '<p>' + node.briefing + '</p>';
+    html += '<div class="progress-line">Étape ' + (currentStepIndex + 1) + ' / ' + node.steps.length + '</div>';
+    html += '<p><b>' + step.prompt.replace(/\n/g, '<br>') + '</b></p>';
+
+    if (step.type === 'input' || step.type === 'role') {
+        html += '<textarea id="answer-input" rows="2" placeholder="Votre réponse..."></textarea>';
+        html += '<div id="hint-area"></div>';
+        html += '<div id="feedback-area"></div>';
+        html += '<div class="modal-actions">';
+        if (step.hints && step.hints.length) {
+            html += '<button class="btn btn-secondary" onclick="showHint()">💡 Indice (-2 pts)</button>';
+        }
+        html += '<button class="btn" onclick="submitAnswer()">Valider</button>';
+        html += '</div>';
+    } else if (step.type === 'choice') {
+        html += '<div id="choices-area">';
+        step.options.forEach((opt, i) => {
+            html += '<button class="choice-btn" id="choice-' + i + '" onclick="selectChoice(' + i + ')">' + opt.text + '</button>';
+        });
+        html += '</div>';
+        html += '<div id="feedback-area"></div>';
+        html += '<div class="modal-actions"><button class="btn" id="next-after-choice" style="display:none;" onclick="nextStep()">Suivant ▶</button></div>';
+    } else if (step.type === 'terminal') {
+        html += '<div class="terminal-box">';
+        html += '<div class="terminal-output" id="terminal-output">Terminal prêt. Tapez « help » pour voir les commandes disponibles.</div>';
+        html += '<div class="terminal-line"><span class="terminal-prompt">&gt;</span><input type="text" id="terminal-input" class="terminal-input" placeholder="Entrez une commande..." autocomplete="off" autofocus onkeydown="if(event.key===\'Enter\'){event.preventDefault();executeTerminalCommand();}"></div>';
+        html += '</div>';
+        html += '<div id="feedback-area"></div>';
+        html += '<div class="modal-actions">';
+        if (step.hints && step.hints.length) {
+            html += '<button class="btn btn-secondary" onclick="showHint()">💡 Indice (-2 pts)</button>';
+        }
+        html += '<button class="btn btn-terminal" onclick="executeTerminalCommand()">RUN ▶</button>';
+        html += '</div>';
+    }
+
+    if (step.timerSeconds) {
+        html = html.replace('<h2>', '<span id="timeline-timer"></span><h2>');
+    }
+
+    box.innerHTML = html;
+
+    if (step.timerSeconds) startTimelineTimer(step.timerSeconds);
+}
+
+function startTimelineTimer(seconds) {
+    let remaining = seconds;
+    const el = document.getElementById('timeline-timer');
+    const tick = () => {
+        el.textContent = '⏱ ' + remaining + 's';
+        if (remaining <= 0) {
+            clearInterval(timelineInterval);
+            el.textContent = '⏱ 00:00';
+        }
+        remaining--;
+    };
+    tick();
+    timelineInterval = setInterval(tick, 1000);
+}
+
+function clearTimelineTimer() {
+    if (timelineInterval) clearInterval(timelineInterval);
+    timelineInterval = null;
+}
+
+function showHint() {
+    const node = NODES[currentNodeKey];
+    const step = node.steps[currentStepIndex];
+    if (hintsUsed >= step.hints.length) return;
+    document.getElementById('hint-area').textContent += '💡 ' + step.hints[hintsUsed] + '  ';
+    hintsUsed++;
+    score = Math.max(0, score - 2);
+    updateHUD();
+}
+
+function submitAnswer() {
+    const node = NODES[currentNodeKey];
+    const step = node.steps[currentStepIndex];
+    const val = document.getElementById('answer-input').value;
+    const fb = document.getElementById('feedback-area');
+
+    let ok = false;
+    if (step.type === 'input') ok = estReponseInputValide(step, val);
+    if (step.type === 'role') ok = estReponseRoleValide(val);
+
+    if (ok) {
+        score += step.points;
+        fb.className = 'ok';
+        fb.textContent = '✅ ' + (step.feedbackCorrect || 'Réponse acceptée.');
+    } else {
+        fb.className = 'ko';
+        fb.textContent = '❌ ' + (step.feedbackIncorrect || 'Ce n\'est pas encore ça, réessayez ou utilisez un indice.');
+    }
+    updateHUD();
+
+    if (ok) {
+        setTimeout(nextStep, 900);
+    }
+}
+
+function selectChoice(i) {
+    const node = NODES[currentNodeKey];
+    const step = node.steps[currentStepIndex];
+    const opt = step.options[i];
+    const fb = document.getElementById('feedback-area');
+
+    step.options.forEach((o, idx) => {
+        document.getElementById('choice-' + idx).classList.remove('correct', 'incorrect');
+        document.getElementById('choice-' + idx).onclick = null;
+    });
+    document.getElementById('choice-' + i).classList.add(opt.correct ? 'correct' : 'incorrect');
+
+    fb.className = opt.correct ? 'ok' : 'ko';
+    fb.textContent = (opt.correct ? '✅ ' : '❌ ') + opt.feedback;
+
+    if (opt.correct) score += step.points;
+    updateHUD();
+    document.getElementById('next-after-choice').style.display = 'inline-block';
+}
+
+// ---------- Terminal (invite de commandes) ----------
+function executeTerminalCommand() {
+    const node = NODES[currentNodeKey];
+    const step = node.steps[currentStepIndex];
+    const inputEl = document.getElementById('terminal-input');
+    const output = document.getElementById('terminal-output');
+    const raw = inputEl.value.trim();
+    if (!raw) return;
+    const cmd = normalise(raw);
+
+    if (cmd === 'help') {
+        const liste = Object.keys(step.commands).map(c => '[' + c + ']').join('  ');
+        output.innerHTML += '<br>&gt; ' + raw + '<br>Commandes disponibles : ' + liste;
+    } else if (step.commands[cmd]) {
+        const def = step.commands[cmd];
+        output.innerHTML += '<br>&gt; ' + raw + '<br>' + def.output;
+        if (def.success) {
+            const fb = document.getElementById('feedback-area');
+            score += step.points;
+            fb.className = 'ok';
+            fb.textContent = '✅ ' + (step.feedbackCorrect || 'Étape validée.');
+            updateHUD();
+            setTimeout(nextStep, 1300);
+        }
+    } else {
+        output.innerHTML += '<br>&gt; ' + raw + '<br>Commande inconnue. Tapez « help » pour voir les commandes disponibles.';
+    }
+
+    inputEl.value = '';
+    output.scrollTop = output.scrollHeight;
+}
+
+function nextStep() {
+    const node = NODES[currentNodeKey];
+    currentStepIndex++;
+    hintsUsed = 0;
+    if (currentStepIndex < node.steps.length) {
+        renderStep();
+    } else {
+        finishNode();
+    }
+}
+
+function finishNode() {
+    completedNodes[currentNodeKey] = true;
+    document.getElementById('node-' + currentNodeKey).classList.add('done');
+    closeNode();
+    updateHUD();
+    ouvrirSynthese(currentNodeKey);
+    sauvegarder();
+}
+
+// ---------- Synthèse / export PDF ----------
+function ouvrirSynthese(key) {
+    document.getElementById('synthese-box').textContent = NODES[key].synthese;
+    document.getElementById('synthese-modal').classList.add('open');
+    document.getElementById('synthese-modal').dataset.key = key;
+}
+
+function fermerSynthese() {
+    document.getElementById('synthese-modal').classList.remove('open');
+}
+
+// Export simple, sans dépendance externe : on prépare une zone imprimable
+// et on ouvre la boîte de dialogue d'impression du navigateur (« Enregistrer en PDF »).
+function exporterSynthese() {
+    const key = document.getElementById('synthese-modal').dataset.key;
+    const node = NODES[key];
+    const zone = document.getElementById('print-area');
+    zone.innerHTML = '<h1>' + node.title + '</h1><p>' + node.synthese.replace(/\n/g, '<br>') + '</p>';
+    zone.style.display = 'block';
+    window.print();
+    zone.style.display = 'none';
+}
+
+// ---------- HUD ----------
+function updateHUD() {
+    document.getElementById('score-display').textContent = score;
+    document.getElementById('progress-display').textContent = Object.keys(completedNodes).length;
+}
+
+// ---------- Sauvegarde locale (facultatif) ----------
+function sauvegarder() {
+    localStorage.setItem('modele_eleve_save', JSON.stringify({ score, completedNodes }));
+}
+
+function charger() {
+    const raw = localStorage.getItem('modele_eleve_save');
+    if (!raw) return;
+    try {
+        const data = JSON.parse(raw);
+        score = data.score || 0;
+        completedNodes = data.completedNodes || {};
+        Object.keys(completedNodes).forEach(key => {
+            const el = document.getElementById('node-' + key);
+            if (el) el.classList.add('done');
+        });
+        updateHUD();
+    } catch (e) { /* sauvegarde illisible, on ignore */ }
+}
+
+// ---------- Panneau enseignant ----------
+function ouvrirPanneauEnseignant() {
+    document.getElementById('teacher-panel').classList.add('open');
+}
+function fermerPanneauEnseignant() {
+    document.getElementById('teacher-panel').classList.remove('open');
+    document.getElementById('teacher-login').style.display = 'block';
+    document.getElementById('teacher-content').style.display = 'none';
+    document.getElementById('teacher-pwd').value = '';
+}
+function verifierMotDePasse() {
+    if (document.getElementById('teacher-pwd').value === MOT_DE_PASSE_ENSEIGNANT) {
+        document.getElementById('teacher-login').style.display = 'none';
+        document.getElementById('teacher-content').style.display = 'block';
+        remplirTableEnseignant();
+    } else {
+        alert('Mot de passe incorrect.');
+    }
+}
+function remplirTableEnseignant() {
+    const table = document.getElementById('teacher-table');
+    let html = '<tr><th>Nœud</th><th>Étape</th><th>Réponse(s) attendue(s)</th></tr>';
+    Object.values(NODES).forEach(node => {
+        node.steps.forEach((step, i) => {
+            let attendu = '—';
+            if (step.type === 'input') attendu = step.keywords.join(' / ');
+            if (step.type === 'choice') attendu = step.options.find(o => o.correct).text;
+            if (step.type === 'role') attendu = '(toute réponse ≥ 2 mots, cohérente)';
+            if (step.type === 'terminal') attendu = Object.keys(step.commands).filter(c => step.commands[c].success).join(' / ');
+            html += '<tr><td>' + node.title + '</td><td>' + (i + 1) + '</td><td>' + attendu + '</td></tr>';
+        });
+    });
+    table.innerHTML = html;
+}
+
+// ---------- Initialisation ----------
+renderMap();
+charger();
+</script>
+</body>
+</html>
