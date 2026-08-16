@@ -133,40 +133,40 @@
     <a class="back-link" href="../index.html">⬅ Retour à l'accueil général</a>
 
     <script>
-        // Classement complet des 10 défis par niveau extraits des documents[cite: 3]
+        // Classement complet des 10 défis par niveau extraits des documents
         const defisParNiveau = {
             facile: [
-                "<strong>01. THE CALLIGRAPHIST (LE CALLIGRAPHE)</strong> : Pose une grande feuille sur la table ou sur le sol, prends un stylo et place-le dans le trou de Thymio. Maintenant, essaie d’écrire ton nom en guidant ton robot avec sa télécommande[cite: 3].",
-                "<strong>02. PENALTY KICK (TIR AU BUT)</strong> : Crée un but avec deux obstacles et avec une balle essaie de marquer un goal en guidant Thymio avec la télécommande[cite: 3].",
-                "<strong>03. THE ADVENTURER (L’AVENTURIER)</strong> : Crée un labyrinthe avec des obstacles et place une cible au centre. Cherche le bon comportement pour que Thymio arrive à destination[cite: 3].",
-                "<strong>04. THE SPIDER (L’ARAIGNÉE)</strong> : Déguise Thymio en araignée. Équipe-le d’un stylo et amuse-toi à dessiner des toiles d’araignées[cite: 3].",
-                "<strong>05. THE WAITER (LE SERVEUR)</strong> : Prends la piste Thymio Racetrack et pose une assiette sur Thymio. Tu peux ainsi créer ton premier buffet robotisé[cite: 3].",
-                "<strong>06. THE CLEANER (LE DOMESTIQUE)</strong> : Fais faire le ménage à Thymio ! Attache un chiffon au crochet de Thymio avec une ficelle et essaie de trouver le meilleur comportement pour qu’il enlève un maximum de poussière et de miettes[cite: 3].",
-                "<strong>01. THE WATCHDOG (LE CHIEN DE GARDE)</strong> : Programme Thymio pour qu’il se transforme en chien de garde et qu’il fasse du bruit dès qu’il voit quelque chose s’approcher de lui[cite: 3].",
-                "<strong>02. THE STUBBORN MULE (LA TÊTE DE MULE)</strong> : Fais en sorte que Thymio t’obéisse, mais à l’envers ! Appuie sur « avant », il recule ; appuie sur « gauche », il va à droite, etc.[cite: 3]",
-                "<strong>03. THE CAREFUL DRIVER (LE BON CONDUCTEUR)</strong> : Prends la piste « Thymio Racetrack » et programme Thymio pour qu’il suive la ligne noire large. Il faut qu’il s’arrête s’il voit un obstacle devant lui[cite: 3].",
-                "<strong>04. THE CHAMELEON (LE CAMÉLÉON)</strong> : Thymio a 7 capteurs de proximité horizontaux : 5 devant, 2 derrière. Fais-le s’allumer de différentes couleurs lorsqu’il voit quelque chose autour de lui[cite: 3]."
+                "<strong>01. THE CALLIGRAPHIST (LE CALLIGRAPHE)</strong> : Pose une grande feuille sur la table ou sur le sol, prends un stylo et place-le dans le trou de Thymio. Maintenant, essaie d’écrire ton nom en guidant ton robot avec sa télécommande.",
+                "<strong>02. PENALTY KICK (TIR AU BUT)</strong> : Crée un but avec deux obstacles et avec une balle essaie de marquer un goal en guidant Thymio avec la télécommande.",
+                "<strong>03. THE ADVENTURER (L’AVENTURIER)</strong> : Crée un labyrinthe avec des obstacles et place une cible au centre. Cherche le bon comportement pour que Thymio arrive à destination.",
+                "<strong>04. THE SPIDER (L’ARAIGNÉE)</strong> : Déguise Thymio en araignée. Équipe-le d’un stylo et amuse-toi à dessiner des toiles d’araignées.",
+                "<strong>05. THE WAITER (LE SERVEUR)</strong> : Prends la piste Thymio Racetrack et pose une assiette sur Thymio. Tu peux ainsi créer ton premier buffet robotisé.",
+                "<strong>06. THE CLEANER (LE DOMESTIQUE)</strong> : Fais faire le ménage à Thymio ! Attache un chiffon au crochet de Thymio avec une ficelle et essaie de trouver le meilleur comportement pour qu’il enlève un maximum de poussière et de miettes.",
+                "<strong>01. THE WATCHDOG (LE CHIEN DE GARDE)</strong> : Programme Thymio pour qu’il se transforme en chien de garde et qu’il fasse du bruit dès qu’il voit quelque chose s’approcher de lui.",
+                "<strong>02. THE STUBBORN MULE (LA TÊTE DE MULE)</strong> : Fais en sorte que Thymio t’obéisse, mais à l’envers ! Appuie sur « avant », il recule ; appuie sur « gauche », il va à droite, etc.",
+                "<strong>03. THE CAREFUL DRIVER (LE BON CONDUCTEUR)</strong> : Prends la piste « Thymio Racetrack » et programme Thymio pour qu’il suive la ligne noire large. Il faut qu’il s’arrête s’il voit un obstacle devant lui.",
+                "<strong>04. THE CHAMELEON (LE CAMÉLÉON)</strong> : Thymio a 7 capteurs de proximité horizontaux : 5 devant, 2 derrière. Fais-le s’allumer de différentes couleurs lorsqu’il voit quelque chose autour de lui."
             ],
             moyen: [
-                "<strong>07. THE COPYIST (LE COPISTE)</strong> : Essaie d’écrire tes initiales en guidant Thymio avec tes mains. Prends une grande feuille de papier afin que ce soit plus simple[cite: 3].",
-                "<strong>08. THE ATTENTIVE PRINTER (L’IMPRIMEUR À L’ÉCOUTE)</strong> : Redessine les formes pointillées en équipant Thymio d’un stylo et guide-le en tapant dans tes mains[cite: 3].",
-                "<strong>09. THE MOONWALKER (À L’ENVERS)</strong> : Crée un labyrinthe avec des obstacles et place une cible au centre. Ton but est de contourner les obstacles en marche arrière et d’arriver jusqu’à la cible[cite: 3].",
-                "<strong>10. THE LIGHT PAINTER (LE PEINTRE DE LUMIÈRE)</strong> : Prends la piste Thymio Racetrack ou crée une nouvelle piste. Éteins toutes les lumières, ferme les rideaux et prends une photo longue exposition pour faire des dessins de lumière[cite: 3].",
-                "<strong>03. THE FIVE-COLOUR BUTTON (LE BOUTON AUX CINQ COULEURS)</strong> : Fais changer Thymio de couleur pour qu’il passe du rouge au vert, puis au bleu, puis au jaune, puis au violet et à nouveau au rouge, avec un seul bouton[cite: 3].",
-                "<strong>08. THE BACKWARDS FOLLOWER (LES YEUX DANS LE DOS)</strong> : Programme Thymio pour que Thymio te suive, mais avec ses capteurs arrière[cite: 3].",
-                "<strong>09. THE BUZZER (LE BUZZER)</strong> : Transforme Thymio en buzzer et utilise-le dans un quiz avec tes proches ! Programme-le pour qu’il s’allume et joue une mélodie dès qu’il reçoit une tape[cite: 3].",
-                "<strong>01. THE CRASH PREVENTING SYSTEM (LE FREINAGE EN DOUCEUR)</strong> : Programme Thymio pour qu’il avance vite tant qu’il ne voit rien et qu’il ralentisse dès qu’il aperçoit l’obstacle[cite: 3].",
-                "<strong>02. THE DARTS (LES FLÉCHETTES)</strong> : Place Thymio à 40 cm de la cible de fléchettes et programme-le pour qu’il avance et s’arrête au plus près du centre lorsque tu appuies sur le bouton avant[cite: 3]."
+                "<strong>07. THE COPYIST (LE COPISTE)</strong> : Essaie d’écrire tes initiales en guidant Thymio avec tes mains. Prends une grande feuille de papier afin que ce soit plus simple.",
+                "<strong>08. THE ATTENTIVE PRINTER (L’IMPRIMEUR À L’ÉCOUTE)</strong> : Redessine les formes pointillées en équipant Thymio d’un stylo et guide-le en tapant dans tes mains.",
+                "<strong>09. THE MOONWALKER (À L’ENVERS)</strong> : Crée un labyrinthe avec des obstacles et place une cible au centre. Ton but est de contourner les obstacles en marche arrière et d’arriver jusqu’à la cible.",
+                "<strong>10. THE LIGHT PAINTER (LE PEINTRE DE LUMIÈRE)</strong> : Prends la piste Thymio Racetrack ou crée une nouvelle piste. Éteins toutes les lumières, ferme les rideaux et prends une photo longue exposition pour faire des dessins de lumière.",
+                "<strong>03. THE FIVE-COLOUR BUTTON (LE BOUTON AUX CINQ COULEURS)</strong> : Fais changer Thymio de couleur pour qu’il passe du rouge au vert, puis au bleu, puis au jaune, puis au violet et à nouveau au rouge, avec un seul bouton.",
+                "<strong>08. THE BACKWARDS FOLLOWER (LES YEUX DANS LE DOS)</strong> : Programme Thymio pour que Thymio te suive, mais avec ses capteurs arrière.",
+                "<strong>09. THE BUZZER (LE BUZZER)</strong> : Transforme Thymio en buzzer et utilise-le dans un quiz avec tes proches ! Programme-le pour qu’il s’allume et joue une mélodie dès qu’il reçoit une tape.",
+                "<strong>01. THE CRASH PREVENTING SYSTEM (LE FREINAGE EN DOUCEUR)</strong> : Programme Thymio pour qu’il avance vite tant qu’il ne voit rien et qu’il ralentisse dès qu’il aperçoit l’obstacle.",
+                "<strong>02. THE DARTS (LES FLÉCHETTES)</strong> : Place Thymio à 40 cm de la cible de fléchettes et programme-le pour qu’il avance et s’arrête au plus près du centre lorsque tu appuies sur le bouton avant."
             ],
             avance: [
-                "<strong>10. THE TELEGRAPH (LE TÉLÉGRAPHE)</strong> : Utilise Thymio pour faire deviner des mots en utilisant un code Morse simplifié. Associe un capteur à une lettre pour que Thymio la joue quand tu mets ton doigt devant[cite: 3].",
-                "<strong>04. THE DANCER (LE DANSEUR)</strong> : Crée une chorégraphie avec Thymio en combinant les blocs de timers, d’états et de moteurs ! Ajoute de la couleur et fais une vidéo[cite: 3].",
-                "<strong>05. THE AMBULANCE (L’AMBULANCE)</strong> : Crée ta propre ambulance Thymio télécommandée. Elle doit avancer doucement ou aller très vite en allumant son gyrophare et sa sirène[cite: 3].",
-                "<strong>06. THE EQUILIBRIST (LE FUNAMBULE)</strong> : Crée une balance avec un plateau posé sur un axe. Programme Thymio pour qu’il maintienne son équilibre en se déplaçant s’il bascule en avant ou en arrière[cite: 3].",
-                "<strong>07. TOM THUMB (LE PETIT POUCET)</strong> : Utilise plusieurs cibles et dépose-les par terre. Place Thymio devant la première et programme-le pour qu’il se déplace d’une cible à l’autre automatiquement[cite: 3].",
-                "<strong>08. THE AUTOMATIC TELEGRAPH (LE TÉLÉGRAPHE AUTOMATIQUE)</strong> : Programme Thymio pour que lorsque tu appuies sur un bouton, il joue un mot en code Morse[cite: 3].",
-                "<strong>09. THE MAD CLEANER (LE BALAYEUR FOU)</strong> : Place des obstacles au hasard sur une table avec Thymio. Programme-le pour qu’il trouve les obstacles et les pousse hors de la table sans tomber ![cite: 3]",
-                "<strong>10. THE BULLDOZER (LE BULLDOZER)</strong> : Pose des obstacles sur la piste Racetrack. Programme ensuite Thymio pour qu’il suive la piste et pousse les obstacles hors de cette dernière[cite: 3]."
+                "<strong>10. THE TELEGRAPH (LE TÉLÉGRAPHE)</strong> : Utilise Thymio pour faire deviner des mots en utilisant un code Morse simplifié. Associe un capteur à une lettre pour que Thymio la joue quand tu mets ton doigt devant.",
+                "<strong>04. THE DANCER (LE DANSEUR)</strong> : Crée une chorégraphie avec Thymio en combinant les blocs de timers, d’états et de moteurs ! Ajoute de la couleur et fais une vidéo.",
+                "<strong>05. THE AMBULANCE (L’AMBULANCE)</strong> : Crée ta propre ambulance Thymio télécommandée. Elle doit avancer doucement ou aller très vite en allumant son gyrophare et sa sirène.",
+                "<strong>06. THE EQUILIBRIST (LE FUNAMBULE)</strong> : Crée une balance avec un plateau posé sur un axe. Programme Thymio pour qu’il maintienne son équilibre en se déplaçant s’il bascule en avant ou en arrière.",
+                "<strong>07. TOM THUMB (LE PETIT POUCET)</strong> : Utilise plusieurs cibles et dépose-les par terre. Place Thymio devant la première et programme-le pour qu’il se déplace d’une cible à l’autre automatiquement.",
+                "<strong>08. THE AUTOMATIC TELEGRAPH (LE TÉLÉGRAPHE AUTOMATIQUE)</strong> : Programme Thymio pour que lorsque tu appuies sur un bouton, il joue un mot en code Morse.",
+                "<strong>09. THE MAD CLEANER (LE BALAYEUR FOU)</strong> : Place des obstacles au hasard sur une table avec Thymio. Programme-le pour qu’il trouve les obstacles et les pousse hors de la table sans tomber !",
+                "<strong>10. THE BULLDOZER (LE BULLDOZER)</strong> : Pose des obstacles sur la piste Racetrack. Programme ensuite Thymio pour qu’il suive la piste et pousse les obstacles hors de cette dernière."
             ]
         };
 
