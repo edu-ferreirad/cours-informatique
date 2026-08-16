@@ -53,6 +53,36 @@
             position: relative;
             z-index: 10;
         }
+        /* Style pour la section des fiches PDF */
+        #fiches-container {
+            margin: 20px auto;
+            max-width: 600px;
+            padding: 20px;
+            background-color: rgba(0, 5, 20, 0.85);
+            border: 1px solid #0055ff;
+            border-radius: 8px;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 0 15px rgba(0, 85, 255, 0.3);
+        }
+        #fiches-container h3 {
+            color: #6688ff;
+            margin-top: 0;
+        }
+        .fiche-link {
+            display: block;
+            color: #69b4ff;
+            text-decoration: none;
+            margin: 10px 0;
+            padding: 8px;
+            border: 1px dashed #0055ff;
+            border-radius: 4px;
+            transition: background 0.3s, color 0.3s;
+        }
+        .fiche-link:hover {
+            background-color: #0055ff;
+            color: white;
+        }
         /* Style pour la zone d'affichage des défis */
         #defi-container {
             margin: 20px auto;
@@ -75,14 +105,17 @@
 <body>
     <canvas id="matrix"></canvas>
 
-    <h1>Espace Cycle</h1>
-    <p>Choisissez votre fiche d'apprentissage ou tirez un défi :</p>
-    
-    <a class="btn" href="1ere/">1ère année</a>
-    <a class="btn" href="2eme/">2ème année</a>
-    <a class="btn" href="3eme/">3ème année</a>
-    <a class="btn" href="4eme/">4ème année</a>
-    
+    <h1>Espace Cour fac-bases</h1>
+    <p>Consultez vos fiches d'apprentissage ou tirez un défi :</p>
+
+    <!-- Section Fiches pour les PDF -->
+    <div id="fiches-container">
+        <h3>Fiches d'apprentissage</h3>
+        <!-- Remplace les liens ci-dessous par les chemins vers tes fichiers PDF -->
+        <a class="fiche-link" href="fiches/fiche1.pdf" target="_blank">📄 Fiche 1 (Exemple)</a>
+        <a class="fiche-link" href="fiches/fiche2.pdf" target="_blank">📄 Fiche 2 (Exemple)</a>
+    </div>
+
     <hr style="width: 50%; border-color: #0055ff; margin: 30px auto; position: relative; z-index: 10;">
 
     <!-- Boutons interactifs pour les défis par niveau -->
@@ -95,12 +128,12 @@
         <h3 id="defi-titre">Défi Aléatoire</h3>
         <p id="defi-texte"></p>
     </div>
-    
+
     <br><br>
     <a class="back-link" href="../index.html">⬅ Retour à l'accueil général</a>
 
     <script>
-        // Classement complet des 10 défis par niveau extraits des documents
+        // Classement complet des 10 défis par niveau extraits des documents[cite: 3]
         const defisParNiveau = {
             facile: [
                 "<strong>01. THE CALLIGRAPHIST (LE CALLIGRAPHE)</strong> : Pose une grande feuille sur la table ou sur le sol, prends un stylo et place-le dans le trou de Thymio. Maintenant, essaie d’écrire ton nom en guidant ton robot avec sa télécommande[cite: 3].",
@@ -145,7 +178,7 @@
             const container = document.getElementById('defi-container');
             const titreElement = document.getElementById('defi-titre');
             const texteElement = document.getElementById('defi-texte');
-            
+
             titreElement.innerHTML = `Défi Aléatoire (Niveau ${niveau.toUpperCase()})`;
             texteElement.innerHTML = defiChoisi;
             container.style.display = 'block';
@@ -166,12 +199,12 @@
             ctx.fillStyle = 'rgba(0, 3, 9, 0.08)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.font = fontSize + 'px monospace';
-            
+
             drops.forEach((drop, i) => {
                 const colors = ['#6688ff', '#0055ff', '#002288'];
                 ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
                 ctx.fillText(chars.charAt(Math.floor(Math.random() * chars.length)), i * fontSize, drop * fontSize);
-                
+
                 if (drop * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
                 drops[i]++;
             });
