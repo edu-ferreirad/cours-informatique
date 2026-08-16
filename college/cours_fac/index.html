@@ -1,1 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Index des Cours</title>
+    <style>
+        body {
+            background-color: #050914;
+            color: #00ffff;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding-top: 50px;
+            overflow-x: hidden;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+            padding-bottom: 50px;
+        }
+        h1 {
+            color: #ffffff;
+            text-shadow: 0 0 10px #00bfff, 0 0 20px #0044ff;
+            margin-bottom: 40px;
+        }
+        .menu-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+        .menu-btn {
+            display: inline-block;
+            width: 80%;
+            max-width: 400px;
+            padding: 20px;
+            background: rgba(5, 15, 35, 0.85);
+            border: 1px solid #00ffff;
+            color: #00ffff;
+            text-decoration: none;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+            transition: background-color 0.2s, box-shadow 0.2s, transform 0.2s;
+            text-shadow: 0 0 5px #00bfff;
+        }
+        .menu-btn:hover {
+            background-color: rgba(0, 123, 255, 0.3);
+            box-shadow: 0 0 25px #00ffff;
+            transform: scale(1.02);
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="matrix"></canvas>
+
+    <div class="container">
+        <h1>Index des Cours et Projets</h1>
+
+        <div class="menu-grid">
+            <a href="jeu/index.html" class="menu-btn">Serious Game</a>
+            <a href="concours-uit/index.html" class="menu-btn">Concours UIT</a>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        const chars = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ<>/\\{}[]*&é"\'(-)=+';
+        const fontSize = 16;
+        let drops = Array(Math.floor(canvas.width / fontSize)).fill(1);
+        function draw() {
+            ctx.fillStyle = 'rgba(5, 9, 20, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.font = fontSize + 'px monospace';
+            drops.forEach((drop, i) => {
+                ctx.fillStyle = ['#00ffff', '#00bfff', '#0044ff'][Math.floor(Math.random()*3)];
+                ctx.fillText(chars.charAt(Math.floor(Math.random() * chars.length)), i * fontSize, drop * fontSize);
+                if (drop * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            });
+        }
+        setInterval(draw, 50);
+    </script>
+</body>
+</html>
 
