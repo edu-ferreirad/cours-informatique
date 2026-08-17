@@ -1,1 +1,185 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Jeux - 9ème</title>
+    <style>
+        body {
+            background-color: #050914;
+            color: #00ffff;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding-top: 30px;
+            overflow-x: hidden;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        h1, p {
+            position: relative;
+            z-index: 10;
+            color: #ffffff;
+            text-shadow: 0 0 10px #00bfff, 0 0 20px #0044ff;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+            padding-bottom: 50px;
+        }
+        .game-card {
+            background: rgba(5, 15, 35, 0.85);
+            border: 1px solid #00ffff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+            border-radius: 8px;
+            margin: 25px auto;
+            padding: 20px;
+            width: 90%;
+        }
+        .game-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #00ffff;
+            margin-bottom: 15px;
+            text-shadow: 0 0 5px #00bfff;
+        }
+        .game-title a {
+            color: #00ffff;
+            text-decoration: none;
+        }
+        .game-title a:hover {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+        .iframe-container {
+            width: 100%;
+            height: 450px;
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1px solid #0044ff;
+            background: #000;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .back-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            position: relative;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix"></canvas>
 
+    <div class="container">
+        <h1>Espace Jeux - 9ème</h1>
+        <p><a class="back-btn" href="index.html">⬅ Retour au menu 9ème</a></p>
+
+        <p>Prévisualisation des activités :</p>
+
+        <!-- 1. Mes jeux -->
+        <div class="game-card">
+            <div class="game-title">🎮 <a href="https://learningapps.org/watch?v=pde90hqct25" target="_blank">Mes jeux (LearningApps)</a></div>
+            <div class="iframe-container">
+                <iframe src="https://learningapps.org/watch?v=pde90hqct25"></iframe>
+            </div>
+        </div>
+
+        <!-- 2. Educlasse -->
+        <div class="game-card">
+            <div class="game-title">🕹️ <a href="https://www.educlasse.ch/cycle-3/9e" target="_blank">Educlasse</a></div>
+            <div class="iframe-container">
+                <iframe src="https://www.educlasse.ch/cycle-3/9e"></iframe>
+            </div>
+        </div>
+
+        <!-- 3. Chasse aux oeufs -->
+        <div class="game-card">
+            <div class="game-title">🥚 <a href="https://opendata.geneve.ch/www/medias/chasse_aux_oeufs_virtuelle/" target="_blank">Chasse aux oeufs</a></div>
+            <div class="iframe-container">
+                <iframe src="https://opendata.geneve.ch/www/medias/chasse_aux_oeufs_virtuelle/"></iframe>
+            </div>
+        </div>
+
+        <!-- 4. Dactylo -->
+        <div class="game-card">
+            <div class="game-title">⌨️ <a href="https://www.dactylocours.com/test.php" target="_blank">Dactylo</a></div>
+            <div class="iframe-container">
+                <iframe src="https://www.dactylocours.com/test.php"></iframe>
+            </div>
+        </div>
+
+        <!-- 5. Studio.org -->
+        <div class="game-card">
+            <div class="game-title">💻 <a href="https://studio.code.org/fr/courses/courseb-2025/units/1/lessons/4/levels/2?lang=fr-FR" target="_blank">Studio.org</a></div>
+            <div class="iframe-container">
+                <iframe src="https://studio.code.org/fr/courses/courseb-2025/units/1/lessons/4/levels/2?lang=fr-FR"></iframe>
+            </div>
+        </div>
+
+        <!-- 6. Scratch -->
+        <div class="game-card">
+            <div class="game-title">🐱 <a href="https://scratch.mit.edu/" target="_blank">Scratch</a></div>
+            <div class="iframe-container">
+                <iframe src="https://scratch.mit.edu/"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const characters = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ<>/\\{}[]*&é"\'(-)=+';
+        const fontSize = 16;
+        let columns = canvas.width / fontSize;
+        let drops = [];
+
+        for (let i = 0; i < columns; i++) {
+            drops[i] = 1;
+        }
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(5, 9, 20, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#00ffff';
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = characters.charAt(Math.floor(Math.random() * characters.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawMatrix, 50);
+    </script>
+</body>
+</html>
