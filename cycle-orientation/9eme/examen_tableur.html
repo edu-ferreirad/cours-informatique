@@ -22,36 +22,36 @@
             z-index: 1;
         }
         h1, h2 {
-            color: #6688ff;
-            border-bottom: 2px solid #0055ff;
+            color: #88ccff;
+            border-bottom: 2px solid #0088ff;
             padding-bottom: 5px;
             position: relative;
             z-index: 10;
-            text-shadow: 0 0 10px #0055ff;
+            text-shadow: 0 0 12px #0088ff;
         }
         p, ul, ol {
             position: relative;
             z-index: 10;
         }
         .section {
-            background: rgba(0, 5, 20, 0.85);
+            background: rgba(0, 15, 40, 0.85);
             padding: 20px;
             margin-bottom: 20px;
             border-radius: 8px;
-            border: 1px solid #0055ff;
-            box-shadow: 0 0 15px rgba(0, 85, 255, 0.3);
+            border: 1px solid #0088ff;
+            box-shadow: 0 0 18px rgba(0, 136, 255, 0.35);
             position: relative;
             z-index: 10;
         }
         .instruction-box {
-            background: rgba(0, 10, 30, 0.9);
-            border-left: 4px solid #0055ff;
+            background: rgba(0, 25, 60, 0.9);
+            border-left: 4px solid #00aaff;
             padding: 15px;
             margin: 15px 0;
         }
         .btn-download {
             display: inline-block;
-            background-color: #002288;
+            background-color: #0044cc;
             color: white;
             padding: 10px 20px;
             text-decoration: none;
@@ -59,15 +59,15 @@
             font-weight: bold;
             margin-top: 10px;
             margin-right: 10px;
-            border: 1px solid #0055ff;
+            border: 1px solid #00aaff;
             transition: background-color 0.3s;
         }
         .btn-download:hover {
-            background-color: #0055ff;
+            background-color: #0088ff;
         }
         .btn-submit {
             display: inline-block;
-            background-color: #0055ff;
+            background-color: #0066ff;
             color: white;
             padding: 12px 25px;
             text-decoration: none;
@@ -75,19 +75,19 @@
             font-weight: bold;
             margin-top: 10px;
             font-size: 1.1em;
-            border: 1px solid #6688ff;
+            border: 1px solid #88ccff;
             transition: background-color 0.3s;
         }
         .btn-submit:hover {
-            background-color: #002288;
+            background-color: #0044cc;
         }
         #auth-screen {
             text-align: center;
             padding: 50px 20px;
-            background: rgba(0, 5, 20, 0.9);
-            border: 1px solid #0055ff;
+            background: rgba(0, 15, 40, 0.9);
+            border: 1px solid #0088ff;
             border-radius: 8px;
-            box-shadow: 0 0 20px rgba(0, 85, 255, 0.4);
+            box-shadow: 0 0 20px rgba(0, 136, 255, 0.4);
             max-width: 500px;
             margin: 100px auto;
             position: relative;
@@ -99,14 +99,14 @@
             width: 70%;
             background-color: #000309;
             color: white;
-            border: 1px solid #0055ff;
+            border: 1px solid #0088ff;
             border-radius: 4px;
             margin-right: 10px;
         }
         #auth-screen button {
             padding: 10px 20px;
             font-size: 1em;
-            background-color: #0055ff;
+            background-color: #0066ff;
             color: white;
             border: none;
             border-radius: 4px;
@@ -114,10 +114,10 @@
             transition: background-color 0.3s;
         }
         #auth-screen button:hover {
-            background-color: #002288;
+            background-color: #0044cc;
         }
         .error-msg {
-            color: #ff4444;
+            color: #ff6666;
             margin-top: 10px;
             display: none;
         }
@@ -189,7 +189,7 @@
             }
         }
 
-        // Animation Matrix en arrière-plan (bleue)
+        // Animation Matrix en arrière-plan (bleu clair)
         const canvas = document.getElementById('matrix');
         const ctx = canvas.getContext('2d');
 
@@ -213,7 +213,7 @@
             ctx.fillStyle = 'rgba(0, 3, 9, 0.08)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            const colors = ['#6688ff', '#0055ff', '#002288'];
+            const colors = ['#ffffff', '#88ccff', '#00aaff', '#0044cc'];
             ctx.font = fontSize + 'px monospace';
 
             for (let i = 0; i < drops.length; i++) {
