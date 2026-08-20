@@ -1,1 +1,229 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Examen - Présentation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #ffffff;
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #000309;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        h1, h2 {
+            color: #6688ff;
+            border-bottom: 2px solid #0055ff;
+            padding-bottom: 5px;
+            position: relative;
+            z-index: 10;
+            text-shadow: 0 0 10px #0055ff;
+        }
+        p, ul {
+            position: relative;
+            z-index: 10;
+        }
+        .section {
+            background: rgba(0, 5, 20, 0.85);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid #0055ff;
+            box-shadow: 0 0 15px rgba(0, 85, 255, 0.3);
+            position: relative;
+            z-index: 10;
+        }
+        .instruction-box {
+            background: rgba(0, 10, 30, 0.9);
+            border-left: 4px solid #0055ff;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .btn-download {
+            display: inline-block;
+            background-color: #002288;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-top: 10px;
+            border: 1px solid #0055ff;
+            transition: background-color 0.3s;
+        }
+        .btn-download:hover {
+            background-color: #0055ff;
+        }
+        .btn-submit {
+            display: inline-block;
+            background-color: #0055ff;
+            color: white;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-top: 10px;
+            font-size: 1.1em;
+            border: 1px solid #6688ff;
+            transition: background-color 0.3s;
+        }
+        .btn-submit:hover {
+            background-color: #002288;
+        }
+        #auth-screen {
+            text-align: center;
+            padding: 50px 20px;
+            background: rgba(0, 5, 20, 0.9);
+            border: 1px solid #0055ff;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 85, 255, 0.4);
+            max-width: 500px;
+            margin: 100px auto;
+            position: relative;
+            z-index: 10;
+        }
+        #auth-screen input[type="password"] {
+            padding: 10px;
+            font-size: 1em;
+            width: 70%;
+            background-color: #000309;
+            color: white;
+            border: 1px solid #0055ff;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        #auth-screen button {
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #0055ff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #auth-screen button:hover {
+            background-color: #002288;
+        }
+        .error-msg {
+            color: #ff4444;
+            margin-top: 10px;
+            display: none;
+        }
+        #main-content {
+            display: none;
+        }
+    </style>
+</head>
+<body>
 
+    <canvas id="matrix"></canvas>
+
+    <div id="auth-screen">
+        <h2>Accès à l'Examen</h2>
+        <p>Veuillez entrer le mot de passe fourni par l'enseignant :</p>
+        <input type="password" id="exam-password" placeholder="Mot de passe">
+        <button onclick="checkPassword()">Valider</button>
+        <p id="error" class="error-msg">Mot de passe incorrect.</p>
+    </div>
+
+    <div id="main-content">
+        <h1>Examen : Présentation (Voyage de rêve) - 10ème</h1>
+
+        <!-- Consignes / Informations -->
+        <div class="section">
+            <h2>1. Consignes générales</h2>
+            <p>Ouvrez un document Google Slides pour faire cette présentation. Vous serez évalués tout au long de votre examen : l’évolution de la présentation, votre autonomie et votre organisation, la manière dont vous sauvegardez, nommez et chargez vos fichiers, ainsi que la maîtrise de Google Slides et le rendu final. Tout manquement aux consignes entraînera un malus.</p>
+            <ul>
+                <li><strong>Temps à disposition :</strong> 2 semaines (4h)</li>
+                <li><strong>Matériel autorisé :</strong> Cours Présentation et Internet</li>
+            </ul>
+        </div>
+
+        <!-- Documents de travail -->
+        <div class="section">
+            <h2>2. Documents de travail & Épreuve</h2>
+            <div class="instruction-box">
+                <p><strong>Étape 1 :</strong> Téléchargez le document de l'épreuve ci-dessous, puis préparez vos vacances de rêve sous forme d'un voyage d'une semaine :</p>
+                <ul>
+                    <li>Prenez en compte que vous ferez cette présentation devant toute la classe, en visioconférence, et qu'elle doit durer <strong>4 minutes</strong> (testez-la avec un chronomètre en ligne).</li>
+                    <li>Il vous faut <strong>tout organiser</strong>, incluant au moins : les bagages, le transport, l’hôtel, les activités (au moins deux par jour), le restaurant (ou autre repas) pour le midi, et un lieu de détente pour le soir.</li>
+                </ul>
+                <a href="Présentation-voyage de rêve.pdf" class="btn-download" download>📥 Télécharger le sujet de l'examen (PDF)</a>
+            </div>
+        </div>
+
+        <!-- Rendu du travail -->
+        <div class="section">
+            <h2>3. Rendu du travail</h2>
+            <p><strong>Étape 2 :</strong> Une fois votre exercice terminé, cliquez sur le bouton ci-dessous pour ouvrir le formulaire officiel, vous connecter avec votre compte institutionnel et rendre votre fichier :</p>
+            
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSc0MR70ch-ja9mpJZkQ61lXuupiiABg9aLCpWZ9GxAvnk7T0Q/viewform?usp=sharing&ouid=117105455808806450739" target="_blank" class="btn-submit">📤 Rendre mon travail (Formulaire officiel)</a>
+        </div>
+    </div>
+
+    <script>
+        function checkPassword() {
+            const pwd = document.getElementById('exam-password').value;
+            if (pwd === 'prof123') {
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+            } else {
+                document.getElementById('error').style.display = 'block';
+            }
+        }
+
+        // Animation Matrix en arrière-plan (bleue)
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const characters = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ<>/\\{}[]*&é"\'(-)=+';
+        const fontSize = 16;
+        let columns = canvas.width / fontSize;
+        let drops = [];
+
+        for (let i = 0; i < columns; i++) {
+            drops[i] = 1;
+        }
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 3, 9, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const colors = ['#6688ff', '#0055ff', '#002288'];
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+                const text = characters.charAt(Math.floor(Math.random() * characters.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawMatrix, 50);
+    </script>
+
+</body>
+</html>
