@@ -1,1 +1,161 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Examen - Traitement d'images</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        h1, h2 {
+            color: #0000FF;
+            border-bottom: 2px solid #0000FF;
+            padding-bottom: 5px;
+        }
+        .section {
+            background: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .instruction-box {
+            background: #f0f0f5;
+            border-left: 4px solid #0000FF;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .btn-download {
+            display: inline-block;
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-top: 10px;
+            margin-right: 10px;
+        }
+        .btn-download:hover {
+            background-color: #218838;
+        }
+        .btn-submit {
+            display: inline-block;
+            background-color: #0000FF;
+            color: white;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-top: 10px;
+            font-size: 1.1em;
+        }
+        .btn-submit:hover {
+            background-color: #000080;
+        }
+        #auth-screen {
+            text-align: center;
+            padding: 50px 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 500px;
+            margin: 100px auto;
+        }
+        #auth-screen input[type="password"] {
+            padding: 10px;
+            font-size: 1em;
+            width: 70%;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        #auth-screen button {
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #0000FF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #auth-screen button:hover {
+            background-color: #000080;
+        }
+        .error-msg {
+            color: red;
+            margin-top: 10px;
+            display: none;
+        }
+        #main-content {
+            display: none;
+        }
+    </style>
+</head>
+<body>
 
+    <div id="auth-screen">
+        <h2>Accès à l'Examen</h2>
+        <p>Veuillez entrer le mot de passe fourni par l'enseignant :</p>
+        <input type="password" id="exam-password" placeholder="Mot de passe">
+        <button onclick="checkPassword()">Valider</button>
+        <p id="error" class="error-msg">Mot de passe incorrect.</p>
+    </div>
+
+    <div id="main-content">
+        <h1>Examen : Traitement d'images</h1>
+
+        <!-- Consignes / Informations -->
+        <div class="section">
+            <h2>1. Consignes générales</h2>
+            <p>Bienvenue à cet examen de traitement d'images. Effectuez bien vos sauvegardes intermédiaires dans le dossier de votre classe. Tout fichier perdu entraînera des points en moins et la répétition par un nouveau travail s'effectuera sans temps supplémentaire.</p>
+            <ul>
+                <li><strong>Temps à disposition :</strong> 45 minutes</li>
+                <li><strong>Matériel autorisé :</strong> Cours Traitement d'images</li>
+            </ul>
+        </div>
+
+        <!-- Documents de travail -->
+        <div class="section">
+            <h2>2. Documents de travail & Exercice</h2>
+            <div class="instruction-box">
+                <p><strong>Étape 1 :</strong> Téléchargez les documents ci-dessous, puis effectuez le travail demandé :</p>
+                <ul>
+                    <li>Suivez attentivement les consignes indiquées dans le sujet PDF.</li>
+                    <li>Utilisez les images sources fournies pour réaliser les manipulations demandées.</li>
+                    <li><em>/!\ N'oubliez pas d'exporter vos images finales au format demandé /!\</em></li>
+                </ul>
+                <a href="Examen_Images.pdf" class="btn-download" download>📥 Télécharger le sujet de l'examen (.pdf)</a>
+                <a href="ressources_images.zip" class="btn-download" download>📥 Télécharger les images sources (.zip)</a>
+            </div>
+        </div>
+
+        <!-- Rendu du travail -->
+        <div class="section">
+            <h2>3. Rendu du travail</h2>
+            <p><strong>Étape 2 :</strong> Une fois votre exercice terminé, cliquez sur le bouton ci-dessous pour ouvrir le formulaire officiel, vous connecter avec votre compte institutionnel et rendre vos fichiers :</p>
+            
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSeznXNxtoH4SlpgMZC6juUow0ztHScg1oN-f3SJrfjoAdZ5VQ/viewform?usp=publish-editor" target="_blank" class="btn-submit">📤 Rendre mon travail (Formulaire officiel)</a>
+        </div>
+    </div>
+
+    <script>
+        function checkPassword() {
+            const pwd = document.getElementById('exam-password').value;
+            if (pwd === 'prof123') {
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+            } else {
+                document.getElementById('error').style.display = 'block';
+            }
+        }
+    </script>
+
+</body>
+</html>
