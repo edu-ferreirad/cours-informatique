@@ -5,8 +5,8 @@
     <title>Examen - Recherche Internet</title>
     <style>
         body {
-            background-color: #050914;
-            color: #00ffff;
+            background-color: #020408;
+            color: #0088cc;
             font-family: Arial, sans-serif;
             text-align: center;
             margin: 0;
@@ -26,23 +26,23 @@
             margin: 0 auto;
             position: relative;
             z-index: 10;
-            background: rgba(5, 15, 35, 0.85);
-            border: 1px solid #00ffff;
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+            background: rgba(2, 6, 15, 0.9);
+            border: 1px solid #005588;
+            box-shadow: 0 0 20px rgba(0, 85, 136, 0.3);
             border-radius: 8px;
             padding: 30px;
         }
         h1, p, label, h2 {
             color: #ffffff;
-            text-shadow: 0 0 10px #00bfff, 0 0 20px #0044ff;
+            text-shadow: 0 0 8px #005588, 0 0 15px #002244;
         }
         input[type="text"], input[type="password"] {
             width: 80%;
             padding: 10px;
             margin: 10px 0;
-            background: #000;
-            border: 1px solid #00ffff;
-            color: #00ffff;
+            background: #010204;
+            border: 1px solid #005588;
+            color: #66ccff;
             border-radius: 4px;
             text-align: center;
             font-size: 1em;
@@ -50,7 +50,7 @@
         .btn {
             display: inline-block;
             padding: 12px 25px;
-            background-color: #007bff;
+            background-color: #003366;
             color: white;
             text-decoration: none;
             border: none;
@@ -58,10 +58,11 @@
             cursor: pointer;
             font-size: 1em;
             margin-top: 15px;
-            box-shadow: 0 0 10px #007bff;
+            box-shadow: 0 0 10px #003366;
+            transition: background-color 0.3s;
         }
         .btn:hover {
-            background-color: #0056b3;
+            background-color: #002244;
         }
         .hidden {
             display: none !important;
@@ -132,7 +133,7 @@
 
         <!-- ÉTAPE 2 : Questionnaire (Une question à la fois) -->
         <div id="step-quiz" class="hidden">
-            <p id="progress-indicator" style="font-size: 0.9em; color: #00bfff;"></p>
+            <p id="progress-indicator" style="font-size: 0.9em; color: #66ccff;"></p>
             <div class="question-box">
                 <p id="question-text" style="font-weight: bold; font-size: 1.1em;"></p>
                 <input type="text" id="student-answer" placeholder="Votre réponse..." style="width: 100%;">
@@ -151,9 +152,9 @@
             </div>
             <p style="font-size: 0.85em; color: #ffeb3b; margin-top: 10px; text-shadow: 0 0 5px rgba(255, 235, 59, 0.5);">* C'est une note indicative avant validation par l'enseignant</p>
             <br><br>
-            <button class="btn" onclick="window.print()" style="background-color: #28a745;">🖨️ Imprimer / Sauvegarder en PDF</button>
+            <button class="btn" onclick="window.print()" style="background-color: #004422;">🖨️ Imprimer / Sauvegarder en PDF</button>
             <br><br>
-            <a class="btn" href="examens.html" style="background-color: #6c757d;">⬅ Retour aux examens</a>
+            <a class="btn" href="examens.html" style="background-color: #333333;">⬅ Retour aux examens</a>
 
             <!-- Rapport détaillé pour l'affichage et l'impression -->
             <div id="print-report" class="print-report" style="margin-top: 30px; text-align: left;"></div>
@@ -278,7 +279,7 @@
                 reportHTML += `
                     <div class="print-item">
                         <p><strong>Q${index + 1}: ${item.question}</strong></p>
-                        <p>Réponse élève : <span style="color: ${item.isCorrect ? '#28a745' : '#dc3545'}; font-weight: bold;">${item.userAnswer}</span></p>
+                        <p>Réponse élève : <span style="color: ${item.isCorrect ? '#00aa55' : '#cc3333'}; font-weight: bold;">${item.userAnswer}</span></p>
                         <p>Réponse attendue : <em>${item.correctAnswer}</em></p>
                     </div>
                 `;
@@ -324,13 +325,14 @@
         }
 
         function drawMatrix() {
-            ctx.fillStyle = 'rgba(5, 9, 20, 0.08)';
+            ctx.fillStyle = 'rgba(2, 4, 8, 0.08)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            ctx.fillStyle = '#00ffff';
+            const colors = ['#003366', '#005588', '#0088cc', '#001122'];
             ctx.font = fontSize + 'px monospace';
 
             for (let i = 0; i < drops.length; i++) {
+                ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
                 const text = characters.charAt(Math.floor(Math.random() * characters.length));
                 ctx.fillText(text, i * fontSize, drops[i] * fontSize);
 
