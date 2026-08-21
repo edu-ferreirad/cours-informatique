@@ -1,1 +1,255 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Cours - 11ème</title>
+    <style>
+        body {
+            background-color: #020408;
+            color: #0088cc;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding-top: 30px;
+            overflow-x: hidden;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        h1, p {
+            position: relative;
+            z-index: 10;
+            color: #ffffff;
+            text-shadow: 0 0 8px #005588, 0 0 15px #002244;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+            padding-bottom: 50px;
+        }
+        .cours-card {
+            background: rgba(2, 6, 15, 0.9);
+            border: 1px solid #005588;
+            box-shadow: 0 0 20px rgba(0, 85, 136, 0.3);
+            border-radius: 8px;
+            margin: 25px auto;
+            padding: 20px;
+            width: 90%;
+        }
+        .cours-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #66ccff;
+            margin-bottom: 15px;
+            text-shadow: 0 0 5px #005588;
+        }
+        .pdf-container {
+            width: 100%;
+            height: 450px;
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1px solid #003366;
+            background: #000;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .back-btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #003366;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 0 10px #003366;
+            transition: background-color 0.3s;
+        }
+        .back-btn:hover {
+            background-color: #002244;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix"></canvas>
 
+    <div class="container">
+        <h1>Documents de Cours - 11ème</h1>
+        <p><a class="back-btn" href="index.html">⬅ Retour au menu 11ème</a></p>
+
+        <p>Prévisualisation des documents de cours :</p>
+
+        <!-- 1. Cours préambule -->
+        <div class="cours-card">
+            <div class="cours-title">📄 1. Cours préambule</div>
+            <div class="pdf-container">
+                <iframe src="1. Cours préambule.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- 2. Cours exercices remise à niveau -->
+        <div class="cours-card">
+            <div class="cours-title">📄 2. Cours exercices remise à niveau</div>
+            <div class="pdf-container">
+                <iframe src="2. Cours exercices remise à niveau.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- 3. Cours exercices remise à niveau corrections -->
+        <div class="cours-card">
+            <div class="cours-title">📄 3. Cours exercices remise à niveau corrections</div>
+            <div class="pdf-container">
+                <iframe src="3. Cours exercices remise à niveau corrections.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- 4. Piqure de rappel -->
+        <div class="cours-card">
+            <div class="cours-title">📄 4. Piqure de rappel</div>
+            <div class="pdf-container">
+                <iframe src="4. Piqure de rappel.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- 5. Cours d'introduction à l'algorithmique -->
+        <div class="cours-card">
+            <div class="cours-title">📄 5. Cours d'introduction à l'algorithmique</div>
+            <div class="pdf-container">
+                <iframe src="5. Cours d'introduction à l'algorithmique.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- 5.1 Cours d'introduction à la programmation -->
+        <div class="cours-card">
+            <div class="cours-title">📄 5.1 Cours d'introduction à la programmation</div>
+            <div class="pdf-container">
+                <iframe src="5.1 Cours d'introduction à la programmation.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- 6. Cours de prévention de base -->
+        <div class="cours-card">
+            <div class="cours-title">📄 6. Cours de prévention de base</div>
+            <div class="pdf-container">
+                <iframe src="6. Cours de prévention de base.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- 7. Cours de CV -->
+        <div class="cours-card">
+            <div class="cours-title">📄 7. Cours de CV</div>
+            <div class="pdf-container">
+                <iframe src="7. Cours de CV.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- 8. Cours de lettre -->
+        <div class="cours-card">
+            <div class="cours-title">📄 8. Cours de lettre</div>
+            <div class="pdf-container">
+                <iframe src="8. Cours de lettre.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- 9. Protection des données -->
+        <div class="cours-card">
+            <div class="cours-title">📄 9. Protection des données</div>
+            <div class="pdf-container">
+                <iframe src="9. Protection des données.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- 10. Cours intro présentation -->
+        <div class="cours-card">
+            <div class="cours-title">📄 10. Cours intro présentation</div>
+            <div class="pdf-container">
+                <iframe src="10. Cours intro présentation.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- 11. Cours de bricklink studio -->
+        <div class="cours-card">
+            <div class="cours-title">📄 11. Cours de bricklink studio</div>
+            <div class="pdf-container">
+                <iframe src="11. Cours de bricklink studio.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- 12. Cours intro gimp -->
+        <div class="cours-card">
+            <div class="cours-title">📄 12. Cours intro gimp</div>
+            <div class="pdf-container">
+                <iframe src="12. Cours intro gimp.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- 13. Cours de recherche internet -->
+        <div class="cours-card">
+            <div class="cours-title">📄 13. Cours de recherche internet</div>
+            <div class="pdf-container">
+                <iframe src="13. Cours de recherche internet.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- 14. Cours de tableur -->
+        <div class="cours-card">
+            <div class="cours-title">📄 14. Cours de tableur</div>
+            <div class="pdf-container">
+                <iframe src="14. Cours de tableur.pdf"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const characters = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ<>/\\{}[]*&é"\'(-)=+';
+        const fontSize = 16;
+        let columns = canvas.width / fontSize;
+        let drops = [];
+
+        for (let i = 0; i < columns; i++) {
+            drops[i] = 1;
+        }
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(2, 4, 8, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const colors = ['#003366', '#005588', '#0088cc', '#001122'];
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+                const text = characters.charAt(Math.floor(Math.random() * characters.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawMatrix, 50);
+    </script>
+</body>
+</html>
