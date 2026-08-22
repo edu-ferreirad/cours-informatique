@@ -56,7 +56,7 @@
         /* Style pour la section des fiches PDF */
         #fiches-container {
             margin: 20px auto;
-            max-width: 600px;
+            max-width: 650px;
             padding: 20px;
             background-color: rgba(0, 5, 20, 0.85);
             border: 1px solid #0055ff;
@@ -64,24 +64,58 @@
             position: relative;
             z-index: 10;
             box-shadow: 0 0 15px rgba(0, 85, 255, 0.3);
+            text-align: left;
         }
         #fiches-container h3 {
             color: #6688ff;
             margin-top: 0;
+            text-align: center;
         }
-        .fiche-link {
-            display: block;
-            color: #69b4ff;
-            text-decoration: none;
-            margin: 10px 0;
-            padding: 8px;
+        .fiche-item {
+            margin: 15px 0;
+            padding: 10px;
             border: 1px dashed #0055ff;
             border-radius: 4px;
-            transition: background 0.3s, color 0.3s;
+            background: rgba(0, 2, 8, 0.5);
+        }
+        .fiche-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .fiche-link {
+            color: #69b4ff;
+            text-decoration: none;
+            font-weight: bold;
         }
         .fiche-link:hover {
+            color: white;
+            text-decoration: underline;
+        }
+        .btn-preview {
+            background-color: #002266;
+            color: #69b4ff;
+            border: 1px solid #0055ff;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+        .btn-preview:hover {
             background-color: #0055ff;
             color: white;
+        }
+        .preview-frame {
+            width: 100%;
+            height: 300px;
+            border: 1px solid #0055ff;
+            margin-top: 10px;
+            display: none;
+            background: #fff;
         }
         /* Style pour la zone d'affichage des défis */
         #defi-container {
@@ -93,7 +127,7 @@
             border-radius: 8px;
             position: relative;
             z-index: 10;
-            display: none; /* Masqué par défaut */
+            display: none;
             box-shadow: 0 0 15px rgba(0, 85, 255, 0.3);
         }
         #defi-container h3 {
@@ -108,12 +142,144 @@
     <h1>Espace Cour fac-bases</h1>
     <p>Consultez vos fiches d'apprentissage ou tirez un défi :</p>
 
-    <!-- Section Fiches pour les PDF -->
+    <!-- Section Fiches pour les PDF avec prévisualisation -->
     <div id="fiches-container">
-        <h3>Fiches d'apprentissage</h3>
-        <!-- Remplace les liens ci-dessous par les chemins vers tes fichiers PDF -->
-        <a class="fiche-link" href="fiches/fiche1.pdf" target="_blank">📄 Fiche 1 (Exemple)</a>
-        <a class="fiche-link" href="fiches/fiche2.pdf" target="_blank">📄 Fiche 2 (Exemple)</a>
+        <h3>Fiches d'apprentissage et Annexes</h3>
+
+        <!-- CHALLENGE_CARDS -->
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="CHALLENGE_CARDS_FR_EN_2018.pdf" target="_blank">📄 CHALLENGE_CARDS_FR_EN_2018.pdf</a>
+                <button class="btn-preview" onclick="togglePreview('prev-1')">👁️ Prévisualiser</button>
+            </div>
+            <iframe id="prev-1" class="preview-frame" src="CHALLENGE_CARDS_FR_EN_2018.pdf"></iframe>
+        </div>
+
+        <!-- EASY_GUIDE -->
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="EASY_GUIDE_FR_2018_UPDATED.pdf" target="_blank">📄 EASY_GUIDE_FR_2018_UPDATED.pdf</a>
+                <button class="btn-preview" onclick="togglePreview('prev-2')">👁️ Prévisualiser</button>
+            </div>
+            <iframe id="prev-2" class="preview-frame" src="EASY_GUIDE_FR_2018_UPDATED.pdf"></iframe>
+        </div>
+
+        <!-- Fiche 1 prof -->
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="Fiche 1 prof.pdf" target="_blank">📄 Fiche 1 prof.pdf</a>
+                <button class="btn-preview" onclick="togglePreview('prev-3')">👁️ Prévisualiser</button>
+            </div>
+            <iframe id="prev-3" class="preview-frame" src="Fiche 1 prof.pdf"></iframe>
+        </div>
+
+        <!-- Fiche 2 -->
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="Fiche 2.pdf" target="_blank">📄 Fiche 2.pdf</a>
+                <button class="btn-preview" onclick="togglePreview('prev-4')">👁️ Prévisualiser</button>
+            </div>
+            <iframe id="prev-4" class="preview-frame" src="Fiche 2.pdf"></iframe>
+        </div>
+
+        <!-- Fiche 3 -->
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="Fiche 3.pdf" target="_blank">📄 Fiche 3.pdf</a>
+                <button class="btn-preview" onclick="togglePreview('prev-5')">👁️ Prévisualiser</button>
+            </div>
+            <iframe id="prev-5" class="preview-frame" src="Fiche 3.pdf"></iframe>
+        </div>
+
+        <!-- Fiche 4 -->
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="Fiche 4.pdf" target="_blank">📄 Fiche 4.pdf</a>
+                <button class="btn-preview" onclick="togglePreview('prev-6')">👁️ Prévisualiser</button>
+            </div>
+            <iframe id="prev-6" class="preview-frame" src="Fiche 4.pdf"></iframe>
+        </div>
+
+        <!-- Fiche 5 -->
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="Fiche 5.pdf" target="_blank">📄 Fiche 5.pdf</a>
+                <button class="btn-preview" onclick="togglePreview('prev-7')">👁️ Prévisualiser</button>
+            </div>
+            <iframe id="prev-7" class="preview-frame" src="Fiche 5.pdf"></iframe>
+        </div>
+
+        <!-- Fiche 6 -->
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="Fiche 6.pdf" target="_blank">📄 Fiche 6.pdf</a>
+                <button class="btn-preview" onclick="togglePreview('prev-8')">👁️ Prévisualiser</button>
+            </div>
+            <iframe id="prev-8" class="preview-frame" src="Fiche 6.pdf"></iframe>
+        </div>
+
+        <!-- Fiche 7 -->
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="Fiche 7.pdf" target="_blank">📄 Fiche 7.pdf</a>
+                <button class="btn-preview" onclick="togglePreview('prev-9')">👁️ Prévisualiser</button>
+            </div>
+            <iframe id="prev-9" class="preview-frame" src="Fiche 7.pdf"></iframe>
+        </div>
+
+        <!-- Fiche 8 prof -->
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="Fiche 8 prof.pdf" target="_blank">📄 Fiche 8 prof.pdf</a>
+                <button class="btn-preview" onclick="togglePreview('prev-10')">👁️ Prévisualiser</button>
+            </div>
+            <iframe id="prev-10" class="preview-frame" src="Fiche 8 prof.pdf"></iframe>
+        </div>
+
+        <!-- Fiche 9 prof -->
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="Fiche 9 prof.pdf" target="_blank">📄 Fiche 9 prof.pdf</a>
+                <button class="btn-preview" onclick="togglePreview('prev-11')">👁️ Prévisualiser</button>
+            </div>
+            <iframe id="prev-11" class="preview-frame" src="Fiche 9 prof.pdf"></iframe>
+        </div>
+
+        <!-- FICHES_ACTIVITÉS -->
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="FICHES_ACTIVITÉS_FR_EN_2018.pdf" target="_blank">📄 FICHES_ACTIVITÉS_FR_EN_2018.pdf</a>
+                <button class="btn-preview" onclick="togglePreview('prev-12')">👁️ Prévisualiser</button>
+            </div>
+            <iframe id="prev-12" class="preview-frame" src="FICHES_ACTIVITÉS_FR_EN_2018.pdf"></iframe>
+        </div>
+
+        <!-- HOW_TO_CARD -->
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="HOW_TO_CARD_FR_EN_2018.pdf" target="_blank">📄 HOW_TO_CARD_FR_EN_2018.pdf</a>
+                <button class="btn-preview" onclick="togglePreview('prev-13')">👁️ Prévisualiser</button>
+            </div>
+            <iframe id="prev-13" class="preview-frame" src="HOW_TO_CARD_FR_EN_2018.pdf"></iframe>
+        </div>
+
+        <!-- RACETRACK -->
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="RACETRACK_2018_PRINT.pdf" target="_blank">📄 RACETRACK_2018_PRINT.pdf</a>
+                <button class="btn-preview" onclick="togglePreview('prev-14')">👁️ Prévisualiser</button>
+            </div>
+            <iframe id="prev-14" class="preview-frame" src="RACETRACK_2018_PRINT.pdf"></iframe>
+        </div>
+
+        <!-- Thymio_alphabet -->
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="Thymio_alphabet.pdf" target="_blank">📄 Thymio_alphabet.pdf</a>
+                <button class="btn-preview" onclick="togglePreview('prev-15')">👁️ Prévisualiser</button>
+            </div>
+            <iframe id="prev-15" class="preview-frame" src="Thymio_alphabet.pdf"></iframe>
+        </div>
     </div>
 
     <hr style="width: 50%; border-color: #0055ff; margin: 30px auto; position: relative; z-index: 10;">
@@ -133,7 +299,15 @@
     <a class="back-link" href="../index.html">⬅ Retour à l'accueil général</a>
 
     <script>
-        // Classement complet des 10 défis par niveau extraits des documents
+        function togglePreview(id) {
+            const frame = document.getElementById(id);
+            if (frame.style.display === 'block') {
+                frame.style.display = 'none';
+            } else {
+                frame.style.display = 'block';
+            }
+        }
+
         const defisParNiveau = {
             facile: [
                 "<strong>01. THE CALLIGRAPHIST (LE CALLIGRAPHE)</strong> : Pose une grande feuille sur la table ou sur le sol, prends un stylo et place-le dans le trou de Thymio. Maintenant, essaie d’écrire ton nom en guidant ton robot avec sa télécommande.",
