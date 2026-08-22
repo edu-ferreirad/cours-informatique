@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Espace Cours fac-bases</title>
+    <title>Espace Concours Cantonal</title>
     <style>
         body { 
             font-family: 'Courier New', Courier, monospace; 
@@ -118,8 +118,8 @@
 <body>
     <canvas id="matrix"></canvas>
 
-    <h1>Espace Cours fac-bases</h1>
-    <p>Consultez les documents et ressources par section :</p>
+    <h1>Espace Concours Cantonal</h1>
+    <p>Consultez les documents et ressources du concours cantonal :</p>
 
     <!-- Section 1: 2023-2024 -->
     <div class="section-container">
@@ -138,7 +138,8 @@
                 <a class="fiche-link" href="SN_cours_Fac_HZ.MOV" target="_blank">🎬 SN_cours_Fac_HZ.MOV</a>
                 <button class="btn-preview" onclick="togglePreview('prev-2')">👁️ Prévisualiser</button>
             </div>
-            <video id="prev-2" class="preview-video" controls>
+            <video id="prev-2" class="preview-video" controls preload="metadata">
+                <source src="SN_cours_Fac_HZ.MOV" type="video/mp4">
                 <source src="SN_cours_Fac_HZ.MOV" type="video/quicktime">
                 Votre navigateur ne prend pas en charge la lecture de vidéos.
             </video>
