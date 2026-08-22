@@ -1,1 +1,221 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Espace Cours fac-bases</title>
+    <style>
+        body { 
+            font-family: 'Courier New', Courier, monospace; 
+            text-align: center; 
+            margin: 0; 
+            padding-top: 50px; 
+            background-color: #000309; 
+            color: white;
+            overflow-x: hidden;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        h1, p {
+            position: relative;
+            z-index: 10;
+            text-shadow: 0 0 10px #0055ff;
+        }
+        .back-link {
+            color: #69b4ff;
+            text-decoration: none;
+            position: relative;
+            z-index: 10;
+        }
+        /* Style pour les sections */
+        .section-container {
+            margin: 25px auto;
+            max-width: 650px;
+            padding: 20px;
+            background-color: rgba(0, 5, 20, 0.85);
+            border: 1px solid #0055ff;
+            border-radius: 8px;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 0 15px rgba(0, 85, 255, 0.3);
+            text-align: left;
+        }
+        .section-container h3 {
+            color: #6688ff;
+            margin-top: 0;
+            text-align: center;
+        }
+        .fiche-item {
+            margin: 15px 0;
+            padding: 10px;
+            border: 1px dashed #0055ff;
+            border-radius: 4px;
+            background: rgba(0, 2, 8, 0.5);
+        }
+        .fiche-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .fiche-link {
+            color: #69b4ff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .fiche-link:hover {
+            color: white;
+            text-decoration: underline;
+        }
+        .btn-preview {
+            background-color: #002266;
+            color: #69b4ff;
+            border: 1px solid #0055ff;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+        .btn-preview:hover {
+            background-color: #0055ff;
+            color: white;
+        }
+        .preview-frame {
+            width: 100%;
+            height: 300px;
+            border: 1px solid #0055ff;
+            margin-top: 10px;
+            display: none;
+            background: #fff;
+        }
+        .preview-image {
+            width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            margin-top: 10px;
+            display: none;
+            border: 1px solid #0055ff;
+            background: #000;
+        }
+        .preview-video {
+            width: 100%;
+            max-height: 350px;
+            margin-top: 10px;
+            display: none;
+            border: 1px solid #0055ff;
+            background: #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix"></canvas>
 
+    <h1>Espace Cours fac-bases</h1>
+    <p>Consultez les documents et ressources par section :</p>
+
+    <!-- Section 1: 2023-2024 -->
+    <div class="section-container">
+        <h3>2023-2024</h3>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="Demi final.docx-1.pdf" target="_blank">📄 Demi final.docx-1.pdf</a>
+                <button class="btn-preview" onclick="togglePreview('prev-1')">👁️ Prévisualiser</button>
+            </div>
+            <iframe id="prev-1" class="preview-frame" src="Demi final.docx-1.pdf"></iframe>
+        </div>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="SN_cours_Fac_HZ.MOV" target="_blank">🎬 SN_cours_Fac_HZ.MOV</a>
+                <button class="btn-preview" onclick="togglePreview('prev-2')">👁️ Prévisualiser</button>
+            </div>
+            <video id="prev-2" class="preview-video" controls>
+                <source src="SN_cours_Fac_HZ.MOV" type="video/quicktime">
+                Votre navigateur ne prend pas en charge la lecture de vidéos.
+            </video>
+        </div>
+    </div>
+
+    <!-- Section 2: 2024-2025 -->
+    <div class="section-container">
+        <h3>2024-2025</h3>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="IMG-20250604-WA0018.jpg" target="_blank">🖼️ IMG-20250604-WA0018.jpg</a>
+                <button class="btn-preview" onclick="togglePreview('prev-3')">👁️ Prévisualiser</button>
+            </div>
+            <img id="prev-3" class="preview-image" src="IMG-20250604-WA0018.jpg" alt="Aperçu image">
+        </div>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="recyclage.playground" download>💾 recyclage.playground (Téléchargement)</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 3: Tutoriel -->
+    <div class="section-container">
+        <h3>Tutoriel</h3>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="Tutoriel simulateur.pdf" target="_blank">📄 Tutoriel simulateur.pdf</a>
+                <button class="btn-preview" onclick="togglePreview('prev-4')">👁️ Prévisualiser</button>
+            </div>
+            <iframe id="prev-4" class="preview-frame" src="Tutoriel simulateur.pdf"></iframe>
+        </div>
+    </div>
+
+    <br><br>
+    <a class="back-link" href="../index.html">⬅ Retour à l'accueil général</a>
+
+    <script>
+        function togglePreview(id) {
+            const element = document.getElementById(id);
+            if (element.style.display === 'block') {
+                element.style.display = 'none';
+            } else {
+                element.style.display = 'block';
+            }
+        }
+
+        // Animation Matrix en arrière-plan (bleue)
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize);
+        resize();
+
+        const chars = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ';
+        const fontSize = 16;
+        let drops = Array(Math.floor(canvas.width / fontSize)).fill(1);
+
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 3, 9, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.font = fontSize + 'px monospace';
+
+            drops.forEach((drop, i) => {
+                const colors = ['#6688ff', '#0055ff', '#002288'];
+                ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+                ctx.fillText(chars.charAt(Math.floor(Math.random() * chars.length)), i * fontSize, drop * fontSize);
+
+                if (drop * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            });
+        }
+        setInterval(draw, 50);
+    </script>
+</body>
+</html>
