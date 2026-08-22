@@ -1,1 +1,246 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Espace Cours Collège</title>
+    <style>
+        body { 
+            font-family: 'Courier New', Courier, monospace; 
+            text-align: center; 
+            margin: 0; 
+            padding-top: 50px; 
+            background-color: #090000; 
+            color: white;
+            overflow-x: hidden;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        h1, p {
+            position: relative;
+            z-index: 10;
+            text-shadow: 0 0 10px #ff0000;
+        }
+        .back-link {
+            color: #ff69b4;
+            text-decoration: none;
+            position: relative;
+            z-index: 10;
+        }
+        .back-link:hover {
+            color: white;
+        }
+        /* Style pour les sections */
+        .section-container {
+            margin: 25px auto;
+            max-width: 650px;
+            padding: 20px;
+            background-color: rgba(20, 0, 0, 0.85);
+            border: 1px solid #ff0000;
+            border-radius: 8px;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.3);
+            text-align: left;
+        }
+        .section-container h3 {
+            color: #ff6666;
+            margin-top: 0;
+            text-align: center;
+        }
+        .fiche-item {
+            margin: 15px 0;
+            padding: 10px;
+            border: 1px dashed #ff0000;
+            border-radius: 4px;
+            background: rgba(8, 0, 0, 0.5);
+        }
+        .fiche-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .fiche-link {
+            color: #ff69b4;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .fiche-link:hover {
+            color: white;
+            text-decoration: underline;
+        }
+        .btn-preview {
+            background-color: #660000;
+            color: #ff9999;
+            border: 1px solid #ff0000;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+        .btn-preview:hover {
+            background-color: #ff0000;
+            color: white;
+        }
+        .preview-frame {
+            width: 100%;
+            height: 300px;
+            border: 1px solid #ff0000;
+            margin-top: 10px;
+            display: none;
+            background: #fff;
+        }
+        .preview-image {
+            width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            margin-top: 10px;
+            display: none;
+            border: 1px solid #ff0000;
+            background: #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix"></canvas>
 
+    <h1>Espace Cours Collège</h1>
+    <p>Consultez les documents, règlements et ressources des cours :</p>
+
+    <!-- Section 1: 2024-2025 -->
+    <div class="section-container">
+        <h3>2024-2025</h3>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="Robotics-for-Good-Youth-Challenge-Rulebook.pdf" target="_blank">📄 Robotics-for-Good-Youth-Challenge-Rulebook.pdf</a>
+                <button class="btn-preview" onclick="togglePreview('prev-1')">👁️ Prévisualiser</button>
+            </div>
+            <iframe id="prev-1" class="preview-frame" src="Robotics-for-Good-Youth-Challenge-Rulebook.pdf"></iframe>
+        </div>
+    </div>
+
+    <!-- Section 2: 2025-2026 -->
+    <div class="section-container">
+        <h3>2025-2026</h3>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="Concours.playground" download>💾 Concours.playground (Téléchargement)</a>
+            </div>
+        </div>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="Reglement_Complet_Robotics_for_Good_Youth_Challenge_2025_2026_FR (1).pdf" target="_blank">📄 Reglement_Complet_Robotics_for_Good_Youth_Challenge_2025_2026_FR (1).pdf</a>
+                <button class="btn-preview" onclick="togglePreview('prev-2')">👁️ Prévisualiser</button>
+            </div>
+            <iframe id="prev-2" class="preview-frame" src="Reglement_Complet_Robotics_for_Good_Youth_Challenge_2025_2026_FR (1).pdf"></iframe>
+        </div>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="RFGYC-2025-2026-Rulebook-1 (1).pdf" target="_blank">📄 RFGYC-2025-2026-Rulebook-1 (1).pdf</a>
+                <button class="btn-preview" onclick="togglePreview('prev-3')">👁️ Prévisualiser</button>
+            </div>
+            <iframe id="prev-3" class="preview-frame" src="RFGYC-2025-2026-Rulebook-1 (1).pdf"></iframe>
+        </div>
+    </div>
+
+    <!-- Section 3: 2026-2027 -->
+    <div class="section-container">
+        <h3>2026-2027</h3>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="AI for Good réglement concours 2026-2027 FR.odt" target="_blank">📄 AI for Good réglement concours 2026-2027 FR.odt</a>
+            </div>
+        </div>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="Concours27.playground" download>💾 Concours27.playground (Téléchargement)</a>
+            </div>
+        </div>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="ENG-V6-Youth-Challenge-Rulebook-2026-2027-Health-Emergencies (1).pdf" target="_blank">📄 ENG-V6-Youth-Challenge-Rulebook-2026-2027-Health-Emergencies (1).pdf</a>
+                <button class="btn-preview" onclick="togglePreview('prev-4')">👁️ Prévisualiser</button>
+            </div>
+            <iframe id="prev-4" class="preview-frame" src="ENG-V6-Youth-Challenge-Rulebook-2026-2027-Health-Emergencies (1).pdf"></iframe>
+        </div>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="terrain concours 2026-2027.png" target="_blank">🖼️ terrain concours 2026-2027.png</a>
+                <button class="btn-preview" onclick="togglePreview('prev-5')">👁️ Prévisualiser</button>
+            </div>
+            <img id="prev-5" class="preview-image" src="terrain concours 2026-2027.png" alt="Aperçu du terrain 2026-2027">
+        </div>
+    </div>
+
+    <!-- Section 4: Tutoriel -->
+    <div class="section-container">
+        <h3>Tutoriel</h3>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="Tutoriel simulateur.pdf" target="_blank">📄 Tutoriel simulateur.pdf</a>
+                <button class="btn-preview" onclick="togglePreview('prev-6')">👁️ Prévisualiser</button>
+            </div>
+            <iframe id="prev-6" class="preview-frame" src="Tutoriel simulateur.pdf"></iframe>
+        </div>
+    </div>
+
+    <br><br>
+    <a class="back-link" href="../index.html">⬅ Retour à l'accueil général</a>
+
+    <script>
+        function togglePreview(id) {
+            const element = document.getElementById(id);
+            if (element.style.display === 'block') {
+                element.style.display = 'none';
+            } else {
+                element.style.display = 'block';
+            }
+        }
+
+        // Animation Matrix en arrière-plan (rouge clair, rouge, rouge foncé)
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize);
+        resize();
+
+        const chars = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ';
+        const fontSize = 16;
+        let drops = Array(Math.floor(canvas.width / fontSize)).fill(1);
+
+        function draw() {
+            ctx.fillStyle = 'rgba(9, 0, 0, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.font = fontSize + 'px monospace';
+
+            drops.forEach((drop, i) => {
+                const colors = ['#ff6666', '#ff0000', '#880000']; // Rouge clair, rouge, rouge foncé
+                ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+                ctx.fillText(chars.charAt(Math.floor(Math.random() * chars.length)), i * fontSize, drop * fontSize);
+
+                if (drop * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            });
+        }
+        setInterval(draw, 50);
+    </script>
+</body>
+</html>
