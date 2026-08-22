@@ -1,1 +1,249 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Examen - Tableur (Trois récitations)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #ffffff;
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #000309;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        h1, h2 {
+            color: #6688ff;
+            border-bottom: 2px solid #0055ff;
+            padding-bottom: 5px;
+            position: relative;
+            z-index: 10;
+            text-shadow: 0 0 10px #0055ff;
+        }
+        p, ul, ol {
+            position: relative;
+            z-index: 10;
+        }
+        .section {
+            background: rgba(0, 5, 20, 0.85);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid #0055ff;
+            box-shadow: 0 0 15px rgba(0, 85, 255, 0.3);
+            position: relative;
+            z-index: 10;
+        }
+        .instruction-box {
+            background: rgba(0, 10, 30, 0.9);
+            border-left: 4px solid #0055ff;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .btn-download {
+            display: inline-block;
+            background-color: #002288;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-top: 10px;
+            margin-right: 10px;
+            border: 1px solid #0055ff;
+            transition: background-color 0.3s;
+        }
+        .btn-download:hover {
+            background-color: #0055ff;
+        }
+        .btn-submit {
+            display: inline-block;
+            background-color: #0055ff;
+            color: white;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-top: 10px;
+            font-size: 1.1em;
+            border: 1px solid #6688ff;
+            transition: background-color 0.3s;
+        }
+        .btn-submit:hover {
+            background-color: #002288;
+        }
+        #auth-screen {
+            text-align: center;
+            padding: 50px 20px;
+            background: rgba(0, 5, 20, 0.9);
+            border: 1px solid #0055ff;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 85, 255, 0.4);
+            max-width: 500px;
+            margin: 100px auto;
+            position: relative;
+            z-index: 10;
+        }
+        #auth-screen input[type="password"] {
+            padding: 10px;
+            font-size: 1em;
+            width: 70%;
+            background-color: #000309;
+            color: white;
+            border: 1px solid #0055ff;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        #auth-screen button {
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #0055ff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #auth-screen button:hover {
+            background-color: #002288;
+        }
+        .error-msg {
+            color: #ff4444;
+            margin-top: 10px;
+            display: none;
+        }
+        #main-content {
+            display: none;
+        }
+    </style>
+</head>
+<body>
 
+    <canvas id="matrix"></canvas>
+
+    <div id="auth-screen">
+        <h2>Accès à l'Examen</h2>
+        <p>Veuillez entrer le mot de passe fourni par l'enseignant :</p>
+        <input type="password" id="exam-password" placeholder="Mot de passe">
+        <button onclick="checkPassword()">Valider</button>
+        <p id="error" class="error-msg">Mot de passe incorrect.</p>
+    </div>
+
+    <div id="main-content">
+        <h1>Examen : Tableur – Trois récitations</h1>
+
+        <!-- Consignes / Informations -->
+        <div class="section">
+            <h2>1. Consignes générales</h2>
+            <p>Les trois récitations suivantes formeront une seule note[cite: 19]. Effectuez des sauvegardes intermédiaires dans le dossier <strong>Tous</strong> de votre classe[cite: 19]. Tout fichier perdu entraînera des points en moins et la répétition par un nouveau travail s'effectuera sans temps supplémentaire[cite: 19].</p>
+            <ul>
+                <li><strong>Temps à disposition :</strong> 135 minutes (20 minutes de plus pour les élèves dys)[cite: 19]</li>
+                <li><strong>Matériel autorisé :</strong> Cours Tableur[cite: 19]</li>
+            </ul>
+        </div>
+
+        <!-- Documents de travail -->
+        <div class="section">
+            <h2>2. Documents de travail & Exercices</h2>
+            <div class="instruction-box">
+                <p><strong>Récitation 1 – Inventaire :</strong> Rendez-vous sur <em>Echange épigène => Cours => David Ferreira => Ta classe => Epreuve</em> et glissez le fichier <strong>Inventaire</strong> sur votre bureau en le copiant[cite: 19]. Faites l'inventaire de la caisse[cite: 19].</p>
+                <ul>
+                    <li><em>/!\ Comme on travaille avec de l'argent, je veux voir apparaître la monnaie /!\</em>[cite: 19]</li>
+                    <li><em>/!\ N'oubliez pas de faire une belle mise en page /!\</em>[cite: 19]</li>
+                    <li><em>/!\ Toutes les options dont vous aurez besoin pour les exercices sont sous Format => Cellule /!\</em>[cite: 19]</li>
+                </ul>
+
+                <p><strong>Récitation 2 – Min-Max :</strong> Rendez-vous sur <em>Echange épigène => Cours => David Ferreira => Ta classe => Epreuve</em>. Glissez le fichier <strong>min-max</strong> sur votre bureau en le copiant et répondez aux questions[cite: 19] :</p>
+                <ul>
+                    <li><strong>Dans la première feuille :</strong> Indiquez ce qu'il y a dans la cellule B15 et expliquez ce que fait la formule. Puis, changez la valeur en B12 et expliquez ce qui a changé[cite: 19].</li>
+                    <li><strong>Dans la seconde feuille :</strong> Indiquez ce qu'il y a dans la cellule B15 et expliquez ce que fait la formule. Puis, changez la valeur en B14 et expliquez ce qui a changé[cite: 19].</li>
+                    <li><strong>Question :</strong> Dites-moi, après analyse, ce à quoi servent les fonctions min-max[cite: 19].</li>
+                </ul>
+
+                <p><strong>Récitation 3 – Carnet scolaire :</strong> Ouvrez un nouveau document Calc[cite: 19]. Faites un joli carnet avec les moyennes au dixième de vos cours[cite: 19]. Ce carnet aura quatre onglets qui contiennent[cite: 19] :</p>
+                <ul>
+                    <li><strong>Moyenne de l'année :</strong> Le report des moyennes générales des feuilles T1, T2 et T3, la moyenne et le graphique de ces trois chiffres[cite: 19].</li>
+                    <li><strong>T1 :</strong> Faites, selon ce que je vous ai montré, un joli carnet avec les moyennes au dixième de vos cours et votre moyenne générale en T1[cite: 19].</li>
+                    <li><strong>T2 :</strong> Faites, selon ce que je vous ai montré, un joli carnet avec les moyennes au dixième de vos cours et votre moyenne générale en T2[cite: 19].</li>
+                    <li><strong>T3 :</strong> Faites, selon ce que je vous ai montré, un joli carnet avec les moyennes au dixième de vos cours et votre moyenne générale en T3[cite: 19].</li>
+                </ul>
+
+                <p>
+                    <a href="5.21 Examen trois récitations.pdf" class="btn-download" download>📥 Télécharger le sujet de l'examen (PDF)</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Rendu du travail -->
+        <div class="section">
+            <h2>3. Rendu du travail</h2>
+            <p>Une fois votre exercice terminé, cliquez sur le bouton ci-dessous pour ouvrir le formulaire officiel, vous connecter avec votre compte institutionnel et rendre votre fichier :</p>
+            
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSfk2JEGeCgtI3XPFJknzfp8OzGNw0pfQD_J2kun4_8EnsTDEw/viewform?usp=sharing&ouid=117105455808806450739" target="_blank" class="btn-submit">📤 Rendre mon travail (Formulaire officiel)</a>
+        </div>
+    </div>
+
+    <script>
+        function checkPassword() {
+            const pwd = document.getElementById('exam-password').value;
+            if (pwd === 'prof123') {
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+            } else {
+                document.getElementById('error').style.display = 'block';
+            }
+        }
+
+        // Animation Matrix en arrière-plan (bleue)
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const characters = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ<>/\\{}[]*&é"\'(-)=+';
+        const fontSize = 16;
+        let columns = canvas.width / fontSize;
+        let drops = [];
+
+        for (let i = 0; i < columns; i++) {
+            drops[i] = 1;
+        }
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 3, 9, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const colors = ['#6688ff', '#0055ff', '#002288'];
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+                const text = characters.charAt(Math.floor(Math.random() * characters.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawMatrix, 50);
+    </script>
+
+</body>
+</html>
