@@ -1,1 +1,231 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Examen - Scratch (11ème)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #ffffff;
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #000309;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        h1, h2 {
+            color: #6688ff;
+            border-bottom: 2px solid #0055ff;
+            padding-bottom: 5px;
+            position: relative;
+            z-index: 10;
+            text-shadow: 0 0 10px #0055ff;
+        }
+        p, ul, li {
+            position: relative;
+            z-index: 10;
+        }
+        .section {
+            background: rgba(0, 5, 20, 0.85);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid #0055ff;
+            box-shadow: 0 0 15px rgba(0, 85, 255, 0.3);
+            position: relative;
+            z-index: 10;
+        }
+        .instruction-box {
+            background: rgba(0, 10, 30, 0.9);
+            border-left: 4px solid #0055ff;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .btn-download {
+            display: inline-block;
+            background-color: #002288;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-top: 10px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #0055ff;
+            transition: background-color 0.3s;
+        }
+        .btn-download:hover {
+            background-color: #0055ff;
+        }
+        .btn-submit {
+            display: inline-block;
+            background-color: #0055ff;
+            color: white;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-top: 10px;
+            font-size: 1.1em;
+            border: 1px solid #6688ff;
+            transition: background-color 0.3s;
+        }
+        .btn-submit:hover {
+            background-color: #002288;
+        }
+        #auth-screen {
+            text-align: center;
+            padding: 50px 20px;
+            background: rgba(0, 5, 20, 0.9);
+            border: 1px solid #0055ff;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 85, 255, 0.4);
+            max-width: 500px;
+            margin: 100px auto;
+            position: relative;
+            z-index: 10;
+        }
+        #auth-screen input[type="password"] {
+            padding: 10px;
+            font-size: 1em;
+            width: 70%;
+            background-color: #000309;
+            color: white;
+            border: 1px solid #0055ff;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        #auth-screen button {
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #0055ff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #auth-screen button:hover {
+            background-color: #002288;
+        }
+        .error-msg {
+            color: #ff4444;
+            margin-top: 10px;
+            display: none;
+        }
+        #main-content {
+            display: none;
+        }
+    </style>
+</head>
+<body>
 
+    <canvas id="matrix"></canvas>
+
+    <div id="auth-screen">
+        <h2>Accès à l'Examen</h2>
+        <p>Veuillez entrer le mot de passe fourni par l'enseignant :</p>
+        <input type="password" id="exam-password" placeholder="Mot de passe">
+        <button onclick="checkPassword()">Valider</button>
+        <p id="error" class="error-msg">Mot de passe incorrect.</p>
+    </div>
+
+    <div id="main-content">
+        <h1>Examen : Scratch - 11ème</h1>
+
+        <!-- Consignes / Informations -->
+        <div class="section">
+            <h2>1. Consignes générales</h2>
+            <p>Créez votre propre animation avec Scratch, après avoir fait le tutoriel[cite: 18].</p>
+            <p>Vous serez évalués tout au long de votre examen : je prendrai en compte, pour la note, l'évolution du projet, votre autonomie, la manière dont vous sauvegardez, nommez et chargez vos fichiers et, bien sûr, la façon dont vous maîtrisez la plateforme en ligne et le rendu final[cite: 18]. Tout manquement aux consignes entraînera un malus[cite: 18].</p>
+            <p>Effectuez bien vos sauvegardes intermédiaires dans le dossier <strong>Tous</strong> de votre classe[cite: 18]. À la fin de votre examen, sauvegardez votre document sous forme d'un dossier nommé <code>Scratch [votre prénom]</code> dans <code>échange épigènes -> rendu</code>[cite: 18]. Tout fichier perdu entraînera des points en moins et la répétition par un nouveau travail s'effectuera sans temps supplémentaire[cite: 18].</p>
+            <ul>
+                <li><strong>Temps à disposition :</strong> Fil rouge qui dure toute l'année[cite: 18]</li>
+                <li><strong>Matériel autorisé :</strong> Tutoriel, cours sur l'introduction à la programmation et Internet[cite: 18]</li>
+            </ul>
+        </div>
+
+        <!-- Documents de travail -->
+        <div class="section">
+            <h2>2. Documents de travail & Épreuve</h2>
+            <div class="instruction-box">
+                <p><strong>Étape 1 :</strong> Téléchargez le sujet de l'examen ci-dessous et commencez votre projet :</p>
+                <div>
+                    <a href="5.4 Examen Scratch.pdf" class="btn-download" download>📥 Télécharger le sujet de l'examen (PDF)[cite: 18]</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rendu du travail -->
+        <div class="section">
+            <h2>3. Rendu du travail</h2>
+            <p><strong>Étape 2 :</strong> Enregistrez votre travail sous forme d'un dossier nommé <code>Scratch [votre prénom]</code> et déposez-le dans <code>échange épigènes -> rendu</code>[cite: 18]. Vous pouvez également utiliser le formulaire officiel ci-dessous :</p>
+            
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLScHCQ0XpJQ2aEtg9W_wcM5-7NIbopWFagRxNtfadOxsTlQhQg/viewform?usp=sharing&ouid=117105455808806450739" target="_blank" class="btn-submit">📤 Rendre mon travail (Formulaire officiel)</a>
+        </div>
+    </div>
+
+    <script>
+        function checkPassword() {
+            const pwd = document.getElementById('exam-password').value;
+            if (pwd === 'prof123') {
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+            } else {
+                document.getElementById('error').style.display = 'block';
+            }
+        }
+
+        // Animation Matrix en arrière-plan (bleue)
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const characters = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ<>/\\{}[]*&é"\'(-)=+';
+        const fontSize = 16;
+        let columns = canvas.width / fontSize;
+        let drops = [];
+
+        for (let i = 0; i < columns; i++) {
+            drops[i] = 1;
+        }
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 3, 9, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const colors = ['#6688ff', '#0055ff', '#002288'];
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+                const text = characters.charAt(Math.floor(Math.random() * characters.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawMatrix, 50);
+    </script>
+
+</body>
+</html>
