@@ -1,1 +1,258 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Examen - Présentations (11ème)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #ffffff;
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #020408;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        h1, h2 {
+            color: #66ccff;
+            border-bottom: 2px solid #003366;
+            padding-bottom: 5px;
+            position: relative;
+            z-index: 10;
+            text-shadow: 0 0 10px #003366;
+        }
+        p, ul, li {
+            position: relative;
+            z-index: 10;
+        }
+        .section {
+            background: rgba(2, 6, 15, 0.85);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid #003366;
+            box-shadow: 0 0 15px rgba(0, 51, 102, 0.3);
+            position: relative;
+            z-index: 10;
+        }
+        .instruction-box {
+            background: rgba(1, 3, 9, 0.9);
+            border-left: 4px solid #004488;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .btn-download {
+            display: inline-block;
+            background-color: #002244;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-top: 10px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #004488;
+            transition: background-color 0.3s;
+        }
+        .btn-download:hover {
+            background-color: #003366;
+        }
+        .btn-submit {
+            display: inline-block;
+            background-color: #003366;
+            color: white;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-top: 10px;
+            font-size: 1.1em;
+            border: 1px solid #66ccff;
+            transition: background-color 0.3s;
+        }
+        .btn-submit:hover {
+            background-color: #002244;
+        }
+        #auth-screen {
+            text-align: center;
+            padding: 50px 20px;
+            background: rgba(2, 6, 15, 0.9);
+            border: 1px solid #003366;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 51, 102, 0.4);
+            max-width: 500px;
+            margin: 100px auto;
+            position: relative;
+            z-index: 10;
+        }
+        #auth-screen input[type="password"] {
+            padding: 10px;
+            font-size: 1em;
+            width: 70%;
+            background-color: #010204;
+            color: white;
+            border: 1px solid #003366;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        #auth-screen button {
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #003366;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #auth-screen button:hover {
+            background-color: #002244;
+        }
+        .error-msg {
+            color: #ff4444;
+            margin-top: 10px;
+            display: none;
+        }
+        #main-content {
+            display: none;
+        }
+    </style>
+</head>
+<body>
 
+    <canvas id="matrix"></canvas>
+
+    <div id="auth-screen">
+        <h2>Accès à l'Examen</h2>
+        <p>Veuillez entrer le mot de passe fourni par l'enseignant :</p>
+        <input type="password" id="exam-password" placeholder="Mot de passe">
+        <button onclick="checkPassword()">Valider</button>
+        <p id="error" class="error-msg">Mot de passe incorrect.</p>
+    </div>
+
+    <div id="main-content">
+        <h1>Examen : Présentations (11ème)</h1>
+
+        <!-- Sujet 1 : Présentation sur le thème de son choix ou métier de rêve -->
+        <div class="section">
+            <h2>1. Sujet A : Présentation sur le thème de son choix ou métier de rêve</h2>
+            <p>Ouvrez un document Impress pour faire cette présentation[cite: 16].</p>
+            <p>Faites une présentation sur la thématique de votre choix ou sur votre métier de rêve en prenant en compte que vous la ferez devant toute la classe et qu'elle doit durer 4 minutes[cite: 16]. Pour tester la durée, enclenchez un chronomètre en ligne et testez votre présentation[cite: 16].</p>
+            <p>À la fin de votre examen, sauvegardez votre document dans votre dossier <strong>rendu</strong> sous « Le thème que vous avez choisi »[cite: 16]. Effectuez bien vos sauvegardes intermédiaires dans le dossier <strong>Tous</strong> de la classe[cite: 16]. Tout fichier perdu entraînera des points en moins et la répétition par un nouveau travail s'effectuera sans temps supplémentaire[cite: 16].</p>
+            <p>Vous serez évalués tout au long de votre examen[cite: 16]. Je prendrai en compte, pour la note, l'évolution de la présentation, votre autonomie, la manière dont vous sauvegardez, nommez et chargez vos fichiers, ainsi que bien sûr la façon dont vous maîtrisez Impress et le rendu final[cite: 16]. Tout manquement aux consignes entraînera un malus[cite: 16].</p>
+            <ul>
+                <li><strong>Temps à disposition :</strong> 3 semaines (3h45min)[cite: 16]</li>
+                <li><strong>Matériel à disposition :</strong> Cours de Présentation et Internet[cite: 16]</li>
+            </ul>
+            <div class="instruction-box">
+                <p><strong>Documents de travail :</strong></p>
+                <div>
+                    <a href="5.16 Présentation-thématique à choix ou métier de rêve - v2.pdf" class="btn-download" download>📥 Consignes Thème au choix (.pdf)</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sujet 2 : Création de film -->
+        <div class="section">
+            <h2>2. Sujet B : Création de film</h2>
+            <p>Ouvrez un document Impress pour lancer une présentation[cite: 17].</p>
+            <p>Par groupe de deux, préparez le projet autour de la sortie d'un film[cite: 17]. Prenez en compte que vous ferez cette présentation devant toute la classe, à deux, et qu'elle doit durer 6 minutes[cite: 17]. Pour tester la durée, enclenchez un chronomètre en ligne et testez votre présentation[cite: 17].</p>
+            <p>Il vous faut TOUT organiser et au moins[cite: 17] :</p>
+            <ul>
+                <li>Le titre du film[cite: 17]</li>
+                <li>Sa trame[cite: 17]</li>
+                <li>Le budget total estimé[cite: 17]</li>
+                <li>Les acteurs : leur nombre, leurs rôles (proposition de noms ?)[cite: 17]</li>
+                <li>Le(s) lieu(x) de tournage[cite: 17]</li>
+                <li>Le planning[cite: 17]</li>
+                <li>Les délais fixés (dates d'annonce, date de sortie du film)[cite: 17]</li>
+                <li>Une mini scène à présenter[cite: 17]</li>
+                <li>Le réalisateur, le producteur et la distribution (Netflix, etc.)[cite: 17]</li>
+                <li>Les questions éventuelles de propriété individuelle[cite: 17]</li>
+            </ul>
+            <p>À la fin de l'examen, sauvegardez votre document dans votre dossier <strong>rendu</strong> sous « Le thème que vous avez choisi »[cite: 17]. Effectuez bien vos sauvegardes intermédiaires dans le dossier <strong>Tous</strong> de votre classe[cite: 17]. Tout fichier perdu entraînera des points en moins et la répétition par un nouveau travail s'effectuera sans temps supplémentaire[cite: 17].</p>
+            <p>Vous serez évalués tout au long de votre examen[cite: 17]. Je prendrai en compte, pour la note, l'évolution de la présentation, votre autonomie ainsi que la façon de vous coordonner entre vous et votre organisation, la manière dont vous sauvegardez, nommez et chargez vos fichiers et bien sûr la façon dont vous maîtrisez Impress et le rendu final[cite: 17]. Tout manquement aux consignes entraînera un malus[cite: 17].</p>
+            <ul>
+                <li><strong>Temps à disposition :</strong> 3 semaines (3h45min)[cite: 17]</li>
+                <li><strong>Matériel à disposition :</strong> Cours de Présentation et Internet[cite: 17]</li>
+            </ul>
+            <div class="instruction-box">
+                <p><strong>Documents de travail :</strong></p>
+                <div>
+                    <a href="5.15 Présentation-création de film.pdf" class="btn-download" download>📥 Consignes Création de film (.pdf)</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rendu du travail -->
+        <div class="section">
+            <h2>3. Rendu du travail</h2>
+            <p><strong>Étape finale :</strong> Une fois votre présentation terminée et sauvegardée selon les consignes, cliquez sur le bouton ci-dessous pour accéder au formulaire officiel et rendre votre travail :</p>
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSegErZWLMQGtxPEsmkA9uN39P7uFADsxxb2ZGc7IoSSw8BoyA/viewform?usp=sharing&ouid=117105455808806450739" target="_blank" class="btn-submit">📤 Rendre mon travail (Formulaire officiel)</a>
+        </div>
+    </div>
+
+    <script>
+        function checkPassword() {
+            const pwd = document.getElementById('exam-password').value;
+            if (pwd === 'prof123') {
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+            } else {
+                document.getElementById('error').style.display = 'block';
+            }
+        }
+
+        // Animation Matrix en arrière-plan (bleu foncé)
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const characters = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ<>/\\{}[]*&é"\'(-)=+';
+        const fontSize = 16;
+        let columns = canvas.width / fontSize;
+        let drops = [];
+
+        for (let i = 0; i < columns; i++) {
+            drops[i] = 1;
+        }
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(2, 4, 8, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const colors = ['#001122', '#002244', '#003366', '#002233'];
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+                const text = characters.charAt(Math.floor(Math.random() * characters.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawMatrix, 50);
+    </script>
+
+</body>
+</html>
