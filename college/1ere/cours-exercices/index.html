@@ -1,1 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Cours et Exercices - 1ère matu</title>
+    <style>
+        body { 
+            font-family: 'Courier New', Courier, monospace; 
+            text-align: center; 
+            margin: 0; 
+            padding-top: 50px; 
+            background-color: #090000; 
+            color: white;
+            overflow-x: hidden;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        h1, p {
+            position: relative;
+            z-index: 10;
+            text-shadow: 0 0 10px #ff6666;
+        }
+        .btn { 
+            display: block; 
+            width: 280px; 
+            margin: 15px auto; 
+            padding: 15px; 
+            background-color: rgba(20, 0, 5, 0.9); 
+            color: #ff9999; 
+            text-decoration: none; 
+            border: 1px solid #ff6666;
+            border-radius: 5px; 
+            font-weight: bold;
+            transition: all 0.3s;
+            position: relative;
+            z-index: 10;
+        }
+        .btn:hover { 
+            background-color: #ff6666; 
+            color: white;
+            box-shadow: 0 0 20px #ff6666;
+        }
+        .back-link {
+            color: #ff9999;
+            text-decoration: none;
+            position: relative;
+            z-index: 10;
+        }
+        .back-link:hover {
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix"></canvas>
 
+    <h1>Cours et Exercices - 1ère matu</h1>
+    <p>Choisissez un thème :</p>
+    
+    <a class="btn" href="base/">Base</a>
+    <a class="btn" href="algorithmique/">Algorithmique</a>
+    <a class="btn" href="scratch/">Scratch</a>
+    <a class="btn" href="informatique-societe/">Informatique dans la société</a>
+    <a class="btn" href="python/">Python</a>
+    <a class="btn" href="reseau/">Réseau</a>
+    
+    <br><br>
+    <a class="back-link" href="../index.html">⬅ Retour au menu 1ère matu</a>
+
+    <script>
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize);
+        resize();
+
+        const chars = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ';
+        const fontSize = 16;
+        let drops = Array(Math.floor(canvas.width / fontSize)).fill(1);
+
+        function draw() {
+            ctx.fillStyle = 'rgba(9, 0, 5, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.font = fontSize + 'px monospace';
+            
+            drops.forEach((drop, i) => {
+                // Nuances de rouge clair
+                const colors = ['#ffffff', '#ff9999', '#ff6666'];
+                ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+                ctx.fillText(chars.charAt(Math.floor(Math.random() * chars.length)), i * fontSize, drop * fontSize);
+                
+                if (drop * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            });
+        }
+        setInterval(draw, 50);
+    </script>
+</body>
+</html>
