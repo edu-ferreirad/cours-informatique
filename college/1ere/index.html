@@ -55,22 +55,95 @@
         .back-link:hover {
             color: white;
         }
+        #auth-container {
+            position: relative;
+            z-index: 10;
+            margin-top: 50px;
+        }
+        input[type="password"] {
+            padding: 10px;
+            font-family: 'Courier New', Courier, monospace;
+            background: rgba(20, 0, 5, 0.9);
+            color: #ff9999;
+            border: 1px solid #ff6666;
+            border-radius: 5px;
+            outline: none;
+            width: 220px;
+            text-align: center;
+        }
+        button {
+            padding: 10px 15px;
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #880022;
+            color: white;
+            border: 1px solid #ff6666;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background-color: #ff6666;
+            box-shadow: 0 0 10px #ff6666;
+        }
+        .error-msg {
+            color: #ff4444;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+        #protected-content {
+            display: none;
+        }
     </style>
 </head>
 <body>
     <canvas id="matrix"></canvas>
 
-    <h1>1ère matu</h1>
-    <p>Choisissez une catégorie :</p>
-    
-    <a class="btn" href="cours-exercices/">Cours-Exercices</a>
-    <a class="btn" href="examens-projets/">Examens-Projets</a>
-    <a class="btn" href="jeux/">Jeux</a>
-    
-    <br><br>
-    <a class="back-link" href="../index.html">⬅ Retour à l'accueil général</a>
+    <!-- ZONE DE CONNEXION -->
+    <div id="auth-container">
+        <h1>Accès Protégé</h1>
+        <p>Veuillez entrer le mot de passe pour accéder à l'espace 1ère matu :</p>
+        <input type="password" id="password-input" placeholder="Mot de passe">
+        <br><br>
+        <button onclick="checkPassword()">Valider</button>
+        <div id="error" class="error-msg"></div>
+        <br><br>
+        <a class="back-link" href="../index.html">⬅ Retour à l'accueil général</a>
+    </div>
+
+    <!-- CONTENU PROTÉGÉ -->
+    <div id="protected-content">
+        <h1>1ère matu</h1>
+        <p>Choisissez une catégorie :</p>
+        
+        <a class="btn" href="cours-exercices/">Cours-Exercices</a>
+        <a class="btn" href="examens-projets/">Examens-Projets</a>
+        <a class="btn" href="jeux/">Jeux</a>
+        
+        <br><br>
+        <a class="back-link" href="../index.html">⬅ Retour à l'accueil général</a>
+    </div>
 
     <script>
+        function checkPassword() {
+            const input = document.getElementById('password-input').value;
+            const errorDiv = document.getElementById('error');
+            
+            if (input === 'motdepasse1m') {
+                document.getElementById('auth-container').style.display = 'none';
+                document.getElementById('protected-content').style.display = 'block';
+            } else {
+                errorDiv.textContent = 'Mot de passe incorrect.';
+            }
+        }
+
+        // Permettre de valider aussi avec la touche Entrée
+        document.getElementById('password-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
+        });
+
         const canvas = document.getElementById('matrix');
         const ctx = canvas.getContext('2d');
         function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
@@ -87,7 +160,6 @@
             ctx.font = fontSize + 'px monospace';
             
             drops.forEach((drop, i) => {
-                // Nuances de rouge clair
                 const colors = ['#ffffff', '#ff9999', '#ff6666'];
                 ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
                 ctx.fillText(chars.charAt(Math.floor(Math.random() * chars.length)), i * fontSize, drop * fontSize);
