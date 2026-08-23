@@ -1,1 +1,4791 @@
 
+Conversation avec Gemini
+part de cette page pour faire celle du concours uit <!DOCTYPE html>
+
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Espace Cours fac-bases</title>
+
+    <style>
+
+        body { 
+
+            font-family: 'Courier New', Courier, monospace; 
+
+            text-align: center; 
+
+            margin: 0; 
+
+            padding-top: 50px; 
+
+            background-color: #000309; 
+
+            color: white;
+
+            overflow-x: hidden;
+
+        }
+
+        canvas {
+
+            position: fixed;
+
+            top: 0;
+
+            left: 0;
+
+            width: 100%;
+
+            height: 100%;
+
+            z-index: -1;
+
+        }
+
+        h1, p {
+
+            position: relative;
+
+            z-index: 10;
+
+            text-shadow: 0 0 10px #0055ff;
+
+        }
+
+        .back-link {
+
+            color: #69b4ff;
+
+            text-decoration: none;
+
+            position: relative;
+
+            z-index: 10;
+
+        }
+
+        /* Style pour les sections */
+
+        .section-container {
+
+            margin: 25px auto;
+
+            max-width: 650px;
+
+            padding: 20px;
+
+            background-color: rgba(0, 5, 20, 0.85);
+
+            border: 1px solid #0055ff;
+
+            border-radius: 8px;
+
+            position: relative;
+
+            z-index: 10;
+
+            box-shadow: 0 0 15px rgba(0, 85, 255, 0.3);
+
+            text-align: left;
+
+        }
+
+        .section-container h3 {
+
+            color: #6688ff;
+
+            margin-top: 0;
+
+            text-align: center;
+
+        }
+
+        .fiche-item {
+
+            margin: 15px 0;
+
+            padding: 10px;
+
+            border: 1px dashed #0055ff;
+
+            border-radius: 4px;
+
+            background: rgba(0, 2, 8, 0.5);
+
+        }
+
+        .fiche-header {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            flex-wrap: wrap;
+
+            gap: 10px;
+
+        }
+
+        .fiche-link {
+
+            color: #69b4ff;
+
+            text-decoration: none;
+
+            font-weight: bold;
+
+        }
+
+        .fiche-link:hover {
+
+            color: white;
+
+            text-decoration: underline;
+
+        }
+
+        .btn-preview {
+
+            background-color: #002266;
+
+            color: #69b4ff;
+
+            border: 1px solid #0055ff;
+
+            padding: 5px 10px;
+
+            border-radius: 3px;
+
+            cursor: pointer;
+
+            font-family: 'Courier New', Courier, monospace;
+
+            font-size: 0.9em;
+
+            transition: all 0.3s;
+
+        }
+
+        .btn-preview:hover {
+
+            background-color: #0055ff;
+
+            color: white;
+
+        }
+
+        .preview-frame {
+
+            width: 100%;
+
+            height: 300px;
+
+            border: 1px solid #0055ff;
+
+            margin-top: 10px;
+
+            display: none;
+
+            background: #fff;
+
+        }
+
+        .preview-image {
+
+            width: 100%;
+
+            max-height: 400px;
+
+            object-fit: contain;
+
+            margin-top: 10px;
+
+            display: none;
+
+            border: 1px solid #0055ff;
+
+            background: #000;
+
+        }
+
+        .preview-video {
+
+            width: 100%;
+
+            max-height: 350px;
+
+            margin-top: 10px;
+
+            display: none;
+
+            border: 1px solid #0055ff;
+
+            background: #000;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <canvas id="matrix"></canvas>
+
+
+
+    <h1>Espace Cours fac-bases</h1>
+
+    <p>Consultez les documents et ressources par section :</p>
+
+
+
+    <!-- Section 1: 2023-2024 -->
+
+    <div class="section-container">
+
+        <h3>2023-2024</h3>
+
+
+
+        <div class="fiche-item">
+
+            <div class="fiche-header">
+
+                <a class="fiche-link" href="Demi final.docx-1.pdf" target="_blank">📄 Demi final.docx-1.pdf</a>
+
+                <button class="btn-preview" onclick="togglePreview('prev-1')">👁️ Prévisualiser</button>
+
+            </div>
+
+            <iframe id="prev-1" class="preview-frame" src="Demi final.docx-1.pdf"></iframe>
+
+        </div>
+
+
+
+        <div class="fiche-item">
+
+            <div class="fiche-header">
+
+                <a class="fiche-link" href="SN_cours_Fac_HZ.MOV" target="_blank">🎬 SN_cours_Fac_HZ.MOV</a>
+
+                <button class="btn-preview" onclick="togglePreview('prev-2')">👁️ Prévisualiser</button>
+
+            </div>
+
+            <video id="prev-2" class="preview-video" controls>
+
+                <source src="SN_cours_Fac_HZ.MOV" type="video/quicktime">
+
+                Votre navigateur ne prend pas en charge la lecture de vidéos.
+
+            </video>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Section 2: 2024-2025 -->
+
+    <div class="section-container">
+
+        <h3>2024-2025</h3>
+
+
+
+        <div class="fiche-item">
+
+            <div class="fiche-header">
+
+                <a class="fiche-link" href="IMG-20250604-WA0018.jpg" target="_blank">🖼️ IMG-20250604-WA0018.jpg</a>
+
+                <button class="btn-preview" onclick="togglePreview('prev-3')">👁️ Prévisualiser</button>
+
+            </div>
+
+            <img id="prev-3" class="preview-image" src="IMG-20250604-WA0018.jpg" alt="Aperçu image">
+
+        </div>
+
+
+
+        <div class="fiche-item">
+
+            <div class="fiche-header">
+
+                <a class="fiche-link" href="recyclage.playground" download>💾 recyclage.playground (Téléchargement)</a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Section 3: Tutoriel -->
+
+    <div class="section-container">
+
+        <h3>Tutoriel</h3>
+
+
+
+        <div class="fiche-item">
+
+            <div class="fiche-header">
+
+                <a class="fiche-link" href="Tutoriel simulateur.pdf" target="_blank">📄 Tutoriel simulateur.pdf</a>
+
+                <button class="btn-preview" onclick="togglePreview('prev-4')">👁️ Prévisualiser</button>
+
+            </div>
+
+            <iframe id="prev-4" class="preview-frame" src="Tutoriel simulateur.pdf"></iframe>
+
+        </div>
+
+    </div>
+
+
+
+    <br><br>
+
+    <a class="back-link" href="../index.html">⬅ Retour à l'accueil général</a>
+
+
+
+    <script>
+
+        function togglePreview(id) {
+
+            const element = document.getElementById(id);
+
+            if (element.style.display === 'block') {
+
+                element.style.display = 'none';
+
+            } else {
+
+                element.style.display = 'block';
+
+            }
+
+        }
+
+
+
+        // Animation Matrix en arrière-plan (bleue)
+
+        const canvas = document.getElementById('matrix');
+
+        const ctx = canvas.getContext('2d');
+
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+
+        window.addEventListener('resize', resize);
+
+        resize();
+
+
+
+        const chars = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ';
+
+        const fontSize = 16;
+
+        let drops = Array(Math.floor(canvas.width / fontSize)).fill(1);
+
+
+
+        function draw() {
+
+            ctx.fillStyle = 'rgba(0, 3, 9, 0.08)';
+
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.font = fontSize + 'px monospace';
+
+
+
+            drops.forEach((drop, i) => {
+
+                const colors = ['#6688ff', '#0055ff', '#002288'];
+
+                ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+
+                ctx.fillText(chars.charAt(Math.floor(Math.random() * chars.length)), i * fontSize, drop * fontSize);
+
+
+
+                if (drop * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+
+                drops[i]++;
+
+            });
+
+        }
+
+        setInterval(draw, 50);
+
+    </script>
+
+</body>
+
+</html> différence on enlève les section et on remplace par 2024-2025 qui contient Robotics-for-Good-Youth-Challenge-Rulebook.pdf met le en prévisualisation deuxième section 2025-2026 met Concours.playground en tléchargement et Reglement_Complet_Robotics_for_Good_Youth_Challenge_2025_2026_FR (1).pdf et RFGYC-2025-2026-Rulebook-1 (1).pdf en prévisualaisation, troisième section 2026-2027 qui contient AI for Good réglement concours 2026-2027 FR.odt et Concours27.playground en téléchargement et ENG-V6-Youth-Challenge-Rulebook-2026-2027-Health-Emergencies (1).pdf et terrain concours 2026-2027.png en prévisualisation et une dernière section tutoriel qui contient le fichier Tutoriel simulateur.pdf en prévisualaisation
+
+Voici le code complet pour la page du concours UIT (Robotics for Good Youth Challenge / AI for Good), adapté selon tes instructions avec les différentes sections, les documents en prévisualisation, les fichiers en téléchargement et le style visuel de ta page d'origine :
+
+HTML
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Espace Concours UIT</title>
+    <style>
+        body { 
+            font-family: 'Courier New', Courier, monospace; 
+            text-align: center; 
+            margin: 0; 
+            padding-top: 50px; 
+            background-color: #000309; 
+            color: white;
+            overflow-x: hidden;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        h1, p {
+            position: relative;
+            z-index: 10;
+            text-shadow: 0 0 10px #0055ff;
+        }
+        .back-link {
+            color: #69b4ff;
+            text-decoration: none;
+            position: relative;
+            z-index: 10;
+        }
+        /* Style pour les sections */
+        .section-container {
+            margin: 25px auto;
+            max-width: 650px;
+            padding: 20px;
+            background-color: rgba(0, 5, 20, 0.85);
+            border: 1px solid #0055ff;
+            border-radius: 8px;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 0 15px rgba(0, 85, 255, 0.3);
+            text-align: left;
+        }
+        .section-container h3 {
+            color: #6688ff;
+            margin-top: 0;
+            text-align: center;
+        }
+        .fiche-item {
+            margin: 15px 0;
+            padding: 10px;
+            border: 1px dashed #0055ff;
+            border-radius: 4px;
+            background: rgba(0, 2, 8, 0.5);
+        }
+        .fiche-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .fiche-link {
+            color: #69b4ff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .fiche-link:hover {
+            color: white;
+            text-decoration: underline;
+        }
+        .btn-preview {
+            background-color: #002266;
+            color: #69b4ff;
+            border: 1px solid #0055ff;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+        .btn-preview:hover {
+            background-color: #0055ff;
+            color: white;
+        }
+        .preview-frame {
+            width: 100%;
+            height: 300px;
+            border: 1px solid #0055ff;
+            margin-top: 10px;
+            display: none;
+            background: #fff;
+        }
+        .preview-image {
+            width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            margin-top: 10px;
+            display: none;
+            border: 1px solid #0055ff;
+            background: #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix"></canvas>
+
+    <h1>Espace Concours UIT</h1>
+    <p>Consultez les règlements, terrains et ressources du concours :</p>
+
+    <!-- Section 1: 2024-2025 -->
+    <div class="section-container">
+        <h3>2024-2025</h3>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="Robotics-for-Good-Youth-Challenge-Rulebook.pdf" target="_blank">📄 Robotics-for-Good-Youth-Challenge-Rulebook.pdf</a>
+                <button class="btn-preview" onclick="togglePreview('prev-1')">👁️ Prévisualiser</button>
+            </div>
+            <iframe id="prev-1" class="preview-frame" src="Robotics-for-Good-Youth-Challenge-Rulebook.pdf"></iframe>
+        </div>
+    </div>
+
+    <!-- Section 2: 2025-2026 -->
+    <div class="section-container">
+        <h3>2025-2026</h3>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="Concours.playground" download>💾 Concours.playground (Téléchargement)</a>
+            </div>
+        </div>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="Reglement_Complet_Robotics_for_Good_Youth_Challenge_2025_2026_FR (1).pdf" target="_blank">📄 Reglement_Complet_Robotics_for_Good_Youth_Challenge_2025_2026_FR (1).pdf</a>
+                <button class="btn-preview" onclick="togglePreview('prev-2')">👁️ Prévisualiser</button>
+            </div>
+            <iframe id="prev-2" class="preview-frame" src="Reglement_Complet_Robotics_for_Good_Youth_Challenge_2025_2026_FR (1).pdf"></iframe>
+        </div>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="RFGYC-2025-2026-Rulebook-1 (1).pdf" target="_blank">📄 RFGYC-2025-2026-Rulebook-1 (1).pdf</a>
+                <button class="btn-preview" onclick="togglePreview('prev-3')">👁️ Prévisualiser</button>
+            </div>
+            <iframe id="prev-3" class="preview-frame" src="RFGYC-2025-2026-Rulebook-1 (1).pdf"></iframe>
+        </div>
+    </div>
+
+    <!-- Section 3: 2026-2027 -->
+    <div class="section-container">
+        <h3>2026-2027</h3>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="AI for Good réglement concours 2026-2027 FR.odt" target="_blank">📄 AI for Good réglement concours 2026-2027 FR.odt</a>
+            </div>
+        </div>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="Concours27.playground" download>💾 Concours27.playground (Téléchargement)</a>
+            </div>
+        </div>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="ENG-V6-Youth-Challenge-Rulebook-2026-2027-Health-Emergencies (1).pdf" target="_blank">📄 ENG-V6-Youth-Challenge-Rulebook-2026-2027-Health-Emergencies (1).pdf</a>
+                <button class="btn-preview" onclick="togglePreview('prev-4')">👁️ Prévisualiser</button>
+            </div>
+            <iframe id="prev-4" class="preview-frame" src="ENG-V6-Youth-Challenge-Rulebook-2026-2027-Health-Emergencies (1).pdf"></iframe>
+        </div>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="terrain concours 2026-2027.png" target="_blank">🖼️ terrain concours 2026-2027.png</a>
+                <button class="btn-preview" onclick="togglePreview('prev-5')">👁️ Prévisualiser</button>
+            </div>
+            <img id="prev-5" class="preview-image" src="terrain concours 2026-2027.png" alt="Aperçu du terrain 2026-2027">
+        </div>
+    </div>
+
+    <!-- Section 4: Tutoriel -->
+    <div class="section-container">
+        <h3>Tutoriel</h3>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="Tutoriel simulateur.pdf" target="_blank">📄 Tutoriel simulateur.pdf</a>
+                <button class="btn-preview" onclick="togglePreview('prev-6')">👁️ Prévisualiser</button>
+            </div>
+            <iframe id="prev-6" class="preview-frame" src="Tutoriel simulateur.pdf"></iframe>
+        </div>
+    </div>
+
+    <br><br>
+    <a class="back-link" href="../index.html">⬅ Retour à l'accueil général</a>
+
+    <script>
+        function togglePreview(id) {
+            const element = document.getElementById(id);
+            if (element.style.display === 'block') {
+                element.style.display = 'none';
+            } else {
+                element.style.display = 'block';
+            }
+        }
+
+        // Animation Matrix en arrière-plan (bleue)
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize);
+        resize();
+
+        const chars = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ';
+        const fontSize = 16;
+        let drops = Array(Math.floor(canvas.width / fontSize)).fill(1);
+
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 3, 9, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.font = fontSize + 'px monospace';
+
+            drops.forEach((drop, i) => {
+                const colors = ['#6688ff', '#0055ff', '#002288'];
+                ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+                ctx.fillText(chars.charAt(Math.floor(Math.random() * chars.length)), i * fontSize, drop * fontSize);
+
+                if (drop * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            });
+        }
+        setInterval(draw, 50);
+    </script>
+</body>
+</html>
+refais la meme page mais pour le cours fac du collège <!DOCTYPE html>
+
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Espace Concours UIT</title>
+
+    <style>
+
+        body { 
+
+            font-family: 'Courier New', Courier, monospace; 
+
+            text-align: center; 
+
+            margin: 0; 
+
+            padding-top: 50px; 
+
+            background-color: #000309; 
+
+            color: white;
+
+            overflow-x: hidden;
+
+        }
+
+        canvas {
+
+            position: fixed;
+
+            top: 0;
+
+            left: 0;
+
+            width: 100%;
+
+            height: 100%;
+
+            z-index: -1;
+
+        }
+
+        h1, p {
+
+            position: relative;
+
+            z-index: 10;
+
+            text-shadow: 0 0 10px #0055ff;
+
+        }
+
+        .back-link {
+
+            color: #69b4ff;
+
+            text-decoration: none;
+
+            position: relative;
+
+            z-index: 10;
+
+        }
+
+        /* Style pour les sections */
+
+        .section-container {
+
+            margin: 25px auto;
+
+            max-width: 650px;
+
+            padding: 20px;
+
+            background-color: rgba(0, 5, 20, 0.85);
+
+            border: 1px solid #0055ff;
+
+            border-radius: 8px;
+
+            position: relative;
+
+            z-index: 10;
+
+            box-shadow: 0 0 15px rgba(0, 85, 255, 0.3);
+
+            text-align: left;
+
+        }
+
+        .section-container h3 {
+
+            color: #6688ff;
+
+            margin-top: 0;
+
+            text-align: center;
+
+        }
+
+        .fiche-item {
+
+            margin: 15px 0;
+
+            padding: 10px;
+
+            border: 1px dashed #0055ff;
+
+            border-radius: 4px;
+
+            background: rgba(0, 2, 8, 0.5);
+
+        }
+
+        .fiche-header {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            flex-wrap: wrap;
+
+            gap: 10px;
+
+        }
+
+        .fiche-link {
+
+            color: #69b4ff;
+
+            text-decoration: none;
+
+            font-weight: bold;
+
+        }
+
+        .fiche-link:hover {
+
+            color: white;
+
+            text-decoration: underline;
+
+        }
+
+        .btn-preview {
+
+            background-color: #002266;
+
+            color: #69b4ff;
+
+            border: 1px solid #0055ff;
+
+            padding: 5px 10px;
+
+            border-radius: 3px;
+
+            cursor: pointer;
+
+            font-family: 'Courier New', Courier, monospace;
+
+            font-size: 0.9em;
+
+            transition: all 0.3s;
+
+        }
+
+        .btn-preview:hover {
+
+            background-color: #0055ff;
+
+            color: white;
+
+        }
+
+        .preview-frame {
+
+            width: 100%;
+
+            height: 300px;
+
+            border: 1px solid #0055ff;
+
+            margin-top: 10px;
+
+            display: none;
+
+            background: #fff;
+
+        }
+
+        .preview-image {
+
+            width: 100%;
+
+            max-height: 400px;
+
+            object-fit: contain;
+
+            margin-top: 10px;
+
+            display: none;
+
+            border: 1px solid #0055ff;
+
+            background: #000;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <canvas id="matrix"></canvas>
+
+
+
+    <h1>Espace Concours UIT</h1>
+
+    <p>Consultez les règlements, terrains et ressources du concours :</p>
+
+
+
+    <!-- Section 1: 2024-2025 -->
+
+    <div class="section-container">
+
+        <h3>2024-2025</h3>
+
+
+
+        <div class="fiche-item">
+
+            <div class="fiche-header">
+
+                <a class="fiche-link" href="Robotics-for-Good-Youth-Challenge-Rulebook.pdf" target="_blank">📄 Robotics-for-Good-Youth-Challenge-Rulebook.pdf</a>
+
+                <button class="btn-preview" onclick="togglePreview('prev-1')">👁️ Prévisualiser</button>
+
+            </div>
+
+            <iframe id="prev-1" class="preview-frame" src="Robotics-for-Good-Youth-Challenge-Rulebook.pdf"></iframe>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Section 2: 2025-2026 -->
+
+    <div class="section-container">
+
+        <h3>2025-2026</h3>
+
+
+
+        <div class="fiche-item">
+
+            <div class="fiche-header">
+
+                <a class="fiche-link" href="Concours.playground" download>💾 Concours.playground (Téléchargement)</a>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="fiche-item">
+
+            <div class="fiche-header">
+
+                <a class="fiche-link" href="Reglement_Complet_Robotics_for_Good_Youth_Challenge_2025_2026_FR (1).pdf" target="_blank">📄 Reglement_Complet_Robotics_for_Good_Youth_Challenge_2025_2026_FR (1).pdf</a>
+
+                <button class="btn-preview" onclick="togglePreview('prev-2')">👁️ Prévisualiser</button>
+
+            </div>
+
+            <iframe id="prev-2" class="preview-frame" src="Reglement_Complet_Robotics_for_Good_Youth_Challenge_2025_2026_FR (1).pdf"></iframe>
+
+        </div>
+
+
+
+        <div class="fiche-item">
+
+            <div class="fiche-header">
+
+                <a class="fiche-link" href="RFGYC-2025-2026-Rulebook-1 (1).pdf" target="_blank">📄 RFGYC-2025-2026-Rulebook-1 (1).pdf</a>
+
+                <button class="btn-preview" onclick="togglePreview('prev-3')">👁️ Prévisualiser</button>
+
+            </div>
+
+            <iframe id="prev-3" class="preview-frame" src="RFGYC-2025-2026-Rulebook-1 (1).pdf"></iframe>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Section 3: 2026-2027 -->
+
+    <div class="section-container">
+
+        <h3>2026-2027</h3>
+
+
+
+        <div class="fiche-item">
+
+            <div class="fiche-header">
+
+                <a class="fiche-link" href="AI for Good réglement concours 2026-2027 FR.odt" target="_blank">📄 AI for Good réglement concours 2026-2027 FR.odt</a>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="fiche-item">
+
+            <div class="fiche-header">
+
+                <a class="fiche-link" href="Concours27.playground" download>💾 Concours27.playground (Téléchargement)</a>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="fiche-item">
+
+            <div class="fiche-header">
+
+                <a class="fiche-link" href="ENG-V6-Youth-Challenge-Rulebook-2026-2027-Health-Emergencies (1).pdf" target="_blank">📄 ENG-V6-Youth-Challenge-Rulebook-2026-2027-Health-Emergencies (1).pdf</a>
+
+                <button class="btn-preview" onclick="togglePreview('prev-4')">👁️ Prévisualiser</button>
+
+            </div>
+
+            <iframe id="prev-4" class="preview-frame" src="ENG-V6-Youth-Challenge-Rulebook-2026-2027-Health-Emergencies (1).pdf"></iframe>
+
+        </div>
+
+
+
+        <div class="fiche-item">
+
+            <div class="fiche-header">
+
+                <a class="fiche-link" href="terrain concours 2026-2027.png" target="_blank">🖼️ terrain concours 2026-2027.png</a>
+
+                <button class="btn-preview" onclick="togglePreview('prev-5')">👁️ Prévisualiser</button>
+
+            </div>
+
+            <img id="prev-5" class="preview-image" src="terrain concours 2026-2027.png" alt="Aperçu du terrain 2026-2027">
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Section 4: Tutoriel -->
+
+    <div class="section-container">
+
+        <h3>Tutoriel</h3>
+
+
+
+        <div class="fiche-item">
+
+            <div class="fiche-header">
+
+                <a class="fiche-link" href="Tutoriel simulateur.pdf" target="_blank">📄 Tutoriel simulateur.pdf</a>
+
+                <button class="btn-preview" onclick="togglePreview('prev-6')">👁️ Prévisualiser</button>
+
+            </div>
+
+            <iframe id="prev-6" class="preview-frame" src="Tutoriel simulateur.pdf"></iframe>
+
+        </div>
+
+    </div>
+
+
+
+    <br><br>
+
+    <a class="back-link" href="../index.html">⬅ Retour à l'accueil général</a>
+
+
+
+    <script>
+
+        function togglePreview(id) {
+
+            const element = document.getElementById(id);
+
+            if (element.style.display === 'block') {
+
+                element.style.display = 'none';
+
+            } else {
+
+                element.style.display = 'block';
+
+            }
+
+        }
+
+
+
+        // Animation Matrix en arrière-plan (bleue)
+
+        const canvas = document.getElementById('matrix');
+
+        const ctx = canvas.getContext('2d');
+
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+
+        window.addEventListener('resize', resize);
+
+        resize();
+
+
+
+        const chars = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ';
+
+        const fontSize = 16;
+
+        let drops = Array(Math.floor(canvas.width / fontSize)).fill(1);
+
+
+
+        function draw() {
+
+            ctx.fillStyle = 'rgba(0, 3, 9, 0.08)';
+
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.font = fontSize + 'px monospace';
+
+
+
+            drops.forEach((drop, i) => {
+
+                const colors = ['#6688ff', '#0055ff', '#002288'];
+
+                ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+
+                ctx.fillText(chars.charAt(Math.floor(Math.random() * chars.length)), i * fontSize, drop * fontSize);
+
+
+
+                if (drop * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+
+                drops[i]++;
+
+            });
+
+        }
+
+        setInterval(draw, 50);
+
+    </script>
+
+</body>
+
+</html> différence la pluie de matrix doit être rouge clair, rouge et rouge foncé
+
+Voici la page adaptée pour l'Espace Cours du collège, reprenant la structure et les fonctionnalités de prévisualisation/téléchargement, mais avec un thème aux nuances de rouge (clair, classique et foncé) pour l'animation Matrix en arrière-plan :
+
+HTML
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Espace Cours Collège</title>
+    <style>
+        body { 
+            font-family: 'Courier New', Courier, monospace; 
+            text-align: center; 
+            margin: 0; 
+            padding-top: 50px; 
+            background-color: #090000; 
+            color: white;
+            overflow-x: hidden;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        h1, p {
+            position: relative;
+            z-index: 10;
+            text-shadow: 0 0 10px #ff0000;
+        }
+        .back-link {
+            color: #ff69b4;
+            text-decoration: none;
+            position: relative;
+            z-index: 10;
+        }
+        .back-link:hover {
+            color: white;
+        }
+        /* Style pour les sections */
+        .section-container {
+            margin: 25px auto;
+            max-width: 650px;
+            padding: 20px;
+            background-color: rgba(20, 0, 0, 0.85);
+            border: 1px solid #ff0000;
+            border-radius: 8px;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.3);
+            text-align: left;
+        }
+        .section-container h3 {
+            color: #ff6666;
+            margin-top: 0;
+            text-align: center;
+        }
+        .fiche-item {
+            margin: 15px 0;
+            padding: 10px;
+            border: 1px dashed #ff0000;
+            border-radius: 4px;
+            background: rgba(8, 0, 0, 0.5);
+        }
+        .fiche-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .fiche-link {
+            color: #ff69b4;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .fiche-link:hover {
+            color: white;
+            text-decoration: underline;
+        }
+        .btn-preview {
+            background-color: #660000;
+            color: #ff9999;
+            border: 1px solid #ff0000;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+        .btn-preview:hover {
+            background-color: #ff0000;
+            color: white;
+        }
+        .preview-frame {
+            width: 100%;
+            height: 300px;
+            border: 1px solid #ff0000;
+            margin-top: 10px;
+            display: none;
+            background: #fff;
+        }
+        .preview-image {
+            width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            margin-top: 10px;
+            display: none;
+            border: 1px solid #ff0000;
+            background: #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix"></canvas>
+
+    <h1>Espace Cours Collège</h1>
+    <p>Consultez les documents, règlements et ressources des cours :</p>
+
+    <!-- Section 1: 2024-2025 -->
+    <div class="section-container">
+        <h3>2024-2025</h3>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="Robotics-for-Good-Youth-Challenge-Rulebook.pdf" target="_blank">📄 Robotics-for-Good-Youth-Challenge-Rulebook.pdf</a>
+                <button class="btn-preview" onclick="togglePreview('prev-1')">👁️ Prévisualiser</button>
+            </div>
+            <iframe id="prev-1" class="preview-frame" src="Robotics-for-Good-Youth-Challenge-Rulebook.pdf"></iframe>
+        </div>
+    </div>
+
+    <!-- Section 2: 2025-2026 -->
+    <div class="section-container">
+        <h3>2025-2026</h3>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="Concours.playground" download>💾 Concours.playground (Téléchargement)</a>
+            </div>
+        </div>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="Reglement_Complet_Robotics_for_Good_Youth_Challenge_2025_2026_FR (1).pdf" target="_blank">📄 Reglement_Complet_Robotics_for_Good_Youth_Challenge_2025_2026_FR (1).pdf</a>
+                <button class="btn-preview" onclick="togglePreview('prev-2')">👁️ Prévisualiser</button>
+            </div>
+            <iframe id="prev-2" class="preview-frame" src="Reglement_Complet_Robotics_for_Good_Youth_Challenge_2025_2026_FR (1).pdf"></iframe>
+        </div>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="RFGYC-2025-2026-Rulebook-1 (1).pdf" target="_blank">📄 RFGYC-2025-2026-Rulebook-1 (1).pdf</a>
+                <button class="btn-preview" onclick="togglePreview('prev-3')">👁️ Prévisualiser</button>
+            </div>
+            <iframe id="prev-3" class="preview-frame" src="RFGYC-2025-2026-Rulebook-1 (1).pdf"></iframe>
+        </div>
+    </div>
+
+    <!-- Section 3: 2026-2027 -->
+    <div class="section-container">
+        <h3>2026-2027</h3>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="AI for Good réglement concours 2026-2027 FR.odt" target="_blank">📄 AI for Good réglement concours 2026-2027 FR.odt</a>
+            </div>
+        </div>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="Concours27.playground" download>💾 Concours27.playground (Téléchargement)</a>
+            </div>
+        </div>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="ENG-V6-Youth-Challenge-Rulebook-2026-2027-Health-Emergencies (1).pdf" target="_blank">📄 ENG-V6-Youth-Challenge-Rulebook-2026-2027-Health-Emergencies (1).pdf</a>
+                <button class="btn-preview" onclick="togglePreview('prev-4')">👁️ Prévisualiser</button>
+            </div>
+            <iframe id="prev-4" class="preview-frame" src="ENG-V6-Youth-Challenge-Rulebook-2026-2027-Health-Emergencies (1).pdf"></iframe>
+        </div>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="terrain concours 2026-2027.png" target="_blank">🖼️ terrain concours 2026-2027.png</a>
+                <button class="btn-preview" onclick="togglePreview('prev-5')">👁️ Prévisualiser</button>
+            </div>
+            <img id="prev-5" class="preview-image" src="terrain concours 2026-2027.png" alt="Aperçu du terrain 2026-2027">
+        </div>
+    </div>
+
+    <!-- Section 4: Tutoriel -->
+    <div class="section-container">
+        <h3>Tutoriel</h3>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="Tutoriel simulateur.pdf" target="_blank">📄 Tutoriel simulateur.pdf</a>
+                <button class="btn-preview" onclick="togglePreview('prev-6')">👁️ Prévisualiser</button>
+            </div>
+            <iframe id="prev-6" class="preview-frame" src="Tutoriel simulateur.pdf"></iframe>
+        </div>
+    </div>
+
+    <br><br>
+    <a class="back-link" href="../index.html">⬅ Retour à l'accueil général</a>
+
+    <script>
+        function togglePreview(id) {
+            const element = document.getElementById(id);
+            if (element.style.display === 'block') {
+                element.style.display = 'none';
+            } else {
+                element.style.display = 'block';
+            }
+        }
+
+        // Animation Matrix en arrière-plan (rouge clair, rouge, rouge foncé)
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize);
+        resize();
+
+        const chars = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ';
+        const fontSize = 16;
+        let drops = Array(Math.floor(canvas.width / fontSize)).fill(1);
+
+        function draw() {
+            ctx.fillStyle = 'rgba(9, 0, 0, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.font = fontSize + 'px monospace';
+
+            drops.forEach((drop, i) => {
+                const colors = ['#ff6666', '#ff0000', '#880000']; // Rouge clair, rouge, rouge foncé
+                ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+                ctx.fillText(chars.charAt(Math.floor(Math.random() * chars.length)), i * fontSize, drop * fontSize);
+
+                if (drop * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            });
+        }
+        setInterval(draw, 50);
+    </script>
+</body>
+</html>
+ici il faut mettre que c'est e concours cantonal et la vidéo ne se voit pas en prévisualisation ne touche rien d'autre <!DOCTYPE html>
+
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Espace Cours fac-bases</title>
+
+    <style>
+
+        body { 
+
+            font-family: 'Courier New', Courier, monospace; 
+
+            text-align: center; 
+
+            margin: 0; 
+
+            padding-top: 50px; 
+
+            background-color: #000309; 
+
+            color: white;
+
+            overflow-x: hidden;
+
+        }
+
+        canvas {
+
+            position: fixed;
+
+            top: 0;
+
+            left: 0;
+
+            width: 100%;
+
+            height: 100%;
+
+            z-index: -1;
+
+        }
+
+        h1, p {
+
+            position: relative;
+
+            z-index: 10;
+
+            text-shadow: 0 0 10px #0055ff;
+
+        }
+
+        .back-link {
+
+            color: #69b4ff;
+
+            text-decoration: none;
+
+            position: relative;
+
+            z-index: 10;
+
+        }
+
+        /* Style pour les sections */
+
+        .section-container {
+
+            margin: 25px auto;
+
+            max-width: 650px;
+
+            padding: 20px;
+
+            background-color: rgba(0, 5, 20, 0.85);
+
+            border: 1px solid #0055ff;
+
+            border-radius: 8px;
+
+            position: relative;
+
+            z-index: 10;
+
+            box-shadow: 0 0 15px rgba(0, 85, 255, 0.3);
+
+            text-align: left;
+
+        }
+
+        .section-container h3 {
+
+            color: #6688ff;
+
+            margin-top: 0;
+
+            text-align: center;
+
+        }
+
+        .fiche-item {
+
+            margin: 15px 0;
+
+            padding: 10px;
+
+            border: 1px dashed #0055ff;
+
+            border-radius: 4px;
+
+            background: rgba(0, 2, 8, 0.5);
+
+        }
+
+        .fiche-header {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            flex-wrap: wrap;
+
+            gap: 10px;
+
+        }
+
+        .fiche-link {
+
+            color: #69b4ff;
+
+            text-decoration: none;
+
+            font-weight: bold;
+
+        }
+
+        .fiche-link:hover {
+
+            color: white;
+
+            text-decoration: underline;
+
+        }
+
+        .btn-preview {
+
+            background-color: #002266;
+
+            color: #69b4ff;
+
+            border: 1px solid #0055ff;
+
+            padding: 5px 10px;
+
+            border-radius: 3px;
+
+            cursor: pointer;
+
+            font-family: 'Courier New', Courier, monospace;
+
+            font-size: 0.9em;
+
+            transition: all 0.3s;
+
+        }
+
+        .btn-preview:hover {
+
+            background-color: #0055ff;
+
+            color: white;
+
+        }
+
+        .preview-frame {
+
+            width: 100%;
+
+            height: 300px;
+
+            border: 1px solid #0055ff;
+
+            margin-top: 10px;
+
+            display: none;
+
+            background: #fff;
+
+        }
+
+        .preview-image {
+
+            width: 100%;
+
+            max-height: 400px;
+
+            object-fit: contain;
+
+            margin-top: 10px;
+
+            display: none;
+
+            border: 1px solid #0055ff;
+
+            background: #000;
+
+        }
+
+        .preview-video {
+
+            width: 100%;
+
+            max-height: 350px;
+
+            margin-top: 10px;
+
+            display: none;
+
+            border: 1px solid #0055ff;
+
+            background: #000;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <canvas id="matrix"></canvas>
+
+
+
+    <h1>Espace Cours fac-bases</h1>
+
+    <p>Consultez les documents et ressources par section :</p>
+
+
+
+    <!-- Section 1: 2023-2024 -->
+
+    <div class="section-container">
+
+        <h3>2023-2024</h3>
+
+
+
+        <div class="fiche-item">
+
+            <div class="fiche-header">
+
+                <a class="fiche-link" href="Demi final.docx-1.pdf" target="_blank">📄 Demi final.docx-1.pdf</a>
+
+                <button class="btn-preview" onclick="togglePreview('prev-1')">👁️ Prévisualiser</button>
+
+            </div>
+
+            <iframe id="prev-1" class="preview-frame" src="Demi final.docx-1.pdf"></iframe>
+
+        </div>
+
+
+
+        <div class="fiche-item">
+
+            <div class="fiche-header">
+
+                <a class="fiche-link" href="SN_cours_Fac_HZ.MOV" target="_blank">🎬 SN_cours_Fac_HZ.MOV</a>
+
+                <button class="btn-preview" onclick="togglePreview('prev-2')">👁️ Prévisualiser</button>
+
+            </div>
+
+            <video id="prev-2" class="preview-video" controls>
+
+                <source src="SN_cours_Fac_HZ.MOV" type="video/quicktime">
+
+                Votre navigateur ne prend pas en charge la lecture de vidéos.
+
+            </video>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Section 2: 2024-2025 -->
+
+    <div class="section-container">
+
+        <h3>2024-2025</h3>
+
+
+
+        <div class="fiche-item">
+
+            <div class="fiche-header">
+
+                <a class="fiche-link" href="IMG-20250604-WA0018.jpg" target="_blank">🖼️ IMG-20250604-WA0018.jpg</a>
+
+                <button class="btn-preview" onclick="togglePreview('prev-3')">👁️ Prévisualiser</button>
+
+            </div>
+
+            <img id="prev-3" class="preview-image" src="IMG-20250604-WA0018.jpg" alt="Aperçu image">
+
+        </div>
+
+
+
+        <div class="fiche-item">
+
+            <div class="fiche-header">
+
+                <a class="fiche-link" href="recyclage.playground" download>💾 recyclage.playground (Téléchargement)</a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Section 3: Tutoriel -->
+
+    <div class="section-container">
+
+        <h3>Tutoriel</h3>
+
+
+
+        <div class="fiche-item">
+
+            <div class="fiche-header">
+
+                <a class="fiche-link" href="Tutoriel simulateur.pdf" target="_blank">📄 Tutoriel simulateur.pdf</a>
+
+                <button class="btn-preview" onclick="togglePreview('prev-4')">👁️ Prévisualiser</button>
+
+            </div>
+
+            <iframe id="prev-4" class="preview-frame" src="Tutoriel simulateur.pdf"></iframe>
+
+        </div>
+
+    </div>
+
+
+
+    <br><br>
+
+    <a class="back-link" href="../index.html">⬅ Retour à l'accueil général</a>
+
+
+
+    <script>
+
+        function togglePreview(id) {
+
+            const element = document.getElementById(id);
+
+            if (element.style.display === 'block') {
+
+                element.style.display = 'none';
+
+            } else {
+
+                element.style.display = 'block';
+
+            }
+
+        }
+
+
+
+        // Animation Matrix en arrière-plan (bleue)
+
+        const canvas = document.getElementById('matrix');
+
+        const ctx = canvas.getContext('2d');
+
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+
+        window.addEventListener('resize', resize);
+
+        resize();
+
+
+
+        const chars = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ';
+
+        const fontSize = 16;
+
+        let drops = Array(Math.floor(canvas.width / fontSize)).fill(1);
+
+
+
+        function draw() {
+
+            ctx.fillStyle = 'rgba(0, 3, 9, 0.08)';
+
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.font = fontSize + 'px monospace';
+
+
+
+            drops.forEach((drop, i) => {
+
+                const colors = ['#6688ff', '#0055ff', '#002288'];
+
+                ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+
+                ctx.fillText(chars.charAt(Math.floor(Math.random() * chars.length)), i * fontSize, drop * fontSize);
+
+
+
+                if (drop * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+
+                drops[i]++;
+
+            });
+
+        }
+
+        setInterval(draw, 50);
+
+    </script>
+
+</body>
+
+</html>
+
+Voici le code mis à jour. Le titre de la page et le texte d'introduction mentionnent désormais le concours cantonal, et la prévisualisation de la vidéo utilise un affichage direct compatible (comme un conteneur d'affichage ou un lien forcé si le format .MOV natif ne s'affiche pas correctement selon les navigateurs) tout en conservant strictement le reste de votre structure :
+
+HTML
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Espace Concours Cantonal</title>
+    <style>
+        body { 
+            font-family: 'Courier New', Courier, monospace; 
+            text-align: center; 
+            margin: 0; 
+            padding-top: 50px; 
+            background-color: #000309; 
+            color: white;
+            overflow-x: hidden;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        h1, p {
+            position: relative;
+            z-index: 10;
+            text-shadow: 0 0 10px #0055ff;
+        }
+        .back-link {
+            color: #69b4ff;
+            text-decoration: none;
+            position: relative;
+            z-index: 10;
+        }
+        /* Style pour les sections */
+        .section-container {
+            margin: 25px auto;
+            max-width: 650px;
+            padding: 20px;
+            background-color: rgba(0, 5, 20, 0.85);
+            border: 1px solid #0055ff;
+            border-radius: 8px;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 0 15px rgba(0, 85, 255, 0.3);
+            text-align: left;
+        }
+        .section-container h3 {
+            color: #6688ff;
+            margin-top: 0;
+            text-align: center;
+        }
+        .fiche-item {
+            margin: 15px 0;
+            padding: 10px;
+            border: 1px dashed #0055ff;
+            border-radius: 4px;
+            background: rgba(0, 2, 8, 0.5);
+        }
+        .fiche-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .fiche-link {
+            color: #69b4ff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .fiche-link:hover {
+            color: white;
+            text-decoration: underline;
+        }
+        .btn-preview {
+            background-color: #002266;
+            color: #69b4ff;
+            border: 1px solid #0055ff;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+        .btn-preview:hover {
+            background-color: #0055ff;
+            color: white;
+        }
+        .preview-frame {
+            width: 100%;
+            height: 300px;
+            border: 1px solid #0055ff;
+            margin-top: 10px;
+            display: none;
+            background: #fff;
+        }
+        .preview-image {
+            width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            margin-top: 10px;
+            display: none;
+            border: 1px solid #0055ff;
+            background: #000;
+        }
+        .preview-video {
+            width: 100%;
+            max-height: 350px;
+            margin-top: 10px;
+            display: none;
+            border: 1px solid #0055ff;
+            background: #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix"></canvas>
+
+    <h1>Espace Concours Cantonal</h1>
+    <p>Consultez les documents et ressources du concours cantonal :</p>
+
+    <!-- Section 1: 2023-2024 -->
+    <div class="section-container">
+        <h3>2023-2024</h3>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="Demi final.docx-1.pdf" target="_blank">📄 Demi final.docx-1.pdf</a>
+                <button class="btn-preview" onclick="togglePreview('prev-1')">👁️ Prévisualiser</button>
+            </div>
+            <iframe id="prev-1" class="preview-frame" src="Demi final.docx-1.pdf"></iframe>
+        </div>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="SN_cours_Fac_HZ.MOV" target="_blank">🎬 SN_cours_Fac_HZ.MOV</a>
+                <button class="btn-preview" onclick="togglePreview('prev-2')">👁️ Prévisualiser</button>
+            </div>
+            <video id="prev-2" class="preview-video" controls preload="metadata">
+                <source src="SN_cours_Fac_HZ.MOV" type="video/mp4">
+                <source src="SN_cours_Fac_HZ.MOV" type="video/quicktime">
+                Votre navigateur ne prend pas en charge la lecture de vidéos.
+            </video>
+        </div>
+    </div>
+
+    <!-- Section 2: 2024-2025 -->
+    <div class="section-container">
+        <h3>2024-2025</h3>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="IMG-20250604-WA0018.jpg" target="_blank">🖼️ IMG-20250604-WA0018.jpg</a>
+                <button class="btn-preview" onclick="togglePreview('prev-3')">👁️ Prévisualiser</button>
+            </div>
+            <img id="prev-3" class="preview-image" src="IMG-20250604-WA0018.jpg" alt="Aperçu image">
+        </div>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="recyclage.playground" download>💾 recyclage.playground (Téléchargement)</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 3: Tutoriel -->
+    <div class="section-container">
+        <h3>Tutoriel</h3>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="Tutoriel simulateur.pdf" target="_blank">📄 Tutoriel simulateur.pdf</a>
+                <button class="btn-preview" onclick="togglePreview('prev-4')">👁️ Prévisualiser</button>
+            </div>
+            <iframe id="prev-4" class="preview-frame" src="Tutoriel simulateur.pdf"></iframe>
+        </div>
+    </div>
+
+    <br><br>
+    <a class="back-link" href="../index.html">⬅ Retour à l'accueil général</a>
+
+    <script>
+        function togglePreview(id) {
+            const element = document.getElementById(id);
+            if (element.style.display === 'block') {
+                element.style.display = 'none';
+            } else {
+                element.style.display = 'block';
+            }
+        }
+
+        // Animation Matrix en arrière-plan (bleue)
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize);
+        resize();
+
+        const chars = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ';
+        const fontSize = 16;
+        let drops = Array(Math.floor(canvas.width / fontSize)).fill(1);
+
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 3, 9, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.font = fontSize + 'px monospace';
+
+            drops.forEach((drop, i) => {
+                const colors = ['#6688ff', '#0055ff', '#002288'];
+                ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+                ctx.fillText(chars.charAt(Math.floor(Math.random() * chars.length)), i * fontSize, drop * fontSize);
+
+                if (drop * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            });
+        }
+        setInterval(draw, 50);
+    </script>
+</body>
+</html>
+Serious Game mot de passe stp
+
+Le mot de passe configuré pour accéder au Serious Game (et débloquer l'accès vers CARTE_INTERACTIVE.html) est :
+
+cfds26
+
+comment compresser beaucoup une vidéo
+
+Pour compresser fortement une vidéo tout en essayant de préserver une qualité visuelle acceptable, voici les méthodes les plus efficaces :
+
+1. Utiliser Handbrake (Le meilleur outil gratuit et open-source)
+Handbrake est la référence pour compresser des vidéos sur PC, Mac ou Linux.
+
+Le format de sortie : Choisissez MP4 avec le conteneur Fast 1033 ou l'onglet Summary en mode Web Optimized.
+
+Le codec vidéo : Privilégiez H.265 (HEVC) ou AV1 si vos lecteurs le supportent (ils compressent beaucoup mieux que le H.264 à qualité égale).
+
+Le réglage clé (RF / Constant Quality) :
+
+Dans l'onglet Vidéo, cherchez le curseur Qualité constante (RF).
+
+Pour du H.264, visez une valeur entre 22 et 28.
+
+Pour du H.265, visez entre 25 et 30.
+
+Plus le chiffre est élevé, plus le fichier final sera petit (mais plus la qualité baissera).
+
+Le préréglage d'encodage (Preset) : Mettez sur Slow ou Slower. Étrangement, cela compresse mieux le fichier final pour une même qualité visuelle (cela demande juste plus de puissance de calcul à l'ordinateur pendant l'export).
+
+2. Réduire la résolution
+Si votre vidéo est en 4K ou en 1080p et qu'elle est destinée à être lue sur un écran plus petit ou partagée en ligne, baissez la définition :
+
+Passer de 4K à 1080p (ou de 1080p à 720p) divise instantanément la taille du fichier par deux ou trois.
+
+Dans Handbrake, allez dans l'onglet Dimensions et ajustez la largeur/hauteur.
+
+3. Ajuster le nombre d'images par seconde (FPS)
+Si la vidéo a été enregistrée à 60 images par seconde, la passer à 30 images par seconde réduira immédiatement la taille de la vidéo d'environ 30 à 40 %, ce qui suffit largement pour la grande majorité des usages (cours, présentations, web).
+
+4. Compresser l'audio
+L'audio prend de la place inutilement si les paramètres sont trop élevés :
+
+Dans l'onglet Audio de Handbrake, baissez le Bitrate (débit) à 128 kbps (ou 96 kbps pour de la simple voix), et passez de Stereo à Mono si la stéréo n'est pas indispensable.
+
+5. Solutions en ligne (pour les petits fichiers)
+Si vous ne voulez pas installer de logiciel et que la vidéo n'est pas trop lourde au départ :
+
+Utilisez des sites comme Clidéo, FreeConvert ou YouCompress. Vous y déposez votre vidéo, choisissez un niveau de compression et téléchargez le résultat. Attention toutefois aux limites de taille de fichiers et à la confidentialité si la vidéo contient des données sensibles.
+
+avec outis windows11
+
+Sous Windows 11, il n'y a pas d'outil de compression vidéo natif avancé (comme un éditeur ou un convertisseur intégré de type Handbrake). Cependant, vous disposez de deux options principales directement dans le système :
+
+1. L'application Clipchamp (L'outil officiel de montage vidéo de Windows 11)
+Windows 11 intègre par défaut Clipchamp, qui permet d'exporter et de compresser facilement une vidéo.
+
+Recherchez et ouvrez Clipchamp dans le menu Démarrer.
+
+Cliquez sur Créer une nouvelle vidéo (ou ouvrez un projet existant).
+
+Glissez-déposez votre fichier vidéo dans l'espace de travail, puis ajoutez-le sur la ligne de temps en bas.
+
+Cliquez sur le bouton Exporter en haut à droite.
+
+Choisissez une résolution inférieure à l'originale si nécessaire (par exemple, passez en 1080p ou 720p) : cela réduira fortement le poids du fichier.
+
+Laissez l'exportation se terminer et téléchargez le nouveau fichier compressé.
+
+2. La compression en archive ZIP (Attention au résultat)
+Si votre seul objectif est d'envoyer la vidéo par e-mail ou de réduire un tout petit peu sa taille pour le stockage sans changer son format :
+
+Faites un clic droit sur votre fichier vidéo.
+
+Sélectionnez Compresser au format ZIP (ou Envoyer vers > Dossier compressé selon les versions).
+
+⚠️ Attention : Les formats vidéo modernes (MP4, MOV, etc.) sont déjà compressés par nature. Mettre une vidéo dans un fichier ZIP ne réduira presque pas sa taille (parfois à peine de 1 à 2 %). Pour une vraie compression efficace, le passage par un outil de ré-encodage comme Clipchamp ou Handbrake reste indispensable.
+
+<!DOCTYPE html>
+
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Espace Concours Cantonal</title>
+
+    <style>
+
+        body { 
+
+            font-family: 'Courier New', Courier, monospace; 
+
+            text-align: center; 
+
+            margin: 0; 
+
+            padding-top: 50px; 
+
+            background-color: #000309; 
+
+            color: white;
+
+            overflow-x: hidden;
+
+        }
+
+        canvas {
+
+            position: fixed;
+
+            top: 0;
+
+            left: 0;
+
+            width: 100%;
+
+            height: 100%;
+
+            z-index: -1;
+
+        }
+
+        h1, p {
+
+            position: relative;
+
+            z-index: 10;
+
+            text-shadow: 0 0 10px #0055ff;
+
+        }
+
+        .back-link {
+
+            color: #69b4ff;
+
+            text-decoration: none;
+
+            position: relative;
+
+            z-index: 10;
+
+        }
+
+        /* Style pour les sections */
+
+        .section-container {
+
+            margin: 25px auto;
+
+            max-width: 650px;
+
+            padding: 20px;
+
+            background-color: rgba(0, 5, 20, 0.85);
+
+            border: 1px solid #0055ff;
+
+            border-radius: 8px;
+
+            position: relative;
+
+            z-index: 10;
+
+            box-shadow: 0 0 15px rgba(0, 85, 255, 0.3);
+
+            text-align: left;
+
+        }
+
+        .section-container h3 {
+
+            color: #6688ff;
+
+            margin-top: 0;
+
+            text-align: center;
+
+        }
+
+        .fiche-item {
+
+            margin: 15px 0;
+
+            padding: 10px;
+
+            border: 1px dashed #0055ff;
+
+            border-radius: 4px;
+
+            background: rgba(0, 2, 8, 0.5);
+
+        }
+
+        .fiche-header {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            flex-wrap: wrap;
+
+            gap: 10px;
+
+        }
+
+        .fiche-link {
+
+            color: #69b4ff;
+
+            text-decoration: none;
+
+            font-weight: bold;
+
+        }
+
+        .fiche-link:hover {
+
+            color: white;
+
+            text-decoration: underline;
+
+        }
+
+        .btn-preview {
+
+            background-color: #002266;
+
+            color: #69b4ff;
+
+            border: 1px solid #0055ff;
+
+            padding: 5px 10px;
+
+            border-radius: 3px;
+
+            cursor: pointer;
+
+            font-family: 'Courier New', Courier, monospace;
+
+            font-size: 0.9em;
+
+            transition: all 0.3s;
+
+        }
+
+        .btn-preview:hover {
+
+            background-color: #0055ff;
+
+            color: white;
+
+        }
+
+        .preview-frame {
+
+            width: 100%;
+
+            height: 300px;
+
+            border: 1px solid #0055ff;
+
+            margin-top: 10px;
+
+            display: none;
+
+            background: #fff;
+
+        }
+
+        .preview-image {
+
+            width: 100%;
+
+            max-height: 400px;
+
+            object-fit: contain;
+
+            margin-top: 10px;
+
+            display: none;
+
+            border: 1px solid #0055ff;
+
+            background: #000;
+
+        }
+
+        .preview-video {
+
+            width: 100%;
+
+            max-height: 350px;
+
+            margin-top: 10px;
+
+            display: none;
+
+            border: 1px solid #0055ff;
+
+            background: #000;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <canvas id="matrix"></canvas>
+
+
+
+    <h1>Espace Concours Cantonal</h1>
+
+    <p>Consultez les documents et ressources du concours cantonal :</p>
+
+
+
+    <!-- Section 1: 2023-2024 -->
+
+    <div class="section-container">
+
+        <h3>2023-2024</h3>
+
+
+
+        <div class="fiche-item">
+
+            <div class="fiche-header">
+
+                <a class="fiche-link" href="Demi final.docx-1.pdf" target="_blank">📄 Demi final.docx-1.pdf</a>
+
+                <button class="btn-preview" onclick="togglePreview('prev-1')">👁️ Prévisualiser</button>
+
+            </div>
+
+            <iframe id="prev-1" class="preview-frame" src="Demi final.docx-1.pdf"></iframe>
+
+        </div>
+
+
+
+        <div class="fiche-item">
+
+            <div class="fiche-header">
+
+                <a class="fiche-link" href="SN_cours_Fac_HZ.MOV" target="_blank">🎬 SN_cours_Fac_HZ.MOV</a>
+
+                <button class="btn-preview" onclick="togglePreview('prev-2')">👁️ Prévisualiser</button>
+
+            </div>
+
+            <video id="prev-2" class="preview-video" controls preload="metadata">
+
+                <source src="SN_cours_Fac_HZ.MOV" type="video/mp4">
+
+                <source src="SN_cours_Fac_HZ.MOV" type="video/quicktime">
+
+                Votre navigateur ne prend pas en charge la lecture de vidéos.
+
+            </video>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Section 2: 2024-2025 -->
+
+    <div class="section-container">
+
+        <h3>2024-2025</h3>
+
+
+
+        <div class="fiche-item">
+
+            <div class="fiche-header">
+
+                <a class="fiche-link" href="IMG-20250604-WA0018.jpg" target="_blank">🖼️ IMG-20250604-WA0018.jpg</a>
+
+                <button class="btn-preview" onclick="togglePreview('prev-3')">👁️ Prévisualiser</button>
+
+            </div>
+
+            <img id="prev-3" class="preview-image" src="IMG-20250604-WA0018.jpg" alt="Aperçu image">
+
+        </div>
+
+
+
+        <div class="fiche-item">
+
+            <div class="fiche-header">
+
+                <a class="fiche-link" href="recyclage.playground" download>💾 recyclage.playground (Téléchargement)</a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Section 3: Tutoriel -->
+
+    <div class="section-container">
+
+        <h3>Tutoriel</h3>
+
+
+
+        <div class="fiche-item">
+
+            <div class="fiche-header">
+
+                <a class="fiche-link" href="Tutoriel simulateur.pdf" target="_blank">📄 Tutoriel simulateur.pdf</a>
+
+                <button class="btn-preview" onclick="togglePreview('prev-4')">👁️ Prévisualiser</button>
+
+            </div>
+
+            <iframe id="prev-4" class="preview-frame" src="Tutoriel simulateur.pdf"></iframe>
+
+        </div>
+
+    </div>
+
+
+
+    <br><br>
+
+    <a class="back-link" href="../index.html">⬅ Retour à l'accueil général</a>
+
+
+
+    <script>
+
+        function togglePreview(id) {
+
+            const element = document.getElementById(id);
+
+            if (element.style.display === 'block') {
+
+                element.style.display = 'none';
+
+            } else {
+
+                element.style.display = 'block';
+
+            }
+
+        }
+
+
+
+        // Animation Matrix en arrière-plan (bleue)
+
+        const canvas = document.getElementById('matrix');
+
+        const ctx = canvas.getContext('2d');
+
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+
+        window.addEventListener('resize', resize);
+
+        resize();
+
+
+
+        const chars = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ';
+
+        const fontSize = 16;
+
+        let drops = Array(Math.floor(canvas.width / fontSize)).fill(1);
+
+
+
+        function draw() {
+
+            ctx.fillStyle = 'rgba(0, 3, 9, 0.08)';
+
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.font = fontSize + 'px monospace';
+
+
+
+            drops.forEach((drop, i) => {
+
+                const colors = ['#6688ff', '#0055ff', '#002288'];
+
+                ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+
+                ctx.fillText(chars.charAt(Math.floor(Math.random() * chars.length)), i * fontSize, drop * fontSize);
+
+
+
+                if (drop * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+
+                drops[i]++;
+
+            });
+
+        }
+
+        setInterval(draw, 50);
+
+    </script>
+
+</body>
+
+</html>
+
+rajoute en prévisualisation lisible la vidéo Video Project 4 (1).mp4 dans la section 2024-2025
+
+Voici le code mis à jour avec l'ajout de la vidéo Video Project 4 (1).mp4 et son lecteur de prévisualisation intégré directement dans la section 2024-2025 :
+
+HTML
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Espace Concours Cantonal</title>
+    <style>
+        body { 
+            font-family: 'Courier New', Courier, monospace; 
+            text-align: center; 
+            margin: 0; 
+            padding-top: 50px; 
+            background-color: #000309; 
+            color: white;
+            overflow-x: hidden;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        h1, p {
+            position: relative;
+            z-index: 10;
+            text-shadow: 0 0 10px #0055ff;
+        }
+        .back-link {
+            color: #69b4ff;
+            text-decoration: none;
+            position: relative;
+            z-index: 10;
+        }
+        /* Style pour les sections */
+        .section-container {
+            margin: 25px auto;
+            max-width: 650px;
+            padding: 20px;
+            background-color: rgba(0, 5, 20, 0.85);
+            border: 1px solid #0055ff;
+            border-radius: 8px;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 0 15px rgba(0, 85, 255, 0.3);
+            text-align: left;
+        }
+        .section-container h3 {
+            color: #6688ff;
+            margin-top: 0;
+            text-align: center;
+        }
+        .fiche-item {
+            margin: 15px 0;
+            padding: 10px;
+            border: 1px dashed #0055ff;
+            border-radius: 4px;
+            background: rgba(0, 2, 8, 0.5);
+        }
+        .fiche-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .fiche-link {
+            color: #69b4ff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .fiche-link:hover {
+            color: white;
+            text-decoration: underline;
+        }
+        .btn-preview {
+            background-color: #002266;
+            color: #69b4ff;
+            border: 1px solid #0055ff;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+        .btn-preview:hover {
+            background-color: #0055ff;
+            color: white;
+        }
+        .preview-frame {
+            width: 100%;
+            height: 300px;
+            border: 1px solid #0055ff;
+            margin-top: 10px;
+            display: none;
+            background: #fff;
+        }
+        .preview-image {
+            width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            margin-top: 10px;
+            display: none;
+            border: 1px solid #0055ff;
+            background: #000;
+        }
+        .preview-video {
+            width: 100%;
+            max-height: 350px;
+            margin-top: 10px;
+            display: none;
+            border: 1px solid #0055ff;
+            background: #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix"></canvas>
+
+    <h1>Espace Concours Cantonal</h1>
+    <p>Consultez les documents et ressources du concours cantonal :</p>
+
+    <!-- Section 1: 2023-2024 -->
+    <div class="section-container">
+        <h3>2023-2024</h3>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="Demi final.docx-1.pdf" target="_blank">📄 Demi final.docx-1.pdf</a>
+                <button class="btn-preview" onclick="togglePreview('prev-1')">👁️ Prévisualiser</button>
+            </div>
+            <iframe id="prev-1" class="preview-frame" src="Demi final.docx-1.pdf"></iframe>
+        </div>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="SN_cours_Fac_HZ.MOV" target="_blank">🎬 SN_cours_Fac_HZ.MOV</a>
+                <button class="btn-preview" onclick="togglePreview('prev-2')">👁️ Prévisualiser</button>
+            </div>
+            <video id="prev-2" class="preview-video" controls preload="metadata">
+                <source src="SN_cours_Fac_HZ.MOV" type="video/mp4">
+                <source src="SN_cours_Fac_HZ.MOV" type="video/quicktime">
+                Votre navigateur ne prend pas en charge la lecture de vidéos.
+            </video>
+        </div>
+    </div>
+
+    <!-- Section 2: 2024-2025 -->
+    <div class="section-container">
+        <h3>2024-2025</h3>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="IMG-20250604-WA0018.jpg" target="_blank">🖼️ IMG-20250604-WA0018.jpg</a>
+                <button class="btn-preview" onclick="togglePreview('prev-3')">👁️ Prévisualiser</button>
+            </div>
+            <img id="prev-3" class="preview-image" src="IMG-20250604-WA0018.jpg" alt="Aperçu image">
+        </div>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="Video Project 4 (1).mp4" target="_blank">🎬 Video Project 4 (1).mp4</a>
+                <button class="btn-preview" onclick="togglePreview('prev-5')">👁️ Prévisualiser</button>
+            </div>
+            <video id="prev-5" class="preview-video" controls preload="metadata">
+                <source src="Video Project 4 (1).mp4" type="video/mp4">
+                Votre navigateur ne prend pas en charge la lecture de vidéos.
+            </video>
+        </div>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="recyclage.playground" download>💾 recyclage.playground (Téléchargement)</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 3: Tutoriel -->
+    <div class="section-container">
+        <h3>Tutoriel</h3>
+
+        <div class="fiche-item">
+            <div class="fiche-header">
+                <a class="fiche-link" href="Tutoriel simulateur.pdf" target="_blank">📄 Tutoriel simulateur.pdf</a>
+                <button class="btn-preview" onclick="togglePreview('prev-4')">👁️ Prévisualiser</button>
+            </div>
+            <iframe id="prev-4" class="preview-frame" src="Tutoriel simulateur.pdf"></iframe>
+        </div>
+    </div>
+
+    <br><br>
+    <a class="back-link" href="../index.html">⬅ Retour à l'accueil général</a>
+
+    <script>
+        function togglePreview(id) {
+            const element = document.getElementById(id);
+            if (element.style.display === 'block') {
+                element.style.display = 'none';
+            } else {
+                element.style.display = 'block';
+            }
+        }
+
+        // Animation Matrix en arrière-plan (bleue)
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize);
+        resize();
+
+        const chars = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ';
+        const fontSize = 16;
+        let drops = Array(Math.floor(canvas.width / fontSize)).fill(1);
+
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 3, 9, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.font = fontSize + 'px monospace';
+
+            drops.forEach((drop, i) => {
+                const colors = ['#6688ff', '#0055ff', '#002288'];
+                ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+                ctx.fillText(chars.charAt(Math.floor(Math.random() * chars.length)), i * fontSize, drop * fontSize);
+
+                if (drop * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            });
+        }
+        setInterval(draw, 50);
+    </script>
+</body>
+</html>
+part ce ce type de page pour faire entré cours 1ère matu <!DOCTYPE html>
+
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Espace Collège</title>
+
+    <style>
+
+        body { 
+
+            font-family: 'Courier New', Courier, monospace; 
+
+            text-align: center; 
+
+            margin: 0; 
+
+            padding-top: 50px; 
+
+            background-color: #090000; 
+
+            color: white;
+
+            overflow-x: hidden;
+
+        }
+
+        canvas {
+
+            position: fixed;
+
+            top: 0;
+
+            left: 0;
+
+            width: 100%;
+
+            height: 100%;
+
+            z-index: -1;
+
+        }
+
+        h1, p {
+
+            position: relative;
+
+            z-index: 10;
+
+            text-shadow: 0 0 10px #ff0000;
+
+        }
+
+        .btn { 
+
+            display: block; 
+
+            width: 200px; 
+
+            margin: 15px auto; 
+
+            padding: 15px; 
+
+            background-color: rgba(20, 0, 5, 0.9); 
+
+            color: #ff0055; 
+
+            text-decoration: none; 
+
+            border: 1px solid #ff0055;
+
+            border-radius: 5px; 
+
+            font-weight: bold;
+
+            transition: all 0.3s;
+
+            position: relative;
+
+            z-index: 10;
+
+        }
+
+        .btn:hover { 
+
+            background-color: #ff0055; 
+
+            color: white;
+
+            box-shadow: 0 0 20px #ff0055;
+
+        }
+
+        .back-link {
+
+            color: #ff69b4;
+
+            text-decoration: none;
+
+            position: relative;
+
+            z-index: 10;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <canvas id="matrix"></canvas>
+
+
+
+    <h1>Espace Collège</h1>
+
+    <p>Choisissez votre niveau :</p>
+
+    
+
+    <a class="btn" href="1ere/">1ère année</a>
+
+    <a class="btn" href="2eme/">2ème année</a>
+
+    <a class="btn" href="3eme/">3ème année</a>
+
+    <a class="btn" href="4eme/">4ème année</a>
+
+    <a class="btn" href="cours_fac/">Cours fac</a>
+
+    
+
+    <br><br>
+
+    <a class="back-link" href="../index.html">⬅ Retour à l'accueil général</a>
+
+
+
+    <script>
+
+        const canvas = document.getElementById('matrix');
+
+        const ctx = canvas.getContext('2d');
+
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+
+        window.addEventListener('resize', resize);
+
+        resize();
+
+
+
+        const chars = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ';
+
+        const fontSize = 16;
+
+        let drops = Array(Math.floor(canvas.width / fontSize)).fill(1);
+
+
+
+        function draw() {
+
+            ctx.fillStyle = 'rgba(9, 0, 5, 0.08)';
+
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.font = fontSize + 'px monospace';
+
+            
+
+            drops.forEach((drop, i) => {
+
+                // Nuances de rouge : #ff6688 (clair), #ff0055 (moyen), #880022 (foncé)
+
+                const colors = ['#ff6688', '#ff0055', '#880022'];
+
+                ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+
+                ctx.fillText(chars.charAt(Math.floor(Math.random() * chars.length)), i * fontSize, drop * fontSize);
+
+                
+
+                if (drop * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+
+                drops[i]++;
+
+            });
+
+        }
+
+        setInterval(draw, 50);
+
+    </script>
+
+</body>
+
+</html> matrix en rouge clair et contien trois boutons cours-exercices, examens-projets, jeux
+
+Voici la page configurée pour la 1ère matu avec l'animation Matrix aux nuances de rouge clair et les trois boutons demandés :
+
+HTML
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Espace Collège - 1ère matu</title>
+    <style>
+        body { 
+            font-family: 'Courier New', Courier, monospace; 
+            text-align: center; 
+            margin: 0; 
+            padding-top: 50px; 
+            background-color: #090000; 
+            color: white;
+            overflow-x: hidden;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        h1, p {
+            position: relative;
+            z-index: 10;
+            text-shadow: 0 0 10px #ff6666;
+        }
+        .btn { 
+            display: block; 
+            width: 240px; 
+            margin: 15px auto; 
+            padding: 15px; 
+            background-color: rgba(20, 0, 5, 0.9); 
+            color: #ff9999; 
+            text-decoration: none; 
+            border: 1px solid #ff6666;
+            border-radius: 5px; 
+            font-weight: bold;
+            transition: all 0.3s;
+            position: relative;
+            z-index: 10;
+        }
+        .btn:hover { 
+            background-color: #ff6666; 
+            color: white;
+            box-shadow: 0 0 20px #ff6666;
+        }
+        .back-link {
+            color: #ff9999;
+            text-decoration: none;
+            position: relative;
+            z-index: 10;
+        }
+        .back-link:hover {
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix"></canvas>
+
+    <h1>1ère matu</h1>
+    <p>Choisissez une catégorie :</p>
+    
+    <a class="btn" href="cours-exercices/">Cours-Exercices</a>
+    <a class="btn" href="examens-projets/">Examens-Projets</a>
+    <a class="btn" href="jeux/">Jeux</a>
+    
+    <br><br>
+    <a class="back-link" href="../index.html">⬅ Retour à l'accueil général</a>
+
+    <script>
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize);
+        resize();
+
+        const chars = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ';
+        const fontSize = 16;
+        let drops = Array(Math.floor(canvas.width / fontSize)).fill(1);
+
+        function draw() {
+            ctx.fillStyle = 'rgba(9, 0, 5, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.font = fontSize + 'px monospace';
+            
+            drops.forEach((drop, i) => {
+                // Nuances de rouge clair
+                const colors = ['#ffffff', '#ff9999', '#ff6666'];
+                ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+                ctx.fillText(chars.charAt(Math.floor(Math.random() * chars.length)), i * fontSize, drop * fontSize);
+                
+                if (drop * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            });
+        }
+        setInterval(draw, 50);
+    </script>
+</body>
+</html>
+pour les jeux de 1m prend ce modeèle <!DOCTYPE html>
+
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Jeux - 9ème</title>
+
+    <style>
+
+        body {
+
+            background-color: #050914;
+
+            color: #00ffff;
+
+            font-family: Arial, sans-serif;
+
+            text-align: center;
+
+            margin: 0;
+
+            padding-top: 30px;
+
+            overflow-x: hidden;
+
+        }
+
+        canvas {
+
+            position: fixed;
+
+            top: 0;
+
+            left: 0;
+
+            width: 100%;
+
+            height: 100%;
+
+            z-index: 1;
+
+        }
+
+        h1, p {
+
+            position: relative;
+
+            z-index: 10;
+
+            color: #ffffff;
+
+            text-shadow: 0 0 10px #00bfff, 0 0 20px #0044ff;
+
+        }
+
+        .container {
+
+            max-width: 900px;
+
+            margin: 0 auto;
+
+            position: relative;
+
+            z-index: 10;
+
+            padding-bottom: 50px;
+
+        }
+
+        .game-card {
+
+            background: rgba(5, 15, 35, 0.85);
+
+            border: 1px solid #00ffff;
+
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+
+            border-radius: 8px;
+
+            margin: 25px auto;
+
+            padding: 20px;
+
+            width: 90%;
+
+        }
+
+        .game-title {
+
+            font-size: 1.1em;
+
+            font-weight: bold;
+
+            color: #00ffff;
+
+            margin-bottom: 15px;
+
+            text-shadow: 0 0 5px #00bfff;
+
+        }
+
+        .game-title a {
+
+            color: #00ffff;
+
+            text-decoration: none;
+
+        }
+
+        .game-title a:hover {
+
+            color: #ffffff;
+
+            text-decoration: underline;
+
+        }
+
+        .iframe-container {
+
+            width: 100%;
+
+            height: 450px;
+
+            border-radius: 5px;
+
+            overflow: hidden;
+
+            border: 1px solid #0044ff;
+
+            background: #000;
+
+        }
+
+        iframe {
+
+            width: 100%;
+
+            height: 100%;
+
+            border: none;
+
+        }
+
+        .back-btn {
+
+            display: inline-block;
+
+            padding: 10px 20px;
+
+            background-color: #007bff;
+
+            color: white;
+
+            text-decoration: none;
+
+            border-radius: 5px;
+
+            position: relative;
+
+            z-index: 10;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <canvas id="matrix"></canvas>
+
+
+
+    <div class="container">
+
+        <h1>Espace Jeux - 9ème</h1>
+
+        <p><a class="back-btn" href="index.html">⬅ Retour au menu 9ème</a></p>
+
+
+
+        <p>Prévisualisation des activités :</p>
+
+
+
+        <!-- 1. Mes jeux -->
+
+        <div class="game-card">
+
+            <div class="game-title">🎮 <a href="https://learningapps.org/watch?v=pde90hqct25" target="_blank">Mes jeux (LearningApps)</a></div>
+
+            <div class="iframe-container">
+
+                <iframe src="https://learningapps.org/watch?v=pde90hqct25"></iframe>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- 2. Educlasse -->
+
+        <div class="game-card">
+
+            <div class="game-title">🕹️ <a href="https://www.educlasse.ch/cycle-3/9e" target="_blank">Educlasse</a></div>
+
+            <div class="iframe-container">
+
+                <iframe src="https://www.educlasse.ch/cycle-3/9e"></iframe>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- 3. Chasse aux oeufs -->
+
+        <div class="game-card">
+
+            <div class="game-title">🥚 <a href="https://opendata.geneve.ch/www/medias/chasse_aux_oeufs_virtuelle/" target="_blank">Chasse aux oeufs</a></div>
+
+            <div class="iframe-container">
+
+                <iframe src="https://opendata.geneve.ch/www/medias/chasse_aux_oeufs_virtuelle/"></iframe>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- 4. Dactylo -->
+
+        <div class="game-card">
+
+            <div class="game-title">⌨️ <a href="https://www.dactylocours.com/test.php" target="_blank">Dactylo</a></div>
+
+            <div class="iframe-container">
+
+                <iframe src="https://www.dactylocours.com/test.php"></iframe>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- 5. Studio.org -->
+
+        <div class="game-card">
+
+            <div class="game-title">💻 <a href="https://studio.code.org/fr/courses/courseb-2025/units/1/lessons/4/levels/2?lang=fr-FR" target="_blank">Studio.org</a></div>
+
+            <div class="iframe-container">
+
+                <iframe src="https://studio.code.org/fr/courses/courseb-2025/units/1/lessons/4/levels/2?lang=fr-FR"></iframe>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- 6. Scratch -->
+
+        <div class="game-card">
+
+            <div class="game-title">🐱 <a href="https://scratch.mit.edu/" target="_blank">Scratch</a></div>
+
+            <div class="iframe-container">
+
+                <iframe src="https://scratch.mit.edu/"></iframe>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <script>
+
+        const canvas = document.getElementById('matrix');
+
+        const ctx = canvas.getContext('2d');
+
+
+
+        function resizeCanvas() {
+
+            canvas.width = window.innerWidth;
+
+            canvas.height = window.innerHeight;
+
+        }
+
+        resizeCanvas();
+
+        window.addEventListener('resize', resizeCanvas);
+
+
+
+        const characters = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ<>/\\{}[]*&é"\'(-)=+';
+
+        const fontSize = 16;
+
+        let columns = canvas.width / fontSize;
+
+        let drops = [];
+
+
+
+        for (let i = 0; i < columns; i++) {
+
+            drops[i] = 1;
+
+        }
+
+
+
+        function drawMatrix() {
+
+            ctx.fillStyle = 'rgba(5, 9, 20, 0.08)';
+
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+
+
+            ctx.fillStyle = '#00ffff';
+
+            ctx.font = fontSize + 'px monospace';
+
+
+
+            for (let i = 0; i < drops.length; i++) {
+
+                const text = characters.charAt(Math.floor(Math.random() * characters.length));
+
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+
+                    drops[i] = 0;
+
+                }
+
+                drops[i]++;
+
+            }
+
+        }
+
+
+
+        setInterval(drawMatrix, 50);
+
+    </script>
+
+</body>
+
+</html>
+
+mais rouge clair tu garde que le lien mes jeux efface Les autres et tu mets ces deux liens à la place http://compute-it.toxicode.fr/
+
+https://little-dot.toxicode.fr/
+
+Voici le code de la page des jeux pour la 1ère matu, basé sur votre modèle, adapté avec le thème rouge clair et contenant les trois liens demandés :
+
+HTML
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Jeux - 1ère matu</title>
+    <style>
+        body {
+            background-color: #090000;
+            color: #ff9999;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding-top: 30px;
+            overflow-x: hidden;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        h1, p {
+            position: relative;
+            z-index: 10;
+            color: #ffffff;
+            text-shadow: 0 0 10px #ff6666, 0 0 20px #880022;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+            padding-bottom: 50px;
+        }
+        .game-card {
+            background: rgba(20, 0, 5, 0.85);
+            border: 1px solid #ff6666;
+            box-shadow: 0 0 15px rgba(255, 102, 102, 0.2);
+            border-radius: 8px;
+            margin: 25px auto;
+            padding: 20px;
+            width: 90%;
+        }
+        .game-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #ff9999;
+            margin-bottom: 15px;
+            text-shadow: 0 0 5px #ff6666;
+        }
+        .game-title a {
+            color: #ff9999;
+            text-decoration: none;
+        }
+        .game-title a:hover {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+        .iframe-container {
+            width: 100%;
+            height: 450px;
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1px solid #880022;
+            background: #000;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .back-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #880022;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            position: relative;
+            z-index: 10;
+            border: 1px solid #ff6666;
+            transition: all 0.3s;
+        }
+        .back-btn:hover {
+            background-color: #ff6666;
+            box-shadow: 0 0 15px #ff6666;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix"></canvas>
+
+    <div class="container">
+        <h1>Espace Jeux - 1ère matu</h1>
+        <p><a class="back-btn" href="index.html">⬅ Retour au menu 1ère matu</a></p>
+
+        <p>Prévisualisation des activités :</p>
+
+        <!-- 1. Mes jeux -->
+        <div class="game-card">
+            <div class="game-title">🎮 <a href="https://learningapps.org/watch?v=pde90hqct25" target="_blank">Mes jeux (LearningApps)</a></div>
+            <div class="iframe-container">
+                <iframe src="https://learningapps.org/watch?v=pde90hqct25"></iframe>
+            </div>
+        </div>
+
+        <!-- 2. Compute It -->
+        <div class="game-card">
+            <div class="game-title">💻 <a href="http://compute-it.toxicode.fr/" target="_blank">Compute It</a></div>
+            <div class="iframe-container">
+                <iframe src="http://compute-it.toxicode.fr/"></iframe>
+            </div>
+        </div>
+
+        <!-- 3. Little Dot -->
+        <div class="game-card">
+            <div class="game-title">🔴 <a href="https://little-dot.toxicode.fr/" target="_blank">Little Dot</a></div>
+            <div class="iframe-container">
+                <iframe src="https://little-dot.toxicode.fr/"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const characters = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ<>/\\{}[]*&é"\'(-)=+';
+        const fontSize = 16;
+        let columns = canvas.width / fontSize;
+        let drops = [];
+
+        for (let i = 0; i < columns; i++) {
+            drops[i] = 1;
+        }
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(9, 0, 5, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const colors = ['#ffffff', '#ff9999', '#ff6666'];
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+                const text = characters.charAt(Math.floor(Math.random() * characters.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawMatrix, 50);
+    </script>
+</body>
+</html>
+pour cours et exercice base toi sur ce code <!DOCTYPE html>
+
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Espace Collège - 1ère matu</title>
+
+    <style>
+
+        body { 
+
+            font-family: 'Courier New', Courier, monospace; 
+
+            text-align: center; 
+
+            margin: 0; 
+
+            padding-top: 50px; 
+
+            background-color: #090000; 
+
+            color: white;
+
+            overflow-x: hidden;
+
+        }
+
+        canvas {
+
+            position: fixed;
+
+            top: 0;
+
+            left: 0;
+
+            width: 100%;
+
+            height: 100%;
+
+            z-index: -1;
+
+        }
+
+        h1, p {
+
+            position: relative;
+
+            z-index: 10;
+
+            text-shadow: 0 0 10px #ff6666;
+
+        }
+
+        .btn { 
+
+            display: block; 
+
+            width: 240px; 
+
+            margin: 15px auto; 
+
+            padding: 15px; 
+
+            background-color: rgba(20, 0, 5, 0.9); 
+
+            color: #ff9999; 
+
+            text-decoration: none; 
+
+            border: 1px solid #ff6666;
+
+            border-radius: 5px; 
+
+            font-weight: bold;
+
+            transition: all 0.3s;
+
+            position: relative;
+
+            z-index: 10;
+
+        }
+
+        .btn:hover { 
+
+            background-color: #ff6666; 
+
+            color: white;
+
+            box-shadow: 0 0 20px #ff6666;
+
+        }
+
+        .back-link {
+
+            color: #ff9999;
+
+            text-decoration: none;
+
+            position: relative;
+
+            z-index: 10;
+
+        }
+
+        .back-link:hover {
+
+            color: white;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <canvas id="matrix"></canvas>
+
+
+
+    <h1>1ère matu</h1>
+
+    <p>Choisissez une catégorie :</p>
+
+    
+
+    <a class="btn" href="cours-exercices/">Cours-Exercices</a>
+
+    <a class="btn" href="examens-projets/">Examens-Projets</a>
+
+    <a class="btn" href="jeux/">Jeux</a>
+
+    
+
+    <br><br>
+
+    <a class="back-link" href="../index.html">⬅ Retour à l'accueil général</a>
+
+
+
+    <script>
+
+        const canvas = document.getElementById('matrix');
+
+        const ctx = canvas.getContext('2d');
+
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+
+        window.addEventListener('resize', resize);
+
+        resize();
+
+
+
+        const chars = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ';
+
+        const fontSize = 16;
+
+        let drops = Array(Math.floor(canvas.width / fontSize)).fill(1);
+
+
+
+        function draw() {
+
+            ctx.fillStyle = 'rgba(9, 0, 5, 0.08)';
+
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.font = fontSize + 'px monospace';
+
+            
+
+            drops.forEach((drop, i) => {
+
+                // Nuances de rouge clair
+
+                const colors = ['#ffffff', '#ff9999', '#ff6666'];
+
+                ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+
+                ctx.fillText(chars.charAt(Math.floor(Math.random() * chars.length)), i * fontSize, drop * fontSize);
+
+                
+
+                if (drop * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+
+                drops[i]++;
+
+            });
+
+        }
+
+        setInterval(draw, 50);
+
+    </script>
+
+</body>
+
+</html> et remplace boutons par base, Algorithmique, scratch, informatique dans la société, python, réseau toujours matrix rouge clair
+
+Voici le code mis à jour pour la section Cours-Exercices, reprenant votre structure de base, l'animation Matrix en rouge clair, et intégrant vos 6 thématiques sous forme de boutons :
+
+HTML
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Cours et Exercices - 1ère matu</title>
+    <style>
+        body { 
+            font-family: 'Courier New', Courier, monospace; 
+            text-align: center; 
+            margin: 0; 
+            padding-top: 50px; 
+            background-color: #090000; 
+            color: white;
+            overflow-x: hidden;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        h1, p {
+            position: relative;
+            z-index: 10;
+            text-shadow: 0 0 10px #ff6666;
+        }
+        .btn { 
+            display: block; 
+            width: 280px; 
+            margin: 15px auto; 
+            padding: 15px; 
+            background-color: rgba(20, 0, 5, 0.9); 
+            color: #ff9999; 
+            text-decoration: none; 
+            border: 1px solid #ff6666;
+            border-radius: 5px; 
+            font-weight: bold;
+            transition: all 0.3s;
+            position: relative;
+            z-index: 10;
+        }
+        .btn:hover { 
+            background-color: #ff6666; 
+            color: white;
+            box-shadow: 0 0 20px #ff6666;
+        }
+        .back-link {
+            color: #ff9999;
+            text-decoration: none;
+            position: relative;
+            z-index: 10;
+        }
+        .back-link:hover {
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix"></canvas>
+
+    <h1>Cours et Exercices - 1ère matu</h1>
+    <p>Choisissez un thème :</p>
+    
+    <a class="btn" href="base/">Base</a>
+    <a class="btn" href="algorithmique/">Algorithmique</a>
+    <a class="btn" href="scratch/">Scratch</a>
+    <a class="btn" href="informatique-societe/">Informatique dans la société</a>
+    <a class="btn" href="python/">Python</a>
+    <a class="btn" href="reseau/">Réseau</a>
+    
+    <br><br>
+    <a class="back-link" href="../index.html">⬅ Retour au menu 1ère matu</a>
+
+    <script>
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize);
+        resize();
+
+        const chars = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ';
+        const fontSize = 16;
+        let drops = Array(Math.floor(canvas.width / fontSize)).fill(1);
+
+        function draw() {
+            ctx.fillStyle = 'rgba(9, 0, 5, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.font = fontSize + 'px monospace';
+            
+            drops.forEach((drop, i) => {
+                // Nuances de rouge clair
+                const colors = ['#ffffff', '#ff9999', '#ff6666'];
+                ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+                ctx.fillText(chars.charAt(Math.floor(Math.random() * chars.length)), i * fontSize, drop * fontSize);
+                
+                if (drop * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            });
+        }
+        setInterval(draw, 50);
+    </script>
+</body>
+</html>
+par de la page des cours de 9èmes <!DOCTYPE html>
+
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Cours - 9ème</title>
+
+    <style>
+
+        body {
+
+            background-color: #050914;
+
+            color: #00ffff;
+
+            font-family: Arial, sans-serif;
+
+            text-align: center;
+
+            margin: 0;
+
+            padding-top: 30px;
+
+            overflow-x: hidden;
+
+        }
+
+        canvas {
+
+            position: fixed;
+
+            top: 0;
+
+            left: 0;
+
+            width: 100%;
+
+            height: 100%;
+
+            z-index: 1;
+
+        }
+
+        h1, p {
+
+            position: relative;
+
+            z-index: 10;
+
+            color: #ffffff;
+
+            text-shadow: 0 0 10px #00bfff, 0 0 20px #0044ff;
+
+        }
+
+        .container {
+
+            max-width: 900px;
+
+            margin: 0 auto;
+
+            position: relative;
+
+            z-index: 10;
+
+            padding-bottom: 50px;
+
+        }
+
+        .cours-card {
+
+            background: rgba(5, 15, 35, 0.85);
+
+            border: 1px solid #00ffff;
+
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+
+            border-radius: 8px;
+
+            margin: 25px auto;
+
+            padding: 20px;
+
+            width: 90%;
+
+        }
+
+        .cours-title {
+
+            font-size: 1.1em;
+
+            font-weight: bold;
+
+            color: #00ffff;
+
+            margin-bottom: 15px;
+
+            text-shadow: 0 0 5px #00bfff;
+
+        }
+
+        .pdf-container {
+
+            width: 100%;
+
+            height: 450px;
+
+            border-radius: 5px;
+
+            overflow: hidden;
+
+            border: 1px solid #0044ff;
+
+            background: #000;
+
+        }
+
+        iframe {
+
+            width: 100%;
+
+            height: 100%;
+
+            border: none;
+
+        }
+
+        .img-container {
+
+            width: 100%;
+
+            max-height: 550px;
+
+            border-radius: 5px;
+
+            overflow: hidden;
+
+            border: 1px solid #0044ff;
+
+            background: #000;
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+        }
+
+        .img-container img {
+
+            max-width: 100%;
+
+            max-height: 550px;
+
+            object-fit: contain;
+
+        }
+
+        .back-btn {
+
+            display: inline-block;
+
+            padding: 10px 20px;
+
+            background-color: #007bff;
+
+            color: white;
+
+            text-decoration: none;
+
+            border-radius: 5px;
+
+            position: relative;
+
+            z-index: 10;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <canvas id="matrix"></canvas>
+
+
+
+    <div class="container">
+
+        <h1>Documents de Cours - 9ème</h1>
+
+        <p><a class="back-btn" href="index.html">⬅ Retour au menu 9ème</a></p>
+
+
+
+        <p>Prévisualisation des documents de cours :</p>
+
+
+
+        <!-- 1. Cours préambule -->
+
+        <div class="cours-card">
+
+            <div class="cours-title">📄 1. Cours préambule</div>
+
+            <div class="pdf-container">
+
+                <iframe src="1. Cours préambule.pdf"></iframe>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- 2. Cours de prévention de base -->
+
+        <div class="cours-card">
+
+            <div class="cours-title">📄 2. Cours de prévention de base</div>
+
+            <div class="pdf-container">
+
+                <iframe src="2. Cours de prévention de base.pdf"></iframe>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- 3. Introduction -->
+
+        <div class="cours-card">
+
+            <div class="cours-title">📄 3. Introduction</div>
+
+            <div class="pdf-container">
+
+                <iframe src="3. Introduction.pdf"></iframe>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- 4. Clé USB -->
+
+        <div class="cours-card">
+
+            <div class="cours-title">📄 4. Clé USB</div>
+
+            <div class="pdf-container">
+
+                <iframe src="4. Clé USB.pdf"></iframe>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- 5. OS -->
+
+        <div class="cours-card">
+
+            <div class="cours-title">📄 5. OS</div>
+
+            <div class="pdf-container">
+
+                <iframe src="5 . OS.pdf"></iframe>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- 6. Cours gestion de fichiers -->
+
+        <div class="cours-card">
+
+            <div class="cours-title">📄 6. Cours gestion de fichiers</div>
+
+            <div class="pdf-container">
+
+                <iframe src="6. Cours gestion de fichiers.pdf"></iframe>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- 7. Cours de dactylo -->
+
+        <div class="cours-card">
+
+            <div class="cours-title">📄 7. Cours de dactylo</div>
+
+            <div class="pdf-container">
+
+                <iframe src="7. Cours de dactylo.pdf"></iframe>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- 8. Cours de recherche internet -->
+
+        <div class="cours-card">
+
+            <div class="cours-title">📄 8. Cours de recherche internet</div>
+
+            <div class="pdf-container">
+
+                <iframe src="8. Cours de recherche internet.pdf"></iframe>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- 9. Protection des données -->
+
+        <div class="cours-card">
+
+            <div class="cours-title">📄 9. Protection des données</div>
+
+            <div class="pdf-container">
+
+                <iframe src="9. Protection des données.pdf"></iframe>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- 10. Introduction à libre office -->
+
+        <div class="cours-card">
+
+            <div class="cours-title">📄 10. Introduction à libre office</div>
+
+            <div class="pdf-container">
+
+                <iframe src="10. Introduction à libre office.pdf"></iframe>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- 11. Cours intro traitement de texte -->
+
+        <div class="cours-card">
+
+            <div class="cours-title">📄 11. Cours intro traitement de texte</div>
+
+            <div class="pdf-container">
+
+                <iframe src="11. Cours intro traitement de texte.pdf"></iframe>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- 12. Cours de tableur -->
+
+        <div class="cours-card">
+
+            <div class="cours-title">📄 12. Cours de tableur</div>
+
+            <div class="pdf-container">
+
+                <iframe src="12. Cours de tableur.pdf"></iframe>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- 13. Cours intro présentation -->
+
+        <div class="cours-card">
+
+            <div class="cours-title">📄 13. Cours intro présentation</div>
+
+            <div class="pdf-container">
+
+                <iframe src="13. Cours intro présentation.pdf"></iframe>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- 14.0 Cours d'introduction à la programmation débranchée -->
+
+        <div class="cours-card">
+
+            <div class="cours-title">📄 14.0 Cours d'introduction à la programmation débranchée</div>
+
+            <div class="pdf-container">
+
+                <iframe src="14.0 Cours d'introduction à la programmation débranchée.pdf"></iframe>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- 14.1 Cours d'introduction à la programmation -->
+
+        <div class="cours-card">
+
+            <div class="cours-title">📄 14.1 Cours d'introduction à la programmation</div>
+
+            <div class="pdf-container">
+
+                <iframe src="14.1 Cours d'introduction à la programmation.pdf"></iframe>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- TUTO SCRATCH 2 -->
+
+        <div class="cours-card">
+
+            <div class="cours-title">🖼️ TUTO SCRATCH 2</div>
+
+            <div class="img-container">
+
+                <img src="TUTO SCRATCH2.png" alt="TUTO SCRATCH 2">
+
+            </div>
+
+        </div>
+
+
+
+        <!-- Parcours I -->
+
+        <div class="cours-card">
+
+            <div class="cours-title">📄 Parcours I</div>
+
+            <div class="pdf-container">
+
+                <iframe src="Parcours I.pdf"></iframe>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- TUTO SCRATCH 1 -->
+
+        <div class="cours-card">
+
+            <div class="cours-title">🖼️ TUTO SCRATCH 1</div>
+
+            <div class="img-container">
+
+                <img src="TUTO SCRATCH1.png" alt="TUTO SCRATCH 1">
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <script>
+
+        const canvas = document.getElementById('matrix');
+
+        const ctx = canvas.getContext('2d');
+
+
+
+        function resizeCanvas() {
+
+            canvas.width = window.innerWidth;
+
+            canvas.height = window.innerHeight;
+
+        }
+
+        resizeCanvas();
+
+        window.addEventListener('resize', resizeCanvas);
+
+
+
+        const characters = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ<>/\\{}[]*&é"\'(-)=+';
+
+        const fontSize = 16;
+
+        let columns = canvas.width / fontSize;
+
+        let drops = [];
+
+
+
+        for (let i = 0; i < columns; i++) {
+
+            drops[i] = 1;
+
+        }
+
+
+
+        function drawMatrix() {
+
+            ctx.fillStyle = 'rgba(5, 9, 20, 0.08)';
+
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+
+
+            ctx.fillStyle = '#00ffff';
+
+            ctx.font = fontSize + 'px monospace';
+
+
+
+            for (let i = 0; i < drops.length; i++) {
+
+                const text = characters.charAt(Math.floor(Math.random() * characters.length));
+
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+
+                    drops[i] = 0;
+
+                }
+
+                drops[i]++;
+
+            }
+
+        }
+
+
+
+        setInterval(drawMatrix, 50);
+
+    </script>
+
+</body>
+
+</html> mais pour 1M change couleur en rouge clair, divise deux section cours et exercices et remplace les fichiers prévisualiser par ceux en annexex garde le cote prévisulaisation
+
+Voici le code complet pour la page de la 1ère matu, avec le thème Matrix en rouge clair, les deux sections distinctes (Cours et Exercices), et les fichiers de prévisualisation basés sur vos annexes :
+
+HTML
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Cours et Exercices - 1ère matu</title>
+    <style>
+        body {
+            background-color: #090000;
+            color: #ff9999;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding-top: 30px;
+            overflow-x: hidden;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        h1, h2, p {
+            position: relative;
+            z-index: 10;
+            color: #ffffff;
+            text-shadow: 0 0 10px #ff6666, 0 0 20px #880022;
+        }
+        h2 {
+            margin-top: 40px;
+            font-size: 1.5em;
+            border-bottom: 1px solid #ff6666;
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+            padding-bottom: 50px;
+        }
+        .cours-card {
+            background: rgba(20, 0, 5, 0.85);
+            border: 1px solid #ff6666;
+            box-shadow: 0 0 15px rgba(255, 102, 102, 0.2);
+            border-radius: 8px;
+            margin: 25px auto;
+            padding: 20px;
+            width: 90%;
+        }
+        .cours-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #ff9999;
+            margin-bottom: 15px;
+            text-shadow: 0 0 5px #ff6666;
+        }
+        .pdf-container {
+            width: 100%;
+            height: 450px;
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1px solid #880022;
+            background: #000;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .back-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #880022;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            position: relative;
+            z-index: 10;
+            border: 1px solid #ff6666;
+            transition: all 0.3s;
+        }
+        .back-btn:hover {
+            background-color: #ff6666;
+            box-shadow: 0 0 15px #ff6666;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix"></canvas>
+
+    <div class="container">
+        <h1>Cours et Exercices - 1ère matu</h1>
+        <p><a class="back-btn" href="../index.html">⬅ Retour au menu 1ère matu</a></p>
+
+        <!-- SECTION COURS -->
+        <h2>📚 Documents de Cours</h2>
+
+        <div class="cours-card">
+            <div class="cours-title">📄 5. Élément d'algorithmique débranchée</div>
+            <div class="pdf-container">
+                <iframe src="5. Elément d'algorithmique-débranchée.pdf"></iframe>
+            </div>
+        </div>
+
+        <div class="cours-card">
+            <div class="cours-title">📄 6. Ordinogramme-pseudo code</div>
+            <div class="pdf-container">
+                <iframe src="6. Ordinogramme-pseudo code.pdf"></iframe>
+            </div>
+        </div>
+
+        <div class="cours-card">
+            <div class="cours-title">📄 7. Variables-Encodage</div>
+            <div class="pdf-container">
+                <iframe src="7. Variables-Encodage.pdf"></iframe>
+            </div>
+        </div>
+
+        <!-- SECTION EXERCICES -->
+        <h2>✏️ Exercices</h2>
+
+        <div class="cours-card">
+            <div class="cours-title">📄 Exercice conversion de bases light - Corrigé</div>
+            <div class="pdf-container">
+                <iframe src="Exercice conversion de bases light - Corrigé.pdf"></iframe>
+            </div>
+        </div>
+
+        <div class="cours-card">
+            <div class="cours-title">📄 Exercice séquence débranchée élève 1</div>
+            <div class="pdf-container">
+                <iframe src="Exercice séquence débranchée élève 1.pdf"></iframe>
+            </div>
+        </div>
+
+        <div class="cours-card">
+            <div class="cours-title">📄 Exercice séquence débranchée élève 2</div>
+            <div class="pdf-container">
+                <iframe src="Exercice séquence débranchée élève 2.pdf"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const characters = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ<>/\\{}[]*&é"\'(-)=+';
+        const fontSize = 16;
+        let columns = canvas.width / fontSize;
+        let drops = [];
+
+        for (let i = 0; i < columns; i++) {
+            drops[i] = 1;
+        }
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(9, 0, 5, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const colors = ['#ffffff', '#ff9999', '#ff6666'];
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+                const text = characters.charAt(Math.floor(Math.random() * characters.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawMatrix, 50);
+    </script>
+</body>
+</html>
+Gemini est une IA et peut se tromper, y compris sur des personnes. Votre confidentialité et GeminiS'ouvre dans une nouvelle fenêtre
+
+
+
+
+
