@@ -27,6 +27,17 @@
             color: #ffffff;
             text-shadow: 0 0 10px #00bfff, 0 0 20px #0044ff;
         }
+        h2 {
+            position: relative;
+            z-index: 10;
+            color: #00ffff;
+            text-shadow: 0 0 10px #00bfff;
+            margin-top: 40px;
+            font-size: 1.5em;
+            border-bottom: 1px solid #00ffff;
+            display: inline-block;
+            padding-bottom: 5px;
+        }
         .container {
             max-width: 900px;
             margin: 0 auto;
@@ -57,6 +68,36 @@
             overflow: hidden;
             border: 1px solid #0044ff;
             background: #000;
+        }
+        .img-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .img-container {
+            width: 100%;
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1px solid #0044ff;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .img-container img {
+            max-width: 100%;
+            height: auto;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+        .img-label {
+            font-size: 0.9em;
+            color: #ff9999;
+            margin-top: 8px;
+            text-align: center;
         }
         iframe {
             width: 100%;
@@ -168,6 +209,37 @@
     <div class="container" id="main-content" style="display: none;">
         <h1>Jeunes Reporters pour l'Environnement</h1>
         <p><a class="back-btn" href="../index.html">⬅ Retour aux projets</a></p>
+
+        <!-- SECTION EXEMPLES SONDAGES -->
+        <h2>📊 Exemples sondages</h2>
+
+        <div class="cours-card">
+            <div class="cours-title">📈 Résultats Sondage Élèves (935 réponses)</div>
+            <div class="img-grid">
+                <div class="img-container">
+                    <img src="Sondage élève.pdf" alt="Sondage élève graphique 1">
+                    <span class="img-label">Temps d'écran quotidien (Internet)</span>
+                </div>
+                <div class="img-container">
+                    <img src="Sondage élève.pdf" alt="Sondage élève graphique 2">
+                    <span class="img-label">Plateforme principale</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="cours-card">
+            <div class="cours-title">📊 Statistiques Sondage de Rue (Adultes)</div>
+            <div class="img-grid">
+                <div class="img-container">
+                    <img src="stats.pdf" alt="Statistiques rue graphique 1">
+                    <span class="img-label">Impact du smartphone sur le climat</span>
+                </div>
+                <div class="img-container">
+                    <img src="stats.pdf" alt="Statistiques rue graphique 2">
+                    <span class="img-label">Incitation au changement d'appareil</span>
+                </div>
+            </div>
+        </div>
 
         <p>Documents et ressources :</p>
 
@@ -289,7 +361,6 @@
             }
         }
 
-        // Allow pressing Enter in password field
         document.getElementById('password-input').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 checkPassword();
@@ -316,7 +387,6 @@
         }
 
         function drawMatrix() {
-            // Dark blue background tint with fading trail for blue shades effect
             ctx.fillStyle = 'rgba(5, 9, 20, 0.08)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -325,14 +395,13 @@
             for (let i = 0; i < drops.length; i++) {
                 const text = characters.charAt(Math.floor(Math.random() * characters.length));
                 
-                // Multi-shade blue effect: assigning different blue shades to characters randomly
                 const randShade = Math.random();
                 if (randShade < 0.33) {
-                    ctx.fillStyle = '#00ffff'; // Light cyan/bright blue
+                    ctx.fillStyle = '#00ffff';
                 } else if (randShade < 0.66) {
-                    ctx.fillStyle = '#00bfff'; // Sky blue / medium light blue
+                    ctx.fillStyle = '#00bfff';
                 } else {
-                    ctx.fillStyle = '#0044ff'; // Deep blue
+                    ctx.fillStyle = '#0044ff';
                 }
 
                 ctx.fillText(text, i * fontSize, drops[i] * fontSize);
