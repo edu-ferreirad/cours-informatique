@@ -12,6 +12,7 @@
 <body>
 
 <div class="scanlines" aria-hidden="true"></div>
+<div class="blason-backdrop" aria-hidden="true"></div>
 
 <!-- PORTAIL DE CHANTIER : à retirer une fois le site prêt à publier -->
 <div id="gate-screen" class="welcome-screen gate-screen">
@@ -32,6 +33,11 @@
   <div class="welcome-box">
     <h1 class="welcome-title">MATRIX_<span class="digit-1602">1602</span></h1>
     <p class="welcome-sub">Parcours outdoor — Vieille Ville de Genève</p>
+
+    <div class="rules-box start-point-box">
+      <p class="rules-title">📍 Point de départ</p>
+      <p id="start-point-label" class="start-point-label">Chargement…</p>
+    </div>
 
     <div class="rules-box">
       <p class="rules-title">Règles</p>
@@ -63,6 +69,7 @@
         <input type="checkbox" id="checkbox-sobre"> Mode sobre (réduire les animations)
       </label>
       <p class="teacher-links no-print">👩‍🏫 <a href="classe.html">Vue de classe</a></p>
+      <button type="button" id="btn-enable-test-mode" class="btn-secondary test-mode-btn">🧪 Activer le mode test (sans quitter cette page)</button>
       <p id="test-mode-banner" class="test-mode-banner hidden"></p>
     </div>
   </div>
@@ -149,6 +156,7 @@
     </div>
     <canvas class="ar-canvas hidden"></canvas>
     <p class="ar-status"></p>
+    <p class="similarity-status"></p>
     <p class="geo-status"></p>
     <button class="validate-btn photo-validate">Valider ce secteur</button>
     <button class="hint-btn">Indice (−5 pts)</button>
