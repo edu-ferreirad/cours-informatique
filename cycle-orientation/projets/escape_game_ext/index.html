@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MATRIX_1602 // Escalade Outdoor — Vieille Ville de Genève</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="scanlines" aria-hidden="true"></div>
+<div class="blason-backdrop" aria-hidden="true"></div>
+
+<!-- PORTAIL DE CHANTIER : à retirer une fois le site prêt à publier -->
+<div id="gate-screen" class="welcome-screen gate-screen">
+  <div class="welcome-box">
+    <h1 class="welcome-title">🚧 CHANTIER EN COURS</h1>
+    <p class="welcome-sub">Ce parcours n'est pas encore finalisé.</p>
+    <form id="gate-form" class="team-form">
+      <label for="input-gate-password">Mot de passe</label>
+      <input type="password" id="input-gate-password" autocomplete="off" required>
+      <button type="submit" class="btn-start">Déverrouiller</button>
+      <p id="gate-error" class="gate-error"></p>
+    </form>
+  </div>
+</div>
+
+<!-- ÉCRAN D'ACCUEIL : règles + formulaire équipe -->
+<div id="welcome-screen" class="welcome-screen hidden">
+  <div class="welcome-box">
+    <h1 class="welcome-title">MATRIX_<span class="digit-1602">1602</span></h1>
+    <p class="welcome-sub">Parcours outdoor — Vieille Ville de Genève</p>
+
+    <div class="rules-box start-point-box">
+      <p class="rules-title">📍 Point de départ</p>
+      <p id="start-point-label" class="start-point-label">Chargement…</p>
+    </div>
+
+    <div class="rules-box">
+      <p class="rules-title">Règles</p>
+      <ul>
+        <li>Une histoire se déroule chapitre par chapitre : chaque secteur validé débloque le suivant.</li>
+        <li>Un seul secteur s'affiche à la fois — impossible de revenir en arrière, avancez pas à pas comme sur le terrain.</li>
+        <li>Un lien Google Maps vous guide vers chaque lieu. Vous êtes autonomes — pas de maître du jeu sur le terrain.</li>
+        <li>Chaque indice demandé coûte des points, mais ne bloque jamais votre progression.</li>
+        <li>Pour les missions photo, la position GPS doit correspondre au lieu attendu pour valider.</li>
+      </ul>
+    </div>
+
+    <form id="team-form" class="team-form">
+      <label for="input-team-name">🪪 Nom de votre équipe</label>
+      <input type="text" id="input-team-name" maxlength="30" placeholder="Ex : Les Enquêteurs de la Treille" required>
+      <label for="input-team-members">Membres (facultatif)</label>
+      <input type="text" id="input-team-members" maxlength="80" placeholder="Ex : Léa, Noah, Emma...">
+      <label for="input-team-codename">🕵️ Nom de code (facultatif)</label>
+      <div class="codename-row">
+        <input type="text" id="input-team-codename" maxlength="30" placeholder="Ex : Faucon Silencieux">
+        <button type="button" id="btn-generate-codename" class="btn-secondary codename-btn">🎲</button>
+      </div>
+      <button type="submit" class="btn-start">▶ Commencer la mission</button>
+    </form>
+
+    <div class="welcome-footer">
+      <button type="button" id="btn-restore-save" class="btn-secondary hidden">💾 Reprendre une sauvegarde trouvée</button>
+      <label class="sober-toggle">
+        <input type="checkbox" id="checkbox-sobre"> Mode sobre (réduire les animations)
+      </label>
+      <label class="sober-toggle">
+        <input type="checkbox" id="checkbox-ambient" checked> 🔔 Ambiance sonore discrète (cloches lointaines)
+      </label>
+      <p class="teacher-links no-print">👩‍🏫 <a href="classe.html">Vue de classe</a></p>
+      <button type="button" id="btn-enable-test-mode" class="btn-secondary test-mode-btn">🧪 Activer le mode test (sans quitter cette page)</button>
+      <p id="test-mode-banner" class="test-mode-banner hidden"></p>
+    </div>
+  </div>
+</div>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <span class="dot" id="dot"></span>
+    <span class="brand">MATRIX_<span class="digit-1602">1602</span></span>
+    <span class="sub" id="team-display"></span>
+    <span class="topbar-actions">
+      <button type="button" id="btn-porte-documents" class="icon-btn" title="Porte-documents">📁</button>
+      <button type="button" id="btn-mute" class="icon-btn" title="Couper/activer le son">🔊</button>
+      <button type="button" id="btn-save" class="icon-btn" title="Sauvegarder la progression">💾</button>
+      <button type="button" id="btn-load" class="icon-btn" title="Charger une sauvegarde">📂</button>
+      <input type="file" id="file-load" accept=".json" class="hidden">
+    </span>
+  </div>
+  <div class="progress" role="progressbar" aria-label="Progression du parcours">
+    <div class="progress-fill" id="progress-fill"></div>
+  </div>
+  <div id="topbar-test-banner" class="topbar-test-banner hidden">🧪 MODE TEST — vérification GPS désactivée, ne pas utiliser sur le terrain</div>
+</header>
+
+<main id="game" class="game hidden">
+  <div id="step-container"></div>
+</main>
+
+<div id="porte-documents-modal" class="porte-documents-modal hidden"></div>
+
+<template id="tpl-text">
+  <section class="step" data-type="text">
+    <div class="step-head">
+      <span class="step-num"></span>
+      <h2 class="step-title"></h2>
+    </div>
+    <p class="step-brief"></p>
+    <a class="gps-link" target="_blank" rel="noopener">
+      <span class="gps-icon">◎</span> <span class="gps-label"></span>
+    </a>
+    <p class="step-question"></p>
+    <div class="answer-row">
+      <input type="text" class="answer-input" placeholder="RÉPONSE…" autocomplete="off">
+      <button class="validate-btn">Valider</button>
+    </div>
+    <button class="hint-btn">Indice (−5 pts)</button>
+    <p class="hint-text hidden"></p>
+    <p class="feedback"></p>
+  </section>
+</template>
+
+<template id="tpl-photo">
+  <section class="step" data-type="photo">
+    <div class="step-head">
+      <span class="step-num"></span>
+      <h2 class="step-title"></h2>
+    </div>
+    <p class="step-brief"></p>
+    <a class="gps-link" target="_blank" rel="noopener">
+      <span class="gps-icon">◎</span> <span class="gps-label"></span>
+    </a>
+    <p class="step-question"></p>
+    <div class="compare-row">
+      <figure class="ref-photo">
+        <img alt="Photo de référence du lieu">
+        <figcaption>Repère à retrouver sur place</figcaption>
+      </figure>
+      <figure class="user-photo">
+        <div class="photo-placeholder">Votre photo</div>
+        <img class="hidden" alt="Votre photo">
+        <figcaption>Votre preuve</figcaption>
+      </figure>
+    </div>
+    <label class="file-btn">
+      Prendre / choisir une photo
+      <input type="file" accept="image/*" capture="environment" class="photo-input">
+    </label>
+    <button type="button" class="ar-toggle-btn">📷 Vue en direct (effet spécial)</button>
+    <div class="ar-camera-wrap hidden">
+      <video class="ar-video" autoplay playsinline muted></video>
+      <span class="ar-icon-overlay"></span>
+      <button type="button" class="validate-btn ar-capture-btn">📸 Capturer</button>
+      <button type="button" class="btn-secondary ar-cancel-btn">Annuler</button>
+    </div>
+    <canvas class="ar-canvas hidden"></canvas>
+    <p class="ar-status"></p>
+    <p class="similarity-status"></p>
+    <p class="geo-status"></p>
+    <button class="validate-btn photo-validate">Valider ce secteur</button>
+    <button class="hint-btn">Indice (−5 pts)</button>
+    <p class="hint-text hidden"></p>
+    <p class="feedback"></p>
+  </section>
+</template>
+
+<template id="tpl-puzzle">
+  <section class="step" data-type="puzzle">
+    <div class="step-head">
+      <span class="step-num"></span>
+      <h2 class="step-title"></h2>
+    </div>
+    <p class="step-brief"></p>
+    <a class="gps-link" target="_blank" rel="noopener">
+      <span class="gps-icon">◎</span> <span class="gps-label"></span>
+    </a>
+    <p class="step-question"></p>
+    <p class="puzzle-instructions">Touchez deux pièces pour les échanger, jusqu'à reconstituer la carte.</p>
+    <div class="puzzle-grid"></div>
+    <p class="feedback"></p>
+  </section>
+</template>
+
+<footer class="final hidden" id="final-screen">
+  <h1>[ ACCÈS AUTORISÉ : MISSION ACCOMPLIE ]</h1>
+  <p>La marmite est en sécurité. Envoyez votre rapport pour clore la mission :</p>
+  <p class="final-email"></p>
+  <p class="final-code"></p>
+  <p class="final-time"><span id="final-time-value"></span></p>
+  <div class="final-badges"></div>
+  <div class="final-recap"></div>
+  <div class="final-carnet"></div>
+  <div class="final-mindmap"></div>
+  <div class="final-diploma"></div>
+  <div class="final-further-reading"></div>
+  <div class="final-quiz"></div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
