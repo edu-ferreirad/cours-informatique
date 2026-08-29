@@ -10,7 +10,7 @@
             font-family: 'Courier New', Courier, monospace;
             text-align: center;
             margin: 0;
-            padding-top: 80px;
+            padding-top: 50px;
             overflow-x: hidden;
         }
         canvas {
@@ -23,7 +23,7 @@
         }
         .container {
             max-width: 800px;
-            margin: 0 auto;
+            margin: 0 auto 50px auto;
             position: relative;
             z-index: 10;
             padding: 40px;
@@ -37,11 +37,57 @@
             text-shadow: 0 0 10px #ff6666, 0 0 20px #880022;
             margin-bottom: 20px;
         }
+        h2 {
+            color: #ffffff;
+            font-size: 1.3em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            text-shadow: 0 0 8px #ff6666;
+            border-bottom: 1px solid #ff6666;
+            padding-bottom: 5px;
+            display: inline-block;
+        }
         p {
             color: #ff9999;
             font-size: 1.1em;
             text-shadow: 0 0 5px #ff6666;
             margin-bottom: 30px;
+        }
+        .semester-block {
+            background: rgba(40, 0, 10, 0.6);
+            border: 1px solid rgba(255, 102, 102, 0.4);
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        .semester-block h3 {
+            color: #ff9999;
+            margin-top: 0;
+            margin-bottom: 15px;
+            text-shadow: 0 0 5px #ff6666;
+            font-size: 1.15em;
+            border-left: 3px solid #ff6666;
+            padding-left: 10px;
+        }
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(20, 0, 5, 0.9);
+            padding: 10px 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border: 1px solid #880022;
+        }
+        .item-name {
+            color: #ffffff;
+            font-weight: bold;
+        }
+        .item-status {
+            color: #ff6666;
+            font-size: 0.9em;
+            font-style: italic;
         }
         .back-btn {
             display: inline-block;
@@ -53,6 +99,7 @@
             border: 1px solid #ff6666;
             transition: all 0.3s;
             font-weight: bold;
+            margin-top: 20px;
         }
         .back-btn:hover {
             background-color: #ff6666;
@@ -66,7 +113,32 @@
     <div class="container">
         <h1>Examens</h1>
         <p>Espace réservé aux évaluations et examens de 1ère matu.</p>
-        <p style="font-size: 0.9em; color: #ff6666;">Contenu disponible prochainement.</p>
+        
+        <!-- 1ER SEMESTRE -->
+        <div class="semester-block">
+            <h3>1er semestre</h3>
+            <div class="item-row">
+                <span class="item-name">Examen écrit</span>
+                <span class="item-status">Contenu à venir</span>
+            </div>
+            <div class="item-row">
+                <span class="item-name">Projet</span>
+                <span class="item-status">Contenu à venir</span>
+            </div>
+        </div>
+
+        <!-- DEUXIÈME SEMESTRE -->
+        <div class="semester-block">
+            <h3>Deuxième semestre</h3>
+            <div class="item-row">
+                <span class="item-name">Examen écrit</span>
+                <span class="item-status">Contenu à venir</span>
+            </div>
+            <div class="item-row">
+                <span class="item-name">Projet</span>
+                <span class="item-status">Contenu à venir</span>
+            </div>
+        </div>
         
         <a class="back-btn" href="../index.html">⬅ Retour au menu</a>
     </div>
