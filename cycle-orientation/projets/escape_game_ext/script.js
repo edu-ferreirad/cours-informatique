@@ -118,7 +118,7 @@ const STEPS = [
     locationCode: "7", // décode en « G » (table numérique)
     type: "photo",
     title: "ÉNIGME 4 — La marmite de laiton",
-    transition: "Effectivement, c'est bien grâce aux cloches de la ville que les citoyens ont pu être alertés. L'alarme est donnée vers 4h30. Les citoyens se lèvent, saisissent des armes et, en chemise de nuit, viennent prêter main-forte aux troupes de défense — même les femmes s'en mêlent ! Voici notre première héroïne.",
+    transition: "Effectivement, c'est bien grâce aux cloches de la ville que les citoyens ont pu être alertés. L'alarme est donnée vers 4h30. Les citoyens se lèvent, saisissent des armes et, en chemise de nuit, viennent prêter main-forte aux troupes de défense — y compris 3 héroïnes ! Voici notre première héroïne.",
     brief: "Elle aurait renversé sa marmite en laiton sur la tête d'un envahisseur, depuis sa fenêtre. Sa maison se serait en réalité trouvée plus bas, vers l'ancienne porte de la Monnaie — mais le 7, rue de la Corraterie, où une tête sculptée orne la façade au pied de la tour, lui est aujourd'hui associé par la tradition populaire.",
     gps: { lat: 46.20333, lng: 6.14333, label: "7, Rue de la Corraterie (tour de l'Escalade, près du Grand Théâtre)" },
     question: "Prenez en photo la tour dite « de l'Escalade », au 7 rue de la Corraterie, et notez le nom complet de cette héroïne.",
