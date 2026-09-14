@@ -1,0 +1,106 @@
+// ============================================================================
+// SALLE ROME ANTIQUE — données du musée
+// Textes reformulés à partir du chapitre "LA FONDATION DE ROME"
+// (Hist_9e_LE_version_2024_TM.pdf, p.22-33) — aucune phrase copiée du livre.
+// Mêmes conventions que data-grece.js (voir ce fichier pour le détail du
+// système de positions RA et de paliers de parcours).
+// ============================================================================
+
+const DESK_H = 0.6;
+const WALL_H = 1.4;
+const SHELF_H = 1.1;
+
+const MUSEE_ROME_OBJECTS = [
+  {
+    id: "louve_capitoline",
+    tier: "court",
+    emoji: "🐺",
+    label: "La louve et les jumeaux",
+    image: "https://commons.wikimedia.org/wiki/Special:FilePath/Capitoline_she-wolf_Musei_Capitolini_MC1181.jpg",
+    text: "Selon la légende, les jumeaux Romulus et Rémus, abandonnés, sont retrouvés et allaités par une louve au pied du mont Palatin. Ce mythe fondateur est représenté très tôt sur des pièces de monnaie et des mosaïques romaines.",
+    anchor: { distance: 2.2, angle: 30, height: SHELF_H }
+  },
+  {
+    id: "palatin_aventin",
+    tier: "court",
+    emoji: "⛰️",
+    label: "Le choix des collines",
+    text: "Devenus adultes, Romulus et Rémus veulent fonder une ville, mais ne s'entendent pas sur son emplacement : Romulus choisit le mont Palatin, Rémus préfère l'Aventin. Leur désaccord tourne mal et, selon le mythe, coûte la vie à Rémus.",
+    anchor: { distance: 3.6, angle: 100, height: DESK_H }
+  },
+  {
+    id: "fondation_753",
+    tier: "court",
+    emoji: "📜",
+    label: "Rome, fondée en -753 ?",
+    text: "La tradition situe la fondation de Rome en 753 avant notre ère. Son emplacement, entre plusieurs collines, un fleuve navigable et une position proche de la mer Méditerranée, en fait un site stratégique qui favorise son développement.",
+    anchor: { distance: 1.5, angle: 170, height: DESK_H }
+  },
+  {
+    id: "forum_capitole",
+    tier: "court",
+    emoji: "🏛️",
+    label: "Le Forum et le Capitole",
+    text: "Au fil du temps, Rome se structure autour du Forum, place publique et cœur politique de la cité, et du Capitole, colline sacrée toute proche. Ces lieux deviennent le centre de la vie religieuse et politique romaine.",
+    anchor: { distance: 4.4, angle: 260, height: WALL_H }
+  },
+  {
+    id: "republique_senat",
+    tier: "standard",
+    emoji: "⚖️",
+    label: "La République et le Sénat",
+    text: "La royauté romaine finit par être remplacée par un nouveau régime, la République : le pouvoir est alors partagé entre le Sénat, composé de grandes familles nobles, et le peuple romain.",
+    anchor: { distance: 2.8, angle: 310, height: DESK_H }
+  },
+  {
+    id: "jules_cesar",
+    tier: "standard",
+    emoji: "🗡️",
+    label: "Jules César",
+    text: "Général et homme politique influent, Jules César cherche à concentrer un maximum de pouvoirs à la fin de la République. Accusé de vouloir devenir roi, il est assassiné ; son petit-neveu adoptif, Octavien, lui succède.",
+    anchor: { distance: 5.4, angle: 45, height: DESK_H }
+  },
+  {
+    id: "auguste_empereur",
+    tier: "standard",
+    emoji: "👑",
+    label: "Auguste, premier empereur",
+    image: "https://commons.wikimedia.org/wiki/Special:FilePath/Statue-Augustus.jpg",
+    text: "Octavien reçoit à son tour l'ensemble des pouvoirs et devient le premier empereur romain sous le nom d'Auguste. Ce moment marque le passage de la République à l'Empire romain.",
+    anchor: { distance: 1.3, angle: 220, height: SHELF_H }
+  },
+  {
+    id: "mythe_enee",
+    tier: "riche",
+    emoji: "⚔️",
+    label: "Énée, l'autre ancêtre légendaire",
+    text: "Deux auteurs latins proches d'Auguste, Virgile et Tite-Live, relient l'histoire de Rome au héros troyen Énée, présenté comme l'ancêtre à la fois de Romulus et d'Auguste — reliant ainsi le nouvel empereur à un passé glorieux.",
+    anchor: { distance: 6.1, angle: 135, height: DESK_H }
+  },
+  {
+    id: "propagande_auguste",
+    tier: "riche",
+    emoji: "🗿",
+    label: "Le mythe au service du pouvoir",
+    text: "Auguste utilise activement le mythe de Romulus pour légitimer son pouvoir : statues, monuments et discours rappellent ce lien avec le fondateur légendaire de Rome. Le mythe devient un outil politique autant qu'une croyance.",
+    anchor: { distance: 3.1, angle: 350, height: WALL_H }
+  },
+  {
+    id: "archeologie_lupercal",
+    tier: "riche",
+    emoji: "⛏️",
+    label: "Le mythe face à l'archéologie",
+    text: "Historiens et archéologues confrontent le mythe (comme la grotte dite du Lupercal, au pied du Palatin) aux traces réelles retrouvées sur le terrain — des cabanes anciennes découvertes sur le Palatin — pour distinguer légende et faits historiques.",
+    anchor: { distance: 4.1, angle: 65, height: DESK_H }
+  },
+];
+
+const TIER_ORDER = { court: 1, standard: 2, riche: 3 };
+
+function getRomeObjectsForParcours(parcours) {
+  const maxLevel = TIER_ORDER[parcours] || 1;
+  return MUSEE_ROME_OBJECTS.filter(o => TIER_ORDER[o.tier] <= maxLevel);
+}
+
+window.MUSEE_ROME_OBJECTS = MUSEE_ROME_OBJECTS;
+window.getRomeObjectsForParcours = getRomeObjectsForParcours;
