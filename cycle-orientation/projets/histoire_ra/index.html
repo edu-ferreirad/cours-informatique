@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Musée de l'Antiquité</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="screen active">
+  <div class="screen-inner" style="max-width:720px;">
+    <div class="eyebrow">Cours d'histoire — activité en classe</div>
+    <h1 class="display-title">Musée de l'Antiquité</h1>
+    <p class="subtitle">La classe devient un musée. Choisissez une salle, puis un parcours : explorez en réalité augmentée pour trouver les objets cachés, découvrez leur histoire, puis répondez au questionnaire final.</p>
+
+    <div class="museum-grid">
+      <div class="room-card" data-ready="true" data-room="grece">
+        <span class="room-card-badge">Salle 1</span>
+        <div class="room-card-emoji">🏛️</div>
+        <div class="room-card-title">Grèce antique</div>
+        <div class="room-card-tag">Jeux d'Olympie · Démocratie · Parthénon</div>
+        <div class="room-card-desc">Cités grecques, Jeux antiques, naissance de la démocratie à Athènes.</div>
+      </div>
+
+      <div class="room-card" data-ready="true" data-room="rome">
+        <span class="room-card-badge">Salle 2</span>
+        <div class="room-card-emoji">🐺</div>
+        <div class="room-card-title">Rome antique</div>
+        <div class="room-card-tag">Fondation de Rome</div>
+        <div class="room-card-desc">Romulus et Rémus, la louve, la naissance de la Ville éternelle.</div>
+      </div>
+
+      <div class="room-card" data-ready="true" data-room="alexandrie">
+        <span class="room-card-badge">Salle 3</span>
+        <div class="room-card-emoji">🗼</div>
+        <div class="room-card-title">Alexandrie</div>
+        <div class="room-card-tag">Égypte hellénistique</div>
+        <div class="room-card-desc">Le phare d'Alexandrie, la grande bibliothèque, Cléopâtre et les Ptolémées.</div>
+      </div>
+
+      <div class="room-card" data-ready="true" data-room="egypte-pharaonique">
+        <span class="room-card-badge bonus">Bonus — hors livre</span>
+        <div class="room-card-emoji">𓋹</div>
+        <div class="room-card-title">Égypte pharaonique</div>
+        <div class="room-card-tag">Toutankhamon · Pyramides</div>
+        <div class="room-card-desc">Un bonus qui sort du moyen d'enseignement, clairement identifié comme tel.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="modal-root"></div>
+
+<script>
+const $ = (sel, root=document) => root.querySelector(sel);
+const $all = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+
+const ROOM_LINKS = {
+  grece: "salle-grece.html",
+  rome: "salle-rome.html",
+  alexandrie: "salle-alexandrie.html",
+  "egypte-pharaonique": "salle-egypte-pharaonique.html",
+};
+
+const PARCOURS = [
+  { id: "court", label: "Court", desc: "4 objets — ~10 min" },
+  { id: "standard", label: "Standard", desc: "7 objets — ~20 min" },
+  { id: "riche", label: "Riche", desc: "10 objets — ~30 min" },
+];
+
+$all(".room-card").forEach(card => {
+  card.addEventListener("click", () => {
+    if (card.dataset.ready !== "true") return;
+    openParcoursModal(card.dataset.room);
+  });
+});
+
+function openParcoursModal(room) {
+  const root = $("#modal-root");
+  root.innerHTML = `
+    <div class="modal-backdrop" id="modal-backdrop">
+      <div class="modal-box">
+        <div class="eyebrow">Choix du parcours</div>
+        <h2 class="display-title-sm" style="margin-bottom:0;">Salle ${room}</h2>
+        <div class="parcours-list">
+          ${PARCOURS.map(p => `
+            <button class="parcours-btn" data-p="${p.id}">
+              <strong>${p.label}</strong>
+              <span>${p.desc}</span>
+            </button>`).join("")}
+        </div>
+        <button class="btn-secondary" id="modal-cancel" style="margin-top:16px;">Annuler</button>
+      </div>
+    </div>`;
+  $("#modal-backdrop").addEventListener("click", (e) => { if (e.target.id === "modal-backdrop") root.innerHTML = ""; });
+  $("#modal-cancel").addEventListener("click", () => root.innerHTML = "");
+  $all(".parcours-btn", root).forEach(btn => {
+    btn.addEventListener("click", () => {
+      const link = ROOM_LINKS[room];
+      if (link) location.href = `${link}?parcours=${btn.dataset.p}`;
+    });
+  });
+}
+</script>
+</body>
+</html>
