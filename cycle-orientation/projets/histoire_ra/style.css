@@ -1,0 +1,134 @@
+/* ============================================================================
+   MUSÉE DE L'ANTIQUITÉ — style
+   Les classes .xr-* / .test-banner / .btn-* sont reprises à l'identique du
+   projet Escalade 1602 (contrat DOM attendu par ar-engine.js) : NE PAS
+   renommer ces classes-là. Le reste (.museum-*, .room-*) est propre au musée.
+   ============================================================================ */
+:root{
+  --marble:#f4efe4;
+  --marble-dim:#e4dcc8;
+  --ink:#241505;
+  --terracotta:#b5622f;
+  --terracotta-bright:#d97b46;
+  --gold:#a9822f;
+  --bronze:#6b5432;
+  --danger:#b5453a;
+  --success:#4a7c4e;
+  --font-display:'Cormorant Garamond', serif;
+  --font-body:'Inter', system-ui, sans-serif;
+  --font-mono:'JetBrains Mono', monospace;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0; min-height:100vh; background:var(--ink); color:var(--marble);
+  font-family:var(--font-body);
+}
+button{font-family:inherit; cursor:pointer;}
+.hidden{display:none !important;}
+
+/* ---------- boutons communs ---------- */
+.btn-primary, .btn-secondary{
+  border:none; border-radius:10px; padding:13px 22px; font-size:15px; font-weight:600;
+  font-family:var(--font-body);
+}
+.btn-primary{background:var(--terracotta-bright); color:var(--ink);}
+.btn-primary:disabled{opacity:0.5;}
+.btn-secondary{background:transparent; color:var(--marble); border:1px solid rgba(244,239,228,0.35);}
+
+/* ---------- écrans généraux ---------- */
+.screen{min-height:100vh; padding:28px 20px 60px; display:none;}
+.screen.active{display:block;}
+.screen-inner{max-width:640px; margin:0 auto; text-align:center;}
+.eyebrow{font-family:var(--font-mono); font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--gold);}
+.display-title{font-family:var(--font-display); font-weight:700; font-size:34px; margin:8px 0 4px;}
+.display-title-sm{font-family:var(--font-display); font-weight:700; font-size:26px; margin:8px 0 4px;}
+.subtitle{font-family:var(--font-body); font-size:14.5px; line-height:1.6; color:var(--marble-dim); margin:0 0 24px;}
+
+/* ---------- cartes des 4 espaces (accueil) ---------- */
+.museum-grid{display:grid; grid-template-columns:1fr; gap:14px; margin-top:24px;}
+@media(min-width:560px){.museum-grid{grid-template-columns:1fr 1fr;}}
+.room-card{
+  position:relative; text-align:left; border-radius:16px; padding:20px;
+  background:linear-gradient(160deg, rgba(244,239,228,0.08), rgba(244,239,228,0.02));
+  border:1px solid rgba(244,239,228,0.15); cursor:pointer;
+}
+.room-card[data-ready="false"]{opacity:0.45; cursor:default;}
+.room-card-emoji{font-size:34px;}
+.room-card-title{font-family:var(--font-display); font-weight:700; font-size:22px; margin:6px 0 2px;}
+.room-card-tag{font-family:var(--font-mono); font-size:10.5px; letter-spacing:0.05em; text-transform:uppercase; color:var(--gold);}
+.room-card-desc{font-size:13px; color:var(--marble-dim); margin-top:8px; line-height:1.5;}
+.room-card-badge{
+  position:absolute; top:14px; right:14px; font-family:var(--font-mono); font-size:9.5px;
+  letter-spacing:0.06em; text-transform:uppercase; padding:3px 8px; border-radius:999px;
+  background:rgba(169,130,47,0.18); color:var(--gold);
+}
+.room-card-badge.bonus{background:rgba(181,69,58,0.18); color:#e08a83;}
+
+/* ---------- modale de choix de parcours ---------- */
+.modal-backdrop{
+  position:fixed; inset:0; background:rgba(10,7,3,0.72); display:flex; align-items:center;
+  justify-content:center; padding:20px; z-index:50;
+}
+.modal-box{
+  background:#2b1a0d; border:1px solid rgba(244,239,228,0.15); border-radius:16px;
+  padding:26px; max-width:440px; width:100%; text-align:center;
+}
+.parcours-list{display:flex; flex-direction:column; gap:10px; margin-top:18px;}
+.parcours-btn{
+  border-radius:12px; padding:14px 16px; text-align:left; background:rgba(244,239,228,0.05);
+  border:1px solid rgba(244,239,228,0.15); color:var(--marble);
+}
+.parcours-btn strong{display:block; font-family:var(--font-display); font-size:17px;}
+.parcours-btn span{font-size:12.5px; color:var(--marble-dim);}
+
+/* ---------- salle d'exploration ---------- */
+.room-progress{
+  font-family:var(--font-mono); font-size:13px; letter-spacing:0.05em; color:var(--gold);
+  margin:6px 0 20px;
+}
+.room-object-list{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin:18px 0;}
+.room-object-chip{
+  font-family:var(--font-mono); font-size:11px; padding:6px 10px; border-radius:999px;
+  border:1px solid rgba(244,239,228,0.18); color:var(--marble-dim);
+}
+.room-object-chip.found{background:rgba(74,124,78,0.25); border-color:var(--success); color:var(--marble);}
+
+/* ---------- panneau d'inspection (contrat DOM repris de l'escape game) ---------- */
+.xr-overlay-root{position:fixed; inset:0; z-index:40; pointer-events:none;}
+.xr-overlay-root.hidden{display:none;}
+.xr-reticle{
+  position:absolute; top:50%; left:50%; width:34px; height:34px; margin:-17px 0 0 -17px;
+  border:2px solid rgba(244,239,228,0.8); border-radius:50%;
+}
+.xr-overlay-hint{
+  position:absolute; bottom:110px; left:0; right:0; text-align:center; font-family:var(--font-body);
+  font-size:14px; color:var(--marble); padding:0 24px;
+}
+.xr-hint-panel, .xr-inspect-panel{
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:min(86vw,380px);
+  max-height:85vh; overflow-y:auto; -webkit-overflow-scrolling:touch;
+  background:#2b1a0d; border:1px solid rgba(244,239,228,0.2); border-radius:16px; padding:16px;
+  text-align:center; pointer-events:auto;
+}
+.xr-inspect-emoji{font-size:44px; margin-bottom:8px;}
+#xr-inspect-media img{max-height:90px; max-width:80%; width:auto; display:block; margin:0 auto 8px; object-fit:contain; border-radius:8px; cursor:zoom-in;}
+.xr-inspect-question{font-size:13px; color:var(--marble-dim); margin:6px 0 12px;}
+.xr-inspect-panel .btn-primary{position:sticky; bottom:-20px; box-shadow:0 -8px 12px -4px rgba(43,26,13,0.9);}
+.xr-hint-actions{display:flex; gap:10px; justify-content:center;}
+.xr-exit-btn, .xr-recalibrate-btn{
+  position:absolute; bottom:24px; pointer-events:auto; font-size:13px; padding:10px 16px;
+}
+.xr-exit-btn{left:20px;}
+.xr-recalibrate-btn{right:20px;}
+.test-banner{
+  position:fixed; top:0; left:0; right:0; z-index:60; background:var(--danger); color:#fff;
+  text-align:center; font-family:var(--font-mono); font-size:12px; padding:6px;
+}
+.test-banner.hidden{display:none;}
+
+/* ---------- zoom image plein écran (pour les images "grandes quand nécessaire") ---------- */
+.zoom-backdrop{
+  position:fixed; inset:0; background:rgba(10,7,3,0.92); z-index:70; display:flex;
+  align-items:center; justify-content:center; padding:20px;
+}
+.zoom-backdrop img{max-width:100%; max-height:92vh; border-radius:8px;}
