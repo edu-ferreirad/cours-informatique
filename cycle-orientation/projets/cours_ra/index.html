@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Musée des Matières</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="screen active" id="screen-password">
+  <div class="screen-inner" style="max-width:420px;">
+    <div class="eyebrow">Cours — activités en classe</div>
+    <h1 class="display-title">Musée des Matières</h1>
+    <p class="subtitle">Accès réservé à la classe. Entrez le mot de passe donné par votre enseignant.</p>
+    <input id="password-input" type="password" class="quiz-input-like" placeholder="Mot de passe"
+      style="width:100%; padding:12px 14px; border-radius:10px; border:1px solid rgba(244,239,228,0.25); background:rgba(0,0,0,0.2); color:var(--marble); font-size:15px; margin-bottom:12px;">
+    <button id="password-submit" class="btn-primary" style="width:100%;">Entrer</button>
+    <p id="password-error" class="hidden" style="color:#e08a83; font-size:13px; margin-top:10px;">Mot de passe incorrect.</p>
+  </div>
+</div>
+
+<div class="screen" id="screen-museum">
+  <div class="screen-inner" style="max-width:820px;">
+    <div class="eyebrow">Cours — activités en classe</div>
+    <h1 class="display-title">Musée des Matières</h1>
+    <p class="subtitle">La classe devient un musée. Choisissez une discipline, puis un niveau et un parcours : explorez en réalité augmentée pour trouver les objets cachés, découvrez leur histoire, puis répondez au questionnaire final.</p>
+
+    <div class="museum-grid" id="discipline-grid"></div>
+  </div>
+
+  <div style="text-align:center; margin-top:36px; padding-top:18px; border-top:1px solid rgba(244,239,228,0.12);">
+    <p style="font-size:12px; color:var(--marble-dim); margin:0;">Créé par David Ferreira — corrigé et optimisé par Claude IA</p>
+    <a href="credits.html" style="font-size:12px; color:var(--terracotta-bright);">Voir les crédits et sources</a>
+  </div>
+</div>
+
+<div id="modal-root"></div>
+
+<script>
+const $ = (sel, root=document) => root.querySelector(sel);
+const $all = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+
+const MUSEUM_PASSWORD = "drizecora2025";
+
+function tryEnterMuseum() {
+  const input = $("#password-input");
+  if (input.value === MUSEUM_PASSWORD) {
+    sessionStorage.setItem("museeMatieresAccesOk", "1");
+    $("#screen-password").classList.remove("active");
+    $("#screen-museum").classList.add("active");
+  } else {
+    $("#password-error").classList.remove("hidden");
+  }
+}
+$("#password-submit").addEventListener("click", tryEnterMuseum);
+$("#password-input").addEventListener("keydown", (e) => { if (e.key === "Enter") tryEnterMuseum(); });
+
+if (sessionStorage.getItem("museeMatieresAccesOk") === "1") {
+  $("#screen-password").classList.remove("active");
+  $("#screen-museum").classList.add("active");
+}
+
+// ============================================================================
+// Catalogue des disciplines. "grades" liste les niveaux réellement construits
+// (fichier salle-<matiere>-<niveau>.html existant). Une discipline sans aucun
+// niveau prêt s'affiche grisée avec la mention "Bientôt".
+// ============================================================================
+const DISCIPLINES = [
+  {
+    id: "theatre", emoji: "🎭", title: "Théâtre — Expression orale",
+    tag: "Diction · Improvisation · Molière",
+    desc: "Respiration, articulation, masque neutre, improvisation — d'après le Parcours de l'élève d'expression orale.",
+    grades: { "9": "salle-theatre-9e.html" }
+  },
+  {
+    id: "francais", emoji: "📚", title: "Français",
+    tag: "En préparation",
+    desc: "Figures de style, mouvements littéraires, extraits — d'après les moyens d'enseignement romands (FE/LE/Atelier du langage).",
+    grades: {}
+  },
+  {
+    id: "geographie", emoji: "🌍", title: "Géographie",
+    tag: "En préparation",
+    desc: "Biomes, plaques tectoniques, climats — d'après les moyens d'enseignement romands.",
+    grades: {}
+  },
+  {
+    id: "allemand", emoji: "🇩🇪", title: "Allemand",
+    tag: "En préparation",
+    desc: "Vie quotidienne, faux amis, icônes culturelles — d'après geni@l klick.",
+    grades: {}
+  },
+  {
+    id: "anglais", emoji: "🇬🇧", title: "Anglais",
+    tag: "En préparation",
+    desc: "Vie quotidienne, faux amis, icônes culturelles — d'après Cambridge IIP.",
+    grades: {}
+  },
+  {
+    id: "maths", emoji: "📐", title: "Mathématiques",
+    tag: "En attente de ressources",
+    desc: "Cabinet des théorèmes (Pythagore, Thalès, nombre d'or...) — en attente d'un support de cours.",
+    grades: {}
+  },
+  {
+    id: "biologie", emoji: "🧬", title: "Biologie",
+    tag: "En attente de ressources",
+    desc: "Voyage dans le corps humain — en attente d'un support de cours.",
+    grades: {}
+  },
+  {
+    id: "musique", emoji: "🎵", title: "Musique",
+    tag: "En attente de ressources",
+    desc: "Instruments, époques, styles — en attente d'un support de cours.",
+    grades: {}
+  },
+  {
+    id: "physique", emoji: "🍎", title: "Physique",
+    tag: "En attente de ressources",
+    desc: "Salle des expériences (Newton, Galilée...) — en attente d'un support de cours.",
+    grades: {}
+  },
+];
+
+const PARCOURS = [
+  { id: "court", label: "Court", desc: "4 objets — ~10 min" },
+  { id: "moyen", label: "Moyen", desc: "8 objets — ~20 min" },
+  { id: "long", label: "Long", desc: "tous les objets — ~30 min" },
+];
+
+function renderGrid() {
+  const grid = $("#discipline-grid");
+  grid.innerHTML = DISCIPLINES.map(d => {
+    const ready = Object.keys(d.grades).length > 0;
+    return `
+      <div class="room-card" data-ready="${ready}" data-disc="${d.id}" style="${ready ? "" : "opacity:0.55; cursor:default;"}">
+        <span class="room-card-badge${ready ? "" : " bonus"}">${ready ? Object.keys(d.grades).map(g => g + "e").join(" · ") : "Bientôt"}</span>
+        <div class="room-card-emoji">${d.emoji}</div>
+        <div class="room-card-title">${d.title}</div>
+        <div class="room-card-tag">${d.tag}</div>
+        <div class="room-card-desc">${d.desc}</div>
+      </div>`;
+  }).join("");
+
+  $all(".room-card").forEach(card => {
+    card.addEventListener("click", () => {
+      if (card.dataset.ready !== "true") return;
+      openGradeModal(card.dataset.disc);
+    });
+  });
+}
+renderGrid();
+
+function openGradeModal(discId) {
+  const disc = DISCIPLINES.find(d => d.id === discId);
+  const grades = Object.keys(disc.grades);
+  const root = $("#modal-root");
+
+  if (grades.length === 1) {
+    return openParcoursModal(disc.grades[grades[0]], disc.title + " — " + grades[0] + "e");
+  }
+
+  root.innerHTML = `
+    <div class="modal-backdrop" id="modal-backdrop">
+      <div class="modal-box">
+        <div class="eyebrow">Choix du niveau</div>
+        <h2 class="display-title-sm" style="margin-bottom:0;">${disc.title}</h2>
+        <div class="parcours-list">
+          ${grades.map(g => `
+            <button class="parcours-btn" data-g="${g}">
+              <strong>${g}e année</strong>
+            </button>`).join("")}
+        </div>
+        <button class="btn-secondary" id="modal-cancel" style="margin-top:16px;">Annuler</button>
+      </div>
+    </div>`;
+  $("#modal-backdrop").addEventListener("click", (e) => { if (e.target.id === "modal-backdrop") root.innerHTML = ""; });
+  $("#modal-cancel").addEventListener("click", () => root.innerHTML = "");
+  $all(".parcours-btn", root).forEach(btn => {
+    btn.addEventListener("click", () => openParcoursModal(disc.grades[btn.dataset.g], disc.title + " — " + btn.dataset.g + "e"));
+  });
+}
+
+function openParcoursModal(link, label) {
+  const root = $("#modal-root");
+  root.innerHTML = `
+    <div class="modal-backdrop" id="modal-backdrop">
+      <div class="modal-box">
+        <div class="eyebrow">Choix du parcours</div>
+        <h2 class="display-title-sm" style="margin-bottom:0;">${label}</h2>
+        <div class="parcours-list">
+          ${PARCOURS.map(p => `
+            <button class="parcours-btn" data-p="${p.id}">
+              <strong>${p.label}</strong>
+              <span>${p.desc}</span>
+            </button>`).join("")}
+        </div>
+        <button class="btn-secondary" id="modal-cancel" style="margin-top:16px;">Annuler</button>
+      </div>
+    </div>`;
+  $("#modal-backdrop").addEventListener("click", (e) => { if (e.target.id === "modal-backdrop") root.innerHTML = ""; });
+  $("#modal-cancel").addEventListener("click", () => root.innerHTML = "");
+  $all(".parcours-btn", root).forEach(btn => {
+    btn.addEventListener("click", () => { location.href = `${link}?parcours=${btn.dataset.p}`; });
+  });
+}
+</script>
+</body>
+</html>
