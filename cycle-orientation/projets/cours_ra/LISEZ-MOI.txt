@@ -1,0 +1,71 @@
+MUSÉE DES MATIÈRES — comment l'utiliser
+=========================================
+
+1. Dézippez ce dossier entièrement (tous les fichiers doivent rester
+   ensemble, au même niveau — ne renommez rien).
+2. Ouvrez index.html dans un navigateur (double-clic), ou hébergez le
+   dossier sur un petit serveur web (recommandé pour la RA caméra —
+   voir ci-dessous).
+3. Mot de passe d'accès : drizecora2025
+
+ÉTAT ACTUEL — 24 salles complètes
+-----------------------------------
+Construites à partir de vos manuels officiels (contenu reformulé,
+jamais copié tel quel) :
+✅ Mathématiques 9e / 10e / 11e — Cabinet des nombres et stratégies
+✅ Géographie 9e / 10e / 11e — Risques/ressources/villes,
+   Climat/industrie/migrations, Eau/énergie/information
+✅ Français 9e / 10e / 11e — Musée des mots
+✅ Histoire 9e / 10e / 11e — Antiquité/Moyen Âge, Renaissance/temps
+   modernes, XXe siècle
+✅ Informatique 9e / 10e / 11e — Machine et information,
+   Clavier et bureautique, Programmer avec Python
+✅ Théâtre 9e — Expression orale (13 objets)
+✅ Média-Images 11e — Éducation aux médias et à l'image (EdMI, 13 objets)
+
+Construites en contenu original (aucun manuel disponible pour ces
+branches), fidèle aux prescriptions cantonales officielles du DIP
+Genève — indiqué clairement dans credits.html :
+✅ Biologie 9e / 10e — Voyage dans le vivant, Le corps en action
+   (la biologie s'arrête officiellement en 10e au CO genevois)
+✅ Physique 11e — Salle des expériences
+   (la physique ne commence qu'en 11e au CO genevois)
+✅ Musique 9e-10e — Voix, rythme et création
+   (pas d'enseignement de musique en 11e au CO genevois)
+✅ Allemand — Alltag (vie quotidienne, faux amis, culture)
+✅ Anglais — Everyday Life (vie quotidienne, faux amis, culture)
+   (geni@l klick et Cambridge IIP sont protégés par identifiant et
+   chargent leur contenu en JavaScript après connexion : impossible
+   à consulter à distance sans session ouverte. Pour coller plus
+   précisément aux chapitres réellement enseignés, vous pouvez à
+   tout moment coller ici le contenu d'un chapitre — texte, captures
+   d'écran, export PDF — et il sera intégré comme les manuels papier)
+
+Bonus culture générale (hors curriculum, contenu original) :
+✅ Théâtre — Salle des masques (comédie/tragédie grecques,
+   Commedia dell'arte, kabuki, Brecht — 12 objets)
+
+QUALITÉ — audit technique
+---------------------------
+Chaque salle a été vérifiée automatiquement : syntaxe JS valide,
+liens salle/quiz/hub corrects, aucun id ou ancrage RA dupliqué,
+compteurs de parcours (court/moyen/long) exacts. 0 erreur détectée
+à la dernière vérification.
+
+RÉUTILISATION DU MOTEUR
+------------------------
+ar-engine.js et style.css sont strictement identiques au musée de
+l'Antiquité — c'est le même moteur RA (caméra WebXR + mode boussole
+iPad + repli grille), juste rebranché sur d'autres contenus.
+Chaque salle suit le même schéma que data-rome.js du musée
+d'origine : un objet = id, tier (court/moyen/long), emoji, label,
+texte, "le sais-tu", position d'ancrage RA.
+
+iPad : aucune application à installer, Safari suffit (bascule
+automatique en mode boussole, comme dans le musée de l'Antiquité).
+
+PROCHAINES ÉTAPES POSSIBLES
+------------------------------
+- Contenu Allemand/Anglais collé depuis geni@l klick / Cambridge IIP
+- Sourcer des images libres de droits pour les salles (comme pour le
+  musée de l'Antiquité) — actuellement emoji uniquement
