@@ -1,0 +1,60 @@
+// ============================================================================
+// SALLE ITALIEN — COLLÈGE DE GENÈVE (DF/OS, 1ère-4e)
+// Contenu reformulé à partir du Plan d'études du Collège de Genève,
+// section Italien p. 16-18. Aucun énoncé n'est copié tel quel.
+// ============================================================================
+const DESK_H = 0.6, WALL_H = 1.4, SHELF_H = 1.1;
+const MUSEE_ITALIEN_COLLEGE_OBJECTS = [
+  { id:"civilisation_proche_suisse_italienne", tier:"court", emoji:"🇮🇹", label:"Une civilisation proche, nationale et européenne",
+    text:"L'étude de l'italien amène l'élève à se situer par rapport aux autres en développant un esprit d'ouverture envers une civilisation à la fois proche géographiquement, nationale (la Suisse italienne) et européenne (l'Italie).",
+    fact:"Le plan d'études met explicitement l'accent sur la Suisse italienne et son rôle en tant qu'entité nationale — l'italien enseigné au collège n'est donc pas seulement tourné vers l'Italie, mais aussi vers le Tessin.",
+    anchor:{distance:2.0,angle:20,height:SHELF_H} },
+  { id:"cinq_dimensions_italien", tier:"court", emoji:"🎯", label:"Communiquer, comprendre, analyser, juger",
+    text:"L'enseignement vise l'acquisition de moyens écrits et oraux pour communiquer dans la vie courante, comprendre un texte ou un film, s'exprimer à l'écrit, analyser un texte, mais aussi exprimer un jugement personnel argumenté sur une œuvre.",
+    fact:"Cette dernière compétence — l'argumentation critique sur une œuvre littéraire — place la discussion et le débat au cœur de l'apprentissage, pas seulement la compréhension passive d'un texte.",
+    anchor:{distance:3.4,angle:95,height:DESK_H} },
+  { id:"sensibilite_artistique_italien", tier:"court", emoji:"🎨", label:"Une sensibilité artistique élargie",
+    text:"L'étude de la langue et de la civilisation italiennes développe la sensibilité artistique de l'élève : curiosité envers la littérature, le théâtre, la musique, les arts et les médias italophones, au-delà du seul apprentissage linguistique.",
+    fact:"Le plan d'études relie explicitement cette sensibilité artistique à la capacité de poser \"un regard personnel sur le monde environnant\" — l'italien devient ainsi un outil de formation culturelle globale.",
+    anchor:{distance:1.4,angle:160,height:DESK_H} },
+  { id:"tronc_commun_italien_1ere", tier:"court", emoji:"1️⃣", label:"Le tronc commun de 1ère année",
+    text:"En 1ère année, tous les élèves reconnaissent et reproduisent les sons de l'italien, comprennent un énoncé simple, décrivent un lieu ou une personne, et écrivent un texte court (lettre, invitation, description) dans une orthographe correcte.",
+    fact:"L'accent porte d'abord sur les sons de la langue elle-même — reconnaître et reproduire la prononciation italienne précède la maîtrise de structures grammaticales plus complexes.",
+    anchor:{distance:4.6,angle:250,height:WALL_H} },
+  { id:"quatre_competences_df_italien", tier:"moyen", emoji:"📚", label:"Écouter, parler, lire, écrire",
+    text:"En discipline fondamentale, l'élève suit sans peine une conversation, participe activement à un échange d'idées, présente un exposé sur un sujet d'intérêt général, lit sans difficulté des textes variés, et rédige avec une certaine aisance résumés et commentaires.",
+    fact:"Cette maîtrise suppose une solide connaissance de la grammaire ET la lecture d'œuvres représentatives de la littérature italienne — les deux dimensions, technique et culturelle, avancent toujours ensemble.",
+    anchor:{distance:2.6,angle:300,height:SHELF_H} },
+  { id:"diversite_textes_presse_chansons", tier:"moyen", emoji:"🎵", label:"Articles, chansons, bandes dessinées",
+    text:"Au-delà des œuvres littéraires classiques, l'enseignement mobilise des textes tels qu'articles de presse, chansons, bandes dessinées ou nouvelles, afin que l'élève découvre la diversité et la richesse de la culture italienne sous toutes ses formes.",
+    fact:"Cette diversité volontaire de supports (presse, chanson, BD) montre que la culture italienne étudiée au collège ne se limite pas à la seule littérature classique, mais englobe la culture populaire contemporaine.",
+    anchor:{distance:5.2,angle:40,height:DESK_H} },
+  { id:"projet_personnel_os_italien", tier:"moyen", emoji:"🎯", label:"Un rythme plus soutenu en option (OS)",
+    text:"En option spécifique, les objectifs et méthodes sont les mêmes qu'en discipline fondamentale, mais le développement des aptitudes est plus marqué et le rythme d'apprentissage plus soutenu, en tenant compte des attentes et des goûts de l'élève.",
+    fact:"Dès la 2e année d'option spécifique, l'accent est mis progressivement sur l'étude d'œuvres littéraires classiques et modernes, et sur la découverte des différents aspects artistiques et socio-culturels des pays italophones.",
+    anchor:{distance:1.8,angle:210,height:DESK_H} },
+  { id:"histoire_litteraire_italienne", tier:"moyen", emoji:"📜", label:"Les grands courants de l'histoire littéraire",
+    text:"L'option spécifique amène l'élève à connaître les étapes principales de l'histoire littéraire italienne, du Moyen Âge à nos jours, en identifiant les grands courants qui la traversent, à travers la lecture et l'analyse d'œuvres représentatives situées dans leur contexte socio-politique et artistique.",
+    fact:"Les élèves sont conduits à effectuer des recherches personnelles sur ces œuvres — l'histoire littéraire n'est donc pas seulement transmise, mais explorée activement par l'élève lui-même.",
+    anchor:{distance:3.9,angle:130,height:DESK_H} },
+  { id:"presence_culturelle_italienne_europe", tier:"long", emoji:"🏛️", label:"L'Italie, présente dans toute l'Europe",
+    text:"L'option spécifique tient compte de la présence culturelle italienne dans l'histoire des autres pays européens, notamment en musique, en architecture et dans les arts visuels — l'influence italienne dépassant largement les seules frontières de l'Italie actuelle.",
+    fact:"Cette influence culturelle italienne à l'échelle européenne (la Renaissance, l'opéra, l'architecture baroque) illustre bien pourquoi le plan d'études présente l'italien comme une langue \"nationale et européenne\" à la fois.",
+    anchor:{distance:6.0,angle:70,height:SHELF_H} },
+  { id:"quatre_aptitudes_os_italien", tier:"long", emoji:"🗣️", label:"Quatre aptitudes approfondies (OS)",
+    text:"En option spécifique, les quatre aptitudes (compréhension et expression, orales et écrites) sont développées à un niveau plus exigeant : comprendre intégralement un exposé ou une pièce de théâtre, parler spontanément de sujets variés, comprendre des essais ou dossiers d'information, et argumenter à l'écrit dans une langue correcte.",
+    fact:"Le plan d'études précise qu'en option spécifique, l'élève doit aussi savoir \"distinguer différents niveaux de langue et les utiliser de manière adéquate\" — une nuance sociolinguistique absente des exigences de la discipline fondamentale.",
+    anchor:{distance:2.3,angle:340,height:WALL_H} },
+  { id:"connaissance_regions_italophones", tier:"long", emoji:"🗺️", label:"Connaître les régions où l'italien est parlé",
+    text:"L'option spécifique donne à l'élève une bonne connaissance de la culture des pays et des régions où l'italien est parlé — l'Italie elle-même, mais aussi la Suisse italienne, dans toute sa diversité géographique et culturelle.",
+    fact:"Cette attention portée à la diversité régionale de l'espace italophone rappelle que l'italien, comme beaucoup de langues, n'est jamais une réalité culturelle uniforme mais un ensemble de traditions régionales riches.",
+    anchor:{distance:4.4,angle:185,height:DESK_H} },
+  { id:"aspects_communicatifs_cognitifs_socioculturels", tier:"long", emoji:"🧩", label:"Trois dimensions de l'apprentissage",
+    text:"L'enseignement de l'italien tient compte de trois aspects simultanés qui interviennent dans l'apprentissage d'une langue : les aspects communicatifs (se faire comprendre), cognitifs (structurer sa pensée) et socio-culturels (comprendre un contexte culturel différent).",
+    fact:"Cette tripartition explicite (communicatif/cognitif/socio-culturel) montre qu'apprendre une langue au collège n'est jamais réduit à un seul de ces trois aspects : les trois progressent nécessairement ensemble.",
+    anchor:{distance:5.7,angle:15,height:SHELF_H} },
+];
+const TIER_ORDER = { court:1, moyen:2, long:3 };
+function getItalienCollegeObjectsForParcours(p){ const m=TIER_ORDER[p]||1; return MUSEE_ITALIEN_COLLEGE_OBJECTS.filter(o=>TIER_ORDER[o.tier]<=m); }
+window.MUSEE_ITALIEN_COLLEGE_OBJECTS = MUSEE_ITALIEN_COLLEGE_OBJECTS;
+window.getItalienCollegeObjectsForParcours = getItalienCollegeObjectsForParcours;

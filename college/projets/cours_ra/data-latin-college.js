@@ -1,0 +1,60 @@
+// ============================================================================
+// SALLE LATIN — COLLÈGE DE GENÈVE (DF/OS, 1ère-4e)
+// Contenu reformulé à partir du Plan d'études du Collège de Genève,
+// section Latin p. 23-24. Aucun énoncé n'est copié tel quel.
+// ============================================================================
+const DESK_H = 0.6, WALL_H = 1.4, SHELF_H = 1.1;
+const MUSEE_LATIN_COLLEGE_OBJECTS = [
+  { id:"langue_et_civilisation_latin", tier:"court", emoji:"🏛️", label:"La langue et toute une civilisation",
+    text:"L'enseignement du latin vise à amener l'élève à la maîtrise de la langue et à la connaissance de la civilisation romaine sous ses multiples aspects : littéraire, historique, politique, social, religieux, philosophique, artistique et juridique.",
+    fact:"Cette amplitude — sept dimensions différentes de la civilisation romaine citées explicitement — montre que le latin au collège dépasse largement l'exercice de traduction grammaticale pour devenir une véritable porte d'entrée culturelle.",
+    anchor:{distance:2.0,angle:20,height:SHELF_H} },
+  { id:"plaisir_decouverte_antiquite", tier:"court", emoji:"📜", label:"Le plaisir de découvrir l'Antiquité",
+    text:"Parmi les attitudes attendues figure explicitement le plaisir de découvrir les œuvres et documents légués par l'Antiquité, ainsi que la curiosité intellectuelle et l'intérêt pour les grands courants de pensée illustrés par les textes latins.",
+    fact:"Le plan d'études attend aussi de l'élève qu'il soit sensible \"aux différences comme aux similitudes essentielles\" entre civilisation antique et civilisation contemporaine — un exercice constant de comparaison entre hier et aujourd'hui.",
+    anchor:{distance:3.4,angle:95,height:DESK_H} },
+  { id:"maitrise_langue_comprehension", tier:"court", emoji:"📖", label:"Maîtriser la langue pour comprendre les textes",
+    text:"En discipline fondamentale, l'enseignement vise la maîtrise de la langue sous l'angle de la compréhension des textes, en laissant une part de liberté aux maîtres et aux élèves dans le choix des sujets et de leur degré d'approfondissement.",
+    fact:"Cette liberté pédagogique explicite dans le choix des sujets distingue le latin de disciplines au programme plus rigide, en confiant une part de responsabilité pédagogique directement aux enseignants et à leurs classes.",
+    anchor:{distance:1.4,angle:160,height:DESK_H} },
+  { id:"etymologie_langues_romanes", tier:"court", emoji:"🔤", label:"Une clé pour les langues romanes",
+    text:"Parmi les savoirs attendus figurent des notions étymologiques propres à faciliter l'apprentissage des langues romanes (français, italien, espagnol) et de la terminologie scientifique et technique — le latin agissant comme une clé de compréhension pour d'autres langues.",
+    fact:"Cette fonction de \"clé étymologique\" explique pourquoi de nombreux termes scientifiques et médicaux modernes, dans presque toutes les langues européennes, conservent directement des racines latines identifiables.",
+    anchor:{distance:4.6,angle:250,height:WALL_H} },
+  { id:"contexte_historique_culturel_oeuvres", tier:"moyen", emoji:"🗿", label:"Situer une œuvre dans son contexte",
+    text:"L'élève apprend à analyser et interpréter une œuvre sur la base des passages traduits en classe, à en prolonger la lecture par la traduction, et à connaître systématiquement le contexte historique et culturel des œuvres étudiées.",
+    fact:"Cette exigence de contextualisation empêche de traiter un texte latin comme un simple exercice de traduction isolé : chaque texte doit être relié à l'époque et à la société qui l'ont produit.",
+    anchor:{distance:2.6,angle:300,height:SHELF_H} },
+  { id:"genres_litteraires_latins", tier:"moyen", emoji:"📚", label:"Découvrir les genres littéraires latins",
+    text:"L'élève connaît en traduction un large éventail d'œuvres littéraires latines, ainsi que les différents genres littéraires de cette littérature — poésie épique, théâtre, histoire, discours — chacun avec ses propres codes et conventions.",
+    fact:"Beaucoup de ces genres littéraires latins (l'épopée, le théâtre, l'histoire narrative) ont directement influencé, des siècles plus tard, les genres littéraires modernes étudiés en cours de français.",
+    anchor:{distance:5.2,angle:40,height:DESK_H} },
+  { id:"heritage_pensee_occidentale", tier:"moyen", emoji:"💭", label:"L'héritage dans la pensée occidentale",
+    text:"L'élève prend conscience de l'importance de la civilisation latine dans l'histoire de la pensée occidentale jusqu'à nos jours — les concepts politiques, juridiques et philosophiques romains continuant d'influencer directement les sociétés européennes actuelles.",
+    fact:"De nombreux systèmes juridiques européens modernes, y compris certains aspects du droit suisse, conservent des traces directes du droit romain antique, plus de mille cinq cents ans après la chute de l'Empire romain d'Occident.",
+    anchor:{distance:1.8,angle:210,height:DESK_H} },
+  { id:"exercice_version_langue_francaise", tier:"moyen", emoji:"🔄", label:"L'exercice de version, un miroir du français",
+    text:"En option spécifique, l'exercice de la version (traduire du latin vers le français) permet à l'élève de mieux maîtriser le fonctionnement et l'expression de sa propre langue maternelle — traduire une langue ancienne éclaire, en retour, la structure de sa propre langue.",
+    fact:"Ce bénéfice indirect pour la maîtrise du français est explicitement cité par le plan d'études comme un objectif à part entière de l'exercice de traduction, pas seulement un effet secondaire fortuit.",
+    anchor:{distance:3.9,angle:130,height:DESK_H} },
+  { id:"heritage_juridique_politique_suisse", tier:"long", emoji:"⚖️", label:"L'empreinte romaine sur la Suisse",
+    text:"L'option spécifique amène l'élève à reconnaître l'héritage culturel, politique et juridique de la romanité, en prenant conscience de l'empreinte décisive dont elle a marqué l'Occident, et notamment la Suisse elle-même.",
+    fact:"Cette mention spécifique de la Suisse rappelle que le territoire suisse actuel a lui-même été intégré à l'Empire romain pendant plusieurs siècles — l'héritage romain n'est donc pas seulement un savoir abstrait, mais une partie de l'histoire locale.",
+    anchor:{distance:6.0,angle:70,height:SHELF_H} },
+  { id:"etude_seul_texte_auteur", tier:"long", emoji:"🎓", label:"Étudier seul un texte, se préparer à l'autonomie",
+    text:"En 3e et 4e années d'option spécifique, un objectif spécifique consiste à étudier seul un texte d'auteur latin et à le présenter — une compétence d'autonomie intellectuelle qui prépare directement aux exigences des études supérieures.",
+    fact:"Cette capacité à travailler seul sur un texte complexe, sans accompagnement constant du professeur, constitue une préparation méthodologique directe au travail de recherche autonome exigé après le collège.",
+    anchor:{distance:2.3,angle:340,height:WALL_H} },
+  { id:"influence_creation_artistique_latine", tier:"long", emoji:"🎭", label:"Une influence durable sur les arts",
+    text:"L'élève prend conscience de l'influence toujours présente de la culture latine dans la création artistique et littéraire de la civilisation occidentale — des thèmes, des mythes et des formes antiques continuant d'inspirer des œuvres bien après l'Antiquité elle-même.",
+    fact:"Cette influence se retrouve jusque dans des domaines très contemporains : cinéma, littérature de fantasy ou jeux vidéo puisent encore aujourd'hui abondamment dans la mythologie et l'histoire romaines antiques.",
+    anchor:{distance:4.4,angle:185,height:DESK_H} },
+  { id:"ouvrages_reference_autonomie_latin", tier:"long", emoji:"📕", label:"Savoir utiliser les ouvrages de référence",
+    text:"Que ce soit en discipline fondamentale ou en option spécifique, l'élève apprend à utiliser les ouvrages de référence propres au latin (dictionnaires, grammaires) — une compétence méthodologique qui développe son autonomie face à un texte inconnu.",
+    fact:"Cette compétence de consultation autonome des outils de référence, commune à plusieurs langues au collège, forme progressivement l'élève à travailler seul face à un texte complexe, sans dépendre systématiquement d'une aide extérieure.",
+    anchor:{distance:5.7,angle:15,height:SHELF_H} },
+];
+const TIER_ORDER = { court:1, moyen:2, long:3 };
+function getLatinCollegeObjectsForParcours(p){ const m=TIER_ORDER[p]||1; return MUSEE_LATIN_COLLEGE_OBJECTS.filter(o=>TIER_ORDER[o.tier]<=m); }
+window.MUSEE_LATIN_COLLEGE_OBJECTS = MUSEE_LATIN_COLLEGE_OBJECTS;
+window.getLatinCollegeObjectsForParcours = getLatinCollegeObjectsForParcours;

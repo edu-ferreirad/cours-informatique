@@ -1,0 +1,60 @@
+// ============================================================================
+// SALLE ESPAGNOL — COLLÈGE DE GENÈVE (OS, 1ère-4e)
+// Contenu reformulé à partir du Plan d'études du Collège de Genève,
+// section Espagnol p. 21-22. Aucun énoncé n'est copié tel quel.
+// ============================================================================
+const DESK_H = 0.6, WALL_H = 1.4, SHELF_H = 1.1;
+const MUSEE_ESPAGNOL_COLLEGE_OBJECTS = [
+  { id:"expression_aisance_espagnol", tier:"court", emoji:"🗣️", label:"S'exprimer avec aisance",
+    text:"L'objectif général de l'espagnol, enseigné uniquement en option spécifique, est d'amener l'élève à s'exprimer correctement et avec aisance à l'oral comme à l'écrit, en disposant peu à peu d'un vocabulaire permettant d'aborder un large éventail de sujets.",
+    fact:"Contrairement à l'allemand, l'italien ou l'anglais, l'espagnol n'est proposé au collège qu'en option spécifique — un choix qui suppose déjà, dès le départ, un intérêt particulier de l'élève pour cette langue.",
+    anchor:{distance:2.0,angle:20,height:SHELF_H} },
+  { id:"civilisation_hispanique_globale", tier:"court", emoji:"🌎", label:"Le monde hispanique, une civilisation plurielle",
+    text:"Divers aspects linguistiques, culturels, artistiques et sociaux sont abordés, de manière que l'élève acquière peu à peu une bonne connaissance des différents domaines de la civilisation du monde hispanique — un monde qui dépasse largement la seule Espagne.",
+    fact:"Le terme \"monde hispanique\" employé par le plan d'études englobe volontairement l'Espagne mais aussi l'ensemble des pays d'Amérique latine hispanophones — une aire culturelle bien plus vaste qu'un seul pays.",
+    anchor:{distance:3.4,angle:95,height:DESK_H} },
+  { id:"liens_autres_disciplines_espagnol", tier:"court", emoji:"🔗", label:"S'ouvrir à d'autres disciplines",
+    text:"L'élève est amené à s'intéresser à divers aspects de la civilisation, de la culture ou de la littérature hispaniques, puis à élargir progressivement son point de vue en établissant des liens avec d'autres disciplines étudiées au collège.",
+    fact:"Cette ouverture interdisciplinaire délibérée distingue l'apprentissage de l'espagnol d'un simple exercice linguistique isolé : la langue devient un point d'entrée vers d'autres champs de connaissance.",
+    anchor:{distance:1.4,angle:160,height:DESK_H} },
+  { id:"structures_progressives_espagnol", tier:"court", emoji:"📈", label:"Des structures de plus en plus élaborées",
+    text:"Par l'acquisition de structures linguistiques de plus en plus élaborées, l'élève apprend à communiquer dans les situations de la vie courante, à discuter et échanger des idées, puis à s'exprimer avec une bonne prononciation et de l'aisance.",
+    fact:"Cette progression, de la communication basique de la vie courante jusqu'à l'échange d'idées plus complexes, se déploie sur les quatre années du cycle, à un rythme adapté à une discipline choisie uniquement en option.",
+    anchor:{distance:4.6,angle:250,height:WALL_H} },
+  { id:"lecture_oeuvres_complexes_espagnol", tier:"moyen", emoji:"📚", label:"Lire des œuvres de plus en plus complexes",
+    text:"L'élève est amené à lire, comprendre et analyser des textes ou des œuvres littéraires de plus en plus complexes et variés, issus d'époques différentes, puis à les commenter et les interpréter de façon cohérente et critique.",
+    fact:"Cette exigence de lire des œuvres \"d'époques différentes\" garantit une perspective historique de la littérature hispanophone, pas seulement une immersion dans la production contemporaine.",
+    anchor:{distance:2.6,angle:300,height:SHELF_H} },
+  { id:"redaction_progressive_espagnol", tier:"moyen", emoji:"✍️", label:"Rédiger des textes de plus en plus riches",
+    text:"L'élève apprend à rédiger progressivement des compositions, des narrations, des résumés et des textes argumentatifs, tout en effectuant des recherches personnelles — une progression qui couvre l'ensemble des grandes formes d'écriture.",
+    fact:"Cette diversité de formes écrites (narration, résumé, argumentation) reprend la même logique de progression que celle observée dans les autres langues vivantes enseignées au collège.",
+    anchor:{distance:5.2,angle:40,height:DESK_H} },
+  { id:"vocabulaire_quotidien_puis_nuance", tier:"moyen", emoji:"🔤", label:"Du vocabulaire quotidien aux nuances subtiles",
+    text:"L'étude du vocabulaire porte d'abord sur les mots empruntés à la vie quotidienne, puis s'enrichit progressivement en vue de l'expression écrite, notamment par l'étude des nuances et des subtilités du langage espagnol.",
+    fact:"Une attention particulière est aussi accordée à la prononciation et à l'orthographe — deux dimensions parfois négligées dans l'apprentissage d'une langue, mais explicitement mentionnées par le plan d'études.",
+    anchor:{distance:1.8,angle:210,height:DESK_H} },
+  { id:"attitudes_interet_hispanique", tier:"moyen", emoji:"💭", label:"S'intéresser sincèrement à une culture",
+    text:"Au-delà des seules compétences linguistiques, le plan d'études attend de l'élève une véritable attitude d'intérêt envers la civilisation, la culture et la littérature hispaniques — un engagement personnel qui va au-delà de l'obligation scolaire.",
+    fact:"Cet accent mis sur l'attitude, et pas seulement sur la compétence technique, reflète le statut particulier de l'espagnol comme option choisie librement, contrairement à d'autres disciplines imposées à tous.",
+    anchor:{distance:3.9,angle:130,height:DESK_H} },
+  { id:"prononciation_orthographe_soin", tier:"long", emoji:"🔊", label:"Le soin apporté à la prononciation",
+    text:"Le plan d'études accorde une attention particulière à la prononciation et à l'orthographe de l'espagnol — une langue dont la prononciation, plus régulière que celle du français ou de l'anglais, permet un apprentissage progressif mais exigeant en précision.",
+    fact:"La relative régularité de la prononciation espagnole (chaque lettre se prononçant de façon plus constante qu'en français) facilite souvent, en pratique, l'apprentissage initial de l'oral pour les élèves francophones.",
+    anchor:{distance:6.0,angle:70,height:SHELF_H} },
+  { id:"amerique_latine_diversite", tier:"long", emoji:"🌎", label:"Une langue parlée sur plusieurs continents",
+    text:"En étudiant la civilisation du \"monde hispanique\", l'élève découvre une langue parlée non seulement en Espagne mais aussi dans une grande partie de l'Amérique latine — chaque région ayant développé ses propres variantes culturelles et linguistiques.",
+    fact:"L'espagnol est aujourd'hui l'une des langues les plus parlées au monde comme langue maternelle, principalement grâce à sa diffusion historique à travers le continent américain, bien au-delà de son pays d'origine européen.",
+    anchor:{distance:2.3,angle:340,height:WALL_H} },
+  { id:"echange_idees_discussion_espagnol", tier:"long", emoji:"💬", label:"Discuter et échanger des idées",
+    text:"Parmi les aptitudes centrales figure la capacité à discuter et échanger des idées en espagnol — une compétence qui suppose de dépasser la simple récitation de phrases apprises pour entrer dans un véritable dialogue spontané avec un interlocuteur.",
+    fact:"Cette capacité à \"discuter et échanger\" plutôt que seulement répondre à des questions préparées marque une étape importante dans la maîtrise d'une langue, proche de l'aisance d'un locuteur natif.",
+    anchor:{distance:4.4,angle:185,height:DESK_H} },
+  { id:"recherches_personnelles_espagnol", tier:"long", emoji:"🔍", label:"Mener des recherches personnelles",
+    text:"L'élève est amené à effectuer des recherches personnelles sur des sujets liés à la civilisation, la culture ou la littérature hispaniques — une démarche autonome qui complète l'enseignement dispensé en classe par un travail d'investigation individuel.",
+    fact:"Cette exigence de recherche personnelle, commune à plusieurs disciplines du collège, prépare progressivement l'élève au travail de maturité, un projet de recherche approfondi mené en fin de cursus gymnasial.",
+    anchor:{distance:5.7,angle:15,height:SHELF_H} },
+];
+const TIER_ORDER = { court:1, moyen:2, long:3 };
+function getEspagnolCollegeObjectsForParcours(p){ const m=TIER_ORDER[p]||1; return MUSEE_ESPAGNOL_COLLEGE_OBJECTS.filter(o=>TIER_ORDER[o.tier]<=m); }
+window.MUSEE_ESPAGNOL_COLLEGE_OBJECTS = MUSEE_ESPAGNOL_COLLEGE_OBJECTS;
+window.getEspagnolCollegeObjectsForParcours = getEspagnolCollegeObjectsForParcours;

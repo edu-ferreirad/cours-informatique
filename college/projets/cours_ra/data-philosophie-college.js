@@ -1,0 +1,60 @@
+// ============================================================================
+// SALLE PHILOSOPHIE — COLLÈGE DE GENÈVE (DF/OC, 1ère-4e)
+// Contenu reformulé à partir du Plan d'études du Collège de Genève,
+// section Philosophie p. 45-46. Aucun énoncé n'est copié tel quel.
+// ============================================================================
+const DESK_H = 0.6, WALL_H = 1.4, SHELF_H = 1.1;
+const MUSEE_PHILOSOPHIE_COLLEGE_OBJECTS = [
+  { id:"penser_maniere_autonome", tier:"court", emoji:"🧠", label:"Penser de manière autonome",
+    text:"L'enseignement de la philosophie a pour ambition d'apprendre à l'élève à penser de manière autonome, et non par imprégnation dans le milieu ou par voie d'autorité — une discipline nouvelle par rapport au cycle d'orientation, propre au collège.",
+    fact:"Cette ambition d'autonomie de pensée, explicitement opposée à l'imprégnation par le milieu ou l'autorité, place la philosophie dans une posture volontairement différente des autres disciplines, davantage centrées sur la transmission de savoirs établis.",
+    anchor:{distance:2.0,angle:20,height:SHELF_H} },
+  { id:"conscience_soi_place_monde", tier:"court", emoji:"🪞", label:"Approfondir la conscience de soi",
+    text:"La philosophie entend approfondir la conscience que chacun a de soi-même, de sa place dans la société, face à autrui, dans la nature et dans la culture — une discipline qui interroge directement l'élève sur sa propre existence, pas seulement sur des savoirs extérieurs.",
+    fact:"Le plan d'études cite explicitement des problèmes existentiels concrets abordés en philosophie : la finitude, le changement, la créativité, le mal, l'amitié, l'échec, la solidarité ou la violence — des thèmes universels et intemporels.",
+    anchor:{distance:3.4,angle:95,height:DESK_H} },
+  { id:"conscience_citoyenne_philo", tier:"court", emoji:"🏛️", label:"Développer la conscience du citoyen",
+    text:"La philosophie tend à développer la conscience du citoyen, en incluant dans une réflexion critique les dimensions politique, sociale, juridique et économique de l'existence — une pensée autonome qui débouche nécessairement sur une posture civique active.",
+    fact:"Cette dimension civique rejoint directement les objectifs de l'histoire, de la géographie et de l'économie-droit : plusieurs disciplines du collège partagent l'ambition commune de former un citoyen capable de réflexion critique.",
+    anchor:{distance:1.4,angle:160,height:DESK_H} },
+  { id:"dialogue_penseurs_passe", tier:"court", emoji:"💬", label:"Un dialogue permanent avec le passé",
+    text:"En tant que dialogue permanent, particulièrement avec les penseurs du passé, cet enseignement réserve à l'histoire de la philosophie une place importante — les grandes questions actuelles sont aussi éclairées par la manière dont d'autres époques les ont déjà posées.",
+    fact:"Ce dialogue avec le passé n'est jamais une simple récitation de doctrines anciennes : le plan d'études le présente comme un véritable échange vivant, où les penseurs anciens continuent de répondre, d'une certaine façon, aux questions actuelles.",
+    anchor:{distance:4.6,angle:250,height:WALL_H} },
+  { id:"raison_critique_seule_autorite", tier:"moyen", emoji:"⚖️", label:"Sous l'autorité de la seule raison critique",
+    text:"La philosophie se place sous l'autorité de la seule raison critique, consciente de ses propres limites comme de ses compétences, qui ne se subordonne qu'à ses propres impératifs de rigueur et d'universalité — aucun argument d'autorité n'y remplace jamais un raisonnement valide.",
+    fact:"Cette discussion critique ne saurait souffrir aucune restriction d'origine religieuse, culturelle, ethnique ou politique — un principe qui garantit que toute idée, croyance ou institution peut être librement examinée en cours de philosophie.",
+    anchor:{distance:2.6,angle:300,height:SHELF_H} },
+  { id:"reflexion_epistemologique_sciences", tier:"moyen", emoji:"🔬", label:"Interroger la science elle-même",
+    text:"La philosophie intègre l'activité scientifique, ses méthodes et ses résultats, dans une réflexion épistémologique et critique — la science n'est donc pas seulement enseignée pour ses résultats, mais aussi questionnée sur ses propres fondements et ses limites.",
+    fact:"Cette réflexion épistémologique fait explicitement partie des domaines d'étude proposés : \"la connaissance, notamment scientifique\" figure parmi les grands thèmes que le programme de philosophie peut aborder.",
+    anchor:{distance:5.2,angle:40,height:DESK_H} },
+  { id:"etude_grands_textes_philo", tier:"moyen", emoji:"📖", label:"Étudier à partir des grands textes",
+    text:"Les domaines d'étude sont traités en priorité à partir des grands textes de la philosophie : le maître les choisit de manière à couvrir, sur deux ans, des périodes, des courants de pensée, des problèmes et des auteurs aussi divers que possible.",
+    fact:"L'étude par thèmes multiplie volontairement les éclairages d'un même problème pour en souligner la complexité, tandis que l'étude par auteur restitue la cohérence d'une pensée originale — deux approches pédagogiques complémentaires possibles.",
+    anchor:{distance:1.8,angle:210,height:DESK_H} },
+  { id:"domaines_etude_variete_philo", tier:"moyen", emoji:"🗂️", label:"Une grande variété de domaines",
+    text:"Le programme peut aborder l'existence et l'éthique, la métaphysique, les problèmes religieux, la société et la politique, la connaissance scientifique, le langage et la logique, l'esthétique, la psychologie, ou encore l'homme et les technologies du futur.",
+    fact:"Cette variété considérable de domaines montre que la philosophie au collège n'est jamais réduite à un seul type de questionnement : elle couvre potentiellement toutes les grandes dimensions de l'expérience et de la pensée humaines.",
+    anchor:{distance:3.9,angle:130,height:DESK_H} },
+  { id:"tolerance_paix_justice_liberte", tier:"long", emoji:"🕊️", label:"Contribuer à la paix dans la justice",
+    text:"En respectant les conditions de la libre discussion critique, la philosophie contribue à l'effort de compréhension mutuelle, de tolérance, de promotion de l'esprit critique, d'intégration, ainsi qu'au développement de la responsabilité civique et à la promotion de la paix dans la justice et la liberté.",
+    fact:"Cette ambition — relier l'exercice individuel de la pensée critique à des valeurs aussi larges que la paix et la justice — situe la philosophie du collège dans une tradition humaniste qui dépasse largement le seul exercice intellectuel abstrait.",
+    anchor:{distance:6.0,angle:70,height:SHELF_H} },
+  { id:"reflexion_esthetique_art", tier:"long", emoji:"🎨", label:"L'art nourrit aussi la réflexion",
+    text:"L'activité des artistes et leurs œuvres alimentent une réflexion esthétique et critique en philosophie — la question de ce qu'est l'art, de sa fonction et de sa valeur, fait partie intégrante des grands domaines d'étude possibles du programme.",
+    fact:"Cette place accordée à l'esthétique crée un lien direct avec les cours d'arts visuels et de musique, où des questions similaires sur la nature et la fonction de l'art sont également posées, mais sous un angle plus pratique et créatif.",
+    anchor:{distance:2.3,angle:340,height:WALL_H} },
+  { id:"disposition_ethique_responsabilite", tier:"long", emoji:"🧭", label:"Développer une disposition éthique",
+    text:"L'enseignement de la philosophie contribue au développement de la disposition éthique de la personne et prépare chacun à l'exercice d'une réflexion et d'une activité à la fois critiques et responsables dans tous les domaines de sa vie future.",
+    fact:"Cette formation éthique n'est jamais présentée comme l'apprentissage d'une morale toute faite à appliquer : elle vise plutôt à développer la capacité même de réfléchir de façon critique et responsable, quel que soit le domaine concerné.",
+    anchor:{distance:4.4,angle:185,height:DESK_H} },
+  { id:"liens_societe_politique_economie_philo", tier:"long", emoji:"🔗", label:"Des liens avec de nombreuses disciplines",
+    text:"De nombreux sujets philosophiques (la société, la politique, l'économie, le droit, l'épistémologie, le langage et la logique, l'esthétique) peuvent être traités en relation avec d'autres disciplines, notamment dans le cadre de l'option complémentaire.",
+    fact:"Cette porosité délibérée entre la philosophie et de nombreuses autres disciplines en fait un point de convergence naturel du collège : presque toute discipline peut, à un moment donné, poser une question de nature proprement philosophique.",
+    anchor:{distance:5.7,angle:15,height:SHELF_H} },
+];
+const TIER_ORDER = { court:1, moyen:2, long:3 };
+function getPhilosophieCollegeObjectsForParcours(p){ const m=TIER_ORDER[p]||1; return MUSEE_PHILOSOPHIE_COLLEGE_OBJECTS.filter(o=>TIER_ORDER[o.tier]<=m); }
+window.MUSEE_PHILOSOPHIE_COLLEGE_OBJECTS = MUSEE_PHILOSOPHIE_COLLEGE_OBJECTS;
+window.getPhilosophieCollegeObjectsForParcours = getPhilosophieCollegeObjectsForParcours;

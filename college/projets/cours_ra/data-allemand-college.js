@@ -1,0 +1,60 @@
+// ============================================================================
+// SALLE ALLEMAND — COLLÈGE DE GENÈVE (DF/OS, 1ère-4e)
+// Contenu reformulé à partir du Plan d'études du Collège de Genève,
+// section Allemand p. 13-15. Aucun énoncé n'est copié tel quel.
+// ============================================================================
+const DESK_H = 0.6, WALL_H = 1.4, SHELF_H = 1.1;
+const MUSEE_ALLEMAND_COLLEGE_OBJECTS = [
+  { id:"ouverture_suisse_plurilingue", tier:"court", emoji:"🇨🇭", label:"Une ouverture à la Suisse plurilingue",
+    text:"L'allemand, deuxième langue nationale au choix avec l'italien, favorise l'ouverture à la Suisse plurilingue et l'accès à ses institutions et universités. Des voyages d'étude en Suisse alémanique permettent de mieux connaître cette diversité.",
+    fact:"Le plan d'études envisage explicitement la création de classes bilingues, où certaines disciplines sont enseignées par immersion directement en allemand, plutôt que d'apprendre la langue comme un simple objet d'étude séparé.",
+    anchor:{distance:2.0,angle:20,height:SHELF_H} },
+  { id:"quatre_aptitudes_allemand", tier:"court", emoji:"🗣️", label:"Quatre aptitudes, un même objectif",
+    text:"Compréhension orale, expression claire de la pensée, compréhension de textes variés et capacité de rédiger : la grammaire et le vocabulaire ne sont jamais un but en soi, mais restent toujours au service de ces quatre aptitudes.",
+    fact:"Cette hiérarchie est explicite dans le texte officiel : la connaissance grammaticale sert la communication, et non l'inverse — un principe qui oriente toute la pédagogie de la discipline.",
+    anchor:{distance:3.4,angle:95,height:DESK_H} },
+  { id:"autonomie_apprentissage_allemand", tier:"court", emoji:"🧭", label:"Prendre conscience de sa façon d'apprendre",
+    text:"L'élève est amené à une prise de conscience de son propre mode de fonctionnement dans l'apprentissage, à réfléchir sur ses stratégies de travail, et à acquérir toujours plus d'autonomie, y compris la capacité de s'auto-évaluer.",
+    fact:"Cette réflexion sur sa propre méthode d'apprentissage — et pas seulement sur la langue elle-même — est présentée comme une attitude à développer dès le tronc commun de 1ère année.",
+    anchor:{distance:1.4,angle:160,height:DESK_H} },
+  { id:"tronc_commun_1ere_allemand", tier:"court", emoji:"1️⃣", label:"Le tronc commun de 1ère année",
+    text:"En 1ère année, tous les élèves suivent le même programme : comprendre un message simple (consignes, récits, descriptions), acquérir une prononciation compréhensible, et rédiger un texte court comme une Nacherzählung (récit) ou une Bildbeschreibung (description d'image).",
+    fact:"Le vocabulaire allemand utilisé pour nommer ces exercices (Nacherzählung, Zusammenfassung, Bildbeschreibung) montre que l'apprentissage se fait aussi par l'usage direct de termes techniques propres à la langue elle-même.",
+    anchor:{distance:4.6,angle:250,height:WALL_H} },
+  { id:"litterature_reflexion_humanite", tier:"moyen", emoji:"📖", label:"La littérature, au-delà de la langue",
+    text:"L'enseignement offre un choix de textes littéraires variés dont l'analyse dépasse l'aspect pratique de la maîtrise linguistique : elle amène l'élève à une réflexion sur des questions essentielles de l'humanité, pas seulement à un exercice de vocabulaire.",
+    fact:"Cette ambition place la littérature germanophone au même niveau que la littérature française étudiée en cours de français : un texte devient un objet de réflexion universelle, pas seulement un prétexte linguistique.",
+    anchor:{distance:2.6,angle:300,height:SHELF_H} },
+  { id:"comprehension_germanophone_df", tier:"moyen", emoji:"🎧", label:"Comprendre un germanophone réel",
+    text:"En discipline fondamentale, l'élève développe la capacité de comprendre le message d'un locuteur germanophone et d'y répondre, à l'aide de documents sonores variés, de films et de contacts directs avec des germanophones.",
+    fact:"Le plan d'études cite explicitement les contacts directs avec des germanophones comme un moyen pédagogique à part entière — l'apprentissage ne se limite donc pas à la salle de classe.",
+    anchor:{distance:5.2,angle:40,height:DESK_H} },
+  { id:"expression_orale_situations_df", tier:"moyen", emoji:"🎤", label:"Prendre la parole dans des situations variées",
+    text:"L'élève apprend à effectuer un compte rendu, formuler une interview, défendre un point de vue sur la base de textes, présenter un sujet, expliquer un texte littéraire, ou réciter un texte poétique ou théâtral — un éventail large de situations orales.",
+    fact:"La récitation d'un texte poétique ou théâtral figure explicitement parmi les compétences attendues — un écho direct au travail de diction pratiqué en français, mais appliqué cette fois à la langue allemande.",
+    anchor:{distance:1.8,angle:210,height:DESK_H} },
+  { id:"os_projet_personnel_allemand", tier:"moyen", emoji:"🎯", label:"L'option spécifique, un projet personnel",
+    text:"L'option spécifique doit être accessible à tous les élèves intéressés, quelle que soit leur langue maternelle. Elle tient compte des attentes et des goûts des élèves, en leur laissant la possibilité de prendre des initiatives et de mener à bien un projet personnel.",
+    fact:"Cette ouverture explicite à tous, indépendamment de la langue maternelle, distingue l'option spécifique allemand d'un cours réservé aux seuls élèves déjà germanophones ou d'origine germanophone.",
+    anchor:{distance:3.9,angle:130,height:DESK_H} },
+  { id:"contact_realites_pays_allemands", tier:"long", emoji:"🌍", label:"Au contact d'une culture différente et complémentaire",
+    text:"En option spécifique, l'élève est confronté de façon plus étroite aux réalités des pays de langue allemande, au contact d'une culture et d'une mentalité à la fois différentes et complémentaires des siennes — une immersion qui dépasse la seule maîtrise grammaticale.",
+    fact:"Le plan d'études encourage explicitement les séjours dans des régions germanophones, mais aussi des activités interdisciplinaires au sein de l'école ou des projets faisant appel à la créativité de l'élève.",
+    anchor:{distance:6.0,angle:70,height:SHELF_H} },
+  { id:"insertion_contexte_europeen", tier:"long", emoji:"🇪🇺", label:"Préparer l'insertion dans le contexte européen",
+    text:"Au-delà de la seule Suisse, l'enseignement de l'allemand prépare l'élève à son insertion dans le contexte européen plus large — l'allemand étant l'une des langues les plus parlées d'Europe, au cœur de nombreux échanges économiques et culturels du continent.",
+    fact:"Cette dimension européenne complète la dimension suisse plurilingue : l'allemand ouvre à la fois une porte vers la Suisse alémanique voisine et vers l'ensemble de l'espace germanophone européen.",
+    anchor:{distance:2.3,angle:340,height:WALL_H} },
+  { id:"structures_complexes_nuances", tier:"long", emoji:"🔀", label:"Des structures de plus en plus complexes",
+    text:"Au cours des trois années avant la maturité, l'élève se familiarise progressivement avec des structures linguistiques de plus en plus complexes et des nuances sémantiques de plus en plus subtiles, qu'il apprend d'abord à reconnaître avant de les intégrer lui-même dans sa propre expression.",
+    fact:"Cette progression \"reconnaître avant d'intégrer\" reflète un principe pédagogique général de l'apprentissage des langues : la compréhension passive précède toujours, dans le temps, la production active de structures nouvelles.",
+    anchor:{distance:4.4,angle:185,height:DESK_H} },
+  { id:"approche_fine_textes_os", tier:"long", emoji:"🔍", label:"Une approche plus fine et plus détaillée (OS)",
+    text:"En option spécifique, la maîtrise de structures linguistiques plus complexes permet à l'élève une approche plus fine et plus détaillée des textes étudiés, ainsi qu'une expression plus nuancée de sa propre pensée — la langue devenant un outil de précision, pas seulement de communication basique.",
+    fact:"Cette exigence de nuance distingue clairement l'option spécifique de la discipline fondamentale : il ne s'agit plus seulement de se faire comprendre, mais de dire précisément ce que l'on pense.",
+    anchor:{distance:5.7,angle:15,height:SHELF_H} },
+];
+const TIER_ORDER = { court:1, moyen:2, long:3 };
+function getAllemandCollegeObjectsForParcours(p){ const m=TIER_ORDER[p]||1; return MUSEE_ALLEMAND_COLLEGE_OBJECTS.filter(o=>TIER_ORDER[o.tier]<=m); }
+window.MUSEE_ALLEMAND_COLLEGE_OBJECTS = MUSEE_ALLEMAND_COLLEGE_OBJECTS;
+window.getAllemandCollegeObjectsForParcours = getAllemandCollegeObjectsForParcours;
