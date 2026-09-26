@@ -1,1 +1,181 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Musée du Collège</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="screen active" id="screen-password">
+  <div class="screen-inner" style="max-width:420px;">
+    <div class="eyebrow">Collège de Genève</div>
+    <h1 class="display-title">Musée du Collège</h1>
+    <p class="subtitle">Accès réservé à la classe. Entrez le mot de passe donné par votre enseignant.</p>
+    <input id="password-input" type="password" class="quiz-input-like" placeholder="Mot de passe"
+      style="width:100%; padding:12px 14px; border-radius:10px; border:1px solid rgba(244,239,228,0.25); background:rgba(0,0,0,0.2); color:var(--marble); font-size:15px; margin-bottom:12px;">
+    <button id="password-submit" class="btn-primary" style="width:100%;">Entrer</button>
+    <p id="password-error" class="hidden" style="color:#e08a83; font-size:13px; margin-top:10px;">Mot de passe incorrect.</p>
+  </div>
+</div>
+
+<div class="screen" id="screen-museum">
+  <div class="screen-inner" style="max-width:860px;">
+    <div class="eyebrow">Collège de Genève — plan d'études 2018-2019</div>
+    <h1 class="display-title">Musée du Collège</h1>
+    <p class="subtitle">
+      D'après le plan d'études du Collège de Genève. Chaque salle couvre l'ensemble du cycle (1ère à 4e année) :
+      les parcours court/moyen/long représentent une progression en profondeur des objectifs de la discipline,
+      pas une répartition stricte par année — le plan d'études décrit des objectifs pour tout le cycle, pas un
+      chapitre par année comme un manuel scolaire.
+    </p>
+    <p class="subtitle" style="font-size:12.5px; opacity:0.85;">
+      <strong>DF</strong> = discipline fondamentale (tronc commun, obligatoire pour tous) ·
+      <strong>OS</strong> = option spécifique (choisie, orientation de l'élève) ·
+      <strong>OC</strong> = option complémentaire (choisie, 4e année)
+    </p>
+
+    <div class="museum-grid" id="discipline-grid"></div>
+  </div>
+
+  <div style="text-align:center; margin-top:36px; padding-top:18px; border-top:1px solid rgba(244,239,228,0.12);">
+    <p style="font-size:12px; color:var(--marble-dim); margin:0;">Créé par David Ferreira — corrigé et optimisé par Claude IA</p>
+    <a href="credits.html" style="font-size:12px; color:var(--terracotta-bright);">Voir les crédits et sources</a>
+  </div>
+</div>
+
+<div id="modal-root"></div>
+
+<script>
+const $ = (sel, root=document) => root.querySelector(sel);
+const $all = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+
+const MUSEUM_PASSWORD = "destaelcora2025";
+
+function tryEnterMuseum() {
+  const input = $("#password-input");
+  if (input.value === MUSEUM_PASSWORD) {
+    sessionStorage.setItem("museeCollegeAccesOk", "1");
+    $("#screen-password").classList.remove("active");
+    $("#screen-museum").classList.add("active");
+  } else {
+    $("#password-error").classList.remove("hidden");
+  }
+}
+$("#password-submit").addEventListener("click", tryEnterMuseum);
+$("#password-input").addEventListener("keydown", (e) => { if (e.key === "Enter") tryEnterMuseum(); });
+
+if (sessionStorage.getItem("museeCollegeAccesOk") === "1") {
+  $("#screen-password").classList.remove("active");
+  $("#screen-museum").classList.add("active");
+}
+
+// ============================================================================
+// Catalogue des disciplines du plan d'études du Collège de Genève.
+// "grades" pointe vers salle-<slug>-college.html une fois la salle construite.
+// Une discipline sans salle prête s'affiche grisée "Bientôt".
+// ============================================================================
+const DISCIPLINES = [
+  { id: "francais", emoji: "📚", title: "Français", tag: "DF — 6h/4h/4h/4h",
+    desc: "Lecture et interprétation, écriture, expression orale, diction en 1ère année, méthodes de travail.",
+    grades: { "1-4": "salle-francais-college.html" } },
+  { id: "allemand-c", emoji: "🇩🇪", title: "Allemand", tag: "DF/OS",
+    desc: "Ouverture à la Suisse plurilingue, quatre aptitudes, diction, littérature et culture germanophones.", grades: { "1-4": "salle-allemand-college.html" } },
+  { id: "italien-c", emoji: "🇮🇹", title: "Italien", tag: "DF/OS",
+    desc: "Suisse italienne et Italie, sensibilité artistique, littérature de la presse à la BD.", grades: { "1-4": "salle-italien-college.html" } },
+  { id: "anglais-c", emoji: "🇬🇧", title: "Anglais", tag: "DF/OS + ANb",
+    desc: "Langue de communication scientifique mondiale, quatre aptitudes, cours de rattrapage ANb.", grades: { "1-4": "salle-anglais-college.html" } },
+  { id: "espagnol-c", emoji: "🇪🇸", title: "Espagnol", tag: "OS uniquement",
+    desc: "Monde hispanique (Espagne et Amérique latine), civilisation, littérature, prononciation.", grades: { "1-4": "salle-espagnol-college.html" } },
+  { id: "latin-c", emoji: "🏛️", title: "Latin", tag: "DF/OS",
+    desc: "Langue et civilisation romaine, étymologie, héritage juridique et politique jusqu'à la Suisse.", grades: { "1-4": "salle-latin-college.html" } },
+  { id: "grec-c", emoji: "🏺", title: "Grec", tag: "OS uniquement",
+    desc: "Des Mycéniens à la chrétienté, mythologie, naissance de la philosophie et des genres littéraires.", grades: { "1-4": "salle-grec-college.html" } },
+  { id: "maths-c", emoji: "📐", title: "Mathématiques", tag: "DF — MA1/MA2",
+    desc: "Algèbre, fonctions, géométrie, analyse, géométrie vectorielle, statistiques et probabilités.", grades: { "1-4": "salle-maths-college.html" } },
+  { id: "informatique-c", emoji: "🖥️", title: "Informatique", tag: "OC + IDS (1ère)",
+    desc: "Modélisation, algorithmes, démarche scientifique (IDS) — bien plus que les outils numériques.", grades: { "1-4": "salle-informatique-college.html" } },
+  { id: "physique-c", emoji: "🍎", title: "Physique", tag: "DF/OS — PY1/PY2",
+    desc: "Matière, mouvement, énergie, optique, électricité — de l'atome à l'univers.", grades: { "1-4": "salle-physique-college.html" } },
+  { id: "biologie-c", emoji: "🧬", title: "Biologie", tag: "DF/OS — Bio-Chimie",
+    desc: "Regard biologique, diversité du vivant, génétique et évolution, bioéthique.", grades: { "1-4": "salle-biologie-college.html" } },
+  { id: "chimie-c", emoji: "🧪", title: "Chimie", tag: "DF/OS — Bio-Chimie",
+    desc: "Tableau périodique, réactions chimiques, big-bang, radioactivité, chimie organique.", grades: { "1-4": "salle-chimie-college.html" } },
+  { id: "histoire-c", emoji: "📜", title: "Histoire", tag: "DF",
+    desc: "Comprendre le présent par le passé, pluralité des interprétations, pouvoir et contre-pouvoir.", grades: { "1-4": "salle-histoire-college.html" } },
+  { id: "geographie-c", emoji: "🌍", title: "Géographie", tag: "DF",
+    desc: "Homme, espace et territoires, échelles locale à mondiale, conscience planétaire.", grades: { "1-4": "salle-geographie-college.html" } },
+  { id: "philosophie-c", emoji: "🤔", title: "Philosophie", tag: "DF/OC",
+    desc: "Penser de façon autonome, grands textes, éthique, discussion critique sans restriction.", grades: { "1-4": "salle-philosophie-college.html" } },
+  { id: "economie-droit-c", emoji: "⚖️", title: "Économie et droit", tag: "DF/OS/OC",
+    desc: "Produire pour consommer, règles de droit, institutions suisses, citoyen responsable.", grades: { "1-4": "salle-economie-droit-college.html" } },
+  { id: "arts-visuels-c", emoji: "🎨", title: "Arts visuels", tag: "DF/OS/OC",
+    desc: "Arts plastiques et histoire de l'art, vocabulaire plastique, image et pouvoir, XXe siècle.", grades: { "1-4": "salle-arts-visuels-college.html" } },
+  { id: "musique-c", emoji: "🎵", title: "Musique", tag: "DF/OS/OC",
+    desc: "Intersection des disciplines, instrument en plus, styles, improvisation, acoustique.", grades: { "1-4": "salle-musique-college.html" } },
+  { id: "eps-c", emoji: "🏃", title: "Éducation physique et sports", tag: "DF/OC",
+    desc: "Épanouissement du corps, fair-play, éléments naturels, sport et société, capital santé.", grades: { "1-4": "salle-eps-college.html" } },
+];
+
+const PARCOURS = [
+  { id: "court", label: "Court", desc: "4 objets — ~10 min" },
+  { id: "moyen", label: "Moyen", desc: "8 objets — ~20 min" },
+  { id: "long", label: "Long", desc: "tous les objets — ~30 min" },
+];
+
+function renderGrid() {
+  const grid = $("#discipline-grid");
+  grid.innerHTML = DISCIPLINES.map(d => {
+    const ready = Object.keys(d.grades).length > 0;
+    return `
+      <div class="room-card" data-ready="${ready}" data-disc="${d.id}" style="${ready ? "" : "opacity:0.55; cursor:default;"}">
+        <span class="room-card-badge${ready ? "" : " bonus"}">${ready ? "1ère-4e" : "Bientôt"}</span>
+        <div class="room-card-emoji">${d.emoji}</div>
+        <div class="room-card-title">${d.title}</div>
+        <div class="room-card-tag">${d.tag}</div>
+        <div class="room-card-desc">${d.desc}</div>
+      </div>`;
+  }).join("");
+
+  $all(".room-card").forEach(card => {
+    card.addEventListener("click", () => {
+      if (card.dataset.ready !== "true") return;
+      const disc = DISCIPLINES.find(d => d.id === card.dataset.disc);
+      const link = Object.values(disc.grades)[0];
+      openParcoursModal(link, disc.title);
+    });
+  });
+}
+renderGrid();
+
+function openParcoursModal(link, label) {
+  const root = $("#modal-root");
+  root.innerHTML = `
+    <div class="modal-backdrop" id="modal-backdrop">
+      <div class="modal-box">
+        <div class="eyebrow">Choix du parcours</div>
+        <h2 class="display-title-sm" style="margin-bottom:0;">${label}</h2>
+        <div class="parcours-list">
+          ${PARCOURS.map(p => `
+            <button class="parcours-btn" data-p="${p.id}">
+              <strong>${p.label}</strong>
+              <span>${p.desc}</span>
+            </button>`).join("")}
+        </div>
+        <button class="btn-secondary" id="modal-cancel" style="margin-top:16px;">Annuler</button>
+      </div>
+    </div>`;
+  $("#modal-backdrop").addEventListener("click", (e) => { if (e.target.id === "modal-backdrop") root.innerHTML = ""; });
+  $("#modal-cancel").addEventListener("click", () => root.innerHTML = "");
+  $all(".parcours-btn", root).forEach(btn => {
+    btn.addEventListener("click", () => { location.href = `${link}?parcours=${btn.dataset.p}`; });
+  });
+}
+</script>
+</body>
+</html>
 
