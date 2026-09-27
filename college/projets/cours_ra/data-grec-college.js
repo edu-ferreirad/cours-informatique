@@ -1,0 +1,60 @@
+// ============================================================================
+// SALLE GREC — COLLÈGE DE GENÈVE (OS uniquement, 1ère-4e)
+// Contenu reformulé à partir du Plan d'études du Collège de Genève,
+// section Grec p. 25-26. Aucun énoncé n'est copié tel quel.
+// ============================================================================
+const DESK_H = 0.6, WALL_H = 1.4, SHELF_H = 1.1;
+const MUSEE_GREC_COLLEGE_OBJECTS = [
+  { id:"civilisation_fondatrice_grecque", tier:"court", emoji:"🏛️", label:"Une civilisation fondatrice",
+    text:"L'étude du grec, à travers textes et témoignages matériels, permet de découvrir une civilisation qui a joué un rôle fondateur aussi bien dans la culture antique que dans la culture européenne, et d'en suivre l'évolution des Mycéniens jusqu'aux débuts de la chrétienté.",
+    fact:"Le grec n'est proposé qu'en option spécifique, un choix qui reconnaît l'investissement important que représente l'apprentissage d'une langue complexe et d'une culture entière en seulement quatre ans.",
+    anchor:{distance:2.0,angle:20,height:SHELF_H} },
+  { id:"mythologie_imaginaire_collectif", tier:"court", emoji:"⚡", label:"La mythologie, un imaginaire collectif",
+    text:"L'étude de la mythologie ouvre l'élève au vaste domaine de l'imaginaire collectif grec et l'initie à une forme de pensée spécifique — les mythes n'étant jamais de simples histoires divertissantes, mais des façons structurées d'expliquer le monde et l'existence humaine.",
+    fact:"Par les textes, l'archéologie et l'épigraphie, l'élève prend connaissance des institutions sociales, politiques et religieuses de la Grèce — trois sources complémentaires bien au-delà du seul texte écrit.",
+    anchor:{distance:3.4,angle:95,height:DESK_H} },
+  { id:"naissance_pensee_philosophique", tier:"court", emoji:"🤔", label:"Aux origines de la démarche philosophique",
+    text:"L'étude des œuvres des penseurs grecs introduit l'élève à la démarche philosophique, à son développement et à sa problématisation, exerçant les aspects essentiels de la pensée scientifique : discussion critique des idées, raisonnement et argumentation dialectique.",
+    fact:"Cette filiation directe entre le grec ancien et la philosophie explique pourquoi les grands courants de la pensée occidentale continuent, aujourd'hui encore, à se référer aux penseurs grecs antiques comme à leurs origines fondatrices.",
+    anchor:{distance:1.4,angle:160,height:DESK_H} },
+  { id:"naissance_genres_litteraires", tier:"court", emoji:"📚", label:"La naissance des genres littéraires",
+    text:"La lecture des textes originaux offre un accès direct à une littérature qui a vu l'émergence des principaux genres littéraires — poésie épique, théâtre, histoire, roman — et à des œuvres marquantes devenues des références de la littérature universelle.",
+    fact:"La quasi-totalité des grands genres littéraires étudiés aujourd'hui (l'épopée, la tragédie, la comédie, l'histoire narrative) trouve son origine directe dans la littérature grecque antique, bien avant toute autre tradition littéraire européenne.",
+    anchor:{distance:4.6,angle:250,height:WALL_H} },
+  { id:"facultes_analytiques_deductives", tier:"moyen", emoji:"🧠", label:"Développer ses facultés analytiques",
+    text:"L'apprentissage du système de la langue grecque développe les facultés analytiques et déductives de l'élève, et l'amène à comprendre les règles qui régissent un système linguistique — un entraînement intellectuel qui dépasse la seule maîtrise du grec lui-même.",
+    fact:"Ce travail analytique sur une langue à la structure très différente du français aide aussi, selon le plan d'études, à une meilleure maîtrise de sa propre langue maternelle et à une facilité accrue pour apprendre d'autres langues modernes.",
+    anchor:{distance:2.6,angle:300,height:SHELF_H} },
+  { id:"traduction_theme_version_grec", tier:"moyen", emoji:"🔄", label:"Thème et version, deux exercices complémentaires",
+    text:"L'élève sait produire les formes grammaticales les plus courantes par transformation ou traduction du français vers le grec (thème), et traduire en français des phrases et petits textes grecs de difficulté croissante (version) — les deux sens de traduction se complétant.",
+    fact:"Dès la deuxième année, l'élève lit déjà quelques textes d'auteurs faciles et acquiert des notions des divers dialectes littéraires grecs — le grec ancien connaissant en effet plusieurs variantes régionales selon les époques et les genres.",
+    anchor:{distance:5.2,angle:40,height:DESK_H} },
+  { id:"relativite_tolerance_grec", tier:"moyen", emoji:"🌍", label:"Renforcer le sens de la relativité",
+    text:"L'étude du grec renforce le sens de la relativité des choses et l'esprit de tolérance, en développant rigueur et honnêteté intellectuelles — découvrir une vision du monde antique différente de la sienne aide à mieux comprendre le monde actuel, par contraste.",
+    fact:"Le plan d'études relie explicitement cette ouverture d'esprit à la découverte de \"visions du monde et systèmes de pensée différents\" — un objectif éthique et intellectuel, pas seulement linguistique.",
+    anchor:{distance:1.8,angle:210,height:DESK_H} },
+  { id:"dimension_poetique_esthetique_grec", tier:"moyen", emoji:"🎭", label:"Le plaisir du texte et de ses dimensions",
+    text:"La langue grecque et son expressivité éveillent au plaisir du texte : l'élève s'habitue à appréhender les dimensions poétique, esthétique, philosophique et religieuse des œuvres littéraires grecques, bien au-delà de la seule exactitude grammaticale de la traduction.",
+    fact:"Ce plaisir esthétique explicitement recherché distingue l'apprentissage du grec d'un exercice purement technique : la beauté formelle du texte compte autant que sa compréhension correcte.",
+    anchor:{distance:3.9,angle:130,height:DESK_H} },
+  { id:"quatre_annees_progression_grec", tier:"long", emoji:"📈", label:"Une progression sur quatre années",
+    text:"Durant les deux premières années, l'élève acquiert les notions linguistiques élémentaires ; durant les deux dernières, il achève l'étude systématique de la langue et aborde les grands textes de la littérature, par auteurs ou par thèmes.",
+    fact:"Cette progression complète — des bases linguistiques jusqu'aux grands textes littéraires — se déroule sur seulement quatre ans, une durée volontairement resserrée qui explique pourquoi le grec exige un investissement particulièrement important de l'élève.",
+    anchor:{distance:6.0,angle:70,height:SHELF_H} },
+  { id:"travail_autonome_dictionnaire_grec", tier:"long", emoji:"📕", label:"S'entraîner à l'autonomie",
+    text:"L'élève s'entraîne à travailler de façon autonome, en s'habituant au maniement du dictionnaire et des autres ouvrages de référence — une compétence méthodologique essentielle face à un texte grec ancien, souvent dense et exigeant à déchiffrer seul.",
+    fact:"Cette autonomie de travail, développée dès les premières années de l'option, prépare directement l'élève à l'exercice de recherche personnelle et de présentation d'exposés prévu en fin de parcours.",
+    anchor:{distance:2.3,angle:340,height:WALL_H} },
+  { id:"contexte_historique_culturel_grec", tier:"long", emoji:"🏺", label:"Situer chaque texte dans son époque",
+    text:"L'élève apprend à lire, interpréter, apprécier et comparer des textes grecs avec précision, persévérance et concentration, en les situant systématiquement dans leur contexte historique et culturel plutôt que de les traiter comme des exercices linguistiques isolés.",
+    fact:"Cette contextualisation systématique reflète, comme pour le latin, une approche du grec qui refuse de dissocier la maîtrise de la langue de la compréhension de la civilisation qui l'a produite.",
+    anchor:{distance:4.4,angle:185,height:DESK_H} },
+  { id:"exposes_travaux_recherche_grec", tier:"long", emoji:"🎤", label:"Exposés et travaux de recherche",
+    text:"Durant les deux dernières années, l'élève complète sa connaissance de la civilisation grecque par des lectures en traduction, des ouvrages critiques, et des travaux personnels ou en groupe sous forme d'exposés ou de travaux de recherche.",
+    fact:"Cette combinaison de travail individuel et collectif (exposés en groupe, recherches personnelles) prépare l'élève à des méthodes de travail directement transférables à d'autres disciplines et aux études supérieures.",
+    anchor:{distance:5.7,angle:15,height:SHELF_H} },
+];
+const TIER_ORDER = { court:1, moyen:2, long:3 };
+function getGrecCollegeObjectsForParcours(p){ const m=TIER_ORDER[p]||1; return MUSEE_GREC_COLLEGE_OBJECTS.filter(o=>TIER_ORDER[o.tier]<=m); }
+window.MUSEE_GREC_COLLEGE_OBJECTS = MUSEE_GREC_COLLEGE_OBJECTS;
+window.getGrecCollegeObjectsForParcours = getGrecCollegeObjectsForParcours;
