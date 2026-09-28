@@ -1,0 +1,60 @@
+// ============================================================================
+// SALLE MUSIQUE — COLLÈGE DE GENÈVE (DF/OS/OC, 1ère-4e)
+// Contenu reformulé à partir du Plan d'études du Collège de Genève,
+// section Musique p. 58-59. Aucun énoncé n'est copié tel quel.
+// ============================================================================
+const DESK_H = 0.6, WALL_H = 1.4, SHELF_H = 1.1;
+const MUSEE_MUSIQUE_COLLEGE_OBJECTS = [
+  { id:"intersection_disciplines_musique", tier:"court", emoji:"🎵", label:"À l'intersection de nombreuses disciplines",
+    text:"Se trouvant à l'intersection de nombreuses disciplines, la musique permet une approche diversifiée de la culture : elle fait appel à toutes les facultés humaines, aussi bien logiques, réflexives, perceptives, émotionnelles que créatrices, toutes sollicitées à la fois.",
+    fact:"Cette mobilisation simultanée de facultés aussi différentes que la logique et l'émotion distingue la musique de nombreuses autres disciplines, plus souvent centrées sur un seul type de compétence dominant.",
+    anchor:{distance:2.0,angle:20,height:SHELF_H} },
+  { id:"pratique_source_equilibre", tier:"court", emoji:"🎼", label:"La pratique, source d'équilibre personnel",
+    text:"La pratique individuelle et collective de la musique est source d'énergie et de plaisir : elle favorise chez l'élève l'expression de soi, la socialisation, la maîtrise corporelle, et contribue donc directement à son équilibre personnel global.",
+    fact:"Cette dimension d'équilibre personnel place la musique dans une position particulière parmi les disciplines du collège : son objectif dépasse la seule acquisition de savoirs pour toucher directement au bien-être de l'élève.",
+    anchor:{distance:3.4,angle:95,height:DESK_H} },
+  { id:"bons_amateurs_jugement_personnel", tier:"court", emoji:"👂", label:"Former de bons amateurs éclairés",
+    text:"L'enseignement de la musique développe le sens esthétique et les capacités musicales des élèves pour en faire de bons amateurs, capables de formuler un jugement personnel sur les réalisations artistiques auxquelles ils sont confrontés, y compris les leurs.",
+    fact:"Cette formation générale doit aussi pouvoir informer, stimuler et encourager les élèves désirant devenir des musiciens professionnels — le cours de musique du collège n'exclut donc aucune vocation, amateur comme future professionnelle.",
+    anchor:{distance:1.4,angle:160,height:DESK_H} },
+  { id:"une_heure_instrument_supplementaire", tier:"court", emoji:"🎹", label:"Une heure d'instrument en plus",
+    text:"À la dotation horaire habituelle s'ajoute une heure hebdomadaire spécifiquement dédiée à l'étude d'un instrument — la musique au collège combine donc toujours un enseignement théorique et une pratique instrumentale concrète et régulière.",
+    fact:"Cette heure d'instrument supplémentaire, distincte du cours de musique classique, souligne l'importance accordée par le plan d'études à la pratique effective d'un instrument, pas seulement à la théorie musicale ou à l'écoute.",
+    anchor:{distance:4.6,angle:250,height:WALL_H} },
+  { id:"reconnaitre_instruments_styles", tier:"moyen", emoji:"🎻", label:"Reconnaître instruments et styles à l'oreille",
+    text:"Après deux années en discipline fondamentale, l'élève doit pouvoir reconnaître à l'audition et à la vue les instruments les plus courants et les timbres vocaux, déterminer leur usage dans différents genres et formations instrumentales, et reconnaître des styles musicaux divers.",
+    fact:"Cette capacité de reconnaissance auditive suppose un entraînement régulier de l'oreille, comparable par bien des aspects à l'entraînement de l'œil pratiqué en cours d'histoire de l'art pour reconnaître un style ou une époque.",
+    anchor:{distance:2.6,angle:300,height:SHELF_H} },
+  { id:"relier_ecoute_ecriture_musicale", tier:"moyen", emoji:"🎼", label:"Relier ce qu'on entend à ce qui est écrit",
+    text:"L'élève apprend à mettre en relation les pièces musicales entendues avec l'écriture musicale — comprendre qu'une partition n'est pas un objet abstrait mais la représentation écrite précise d'un son que l'on peut effectivement entendre et reconnaître.",
+    fact:"Ce va-et-vient constant entre l'écoute et l'écriture musicale rappelle directement celui exigé en mathématiques entre l'aspect algébrique et l'aspect graphique d'une fonction : deux représentations différentes d'un même objet à relier.",
+    anchor:{distance:5.2,angle:40,height:DESK_H} },
+  { id:"histoire_genres_formes_musicales", tier:"moyen", emoji:"📜", label:"Les grandes articulations de l'histoire musicale",
+    text:"L'élève connaît les grandes articulations de l'histoire de la musique, des genres et des formes musicales — comprendre comment la musique a évolué à travers les siècles éclaire, en retour, la façon dont on écoute et interprète une œuvre précise.",
+    fact:"En option spécifique, cette étude de l'histoire de la musique devient systématique, complétée par l'acquisition des bases de l'écriture musicale et une pratique musicale collective régulière tout au long du cursus.",
+    anchor:{distance:1.8,angle:210,height:DESK_H} },
+  { id:"potentiel_artistique_os_musique", tier:"moyen", emoji:"🎨", label:"Exprimer son potentiel artistique (OS)",
+    text:"En option spécifique, au-delà des objectifs approfondis de la discipline fondamentale, l'élève est amené à exprimer et développer son potentiel artistique par l'interprétation, l'improvisation et la création — trois dimensions actives de la pratique musicale.",
+    fact:"L'improvisation, citée explicitement, exige une maîtrise suffisante des codes musicaux pour pouvoir s'en émanciper librement en temps réel — une compétence bien plus exigeante que la simple exécution d'une partition déjà écrite.",
+    anchor:{distance:3.9,angle:130,height:DESK_H} },
+  { id:"musiques_civilisations_differentes", tier:"long", emoji:"🌍", label:"Des musiques de toutes les civilisations",
+    text:"En option spécifique, l'élève apprend à connaître des musiques de différents styles et de différentes civilisations — la musique occidentale classique n'étant qu'une des nombreuses traditions musicales possibles à travers le monde et l'histoire humaine.",
+    fact:"Cette ouverture vers d'autres civilisations musicales élargit considérablement le champ d'étude au-delà du seul répertoire classique européen habituellement enseigné, vers une perspective plus véritablement mondiale de la musique.",
+    anchor:{distance:6.0,angle:70,height:SHELF_H} },
+  { id:"liens_langues_prosodie_musique", tier:"long", emoji:"🗣️", label:"Musique et langue, une même prosodie",
+    text:"La musique établit des liens explicites avec les langues, notamment via la prosodie — les accents de la langue et ceux de la musique — ainsi qu'avec l'étude et la création de textes mis en musique, poétiques ou chantés dans différentes langues étudiées au collège.",
+    fact:"Ce lien avec les langues anciennes se manifeste aussi par l'étymologie musicale et la liturgie latine — de nombreux termes techniques de la musique classique occidentale viennent directement du latin ou du grec ancien.",
+    anchor:{distance:2.3,angle:340,height:WALL_H} },
+  { id:"acoustique_physique_musique", tier:"long", emoji:"🔬", label:"L'acoustique, un pont vers la physique",
+    text:"La musique entretient un lien direct avec les sciences exactes, en particulier la physique via l'acoustique (l'étude scientifique du son) et les mathématiques — un même phénomène physique, l'onde sonore, étant exploité artistiquement en musique et étudié scientifiquement en physique.",
+    fact:"Ce lien acoustique-physique-musique est explicitement mentionné aussi dans la section physique du plan d'études, confirmant qu'il s'agit d'une connexion interdisciplinaire pensée et reconnue des deux côtés du programme.",
+    anchor:{distance:4.4,angle:185,height:DESK_H} },
+  { id:"informatique_ecriture_partitions", tier:"long", emoji:"💻", label:"L'informatique au service de la partition",
+    text:"La musique se relie aussi à l'informatique, notamment pour la lecture et l'écriture de partitions ainsi que la connaissance de l'instrument — les outils numériques ayant profondément transformé la façon dont on compose, note et partage la musique aujourd'hui.",
+    fact:"Cette dimension numérique de la musique moderne rejoint directement les objectifs de la salle Média-Images du cycle d'orientation, où l'impact des technologies sur la création artistique était déjà interrogé, mais à un niveau moins spécialisé.",
+    anchor:{distance:5.7,angle:15,height:SHELF_H} },
+];
+const TIER_ORDER = { court:1, moyen:2, long:3 };
+function getMusiqueCollegeObjectsForParcours(p){ const m=TIER_ORDER[p]||1; return MUSEE_MUSIQUE_COLLEGE_OBJECTS.filter(o=>TIER_ORDER[o.tier]<=m); }
+window.MUSEE_MUSIQUE_COLLEGE_OBJECTS = MUSEE_MUSIQUE_COLLEGE_OBJECTS;
+window.getMusiqueCollegeObjectsForParcours = getMusiqueCollegeObjectsForParcours;

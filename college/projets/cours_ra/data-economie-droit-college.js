@@ -1,0 +1,60 @@
+// ============================================================================
+// SALLE ÉCONOMIE ET DROIT — COLLÈGE DE GENÈVE (DF/OS/OC, 1ère-4e)
+// Contenu reformulé à partir du Plan d'études du Collège de Genève,
+// section Économie et droit p. 47-51. Aucun énoncé n'est copié tel quel.
+// ============================================================================
+const DESK_H = 0.6, WALL_H = 1.4, SHELF_H = 1.1;
+const MUSEE_ECONOMIE_DROIT_COLLEGE_OBJECTS = [
+  { id:"introduction_1ere_annee_ecodroit", tier:"court", emoji:"1️⃣", label:"Une introduction pour orienter ses choix",
+    text:"En discipline fondamentale de 1ère année, l'introduction à l'économie et au droit sensibilise l'élève aux problèmes économiques (consommation, production, répartition des richesses) et aux problèmes de droit (famille, travail, société), afin qu'il choisisse en connaissance de cause ses options futures.",
+    fact:"Cette introduction d'une seule année en tronc commun agit comme un premier contact obligatoire avec la discipline, avant que les élèves ne décident librement de l'approfondir ou non en option spécifique.",
+    anchor:{distance:2.0,angle:20,height:SHELF_H} },
+  { id:"produire_pour_consommer", tier:"court", emoji:"🏭", label:"Produire pour satisfaire ses besoins",
+    text:"Étudier l'économie, c'est comprendre pourquoi les hommes sont dans l'obligation de produire afin de consommer, c'est-à-dire de satisfaire leurs besoins — l'économie s'inscrivant dans une vision globale de l'humanité et du monde vivant, pas seulement dans un cadre purement financier.",
+    fact:"Le plan d'études demande explicitement de se demander \"si, demain aussi, les êtres humains pourront trouver sur la planète de quoi satisfaire leurs besoins multiples\" — une question directement liée aux enjeux environnementaux et de ressources limitées.",
+    anchor:{distance:3.4,angle:95,height:DESK_H} },
+  { id:"regles_communes_vie_societe", tier:"court", emoji:"⚖️", label:"Des règles pour vivre ensemble",
+    text:"Toute vie en société suppose l'existence de règles communes pour l'organisation des rapports entre les hommes et la résolution des conflits — étudier le droit, c'est étudier ces règles, les mécanismes de leur formation et de leurs transformations au fil du temps.",
+    fact:"Le plan d'études précise explicitement que l'étude du droit doit aussi développer \"un esprit critique quant à leur application\" — le droit n'est donc jamais présenté comme un ensemble de règles figées à simplement mémoriser.",
+    anchor:{distance:1.4,angle:160,height:DESK_H} },
+  { id:"citoyen_consommateur_responsable", tier:"court", emoji:"🛒", label:"Un citoyen et consommateur responsable",
+    text:"L'élève apprend à se situer dans la société en tant que citoyen et consommateur responsable et solidaire, en ayant conscience de la limitation des ressources et en tenant compte du contexte extra-économique de ses propres décisions de consommation.",
+    fact:"Le plan d'études attend aussi que l'élève prenne en considération les valeurs éthiques en économie, notamment concernant l'action des entreprises — une dimension morale explicitement intégrée à l'étude de l'économie.",
+    anchor:{distance:4.6,angle:250,height:WALL_H} },
+  { id:"role_agents_economiques", tier:"moyen", emoji:"🏢", label:"Le rôle des agents économiques",
+    text:"L'élève est amené à comprendre le rôle des agents économiques dans la société, les mécanismes de production, d'échange et de consommation dans le contexte national et international, ainsi que l'interdépendance de ces mécanismes entre eux.",
+    fact:"Cette insistance sur l'interdépendance des mécanismes économiques rappelle qu'aucune décision économique — celle d'une entreprise, d'un État ou d'un consommateur individuel — ne se prend jamais réellement isolément des autres.",
+    anchor:{distance:2.6,angle:300,height:SHELF_H} },
+  { id:"evaluer_critiquer_politiques_economiques", tier:"moyen", emoji:"🔍", label:"Évaluer et critiquer les politiques",
+    text:"L'élève apprend à évaluer et critiquer les politiques conjoncturelles et structurelles menées par l'État, ainsi que les objectifs, stratégies et politiques menées par les entreprises, dans le contexte national et international — une posture critique, pas seulement descriptive.",
+    fact:"Cette exigence critique s'accompagne de la maîtrise du vocabulaire économique courant et des méthodes quantitatives usuelles — l'esprit critique en économie repose toujours sur une base technique et méthodologique solide.",
+    anchor:{distance:5.2,angle:40,height:DESK_H} },
+  { id:"processus_regle_droit", tier:"moyen", emoji:"📜", label:"Comment naît une règle de droit",
+    text:"L'élève apprend à saisir la différence entre une règle de droit et une règle morale ou religieuse, à connaître le processus d'élaboration d'une règle de droit, et à distinguer droit privé et droit public, chacun avec ses caractéristiques et finalités propres.",
+    fact:"Cette distinction entre règle de droit, règle morale et règle religieuse est fondamentale en droit : une même action peut être moralement discutable sans être juridiquement interdite, ou inversement légale sans être moralement approuvée par tous.",
+    anchor:{distance:1.8,angle:210,height:DESK_H} },
+  { id:"raisonnement_juridique_cas_pratiques", tier:"moyen", emoji:"🧑‍⚖️", label:"Résoudre des cas pratiques",
+    text:"L'élève apprend à mettre en œuvre un raisonnement juridique rigoureux, à utiliser le vocabulaire juridique de base, à argumenter et défendre son point de vue, et à résoudre des cas pratiques simples en s'appuyant sur des textes légaux réels.",
+    fact:"Savoir détecter les lacunes et les imprécisions de la loi, et recourir à la jurisprudence et à la doctrine, fait partie des aptitudes attendues — la loi écrite ne suffit jamais seule à trancher toutes les situations concrètes possibles.",
+    anchor:{distance:3.9,angle:130,height:DESK_H} },
+  { id:"institutions_politiques_suisses", tier:"long", emoji:"🇨🇭", label:"Connaître les institutions suisses",
+    text:"L'élève connaît les institutions politiques en général, et suisses en particulier, ainsi que quelques grands principes de procédure suisses et étrangers, notamment français et anglo-saxons — une ouverture comparative au-delà du seul système juridique national.",
+    fact:"Cette comparaison explicite entre systèmes juridiques suisse, français et anglo-saxon (de tradition très différente, la common law) permet à l'élève de comprendre que le droit n'est jamais une évidence universelle, mais une construction culturelle spécifique à chaque société.",
+    anchor:{distance:6.0,angle:70,height:SHELF_H} },
+  { id:"outils_quantitatifs_economie", tier:"long", emoji:"📊", label:"Des outils au service de l'analyse",
+    text:"Les cours d'économie s'appuient sur des principes fondamentaux de comptabilité, des représentations graphiques, des notions d'arithmétique et de statistiques descriptives — des outils quantitatifs qui ne sont jamais approfondis pour eux-mêmes, mais introduits selon les besoins du programme.",
+    fact:"Cette précision — les outils ne sont \"ni approfondis ni étudiés pour eux-mêmes\" — distingue clairement l'économie du collège d'un cours de mathématiques : les chiffres y restent toujours au service de la compréhension économique.",
+    anchor:{distance:2.3,angle:340,height:WALL_H} },
+  { id:"droits_devoirs_responsabilites", tier:"long", emoji:"⚖️", label:"Ses droits, mais aussi ses devoirs",
+    text:"L'élève apprend à apprécier ses droits, mais aussi ses devoirs et ses responsabilités, en percevant l'adéquation d'un droit à une société déterminée en fonction de sa culture, de ses valeurs et de ses besoins, dans une perspective à la fois historique et géographique.",
+    fact:"Cette double attention aux droits ET aux devoirs rappelle qu'un système juridique équilibré repose toujours sur une réciprocité : chaque droit accordé à un individu s'accompagne généralement d'obligations correspondantes envers les autres.",
+    anchor:{distance:4.4,angle:185,height:DESK_H} },
+  { id:"echanges_larges_autres_disciplines", tier:"long", emoji:"🔗", label:"De larges échanges interdisciplinaires",
+    text:"Les semaines à thème, l'option complémentaire ou le travail de maturité permettent de larges échanges entre l'économie-droit et de nombreuses autres disciplines, particulièrement l'ensemble des sciences humaines — histoire, géographie, philosophie, biologie ou informatique.",
+    fact:"Le droit, en tant que science humaine concernant l'ensemble des relations sociales, entretient un rapport étroit avec presque toutes les autres disciplines du collège, de la biologie (bioéthique) à l'informatique (droit numérique).",
+    anchor:{distance:5.7,angle:15,height:SHELF_H} },
+];
+const TIER_ORDER = { court:1, moyen:2, long:3 };
+function getEconomieDroitCollegeObjectsForParcours(p){ const m=TIER_ORDER[p]||1; return MUSEE_ECONOMIE_DROIT_COLLEGE_OBJECTS.filter(o=>TIER_ORDER[o.tier]<=m); }
+window.MUSEE_ECONOMIE_DROIT_COLLEGE_OBJECTS = MUSEE_ECONOMIE_DROIT_COLLEGE_OBJECTS;
+window.getEconomieDroitCollegeObjectsForParcours = getEconomieDroitCollegeObjectsForParcours;
