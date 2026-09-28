@@ -1,0 +1,9 @@
+const QUIZ_BIOLOGIE_1_COLLEGE = [
+  { id:"q1", tier:"court", type:"qcm", prompt:"Quelle activité correspond à : « Avant de découvrir la classification scientifique officielle » ?", options:["Modéliser la cellule pour comprendre ses limites", "OS uniquement — Écologie : inventaire de terrain", "OS uniquement — Évolution : reconstruire un arbre phylogénétique", "Classification : inventer ses propres critères"], correct:3 },
+  { id:"q2", tier:"moyen", type:"qcm", prompt:"Quelle activité correspond à : « Face à une observation simple en classe (des graines qui germent différemment selon leur exposition) » ?", options:["Démarche scientifique : formuler une hypothèse testable", "OS uniquement — Évolution : reconstruire un arbre phylogénétique", "OS uniquement — Écologie : inventaire de terrain", "Classification : inventer ses propres critères"], correct:0 },
+  { id:"q3", tier:"long", type:"qcm", prompt:"Quelle activité correspond à : « Les élèves lisent un court article de vulgarisation scientifique sur un sujet biologique d'actualité et doivent en extraire » ?", options:["Lecture : décortiquer un article de vulgarisation", "OS uniquement — Génétique : résoudre un arbre généalogique", "Démarche scientifique : formuler une hypothèse testable", "OS uniquement — Évolution : reconstruire un arbre phylogénétique"], correct:0 },
+];
+function normalizeAnswer(s){return (s||"").toString().trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9 ]/g,"").replace(/\s+/g," ");}
+const QUIZ_TIER_ORDER = { court:1, moyen:2, long:3 };
+function getQuizForParcours(parcours){ const maxLevel = QUIZ_TIER_ORDER[parcours] || 1; return QUIZ_BIOLOGIE_1_COLLEGE.filter(q => QUIZ_TIER_ORDER[q.tier] <= maxLevel); }
+window.QUIZ_BIOLOGIE_1_COLLEGE = QUIZ_BIOLOGIE_1_COLLEGE; window.getQuizForParcours = getQuizForParcours; window.normalizeAnswer = normalizeAnswer;
