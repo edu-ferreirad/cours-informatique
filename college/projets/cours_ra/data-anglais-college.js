@@ -1,0 +1,60 @@
+// ============================================================================
+// SALLE ANGLAIS — COLLÈGE DE GENÈVE (DF/OS, 1ère-4e)
+// Contenu reformulé à partir du Plan d'études du Collège de Genève,
+// section Anglais p. 19-20. Aucun énoncé n'est copié tel quel.
+// ============================================================================
+const DESK_H = 0.6, WALL_H = 1.4, SHELF_H = 1.1;
+const MUSEE_ANGLAIS_COLLEGE_OBJECTS = [
+  { id:"langue_dominante_communication", tier:"court", emoji:"🌍", label:"La langue de communication dominante",
+    text:"Le plan d'études rappelle que l'anglais est la langue de communication dominante dans le monde entier, souvent utilisée pour la recherche scientifique, la publication et le stockage de l'information — un statut qui dépasse largement celui d'une simple langue étrangère parmi d'autres.",
+    fact:"Cette centralité de l'anglais dans la recherche scientifique mondiale explique pourquoi, comme le rappelle aussi la section biologie du même plan d'études, l'anglais est devenu la principale langue de communication entre scientifiques de tous pays.",
+    anchor:{distance:2.0,angle:20,height:SHELF_H} },
+  { id:"quatre_aptitudes_anglais", tier:"court", emoji:"🗣️", label:"Quatre aptitudes, un même socle",
+    text:"L'enseignement développe la compréhension orale, l'expression orale, la compréhension écrite et l'expression écrite, tout en visant à faire acquérir le vocabulaire et les structures de la langue nécessaires à ces quatre compétences.",
+    fact:"Au-delà de ces quatre aptitudes, le plan d'études vise aussi à éveiller l'intérêt de l'élève pour les domaines littéraire, culturel, socio-économique et historique des pays anglophones — pas seulement la maîtrise technique de la langue.",
+    anchor:{distance:3.4,angle:95,height:DESK_H} },
+  { id:"rechercher_trier_traiter_info", tier:"court", emoji:"🔍", label:"Rechercher, trier, traiter l'information",
+    text:"L'enseignement de l'anglais incite l'élève à rechercher des informations, à les trier, à les traiter, puis à les présenter oralement ou par écrit — une compétence méthodologique transférable bien au-delà du seul cours de langue.",
+    fact:"Cette insistance sur le traitement critique de l'information reflète le statut particulier de l'anglais comme langue dans laquelle circule aujourd'hui l'essentiel de la recherche et de la publication scientifique mondiale.",
+    anchor:{distance:1.4,angle:160,height:DESK_H} },
+  { id:"tronc_commun_anglais_1ere", tier:"court", emoji:"1️⃣", label:"Consolider avant d'avancer",
+    text:"En 1ère année d'anglais, on procède d'abord à une mise au point et une systématisation des connaissances acquises précédemment, avant d'amener l'élève à saisir l'essentiel d'une discussion, à structurer un récit oral et à rédiger une composition.",
+    fact:"Cette phase de révision initiale reconnaît explicitement que les élèves arrivent au collège avec des niveaux d'anglais déjà variés, acquis avant même le début du cycle gymnasial.",
+    anchor:{distance:4.6,angle:250,height:WALL_H} },
+  { id:"comprehension_globale_message_df", tier:"moyen", emoji:"🎧", label:"Comprendre un message oral varié",
+    text:"En discipline fondamentale, l'élève s'entraîne à la compréhension globale d'un message oral — exposés, reportages, films, enregistrements, conversations téléphoniques — une diversité de sources qui dépasse largement le seul dialogue scolaire classique.",
+    fact:"L'inclusion explicite des \"conversations téléphoniques\" parmi les supports d'écoute souligne l'ambition pratique de cet enseignement : préparer à des situations de communication réelles, pas seulement académiques.",
+    anchor:{distance:2.6,angle:300,height:SHELF_H} },
+  { id:"dictionnaire_bilingue_outil", tier:"moyen", emoji:"📕", label:"Utiliser efficacement un dictionnaire bilingue",
+    text:"Parmi les aptitudes attendues en discipline fondamentale figure explicitement l'utilisation efficace d'un dictionnaire bilingue pour la compréhension de textes et la rédaction — un outil pratique dont la bonne utilisation est elle-même une compétence à part entière.",
+    fact:"Cette compétence, en apparence modeste, est explicitement listée au même niveau que les quatre grandes aptitudes linguistiques — savoir chercher efficacement un mot est présenté comme aussi important que le connaître déjà.",
+    anchor:{distance:5.2,angle:40,height:DESK_H} },
+  { id:"anglais_base_cours_facultatif", tier:"moyen", emoji:"🆘", label:"Un cours de rattrapage : l'anglais de base",
+    text:"Pour les élèves n'ayant choisi l'anglais ni en discipline fondamentale ni en option spécifique, un cours facultatif d'anglais de base (ANb), à raison de quatre heures réparties sur deux ans, permet d'acquérir des connaissances suffisantes pour communiquer dans une langue simple.",
+    fact:"L'existence même de ce filet de sécurité (ANb) témoigne du statut considéré comme indispensable de l'anglais : le plan d'études veille à ce qu'aucun élève ne quitte le collège sans un minimum de bases anglophones.",
+    anchor:{distance:1.8,angle:210,height:DESK_H} },
+  { id:"os_interet_particulier_anglais", tier:"moyen", emoji:"🎯", label:"Un enseignement plus varié et approfondi (OS)",
+    text:"L'option spécifique, plus variée et plus approfondie qu'en discipline fondamentale, s'adresse aux élèves manifestant un intérêt particulier : approfondir vocabulaire et structures, élargir la connaissance du monde culturel anglophone, étudier des œuvres littéraires importantes.",
+    fact:"L'option spécifique propose aussi de conduire d'éventuels travaux de recherche transdisciplinaires — l'anglais y devenant un outil de recherche autant qu'un objet d'étude en lui-même.",
+    anchor:{distance:3.9,angle:130,height:DESK_H} },
+  { id:"choix_langues_flexibilite", tier:"long", emoji:"🔀", label:"Un système de choix flexible entre langues",
+    text:"L'anglais est offert à choix avec l'allemand ou l'italien s'ils n'ont pas été choisis comme deuxième langue nationale, et avec le latin — un système qui laisse à l'élève une certaine flexibilité dans la construction de son parcours linguistique au fil des quatre années.",
+    fact:"Cette flexibilité de choix entre langues reflète la réalité plurilingue du système éducatif suisse, où chaque élève construit un parcours linguistique personnalisé plutôt que de suivre un programme unique et identique pour tous.",
+    anchor:{distance:6.0,angle:70,height:SHELF_H} },
+  { id:"expression_ecrite_nuancee_os", tier:"long", emoji:"✍️", label:"Une expression écrite plus riche (OS)",
+    text:"En option spécifique, l'élève développe une compréhension détaillée d'un message oral, une présentation orale dans une langue plus élaborée et précise, la compréhension de textes plus complexes, et une expression écrite dans une langue plus riche que celle exigée en discipline fondamentale.",
+    fact:"Ce niveau supérieur d'exigence en option spécifique prépare directement les élèves qui envisagent des études supérieures où l'anglais jouera un rôle central, que ce soit en sciences, en économie ou dans les relations internationales.",
+    anchor:{distance:2.3,angle:340,height:WALL_H} },
+  { id:"communiquer_partout_domaines", tier:"long", emoji:"🌐", label:"Communiquer dans tous les domaines",
+    text:"L'apprentissage de l'anglais donne à l'élève les moyens de communiquer partout, aussi bien dans la vie courante que dans les domaines scientifique, culturel, commercial et politique — une polyvalence qui distingue l'anglais des autres langues étudiées au collège.",
+    fact:"Cette polyvalence explique pourquoi l'anglais, bien que n'étant pas une langue nationale suisse, occupe une place centrale et quasiment incontournable dans le plan d'études du collège genevois.",
+    anchor:{distance:4.4,angle:185,height:DESK_H} },
+  { id:"vocabulaire_structures_acquisition", tier:"long", emoji:"🧱", label:"Vocabulaire et structures, une base à construire",
+    text:"Au-delà des quatre aptitudes, l'enseignement vise explicitement à faire acquérir le vocabulaire et les structures grammaticales de la langue — une base technique qui, sans être un but en soi, reste la condition nécessaire à toute communication réellement efficace.",
+    fact:"Le plan d'études maintient ainsi un équilibre entre l'ambition communicative globale (parler, comprendre, échanger) et l'exigence technique précise (vocabulaire, grammaire) qui la rend concrètement possible.",
+    anchor:{distance:5.7,angle:15,height:SHELF_H} },
+];
+const TIER_ORDER = { court:1, moyen:2, long:3 };
+function getAnglaisCollegeObjectsForParcours(p){ const m=TIER_ORDER[p]||1; return MUSEE_ANGLAIS_COLLEGE_OBJECTS.filter(o=>TIER_ORDER[o.tier]<=m); }
+window.MUSEE_ANGLAIS_COLLEGE_OBJECTS = MUSEE_ANGLAIS_COLLEGE_OBJECTS;
+window.getAnglaisCollegeObjectsForParcours = getAnglaisCollegeObjectsForParcours;
