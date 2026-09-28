@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Musée des Matières — Quiz Informatique 10e</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link rel="stylesheet" href="style.css">
+<style>
+  .quiz-wrap{max-width:600px; margin:0 auto; padding:28px 20px 60px;}
+  .quiz-q{background:rgba(244,239,228,0.05); border:1px solid rgba(244,239,228,0.15); border-radius:14px; padding:18px; margin-bottom:14px; text-align:left;}
+  .quiz-q-prompt{font-family:var(--font-display); font-weight:700; font-size:17px; margin:0 0 12px;}
+  .quiz-opt{display:block; width:100%; text-align:left; padding:10px 12px; margin-bottom:8px; border-radius:8px; border:1px solid rgba(244,239,228,0.2); background:transparent; color:var(--marble);}
+  .quiz-opt.selected{border-color:var(--gold); background:rgba(169,130,47,0.15);}
+  .quiz-opt.correct{border-color:var(--success); background:rgba(74,124,78,0.2);}
+  .quiz-opt.wrong{border-color:var(--danger); background:rgba(181,69,58,0.2);}
+  .quiz-input{width:100%; padding:10px 12px; border-radius:8px; border:1px solid rgba(244,239,228,0.25); background:rgba(0,0,0,0.2); color:var(--marble); font-size:14px;}
+  .quiz-feedback{font-size:13px; margin-top:8px; font-family:var(--font-mono);}
+  .quiz-feedback.ok{color:var(--success);}
+  .quiz-feedback.ko{color:#e08a83;}
+  .quiz-score{font-family:var(--font-display); font-size:24px; font-weight:700; text-align:center; margin:20px 0;}
+</style>
+</head>
+<body>
+
+<div class="quiz-wrap">
+  <div class="eyebrow" style="text-align:center;">Musée des Matières — Salle Informatique (Clavier et bureautique, 10e)</div>
+  <h1 class="display-title-sm" style="text-align:center;">Questionnaire final</h1>
+  <p class="subtitle" style="text-align:center;">Répondez à chaque question, puis validez pour voir votre corrigé.</p>
+
+  <div id="quiz-form"></div>
+
+  <div style="text-align:center;">
+    <button id="btn-check" class="btn-primary">Corriger mes réponses</button>
+  </div>
+
+  <div id="result-block" class="hidden">
+    <div class="quiz-score" id="quiz-score"></div>
+    <div style="text-align:center;">
+      <button id="btn-pdf" class="btn-primary">📄 Télécharger le PDF (résultat + corrigé)</button>
+    </div>
+  </div>
+
+  <div style="margin-top:26px; text-align:center;">
+    <a href="index.html" class="btn-secondary" style="text-decoration:none; display:inline-block;">← Retour au musée</a>
+  </div>
+</div>
+
+<script src="quiz-informatique-10e.js"></script>
+<script>
+const $ = (sel, root=document) => root.querySelector(sel);
+const $all = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+const params = new URLSearchParams(location.search);
+const parcours = params.get("parcours") || "riche";
+const QUIZ_INFO10_ACTIVE = window.getQuizForParcours ? window.getQuizForParcours(parcours) : QUIZ_INFORMATIQUE_10E;
+const answers = {}; // id -> {value, isQcm}
+
+const form = $("#quiz-form");
+QUIZ_INFO10_ACTIVE.forEach((q, i) => {
+  const box = document.createElement("div");
+  box.className = "quiz-q";
+  box.dataset.id = q.id;
+  const promptEl = `<p class="quiz-q-prompt">${i+1}. ${q.prompt}</p>`;
+  if (q.type === "qcm") {
+    box.innerHTML = promptEl + q.options.map((opt, oi) =>
+      `<button class="quiz-opt" data-oi="${oi}" type="button">${opt}</button>`
+    ).join("") + `<div class="quiz-feedback" data-role="feedback"></div>`;
+  } else {
+    box.innerHTML = promptEl + `<input class="quiz-input" type="text" placeholder="Votre réponse…">
+      <div class="quiz-feedback" data-role="feedback"></div>`;
+  }
+  form.appendChild(box);
+});
+
+// QCM : sélection d'une option
+form.addEventListener("click", (e) => {
+  const btn = e.target.closest(".quiz-opt");
+  if (!btn) return;
+  const box = btn.closest(".quiz-q");
+  $all(".quiz-opt", box).forEach(b => b.classList.remove("selected"));
+  btn.classList.add("selected");
+  answers[box.dataset.id] = parseInt(btn.dataset.oi, 10);
+});
+
+let checked = false;
+
+$("#btn-check").addEventListener("click", () => {
+  checked = true;
+  let score = 0;
+  QUIZ_INFO10_ACTIVE.forEach(q => {
+    const box = $(`.quiz-q[data-id="${q.id}"]`);
+    const fb = $('[data-role="feedback"]', box);
+    if (q.type === "qcm") {
+      const chosen = answers[q.id];
+      $all(".quiz-opt", box).forEach((b, oi) => {
+        b.disabled = true;
+        if (oi === q.correct) b.classList.add("correct");
+        else if (oi === chosen) b.classList.add("wrong");
+      });
+      const isRight = chosen === q.correct;
+      if (isRight) score++;
+      fb.textContent = isRight ? "✓ Bonne réponse" : `✗ Réponse attendue : ${q.options[q.correct]}`;
+      fb.className = "quiz-feedback " + (isRight ? "ok" : "ko");
+      answers[q.id] = { given: chosen != null ? q.options[chosen] : "(sans réponse)", correctText: q.options[q.correct], isRight };
+    } else {
+      const input = $(".quiz-input", box);
+      input.disabled = true;
+      const given = input.value;
+      const isRight = q.answers.includes(normalizeAnswer(given));
+      if (isRight) score++;
+      fb.textContent = isRight ? "✓ Bonne réponse" : `✗ Réponse attendue : ${q.answers[0]}`;
+      fb.className = "quiz-feedback " + (isRight ? "ok" : "ko");
+      answers[q.id] = { given: given || "(sans réponse)", correctText: q.answers[0], isRight };
+    }
+  });
+  $("#quiz-score").textContent = `Score : ${score} / ${QUIZ_INFO10_ACTIVE.length}`;
+  $("#result-block").classList.remove("hidden");
+  $("#btn-check").disabled = true;
+});
+
+$("#btn-pdf").addEventListener("click", () => {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: "mm", format: "a4" });
+  let y = 20;
+  doc.setFont("helvetica", "bold"); doc.setFontSize(16);
+  doc.text("Musée des Matières — Salle Informatique (Clavier et bureautique, 10e) antique", 15, y); y += 8;
+  doc.setFontSize(11); doc.setFont("helvetica", "normal");
+  const score = QUIZ_INFO10_ACTIVE.filter(q => answers[q.id] && answers[q.id].isRight).length;
+  doc.text(`Score : ${score} / ${QUIZ_INFO10_ACTIVE.length}`, 15, y); y += 10;
+
+  QUIZ_INFO10_ACTIVE.forEach((q, i) => {
+    const a = answers[q.id] || { given: "(sans réponse)", correctText: "?", isRight: false };
+    doc.setFont("helvetica", "bold");
+    const promptLines = doc.splitTextToSize(`${i+1}. ${q.prompt}`, 180);
+    if (y + promptLines.length * 6 > 280) { doc.addPage(); y = 20; }
+    doc.text(promptLines, 15, y); y += promptLines.length * 6;
+    doc.setFont("helvetica", "normal");
+    doc.text(`Réponse donnée : ${a.given}`, 18, y); y += 6;
+    doc.setTextColor(a.isRight ? 60 : 180, a.isRight ? 120 : 60, 60);
+    doc.text(a.isRight ? "✓ Correct" : `✗ Réponse attendue : ${a.correctText}`, 18, y);
+    doc.setTextColor(0, 0, 0);
+    y += 10;
+  });
+
+  doc.save("musee-informatique-10e-resultat.pdf");
+});
+</script>
+</body>
+</html>
