@@ -1,0 +1,60 @@
+// ============================================================================
+// SALLE ÉDUCATION PHYSIQUE ET SPORTS — COLLÈGE DE GENÈVE (DP/OC, 1ère-4e)
+// Contenu reformulé à partir du Plan d'études du Collège de Genève,
+// section Éducation physique p. 60-61. Aucun énoncé n'est copié tel quel.
+// ============================================================================
+const DESK_H = 0.6, WALL_H = 1.4, SHELF_H = 1.1;
+const MUSEE_EPS_COLLEGE_OBJECTS = [
+  { id:"epanouissement_harmonieux_corps", tier:"court", emoji:"🏃", label:"L'épanouissement harmonieux du corps",
+    text:"L'éducation physique et sportive contribue à l'épanouissement harmonieux du corps, de la sensibilité, de la volonté et de l'intelligence, et favorise la santé psychique et physique de l'élève — un objectif qui dépasse largement la seule performance sportive.",
+    fact:"Cette formulation associe explicitement des dimensions aussi différentes que le corps, la sensibilité, la volonté et l'intelligence — le sport scolaire n'est donc jamais pensé comme purement physique, indépendamment du reste de la personne.",
+    anchor:{distance:2.0,angle:20,height:SHELF_H} },
+  { id:"corps_organisme_expression", tier:"court", emoji:"💪", label:"Le corps, organisme et moyen d'expression",
+    text:"L'éducation physique a pour but de développer le corps en tant qu'organisme et moyen d'expression, et d'améliorer les aptitudes physiques — le corps y est donc considéré à la fois comme un système biologique à entraîner et comme un outil de communication non verbale.",
+    fact:"Cette double nature du corps (organisme ET moyen d'expression) rejoint les objectifs de la danse ou du théâtre, où le mouvement corporel devient lui-même un langage capable de transmettre des émotions et des intentions.",
+    anchor:{distance:3.4,angle:95,height:DESK_H} },
+  { id:"choisir_independance_sport", tier:"court", emoji:"🎯", label:"Choisir en toute indépendance",
+    text:"Par la pratique de disciplines sportives individuelles et collectives, l'élève acquiert des savoir-faire et attitudes variés et vit, par le jeu, des expériences humaines importantes ; il devient ainsi capable de choisir entre les nombreuses formes de mouvement, de jeu et de sport, et de s'y adonner en toute indépendance.",
+    fact:"Cet objectif d'autonomie de choix va au-delà des seules années de collège : il vise explicitement à préparer l'élève à continuer une pratique sportive régulière et choisie par lui-même, bien après la fin de sa scolarité.",
+    anchor:{distance:1.4,angle:160,height:DESK_H} },
+  { id:"loisirs_sains_environnement_sport", tier:"court", emoji:"🌲", label:"Occuper sainement ses loisirs",
+    text:"La variété des activités proposées a pour but d'inciter l'élève à occuper sainement ses loisirs, à approfondir sa connaissance de la nature et à prendre conscience de sa responsabilité à l'égard de l'environnement — le sport y est relié directement à une conscience écologique.",
+    fact:"Ce lien entre pratique sportive et responsabilité environnementale (via des activités en plein air comme la voile, le ski ou la randonnée) montre que l'éducation physique du collège ne se limite pas au seul cadre du gymnase.",
+    anchor:{distance:4.6,angle:250,height:WALL_H} },
+  { id:"ethique_fair_play_competition", tier:"moyen", emoji:"🤝", label:"L'éthique de la compétition",
+    text:"L'élève doit comprendre les limites que l'éthique lui impose dans diverses compétitions et être amené à se comporter sportivement : esprit d'équipe, fair-play, discipline personnelle et entraide — la victoire n'étant jamais recherchée à n'importe quel prix.",
+    fact:"Parmi les attitudes attendues figure explicitement la maîtrise \"des problèmes de rivalité et d'agressivité\" lors de la pratique sportive — le sport scolaire est ainsi pensé comme un espace privilégié pour apprendre à gérer ces tensions naturelles de façon constructive.",
+    anchor:{distance:2.6,angle:300,height:SHELF_H} },
+  { id:"appareil_locomoteur_systemes", tier:"moyen", emoji:"🦴", label:"Développer l'appareil locomoteur",
+    text:"L'élève est amené à développer les aptitudes motrices et les systèmes organiques qui les conditionnent (appareil locomoteur, systèmes nerveux et métabolique) par des exercices appropriés — un lien direct avec les connaissances acquises en cours de biologie sur le corps humain.",
+    fact:"Cette connexion explicite entre éducation physique et connaissances biologiques du corps humain illustre comment une même compétence (le mouvement) peut être approchée à la fois de façon pratique et de façon théorique dans deux disciplines distinctes.",
+    anchor:{distance:5.2,angle:40,height:DESK_H} },
+  { id:"elements_naturels_eau_neige_glace", tier:"moyen", emoji:"🏔️", label:"Appréhender les éléments naturels",
+    text:"Parmi les aptitudes développées figure la capacité à appréhender et utiliser les éléments naturels — l'eau, la neige, la glace — dans la pratique sportive, une dimension particulièrement adaptée au contexte géographique suisse et à sa proximité avec la montagne et les lacs.",
+    fact:"Cette mention spécifique de la neige et de la glace reflète le contexte local du collège genevois, où le ski et les sports d'hiver en montagne restent des activités sportives scolaires courantes et accessibles.",
+    anchor:{distance:1.8,angle:210,height:DESK_H} },
+  { id:"connaitre_ses_limites_capital_sante", tier:"moyen", emoji:"🧘", label:"Se connaître soi-même par le sport",
+    text:"Parmi les savoirs attendus figure la capacité à apprendre à se connaître soi-même en maîtrisant ses capacités et ses limites, à reconnaître dans sa propre personne l'unité du corps et de l'esprit, et à entretenir et gérer son capital santé sur le long terme.",
+    fact:"Cette notion de \"capital santé\" à entretenir et gérer présente la santé non comme un état fixe donné une fois pour toutes, mais comme une ressource active que chacun doit apprendre à préserver et développer tout au long de sa vie.",
+    anchor:{distance:3.9,angle:130,height:DESK_H} },
+  { id:"oc_sport_option_complementaire", tier:"long", emoji:"⚽", label:"Le sport en option complémentaire",
+    text:"Au-delà du cours obligatoire d'éducation physique, le sport est également offert comme option complémentaire — un choix qui permet à l'élève particulièrement intéressé d'approfondir sa pratique sportive avec des heures supplémentaires dédiées.",
+    fact:"Cette possibilité d'option complémentaire sport, distincte du cours obligatoire, s'adresse aux élèves qui souhaitent faire du sport un axe plus central de leur formation gymnasiale, sans pour autant suivre une filière sportive professionnelle.",
+    anchor:{distance:6.0,angle:70,height:SHELF_H} },
+  { id:"relations_sport_economie_medias", tier:"long", emoji:"📺", label:"Le sport, un phénomène de société",
+    text:"L'élève apprend à discerner l'importance du sport dans la société actuelle et à observer et juger son évolution d'un œil critique, en identifiant les relations entre le sport, l'économie et la médecine : installations sportives, industrie des articles de sport, tourisme, médias, sponsoring et dopage.",
+    fact:"Cette liste explicite — sponsoring, dopage, médias, industrie — montre que le plan d'études aborde le sport aussi comme un phénomène économique et social complexe, pas seulement comme une pratique physique individuelle déconnectée du reste de la société.",
+    anchor:{distance:2.3,angle:340,height:WALL_H} },
+  { id:"differences_culturelles_sport", tier:"long", emoji:"🌍", label:"Accepter les différences culturelles",
+    text:"Parmi les attitudes attendues figure explicitement l'acceptation des différences culturelles dans l'approche du sport — toutes les cultures n'accordant pas la même place, ni les mêmes règles, ni la même signification symbolique à une même pratique sportive.",
+    fact:"Cette ouverture aux différences culturelles rejoint une préoccupation partagée par plusieurs autres disciplines du collège, comme les langues vivantes ou la géographie, autour du respect et de la compréhension de la diversité culturelle mondiale.",
+    anchor:{distance:4.4,angle:185,height:DESK_H} },
+  { id:"delassement_equilibre_ecole", tier:"long", emoji:"⚖️", label:"Un facteur d'équilibre à l'école",
+    text:"L'éducation physique contribue à l'épanouissement de la personnalité et se veut aussi un facteur d'équilibre et de délassement à l'école et en dehors de celle-ci — une respiration physique nécessaire face aux exigences intellectuelles des autres disciplines du collège.",
+    fact:"Ce rôle de \"délassement\" attribué explicitement au sport scolaire reconnaît qu'un parcours gymnasial exigeant intellectuellement a aussi besoin, pour rester équilibré, d'espaces réguliers consacrés à l'activité physique et au plaisir du mouvement.",
+    anchor:{distance:5.7,angle:15,height:SHELF_H} },
+];
+const TIER_ORDER = { court:1, moyen:2, long:3 };
+function getEpsCollegeObjectsForParcours(p){ const m=TIER_ORDER[p]||1; return MUSEE_EPS_COLLEGE_OBJECTS.filter(o=>TIER_ORDER[o.tier]<=m); }
+window.MUSEE_EPS_COLLEGE_OBJECTS = MUSEE_EPS_COLLEGE_OBJECTS;
+window.getEpsCollegeObjectsForParcours = getEpsCollegeObjectsForParcours;

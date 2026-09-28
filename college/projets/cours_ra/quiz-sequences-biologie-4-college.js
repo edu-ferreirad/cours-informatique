@@ -1,0 +1,9 @@
+const QUIZ_BIOLOGIE_4_COLLEGE = [
+  { id:"q1", tier:"court", type:"qcm", prompt:"Quelle activité correspond à : « Sur un dilemme bioéthique réel et actuel (par exemple un enjeu lié aux biotechnologies) » ?", options:["OS uniquement — Génétique : résoudre un arbre généalogique", "OS uniquement — Bioéthique : débat argumenté encadré", "Lecture : décortiquer un article de vulgarisation", "OS uniquement — Évolution : reconstruire un arbre phylogénétique"], correct:1 },
+  { id:"q2", tier:"moyen", type:"qcm", prompt:"Quelle activité correspond à : « À partir d'un tableau de caractères communs et différents entre plusieurs espèces » ?", options:["Rédiger un vrai rapport d'expérience", "OS uniquement — Évolution : reconstruire un arbre phylogénétique", "Avant de choisir : rencontre avec l'option biologie-chimie", "Démarche scientifique : formuler une hypothèse testable"], correct:1 },
+  { id:"q3", tier:"long", type:"qcm", prompt:"Quelle activité correspond à : « En vue du travail de maturité » ?", options:["OS uniquement — Écologie : inventaire de terrain", "OS uniquement — Amorcer un travail personnel encadré", "Démarche scientifique : formuler une hypothèse testable", "OS uniquement — Séquence croisée avec la chimie : les biomolécules"], correct:1 },
+];
+function normalizeAnswer(s){return (s||"").toString().trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9 ]/g,"").replace(/\s+/g," ");}
+const QUIZ_TIER_ORDER = { court:1, moyen:2, long:3 };
+function getQuizForParcours(parcours){ const maxLevel = QUIZ_TIER_ORDER[parcours] || 1; return QUIZ_BIOLOGIE_4_COLLEGE.filter(q => QUIZ_TIER_ORDER[q.tier] <= maxLevel); }
+window.QUIZ_BIOLOGIE_4_COLLEGE = QUIZ_BIOLOGIE_4_COLLEGE; window.getQuizForParcours = getQuizForParcours; window.normalizeAnswer = normalizeAnswer;
