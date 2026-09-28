@@ -1,9 +1,0 @@
-const QUIZ_BIOLOGIE_3_COLLEGE = [
-  { id:"q1", tier:"court", type:"qcm", prompt:"Quelle activité correspond à : « Face à un arbre généalogique fictif présentant la transmission d'un caractère sur plusieurs générations » ?", options:["OS uniquement — Amorcer un travail personnel encadré", "Classification : inventer ses propres critères", "OS uniquement — Génétique : résoudre un arbre généalogique", "OS uniquement — Séquence croisée avec la chimie : les biomolécules"], correct:2 },
-  { id:"q2", tier:"moyen", type:"qcm", prompt:"Quelle activité correspond à : « Lors d'une sortie sur le terrain » ?", options:["Modéliser la cellule pour comprendre ses limites", "OS uniquement — Séquence croisée avec la chimie : les biomolécules", "OS uniquement — Écologie : inventaire de terrain", "Démarche scientifique : formuler une hypothèse testable"], correct:2 },
-  { id:"q3", tier:"long", type:"qcm", prompt:"Quelle activité correspond à : « En coordination avec le cours de chimie de l'option » ?", options:["OS uniquement — Bioéthique : débat argumenté encadré", "OS uniquement — Amorcer un travail personnel encadré", "OS uniquement — Séquence croisée avec la chimie : les biomolécules", "OS uniquement — Évolution : reconstruire un arbre phylogénétique"], correct:2 },
-];
-function normalizeAnswer(s){return (s||"").toString().trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9 ]/g,"").replace(/\s+/g," ");}
-const QUIZ_TIER_ORDER = { court:1, moyen:2, long:3 };
-function getQuizForParcours(parcours){ const maxLevel = QUIZ_TIER_ORDER[parcours] || 1; return QUIZ_BIOLOGIE_3_COLLEGE.filter(q => QUIZ_TIER_ORDER[q.tier] <= maxLevel); }
-window.QUIZ_BIOLOGIE_3_COLLEGE = QUIZ_BIOLOGIE_3_COLLEGE; window.getQuizForParcours = getQuizForParcours; window.normalizeAnswer = normalizeAnswer;
