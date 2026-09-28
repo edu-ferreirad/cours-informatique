@@ -38,8 +38,6 @@ const ArEngine = (() => {
       videoEl.srcObject = stream;
       await videoEl.play();
       resizeCanvas();
-      window.addEventListener("resize", resizeCanvas);
-      window.addEventListener("orientationchange", resizeCanvas);
       loop();
       return { ok: true };
     } catch (err) {
@@ -57,8 +55,6 @@ const ArEngine = (() => {
   function detach() {
     if (rafId) cancelAnimationFrame(rafId);
     rafId = null;
-    window.removeEventListener("resize", resizeCanvas);
-    window.removeEventListener("orientationchange", resizeCanvas);
     if (stream) {
       stream.getTracks().forEach(t => t.stop());
       stream = null;
@@ -94,14 +90,6 @@ const ArEngine = (() => {
     if (!ctx || !canvasEl) return;
     ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
 
-    // BUGFIX (même bug que le musée Collège) : le flux caméra n'était jamais
-    // dessiné sur le canvas visible. La <video> est display:none (elle ne
-    // sert qu'à l'échantillonnage de luminance hors-écran), et le fond de
-    // #compass-root est un noir codé en dur — donc sans WebXR (Windows/
-    // Surface, iOS...), l'utilisateur ne voyait que la réticule flotter sur
-    // du noir. Fix : dessiner l'image vidéo en mode "cover" avant la réticule.
-    drawVideoFrame();
-
     // reticle / anchoring effect
     drawReticle(ts || 0);
 
@@ -125,17 +113,6 @@ const ArEngine = (() => {
         }
       }
     }
-  }
-
-  function drawVideoFrame() {
-    if (!videoEl || videoEl.readyState < 2) return;
-    const vw = videoEl.videoWidth, vh = videoEl.videoHeight;
-    if (!vw || !vh) return;
-    const cw = canvasEl.width, ch = canvasEl.height;
-    const scale = Math.max(cw / vw, ch / vh);
-    const dw = vw * scale, dh = vh * scale;
-    const dx = (cw - dw) / 2, dy = (ch - dh) / 2;
-    ctx.drawImage(videoEl, dx, dy, dw, dh);
   }
 
   function drawReticle(ts) {
