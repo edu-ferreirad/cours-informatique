@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Musée ECG — Quiz OSP Santé</title>
+<title>Musée ECG — Quiz Santé — 3e année</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -27,7 +27,7 @@
 <body>
 
 <div class="quiz-wrap">
-  <div class="eyebrow" style="text-align:center;">Musée ECG — Salle OSP Santé</div>
+  <div class="eyebrow" style="text-align:center;">Santé — 3e année — Questionnaire</div>
   <h1 class="display-title-sm" style="text-align:center;">Questionnaire final</h1>
   <p class="subtitle" style="text-align:center;">Répondez à chaque question, puis validez pour voir votre corrigé.</p>
 
@@ -55,7 +55,7 @@ const $ = (sel, root=document) => root.querySelector(sel);
 const $all = (sel, root=document) => Array.from(root.querySelectorAll(sel));
 const params = new URLSearchParams(location.search);
 const parcours = params.get("parcours") || "riche";
-const QUIZ_SACOLL_ACTIVE = window.getQuizForParcours ? window.getQuizForParcours(parcours) : QUIZ_SANTE_ECG_3;
+const QUIZ_SACOLL_ACTIVE = window.getQuizForParcours ? window.getQuizForParcours(parcours) : QUIZ_SANTE_ECG_1;
 const answers = {}; // id -> {value, isQcm}
 
 const form = $("#quiz-form");

@@ -1,32 +1,36 @@
-// SALLE OSP OSP COMMUNICATION ET INFORMATION — 2e année — paliers court/moyen/long
+// SALLE OSP COMMUNICATION ET INFORMATION — 2e année — le texte s'adresse à l'élève, étape par étape
 const DESK_H = 0.6, WALL_H = 1.4, SHELF_H = 1.1;
-const MUSEE_COMMUNICATION_INFO_ECG_2_OBJECTS = [
-  { id:"meme_info_trois_formats", tier:"court", emoji:"📰", label:"Atelier culture et langue : une info, trois formats",
-    text:"À partir d'un même fait divers fourni, chaque élève doit le reformuler en trois versions : un tweet de 280 caractères, un chapeau d'article de 50 mots, un message vocal de trente secondes — même information, trois contraintes d'écriture totalement différentes.",
-    fact:"Ce même exercice, répété sur des sujets variés au fil de l'année, entraîne un réflexe professionnel réel : savoir adapter instantanément le format d'un message selon le support, sans jamais trahir l'information de départ.",
+const MUSEE_COMMUNICATION_INFO_2_ECG_OBJECTS = [
+  { id:"communication_info_2_1", tier:"court", emoji:"📊", label:"Étape 1 — Lis un tableau de statistiques médiatiques",
+    text:"À partir d'un tableau réel sur l'usage des réseaux sociaux par âge, réponds à trois questions précises et formule une hypothèse pour expliquer une tendance observée.",
+    fact:"Lire des statistiques réelles évite de se fier uniquement à des impressions sur les usages numériques.",
     anchor:{distance:2.0,angle:20,height:SHELF_H} },
-  { id:"capsule_video_60_secondes", tier:"court", emoji:"🎬", label:"Multimédias : la capsule de 60 secondes",
-    text:"Par groupes de trois, les élèves produisent une courte vidéo explicative de 60 secondes maximum sur un sujet donné, en respectant un cahier des charges précis (sous-titres obligatoires, un seul plan fixe, musique libre de droits) — contraintes techniques réelles d'un vrai brief de production.",
-    fact:"Imposer une durée aussi courte oblige à des choix de montage radicaux : couper une information secondaire devient plus formateur, pour apprendre la hiérarchisation, qu'un montage sans limite de temps.",
-    anchor:{distance:1.4,angle:160,height:DESK_H} },
-  { id:"campagne_marketing_produit_fictif", tier:"moyen", emoji:"📈", label:"Économie et marketing : lancer un produit fictif",
-    text:"Par groupes, les élèves inventent un produit ou service fictif et doivent en définir le public cible, le positionnement prix et une accroche publicitaire, avant de présenter leur stratégie face à la classe qui joue le rôle d'investisseurs à convaincre.",
-    fact:"Jouer le rôle d'investisseurs sceptiques plutôt que de simples camarades bienveillants pousse les groupes présentateurs à anticiper de vraies objections commerciales, pas seulement à décrire une idée sans la défendre.",
+  { id:"communication_info_2_2", tier:"court", emoji:"🖋️", label:"Étape 2 — Rédige une brève de dix lignes",
+    text:"Choisis un fait (réel ou inventé pour l'exercice) et rédige une brève journalistique de dix lignes maximum en répondant aux questions qui, quoi, où, quand.",
+    fact:"La brève journalistique impose de trier l'essentiel en très peu de mots.",
+    anchor:{distance:3.4,angle:95,height:DESK_H} },
+  { id:"communication_info_2_3", tier:"court", emoji:"💾", label:"Étape 3 — Explore une base de données simple",
+    text:"Ouvre un tableur contenant une liste de données (films, livres) et utilise le tri et le filtre pour répondre à deux questions précises sur ces données.",
+    fact:"Savoir interroger une base de données, même simple, est une compétence de base en gestion de l'information.",
     anchor:{distance:2.6,angle:300,height:SHELF_H} },
-  { id:"decryptage_une_journal", tier:"moyen", emoji:"🗞️", label:"Sociologie des médias : décrypter une une de journal",
-    text:"Face à la une du jour de trois journaux différents traitant du même événement, les élèves comparent choix de titre, de photo et d'angle, puis formulent une hypothèse sur le public visé par chaque journal en fonction de ces choix éditoriaux.",
-    fact:"Comparer plusieurs unes le même jour révèle immédiatement, de façon très concrète, que le choix d'une photo ou d'un titre n'est jamais neutre : chaque rédaction fait des choix éditoriaux visibles dès la première page.",
+  { id:"communication_info_2_4", tier:"moyen", emoji:"🎨", label:"Étape 4 — Conçois une mise en page de brève",
+    text:"Mets en page ta brève de l'étape 2 avec un titre, une image (ou un emplacement pour une image) et une mise en forme claire, en pensant à ce qui attire l'œil en premier.",
+    fact:"La mise en page influence la lecture autant que le texte lui-même.",
+    anchor:{distance:5.2,angle:40,height:DESK_H} },
+  { id:"communication_info_2_5", tier:"moyen", emoji:"🌐", label:"Étape 5 — Compare deux stratégies numériques",
+    text:"Compare les comptes de réseaux sociaux de deux organisations différentes (une entreprise, une association) et note deux différences dans leur façon de communiquer.",
+    fact:"Comparer des stratégies réelles fait comprendre que la communication numérique se pense selon un public visé.",
     anchor:{distance:1.8,angle:210,height:DESK_H} },
-  { id:"dossier_veille_medias_langues", tier:"long", emoji:"🌍", label:"Vers la MS : constituer un dossier de veille en langue étrangère",
-    text:"En préparation du séjour linguistique exigé pour la maturité spécialisée, l'élève constitue sur plusieurs semaines un dossier de veille médiatique dans l'une de ses langues secondes, résumant chaque semaine un article d'actualité lu en version originale.",
-    fact:"Cette veille régulière en langue étrangère, plus qu'un simple cours de grammaire, prépare concrètement à comprendre l'information locale une fois arrivé en immersion, où l'actualité du pays devient un sujet de conversation quotidien.",
-    anchor:{distance:6.0,angle:70,height:SHELF_H} },
-  { id:"carnet_observation_stage_ci", tier:"long", emoji:"📓", label:"Pendant le stage : le carnet d'observation métier",
-    text:"Durant le stage pratique obligatoire, l'élève note chaque jour une tâche de communication ou de gestion de l'information observée ou réalisée, et identifie en fin de semaine laquelle lui a demandé le plus de rigueur méthodologique, au-delà de la seule créativité.",
-    fact:"Ce suivi révèle souvent aux élèves que les métiers de la communication reposent sur bien plus de rigueur organisationnelle (délais, validation, coordination) qu'ils ne l'imaginaient avant leur premier contact réel avec le milieu professionnel.",
-    anchor:{distance:4.4,angle:185,height:DESK_H} },
+  { id:"communication_info_2_6", tier:"long", emoji:"📈", label:"Étape 6 — Prépare un mini-dossier sur un enjeu numérique",
+    text:"Choisis un enjeu numérique actuel (désinformation, protection des données) et rédige un dossier d'une page avec deux sources fiables citées.",
+    fact:"Citer ses sources est indispensable dès qu'on travaille sur un sujet numérique sensible.",
+    anchor:{distance:4.6,angle:250,height:WALL_H} },
+  { id:"communication_info_2_7", tier:"long", emoji:"🎤", label:"Étape 7 — Présente ton dossier comme un professionnel",
+    text:"Présente ton dossier de l'étape 6 en deux minutes à la classe, avec une structure claire (constat, enjeu, une piste de solution).",
+    fact:"Structurer une présentation en trois temps clairs est une compétence transférable à tous les métiers de la communication.",
+    anchor:{distance:3.9,angle:130,height:DESK_H} },
 ];
 const TIER_ORDER = { court:1, moyen:2, long:3 };
-function getCommunicationInfo2EcgObjectsForParcours(p){ const m=TIER_ORDER[p]||1; return MUSEE_COMMUNICATION_INFO_ECG_2_OBJECTS.filter(o=>TIER_ORDER[o.tier]<=m); }
-window.MUSEE_COMMUNICATION_INFO_ECG_2_OBJECTS = MUSEE_COMMUNICATION_INFO_ECG_2_OBJECTS;
+function getCommunicationInfo2EcgObjectsForParcours(p){ const m=TIER_ORDER[p]||1; return MUSEE_COMMUNICATION_INFO_2_ECG_OBJECTS.filter(o=>TIER_ORDER[o.tier]<=m); }
+window.MUSEE_COMMUNICATION_INFO_2_ECG_OBJECTS = MUSEE_COMMUNICATION_INFO_2_ECG_OBJECTS;
 window.getCommunicationInfo2EcgObjectsForParcours = getCommunicationInfo2EcgObjectsForParcours;

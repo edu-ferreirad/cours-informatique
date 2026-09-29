@@ -1,32 +1,36 @@
-// SALLE OSP OSP ARTS ET DESIGN — 3e année — paliers court/moyen/long
+// SALLE OSP ARTS ET DESIGN — 3e année — le texte s'adresse à l'élève, étape par étape
 const DESK_H = 0.6, WALL_H = 1.4, SHELF_H = 1.1;
-const MUSEE_ARTS_DESIGN_ECG_3_OBJECTS = [
-  { id:"frise_comparee_deux_oeuvres", tier:"court", emoji:"🖼️", label:"Séquence histoire de l'art : comparer deux œuvres, deux siècles",
-    text:"Les élèves reçoivent deux œuvres traitant du même sujet (un portrait, une scène de rue) à un siècle d'écart, et doivent identifier en dix minutes cinq différences de traitement — cadrage, couleur, intention — avant une mise en commun orale en classe.",
-    fact:"Comparer plutôt que décrire une seule œuvre isolément oblige l'élève à formuler ce qui change, donc à nommer des choix — un réflexe d'analyse bien plus actif que la simple observation.",
+const MUSEE_ARTS_DESIGN_3_ECG_OBJECTS = [
+  { id:"arts_design_3_1", tier:"court", emoji:"🔍", label:"Étape 1 — Compare une œuvre ancienne et une œuvre actuelle",
+    text:"Choisis une œuvre classique et une œuvre contemporaine traitant d'un sujet proche (le portrait, le paysage). Note ce que l'œuvre contemporaine remet en question par rapport à l'ancienne.",
+    fact:"Confronter deux époques sur un même sujet révèle ce qui a changé dans le regard de l'artiste, pas seulement dans la technique.",
+    anchor:{distance:2.0,angle:20,height:SHELF_H} },
+  { id:"arts_design_3_2", tier:"court", emoji:"🎨", label:"Étape 2 — Analyse une palette de couleurs",
+    text:"Prélève cinq couleurs dans une œuvre donnée et reproduis-les en mélangeant toi-même la peinture. Note les proportions utilisées pour chaque mélange.",
+    fact:"Reproduire une palette exige de vraiment observer les nuances, bien plus qu'un simple coup d'œil.",
     anchor:{distance:3.4,angle:95,height:DESK_H} },
-  { id:"carnet_art_contemporain_musee", tier:"court", emoji:"📓", label:"Sortie art contemporain : le carnet de doute",
-    text:"Lors d'une visite d'exposition, chaque élève tient un \"carnet de doute\" : pour chaque œuvre, noter une chose comprise et une chose qui reste incertaine ou dérangeante — l'incompréhension face à l'art contemporain devient alors matière à discussion plutôt qu'un blocage à cacher.",
-    fact:"Normaliser le doute face à une œuvre contemporaine évite le réflexe du \"je n'aime pas donc c'est nul\" et pousse à chercher ce que l'artiste a pu vouloir provoquer, même sans certitude.",
-    anchor:{distance:4.6,angle:250,height:WALL_H} },
-  { id:"projet_design_cahier_charges", tier:"moyen", emoji:"📐", label:"Projet design : répondre à un vrai cahier des charges",
-    text:"Par groupes de deux, les élèves reçoivent un cahier des charges fictif mais réaliste (concevoir un packaging économique et écologique pour un produit donné) et doivent présenter, trois semaines plus tard, une maquette accompagnée d'une justification de leurs choix face à la classe.",
-    fact:"Confronter les élèves à des contraintes contradictoires (coût bas ET écologie ET esthétique) reproduit exactement la tension permanente du métier de designer, où aucune contrainte n'est jamais sacrifiée entièrement aux deux autres.",
+  { id:"arts_design_3_3", tier:"court", emoji:"📐", label:"Étape 3 — Repère une règle de composition",
+    text:"Trace sur une reproduction d'œuvre les lignes de force de sa composition (règle des tiers, diagonale) et explique comment elles guident le regard.",
+    fact:"Une composition efficace guide l'œil du spectateur presque sans qu'il s'en rende compte ; la rendre visible aide à la comprendre.",
+    anchor:{distance:2.6,angle:300,height:SHELF_H} },
+  { id:"arts_design_3_4", tier:"moyen", emoji:"🖌️", label:"Étape 4 — Avance sur ton projet personnel",
+    text:"Reprends ton projet personnel commencé en 2e année (ou démarre un nouveau projet) et fixe-toi un objectif précis pour cette séance : une seule chose à améliorer ou à terminer.",
+    fact:"Se fixer un objectif précis par séance, plutôt que « avancer un peu », est ce qui fait vraiment progresser un projet artistique long.",
     anchor:{distance:5.2,angle:40,height:DESK_H} },
-  { id:"portfolio_trois_disciplines", tier:"moyen", emoji:"📁", label:"Constituer un portfolio à trois entrées",
-    text:"Sur l'année, chaque élève alimente un portfolio structuré en trois sections — travaux d'atelier, recherches d'histoire de l'art, croquis personnels — pour apprendre à documenter et sélectionner son propre travail, une compétence attendue dans tout dossier de candidature en école d'art.",
-    fact:"Savoir choisir dix travaux représentatifs parmi cinquante réalisés dans l'année est une compétence à part entière : un portfolio surchargé dilue l'impression laissée, un portfolio trop mince manque de preuves.",
+  { id:"arts_design_3_5", tier:"moyen", emoji:"🗨️", label:"Étape 5 — Reçois une critique constructive",
+    text:"Présente ton projet en cours à un camarade qui doit dire une chose qui fonctionne et une chose à améliorer, avec un exemple précis pour chacune, jamais une impression vague.",
+    fact:"Recevoir une critique précise, pas juste « c'est joli », est ce qui permet vraiment d'améliorer un travail artistique.",
+    anchor:{distance:1.8,angle:210,height:DESK_H} },
+  { id:"arts_design_3_6", tier:"long", emoji:"🏛️", label:"Étape 6 — Visite active un lieu d'exposition",
+    text:"Lors d'une visite (musée, galerie ou en ligne), remplis une grille d'observation sur trois œuvres : ce qu'elles montrent, comment, et ce que tu en retiens personnellement.",
+    fact:"Une visite active, avec une grille précise, fait retenir bien plus qu'une visite libre sans objectif.",
+    anchor:{distance:4.6,angle:250,height:WALL_H} },
+  { id:"arts_design_3_7", tier:"long", emoji:"🎓", label:"Étape 7 — Finalise et présente ton parcours de projet",
+    text:"Finalise ton projet personnel et présente-le à la classe en expliquant la cohérence entre ton intention de départ et le résultat final, en citant un moment où tu as changé d'avis en cours de route.",
+    fact:"Expliquer un changement d'avis en cours de projet montre une vraie réflexion artistique, pas juste l'exécution d'un plan figé.",
     anchor:{distance:3.9,angle:130,height:DESK_H} },
-  { id:"portes_ouvertes_atelier_public", tier:"long", emoji:"🚪", label:"Simulation : portes ouvertes de l'atelier",
-    text:"En fin de semestre, la classe organise une exposition ouverte au reste de l'école : chaque élève affiche trois travaux et doit être capable de les présenter oralement à un visiteur inconnu qui n'a aucune connaissance préalable du projet — un exercice de médiation, pas seulement de création.",
-    fact:"Savoir parler de son travail à un public non initié est une compétence distincte de la création elle-même — beaucoup de bons créateurs échouent au premier abord à expliquer simplement ce qu'ils ont voulu faire.",
-    anchor:{distance:2.3,angle:340,height:WALL_H} },
-  { id:"critique_croisee_collective", tier:"long", emoji:"👥", label:"Rituel régulier : la critique croisée",
-    text:"Une fois par mois, les travaux en cours de toute la classe sont affichés ensemble et chaque élève doit commenter le travail d'un camarade tiré au sort, en formulant une force et une piste d'amélioration précises — jamais un simple \"j'aime\" ou \"j'aime pas\".",
-    fact:"Ce rituel de critique collective, courant dans les écoles d'art professionnelles sous le nom de \"crit\", habitue tôt les élèves à recevoir un avis extérieur sur leur travail sans le vivre comme une attaque personnelle.",
-    anchor:{distance:5.7,angle:15,height:SHELF_H} },
 ];
 const TIER_ORDER = { court:1, moyen:2, long:3 };
-function getArtsDesign3EcgObjectsForParcours(p){ const m=TIER_ORDER[p]||1; return MUSEE_ARTS_DESIGN_ECG_3_OBJECTS.filter(o=>TIER_ORDER[o.tier]<=m); }
-window.MUSEE_ARTS_DESIGN_ECG_3_OBJECTS = MUSEE_ARTS_DESIGN_ECG_3_OBJECTS;
+function getArtsDesign3EcgObjectsForParcours(p){ const m=TIER_ORDER[p]||1; return MUSEE_ARTS_DESIGN_3_ECG_OBJECTS.filter(o=>TIER_ORDER[o.tier]<=m); }
+window.MUSEE_ARTS_DESIGN_3_ECG_OBJECTS = MUSEE_ARTS_DESIGN_3_ECG_OBJECTS;
 window.getArtsDesign3EcgObjectsForParcours = getArtsDesign3EcgObjectsForParcours;

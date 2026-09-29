@@ -1,32 +1,36 @@
-// SALLE OSP OSP MUSIQUE — 2e année — paliers court/moyen/long
+// SALLE OSP MUSIQUE — 2e année — le texte s'adresse à l'élève, étape par étape
 const DESK_H = 0.6, WALL_H = 1.4, SHELF_H = 1.1;
-const MUSEE_MUSIQUE_ECG_2_OBJECTS = [
-  { id:"boeuf_improvise_debut_atelier", tier:"court", emoji:"🎷", label:"Rituel d'atelier : le bœuf improvisé",
-    text:"Chaque séance d'atelier commence par dix minutes de jeu collectif libre sur un accord donné, sans partition — chacun entre et sort comme il veut. L'objectif n'est pas la performance mais de réhabituer l'oreille et le corps à jouer avec les autres avant tout travail technique.",
-    fact:"Ce rituel d'échauffement collectif casse la nervosité de \"jouer juste\" dès la première minute — l'erreur y est explicitement sans conséquence, ce qui libère souvent des idées qu'un cadre plus strict aurait bloquées.",
+const MUSEE_MUSIQUE_2_ECG_OBJECTS = [
+  { id:"musique_2_1", tier:"court", emoji:"🎧", label:"Étape 1 — Écoute avec un objectif précis",
+    text:"Écoute un extrait deux fois avec deux consignes différentes : la première fois repère les instruments, la deuxième fois repère les changements de tempo.",
+    fact:"Changer de consigne d'écoute à chaque passage affine l'oreille bien plus qu'une écoute libre répétée.",
     anchor:{distance:2.0,angle:20,height:SHELF_H} },
-  { id:"dictee_rythmique_flash", tier:"court", emoji:"🥁", label:"Solfège : dictée rythmique flash",
-    text:"L'enseignant frappe un court motif rythmique deux fois seulement, les élèves doivent le retranscrire sur une portée vierge en moins d'une minute — l'exercice se répète dix fois avec des motifs de plus en plus complexes, sans jamais de troisième écoute.",
-    fact:"Limiter volontairement à deux écoutes entraîne une mémoire auditive immédiate, une compétence directement transférable au déchiffrage rapide d'une partition inconnue en situation de concert.",
-    anchor:{distance:1.4,angle:160,height:DESK_H} },
-  { id:"cellule_huit_mesures", tier:"moyen", emoji:"✍️", label:"Composition : la cellule de huit mesures",
-    text:"Chaque élève compose une cellule mélodique de huit mesures seulement, puis l'échange avec un camarade qui doit la développer et la transformer sur huit mesures supplémentaires — composer à plusieurs mains, en respectant une idée de départ qui n'est pas la sienne.",
-    fact:"Devoir prolonger l'idée musicale d'un autre force à sortir de ses propres automatismes de composition et révèle souvent des directions qu'on n'aurait jamais explorées seul.",
+  { id:"musique_2_2", tier:"court", emoji:"📖", label:"Étape 2 — Utilise trois mots de vocabulaire musical",
+    text:"Après une écoute, rédige une critique de cinq lignes en utilisant au moins trois termes précis de vocabulaire musical vus en classe (par exemple tempo, timbre, nuance).",
+    fact:"Utiliser un vocabulaire précis oblige à préciser une impression plutôt que de rester sur « c'est beau » ou « c'est nul ».",
+    anchor:{distance:3.4,angle:95,height:DESK_H} },
+  { id:"musique_2_3", tier:"court", emoji:"🕰️", label:"Étape 3 — Situe un extrait dans le temps",
+    text:"Écoute un extrait inconnu et essaie de le situer approximativement dans l'histoire de la musique à partir d'indices sonores précis (instrumentation, structure), avant de vérifier la vraie période.",
+    fact:"Deviner à partir d'indices précis, puis vérifier, ancre mieux les repères chronologiques qu'une simple leçon d'histoire de la musique.",
     anchor:{distance:2.6,angle:300,height:SHELF_H} },
-  { id:"grille_ecoute_critique", tier:"moyen", emoji:"👂", label:"Grille d'écoute : critiquer sans dire \"j'aime\"",
-    text:"Après chaque prestation d'un camarade en atelier, la classe remplit une grille de trois questions précises (justesse, tenue du rythme, prise de risque) plutôt que de donner un simple avis global — la critique musicale s'apprend comme un vocabulaire technique, pas comme un jugement de goût.",
-    fact:"Interdire le simple \"c'était bien\" au profit de critères précis oblige chaque élève à vraiment écouter en détail la prestation d'un camarade, plutôt que d'attendre passivement son propre tour de jeu.",
+  { id:"musique_2_4", tier:"moyen", emoji:"🎸", label:"Étape 4 — Réarrange une chanson connue",
+    text:"En groupe, choisis une chanson connue et change un seul paramètre (le tempo, l'instrumentation, l'ordre des parties). Présente ta version et explique ce que ce changement modifie dans l'ambiance.",
+    fact:"Changer un seul paramètre à la fois permet de vraiment comprendre l'effet de ce paramètre précis.",
+    anchor:{distance:5.2,angle:40,height:DESK_H} },
+  { id:"musique_2_5", tier:"moyen", emoji:"✍️", label:"Étape 5 — Écris un couplet sur un rythme donné",
+    text:"Écris un court couplet de quatre lignes sur un rythme qu'on te donne, en veillant à ce que les syllabes accentuées du texte tombent sur les temps forts du rythme.",
+    fact:"Faire correspondre les accents du texte et ceux du rythme est un vrai travail de composition, pas seulement de rimes.",
     anchor:{distance:1.8,angle:210,height:DESK_H} },
-  { id:"tpc_carnet_repetition", tier:"long", emoji:"📓", label:"TPC musique : tenir un carnet de répétition",
-    text:"Pour le travail personnel de certificat lié à une interprétation, l'élève tient sur plusieurs mois un carnet de répétition documentant les progrès, les blocages et les choix d'interprétation successifs — le jury évalue alors autant la démarche que le résultat final joué.",
-    fact:"Ce carnet permet souvent de découvrir, en le relisant, qu'un blocage technique frustrant à un moment donné a en réalité forcé une solution d'interprétation plus originale que celle initialement prévue.",
-    anchor:{distance:6.0,angle:70,height:SHELF_H} },
-  { id:"portrait_professionnel_stage", tier:"long", emoji:"🔍", label:"Avant le stage : dresser le portrait d'un métier musical",
-    text:"En amont du stage pratique obligatoire, l'élève choisit un métier précis de la filière (professeur d'instrument, ingénieur du son, chef de chœur) et prépare cinq questions concrètes sur le quotidien réel de ce métier, au-delà de l'image souvent idéalisée du musicien sur scène.",
-    fact:"La majorité des métiers musicaux comportent une part administrative ou pédagogique bien plus importante que ne l'imaginent la plupart des élèves avant leur premier stage — préparer des questions précises permet de le découvrir sans naïveté.",
-    anchor:{distance:4.4,angle:185,height:DESK_H} },
+  { id:"musique_2_6", tier:"long", emoji:"🎙️", label:"Étape 6 — Enregistre ta production",
+    text:"Enregistre la production de ton groupe (chanson réarrangée ou couplet mis en musique) avec un téléphone ou un ordinateur, puis réécoute-la ensemble.",
+    fact:"S'écouter soi-même en enregistrement révèle des détails qu'on ne perçoit jamais en jouant en direct.",
+    anchor:{distance:4.6,angle:250,height:WALL_H} },
+  { id:"musique_2_7", tier:"long", emoji:"🔧", label:"Étape 7 — Améliore ta production à partir de l'écoute",
+    text:"À partir de l'écoute de l'étape 6, note trois améliorations précises et réenregistre au moins une partie de ta production en les appliquant.",
+    fact:"Réenregistrer après une écoute critique, plutôt que de s'arrêter au premier essai, est la méthode réelle de production musicale.",
+    anchor:{distance:3.9,angle:130,height:DESK_H} },
 ];
 const TIER_ORDER = { court:1, moyen:2, long:3 };
-function getMusique2EcgObjectsForParcours(p){ const m=TIER_ORDER[p]||1; return MUSEE_MUSIQUE_ECG_2_OBJECTS.filter(o=>TIER_ORDER[o.tier]<=m); }
-window.MUSEE_MUSIQUE_ECG_2_OBJECTS = MUSEE_MUSIQUE_ECG_2_OBJECTS;
+function getMusique2EcgObjectsForParcours(p){ const m=TIER_ORDER[p]||1; return MUSEE_MUSIQUE_2_ECG_OBJECTS.filter(o=>TIER_ORDER[o.tier]<=m); }
+window.MUSEE_MUSIQUE_2_ECG_OBJECTS = MUSEE_MUSIQUE_2_ECG_OBJECTS;
 window.getMusique2EcgObjectsForParcours = getMusique2EcgObjectsForParcours;

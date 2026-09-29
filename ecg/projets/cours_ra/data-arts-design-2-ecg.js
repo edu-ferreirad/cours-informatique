@@ -1,32 +1,36 @@
-// SALLE OSP OSP ARTS ET DESIGN — 2e année — paliers court/moyen/long
+// SALLE OSP ARTS ET DESIGN — 2e année — le texte s'adresse à l'élève, étape par étape
 const DESK_H = 0.6, WALL_H = 1.4, SHELF_H = 1.1;
-const MUSEE_ARTS_DESIGN_ECG_2_OBJECTS = [
-  { id:"objet_du_quotidien_redessine", tier:"court", emoji:"🪑", label:"Séquence atelier : redessiner un objet banal",
-    text:"Chaque élève apporte un objet du quotidien (chaise, lampe, tasse) et doit en produire trois versions redessinées : une version épurée à l'extrême, une version exagérée, une version détournée de sa fonction d'origine — trois façons de questionner la forme avant de penser au style.",
-    fact:"Travailler sur un objet banal plutôt que sur un sujet \"noble\" enlève la pression de bien faire et laisse l'élève se concentrer uniquement sur la construction plastique — la forme, avant l'idée.",
+const MUSEE_ARTS_DESIGN_2_ECG_OBJECTS = [
+  { id:"arts_design_2_1", tier:"court", emoji:"📷", label:"Étape 1 — Cadre la même scène de trois façons",
+    text:"Photographie ou dessine un même petit espace (un coin de la classe) en variant seulement le cadrage : de très près, de loin, en hauteur. Compare l'effet produit par chaque cadrage.",
+    fact:"Le cadrage seul change complètement ce qu'une image raconte, sans changer le sujet lui-même.",
     anchor:{distance:2.0,angle:20,height:SHELF_H} },
-  { id:"affiche_message_en_30_min", tier:"court", emoji:"📢", label:"Atelier communication visuelle : une affiche en 30 minutes",
-    text:"À partir d'un message donné (\"économiser l'eau\", \"venir voter\"), chaque élève doit produire une affiche lisible et compréhensible en moins de trois secondes de regard — contrainte de temps volontairement serrée pour forcer des choix visuels rapides et tranchés plutôt que trop réfléchis.",
-    fact:"La contrainte des \"trois secondes\" reproduit une réalité du métier : dans la rue, personne ne s'arrête longtemps devant une affiche — le message doit passer avant même une lecture complète.",
-    anchor:{distance:1.4,angle:160,height:DESK_H} },
-  { id:"trente_vignettes_rapides", tier:"moyen", emoji:"✏️", label:"Atelier dessin-graphisme : trente vignettes en une heure",
-    text:"Consigne unique : remplir une planche de trente petites vignettes représentant la même idée (un personnage, un objet) sous trente angles ou styles différents — l'objectif n'est jamais la qualité de chaque case, mais la quantité, pour désinhiber le trait.",
-    fact:"Cette méthode de production massive et rapide, courante dans les écoles de design, casse le réflexe du perfectionnisme sur un seul dessin et révèle souvent les meilleures idées dans les dix dernières vignettes, une fois l'autocensure épuisée.",
+  { id:"arts_design_2_2", tier:"court", emoji:"🔤", label:"Étape 2 — Choisis une typographie pour un message",
+    text:"Écris le mot « urgent » avec trois polices de caractères très différentes et explique laquelle correspond le mieux au sens du mot, et pourquoi.",
+    fact:"Une typographie porte un message avant même d'être lue, c'est ce qu'étudie la communication visuelle.",
+    anchor:{distance:3.4,angle:95,height:DESK_H} },
+  { id:"arts_design_2_3", tier:"court", emoji:"🧱", label:"Étape 3 — Construis en volume avec une contrainte",
+    text:"Avec seulement du papier et de la colle, construis une petite structure qui doit tenir debout seule, sans base large. Note combien d'essais tu as dû faire.",
+    fact:"Travailler en trois dimensions révèle des contraintes physiques que le dessin à plat ne montre jamais.",
     anchor:{distance:2.6,angle:300,height:SHELF_H} },
-  { id:"jury_blanc_avant_tpc", tier:"moyen", emoji:"🗣️", label:"Préparation TPC : le jury blanc",
-    text:"Avant la vraie soutenance du travail personnel de certificat, chaque élève présente son projet artistique en cinq minutes devant deux camarades jouant le rôle de jury, qui doivent poser au moins trois questions critiques — un entraînement à encaisser la critique avant l'épreuve réelle.",
-    fact:"S'entraîner devant des pairs plutôt que devant l'enseignant change la dynamique : les questions de camarades sont souvent plus directes, ce qui prépare mieux à l'imprévisibilité d'un vrai jury.",
+  { id:"arts_design_2_4", tier:"moyen", emoji:"🖥️", label:"Étape 4 — Analyse une interface numérique",
+    text:"Observe l'écran d'accueil d'une application que tu utilises et repère trois choix de design (couleurs, boutons, hiérarchie de l'information) qui la rendent facile ou difficile à utiliser.",
+    fact:"Le design numérique suit les mêmes principes visuels que l'affiche ou la peinture, appliqués à un écran.",
+    anchor:{distance:5.2,angle:40,height:DESK_H} },
+  { id:"arts_design_2_5", tier:"moyen", emoji:"🎭", label:"Étape 5 — Conçois un décor miniature",
+    text:"Conçois en miniature (boîte à chaussures) le décor d'une scène de ton choix, en pensant à l'ambiance que tu veux créer par les couleurs et les objets choisis.",
+    fact:"Concevoir un espace, même miniature, relie les arts visuels à la scénographie et au théâtre.",
     anchor:{distance:1.8,angle:210,height:DESK_H} },
-  { id:"pastiche_puis_rupture", tier:"long", emoji:"🔄", label:"Séquence longue : pasticher puis rompre",
-    text:"Sur trois semaines : d'abord copier fidèlement le style d'un artiste étudié en histoire de l'art (pastiche), puis produire une œuvre personnelle qui s'en éloigne volontairement sur un point précis (couleur, échelle, sujet) — apprendre à s'affranchir d'un modèle qu'on maîtrise déjà.",
-    fact:"Cette méthode du pastiche suivi de la rupture est une pratique ancienne dans la formation des peintres : de nombreux grands artistes ont commencé par copier leurs maîtres avant de trouver leur propre voix.",
-    anchor:{distance:6.0,angle:70,height:SHELF_H} },
-  { id:"enquete_metier_stage_prepa", tier:"long", emoji:"🔍", label:"Avant le stage : enquête métier",
-    text:"En amont du stage pratique obligatoire, chaque élève prépare cinq questions précises à poser à un designer ou artiste professionnel rencontré (rémunération réelle, part de temps administratif, plus grande difficulté du métier) — préparer le stage comme une vraie enquête, pas une simple observation passive.",
-    fact:"Les stagiaires qui arrivent avec des questions précises obtiennent presque toujours des réponses plus honnêtes et plus utiles que ceux qui se contentent d'observer sans jamais interroger le professionnel qui les accueille.",
-    anchor:{distance:4.4,angle:185,height:DESK_H} },
+  { id:"arts_design_2_6", tier:"long", emoji:"🖼️", label:"Étape 6 — Élabore ton mini-projet en trois étapes",
+    text:"Choisis un thème personnel et développe un projet en trois étapes visibles : croquis d'intention, essai de matière ou couleur, version presque finale. Garde une trace de chaque étape.",
+    fact:"Garder une trace de chaque étape d'un projet permet, à la fin, d'expliquer un vrai cheminement plutôt qu'un résultat sorti de nulle part.",
+    anchor:{distance:4.6,angle:250,height:WALL_H} },
+  { id:"arts_design_2_7", tier:"long", emoji:"🗣️", label:"Étape 7 — Présente ton cheminement, pas seulement le résultat",
+    text:"Présente à la classe les trois étapes de ton projet de l'étape 6 en expliquant ce qui a changé entre chacune et pourquoi.",
+    fact:"Un jury d'art évalue autant le cheminement que le résultat final ; s'entraîner à l'expliquer prépare à ce regard.",
+    anchor:{distance:3.9,angle:130,height:DESK_H} },
 ];
 const TIER_ORDER = { court:1, moyen:2, long:3 };
-function getArtsDesign2EcgObjectsForParcours(p){ const m=TIER_ORDER[p]||1; return MUSEE_ARTS_DESIGN_ECG_2_OBJECTS.filter(o=>TIER_ORDER[o.tier]<=m); }
-window.MUSEE_ARTS_DESIGN_ECG_2_OBJECTS = MUSEE_ARTS_DESIGN_ECG_2_OBJECTS;
+function getArtsDesign2EcgObjectsForParcours(p){ const m=TIER_ORDER[p]||1; return MUSEE_ARTS_DESIGN_2_ECG_OBJECTS.filter(o=>TIER_ORDER[o.tier]<=m); }
+window.MUSEE_ARTS_DESIGN_2_ECG_OBJECTS = MUSEE_ARTS_DESIGN_2_ECG_OBJECTS;
 window.getArtsDesign2EcgObjectsForParcours = getArtsDesign2EcgObjectsForParcours;

@@ -1,32 +1,36 @@
-// SALLE OSP OSP MUSIQUE — 3e année — paliers court/moyen/long
+// SALLE OSP MUSIQUE — 3e année — le texte s'adresse à l'élève, étape par étape
 const DESK_H = 0.6, WALL_H = 1.4, SHELF_H = 1.1;
-const MUSEE_MUSIQUE_ECG_3_OBJECTS = [
-  { id:"deux_versions_meme_air", tier:"court", emoji:"📜", label:"Histoire de la musique : deux versions, un même air",
-    text:"On fait écouter deux interprétations très différentes d'un même thème (une version baroque, une version jazz) et les élèves doivent lister par écrit tout ce qui change : tempo, instrumentation, ornementation — avant de deviner l'époque de chaque version sans indice donné.",
-    fact:"Deviner l'époque à l'oreille, sans notation ni date, oblige l'élève à s'appuyer sur des indices sonores réels plutôt que sur une connaissance livresque apprise par cœur.",
+const MUSEE_MUSIQUE_3_ECG_OBJECTS = [
+  { id:"musique_3_1", tier:"court", emoji:"🎻", label:"Étape 1 — Improvise sur une contrainte simple",
+    text:"Sur ton instrument ou avec ta voix, improvise huit temps en respectant une seule contrainte donnée (une gamme, trois notes imposées). Recommence trois fois en changeant la contrainte.",
+    fact:"Improviser sur une contrainte simple, plutôt que sans limite, aide à démarrer sans peur de la page blanche.",
+    anchor:{distance:2.0,angle:20,height:SHELF_H} },
+  { id:"musique_3_2", tier:"court", emoji:"🎼", label:"Étape 2 — Écris une courte mélodie",
+    text:"Compose une mélodie de quatre mesures sur un rythme donné, en utilisant les bases d'écriture vues en classe, puis fais-la jouer ou chanter par un camarade.",
+    fact:"Faire jouer sa mélodie par quelqu'un d'autre révèle immédiatement si l'écriture était vraiment claire.",
     anchor:{distance:3.4,angle:95,height:DESK_H} },
-  { id:"remix_studio_numerique", tier:"court", emoji:"💻", label:"Atelier numérique : remixer un extrait",
-    text:"À partir d'un même court extrait audio fourni à toute la classe, chaque élève doit produire, sur un logiciel simple, trois versions remixées aux ambiances totalement différentes (mélancolique, festive, inquiétante) en modifiant uniquement tempo, effets et instrumentation.",
-    fact:"Travailler à partir d'une matière identique pour tous permet ensuite une comparaison directe en classe : les mêmes notes de départ peuvent raconter des histoires émotionnelles opposées selon les choix de production.",
-    anchor:{distance:4.6,angle:250,height:WALL_H} },
-  { id:"concert_commente_classe", tier:"moyen", emoji:"🎤", label:"Répétition publique : le concert commenté",
-    text:"En fin de trimestre, l'atelier se termine par un mini-concert où chaque interprète doit, avant de jouer, présenter en trente secondes son morceau à un public de camarades d'autres classes — s'entraîner à parler de musique aussi bien qu'à la jouer.",
-    fact:"Présenter oralement son morceau avant de jouer change souvent l'écoute du public : une anecdote ou une explication du contexte de composition rend l'auditeur plus attentif à des détails qu'il aurait sinon manqués.",
+  { id:"musique_3_3", tier:"court", emoji:"🌍", label:"Étape 3 — Compare deux traditions musicales",
+    text:"Écoute un extrait occidental et un extrait d'une autre tradition musicale du monde sur un thème proche (une fête, un deuil) et note deux différences de structure ou de gamme.",
+    fact:"Comparer deux traditions musicales élargit ce qu'on considère comme « normal » en musique.",
+    anchor:{distance:2.6,angle:300,height:SHELF_H} },
+  { id:"musique_3_4", tier:"moyen", emoji:"🎹", label:"Étape 4 — Approfondis ton improvisation",
+    text:"Reprends l'improvisation de l'étape 1 et développe-la sur seize temps cette fois, en gardant une cohérence avec ton idée de départ.",
+    fact:"Développer une idée musicale dans la durée est plus exigeant que la trouver une première fois.",
     anchor:{distance:5.2,angle:40,height:DESK_H} },
-  { id:"simulation_concours_ms", tier:"moyen", emoji:"🏆", label:"Préparer le concours : simulation d'audition",
-    text:"À l'approche du concours d'admission à la maturité spécialisée musique, chaque élève joue son morceau de présentation devant la classe entière dans les conditions exactes de l'audition réelle (temps limité, jury silencieux, pas de deuxième essai) — désamorcer le stress avant le jour J.",
-    fact:"Rejouer plusieurs fois dans des conditions strictement identiques à l'épreuve réelle (même minutage, même silence du public) diminue mesurablement le trac le jour de la vraie audition, un principe bien documenté en préparation aux examens artistiques.",
+  { id:"musique_3_5", tier:"moyen", emoji:"🎧", label:"Étape 5 — Analyse une œuvre en détail",
+    text:"Écoute une œuvre étudiée en classe trois fois avec trois angles différents (mélodie, rythme, structure d'ensemble) et rédige un court commentaire structuré.",
+    fact:"Analyser une œuvre sous plusieurs angles successifs donne une compréhension plus complète qu'une seule écoute globale.",
+    anchor:{distance:1.8,angle:210,height:DESK_H} },
+  { id:"musique_3_6", tier:"long", emoji:"🎭", label:"Étape 6 — Prépare ton projet musical final",
+    text:"En petit groupe, prépare une courte production originale (interprétation ou composition) en combinant ce que tu as travaillé : improvisation, écriture, éventuellement une inspiration d'une autre tradition musicale.",
+    fact:"Combiner plusieurs compétences travaillées séparément dans un seul projet est l'aboutissement logique d'une année d'option.",
+    anchor:{distance:4.6,angle:250,height:WALL_H} },
+  { id:"musique_3_7", tier:"long", emoji:"🎤", label:"Étape 7 — Présente ton projet et explique tes choix",
+    text:"Présente ta production finale à la classe et explique en deux phrases un choix artistique précis que tu as fait et pourquoi.",
+    fact:"Expliquer un choix artistique précis, plutôt que de dire « ça sonnait bien », montre une vraie réflexion musicale.",
     anchor:{distance:3.9,angle:130,height:DESK_H} },
-  { id:"visite_repetition_orchestre", tier:"long", emoji:"🎻", label:"Sortie : observer une vraie répétition d'orchestre",
-    text:"La classe assiste à une répétition (pas un concert) d'un orchestre ou ensemble professionnel, et chaque élève doit noter trois moments où le chef ou la cheffe interrompt le jeu, en essayant de comprendre pourquoi — la répétition révèle un travail invisible au concert final.",
-    fact:"Assister à une répétition plutôt qu'à un concert change complètement la perception d'une œuvre : on découvre que même des musiciens professionnels reprennent le même passage plusieurs fois avant d'obtenir le résultat attendu.",
-    anchor:{distance:2.3,angle:340,height:WALL_H} },
-  { id:"playlist_argumentee_style", tier:"long", emoji:"🎧", label:"Devoir maison : construire une playlist argumentée",
-    text:"Chaque élève constitue une playlist de dix morceaux illustrant l'évolution d'un style musical étudié en cours, avec pour chaque morceau une justification écrite de trois lignes expliquant en quoi il représente une étape précise de cette évolution.",
-    fact:"Choisir et justifier soi-même des exemples, plutôt que de recevoir une liste déjà faite par l'enseignant, transforme la connaissance stylistique en une compétence active de sélection et d'argumentation.",
-    anchor:{distance:5.7,angle:15,height:SHELF_H} },
 ];
 const TIER_ORDER = { court:1, moyen:2, long:3 };
-function getMusique3EcgObjectsForParcours(p){ const m=TIER_ORDER[p]||1; return MUSEE_MUSIQUE_ECG_3_OBJECTS.filter(o=>TIER_ORDER[o.tier]<=m); }
-window.MUSEE_MUSIQUE_ECG_3_OBJECTS = MUSEE_MUSIQUE_ECG_3_OBJECTS;
+function getMusique3EcgObjectsForParcours(p){ const m=TIER_ORDER[p]||1; return MUSEE_MUSIQUE_3_ECG_OBJECTS.filter(o=>TIER_ORDER[o.tier]<=m); }
+window.MUSEE_MUSIQUE_3_ECG_OBJECTS = MUSEE_MUSIQUE_3_ECG_OBJECTS;
 window.getMusique3EcgObjectsForParcours = getMusique3EcgObjectsForParcours;

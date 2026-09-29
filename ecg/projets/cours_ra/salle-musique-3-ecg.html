@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Musée ECG — OSP Musique — 3e année</title>
+<title>Musée ECG — Musique — 3e année</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -52,8 +52,8 @@
 
   <section class="screen active" id="screen-intro" data-screen="intro">
     <div class="screen-inner">
-      <div class="eyebrow">Musée ECG — OSP Musique</div>
-      <h1 class="display-title">OSP Musique (2e-3e) — 3e année</h1>
+      <div class="eyebrow">Musée ECG — OSP Santé</div>
+      <h1 class="display-title">Musique — 3e année</h1>
       <p class="subtitle" id="parcours-desc">Chargement du parcours…</p>
       <div class="room-object-list" id="chip-list"></div>
       <button id="btn-explore" class="btn-primary">🔎 Explorer la salle en RA</button>
@@ -70,7 +70,7 @@
 
   <section class="screen" id="screen-done" data-screen="done">
     <div class="screen-inner">
-      <div class="eyebrow">Salle OSP Musique — terminée</div>
+      <div class="eyebrow">Salle OSP Santé — terminée</div>
       <h2 class="display-title-sm">Tous les objets ont été trouvés !</h2>
       <p class="subtitle">Passez maintenant au questionnaire de la salle.</p>
       <a href="quiz-musique-3-ecg.html" id="quiz-link" class="btn-primary" style="text-decoration:none; display:inline-block;">📝 Faire le questionnaire</a>
@@ -107,7 +107,7 @@ const objects = window.getMusique3EcgObjectsForParcours(parcours);
 const objectsById = Object.fromEntries(objects.map(o => [o.id, o]));
 const found = new Set();
 
-const PARCOURS_LABEL = { court: "court (2 objets)", moyen: "moyen (4 objets)", long: "long (6 objets)" };
+const PARCOURS_LABEL = { court: "court (3 étapes, ~10 min)", moyen: "moyen (5 étapes, ~20 min)", long: "long (7 étapes, ~30 min)" };
 $("#parcours-desc").textContent =
   `Parcours ${PARCOURS_LABEL[parcours] || PARCOURS_LABEL.court} — cherchez chaque objet caché dans la salle, touchez-le pour découvrir son histoire.`;
 

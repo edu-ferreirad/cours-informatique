@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Musée ECG — Quiz OSP Communication et information</title>
+<title>Musée ECG — Quiz Communication et information — 3e année</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -27,7 +27,7 @@
 <body>
 
 <div class="quiz-wrap">
-  <div class="eyebrow" style="text-align:center;">Musée ECG — Salle OSP Communication et information</div>
+  <div class="eyebrow" style="text-align:center;">Communication et information — 3e année — Questionnaire</div>
   <h1 class="display-title-sm" style="text-align:center;">Questionnaire final</h1>
   <p class="subtitle" style="text-align:center;">Répondez à chaque question, puis validez pour voir votre corrigé.</p>
 
@@ -55,11 +55,11 @@ const $ = (sel, root=document) => root.querySelector(sel);
 const $all = (sel, root=document) => Array.from(root.querySelectorAll(sel));
 const params = new URLSearchParams(location.search);
 const parcours = params.get("parcours") || "riche";
-const QUIZ_CICOLL_ACTIVE = window.getQuizForParcours ? window.getQuizForParcours(parcours) : QUIZ_COMMUNICATION_INFO_ECG_3;
+const QUIZ_SACOLL_ACTIVE = window.getQuizForParcours ? window.getQuizForParcours(parcours) : QUIZ_SANTE_ECG_1;
 const answers = {}; // id -> {value, isQcm}
 
 const form = $("#quiz-form");
-QUIZ_CICOLL_ACTIVE.forEach((q, i) => {
+QUIZ_SACOLL_ACTIVE.forEach((q, i) => {
   const box = document.createElement("div");
   box.className = "quiz-q";
   box.dataset.id = q.id;
@@ -90,7 +90,7 @@ let checked = false;
 $("#btn-check").addEventListener("click", () => {
   checked = true;
   let score = 0;
-  QUIZ_CICOLL_ACTIVE.forEach(q => {
+  QUIZ_SACOLL_ACTIVE.forEach(q => {
     const box = $(`.quiz-q[data-id="${q.id}"]`);
     const fb = $('[data-role="feedback"]', box);
     if (q.type === "qcm") {
@@ -116,7 +116,7 @@ $("#btn-check").addEventListener("click", () => {
       answers[q.id] = { given: given || "(sans réponse)", correctText: q.answers[0], isRight };
     }
   });
-  $("#quiz-score").textContent = `Score : ${score} / ${QUIZ_CICOLL_ACTIVE.length}`;
+  $("#quiz-score").textContent = `Score : ${score} / ${QUIZ_SACOLL_ACTIVE.length}`;
   $("#result-block").classList.remove("hidden");
   $("#btn-check").disabled = true;
 });
@@ -126,12 +126,12 @@ $("#btn-pdf").addEventListener("click", () => {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   let y = 20;
   doc.setFont("helvetica", "bold"); doc.setFontSize(16);
-  doc.text("Musée ECG — Salle OSP Communication et information antique", 15, y); y += 8;
+  doc.text("Musée ECG — Salle OSP Santé antique", 15, y); y += 8;
   doc.setFontSize(11); doc.setFont("helvetica", "normal");
-  const score = QUIZ_CICOLL_ACTIVE.filter(q => answers[q.id] && answers[q.id].isRight).length;
-  doc.text(`Score : ${score} / ${QUIZ_CICOLL_ACTIVE.length}`, 15, y); y += 10;
+  const score = QUIZ_SACOLL_ACTIVE.filter(q => answers[q.id] && answers[q.id].isRight).length;
+  doc.text(`Score : ${score} / ${QUIZ_SACOLL_ACTIVE.length}`, 15, y); y += 10;
 
-  QUIZ_CICOLL_ACTIVE.forEach((q, i) => {
+  QUIZ_SACOLL_ACTIVE.forEach((q, i) => {
     const a = answers[q.id] || { given: "(sans réponse)", correctText: "?", isRight: false };
     doc.setFont("helvetica", "bold");
     const promptLines = doc.splitTextToSize(`${i+1}. ${q.prompt}`, 180);
@@ -145,7 +145,7 @@ $("#btn-pdf").addEventListener("click", () => {
     y += 10;
   });
 
-  doc.save("musee-ecg-communication-info-ecg-resultat.pdf");
+  doc.save("musee-ecg-sante-ecg-resultat.pdf");
 });
 </script>
 </body>

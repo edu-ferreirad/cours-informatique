@@ -1,32 +1,36 @@
-// SALLE OSP OSP PÉDAGOGIE — 2e année — paliers court/moyen/long
+// SALLE OSP PÉDAGOGIE — 2e année — le texte s'adresse à l'élève, étape par étape
 const DESK_H = 0.6, WALL_H = 1.4, SHELF_H = 1.1;
-const MUSEE_PEDAGOGIE_ECG_2_OBJECTS = [
-  { id:"expliquer_notion_a_un_enfant", tier:"court", emoji:"🍎", label:"Français renforcé : expliquer une notion à un enfant de 6 ans",
-    text:"Chaque élève doit réexpliquer une notion de mathématiques ou de sciences qu'il maîtrise, mais en utilisant uniquement un vocabulaire compréhensible par un enfant de six ans, sans aucun mot technique — un exercice de simplification bien plus difficile qu'il n'y paraît au premier abord.",
-    fact:"Réussir à expliquer simplement une notion complexe révèle presque toujours si on la maîtrise vraiment soi-même : dès qu'on ne peut plus se cacher derrière un vocabulaire technique, les zones d'incompréhension personnelles apparaissent immédiatement.",
+const MUSEE_PEDAGOGIE_2_ECG_OBJECTS = [
+  { id:"pedagogie_2_1", tier:"court", emoji:"👶", label:"Étape 1 — Repère une étape du développement",
+    text:"À partir d'une courte description d'un comportement d'enfant (par exemple : à deux ans il dit « non » à tout), identifie à quelle étape du développement cela correspond en cherchant dans une ressource donnée.",
+    fact:"Connaître les étapes du développement évite d'interpréter un comportement normal comme un problème.",
     anchor:{distance:2.0,angle:20,height:SHELF_H} },
-  { id:"carte_mentale_periode_histoire", tier:"court", emoji:"🗺️", label:"Histoire-géographie : la carte mentale simplifiée",
-    text:"Après avoir étudié une période historique, chaque élève doit produire une carte mentale illustrée, destinée à un jeune élève de primaire, résumant l'essentiel en cinq images-clés maximum et aucune date précise — trier l'essentiel du détail secondaire.",
-    fact:"Cet exercice de simplification radicale (cinq images maximum, aucune date) force à distinguer ce qui constitue vraiment l'essentiel d'une période historique, une compétence pédagogique aussi utile pour soi-même que pour transmettre ensuite à d'autres.",
-    anchor:{distance:1.4,angle:160,height:DESK_H} },
-  { id:"debat_autorite_philosophie", tier:"moyen", emoji:"🤔", label:"Philosophie : débattre de l'autorité juste",
-    text:"La classe débat d'un cas concret et fictif de conflit d'autorité en classe (un élève refuse une consigne) sous deux angles opposés : celui qui privilégie la règle stricte, celui qui privilégie la négociation — sans qu'aucune des deux positions ne soit présentée comme évidemment la bonne.",
-    fact:"Ce débat révèle souvent aux futurs enseignants qu'il n'existe aucune réponse unique et universelle à la question de l'autorité en classe — chaque situation réelle demande un jugement contextuel, jamais une règle appliquée mécaniquement.",
+  { id:"pedagogie_2_2", tier:"court", emoji:"📖", label:"Étape 2 — Choisis un livre pour un âge précis",
+    text:"Feuillette trois albums jeunesse différents et détermine, pour chacun, l'âge le plus adapté en justifiant par le vocabulaire, la longueur du texte et le thème.",
+    fact:"Choisir un livre adapté à l'âge est une compétence concrète, pas seulement une question de goût.",
+    anchor:{distance:3.4,angle:95,height:DESK_H} },
+  { id:"pedagogie_2_3", tier:"court", emoji:"🧩", label:"Étape 3 — Adapte une consigne pour un enfant en difficulté",
+    text:"Voici une consigne standard pour une activité. Réécris-la en la simplifiant pour un enfant qui a du mal à se concentrer longtemps, sans en changer l'objectif.",
+    fact:"Adapter une consigne sans changer l'objectif d'apprentissage est un exercice quotidien de l'enseignant.",
     anchor:{distance:2.6,angle:300,height:SHELF_H} },
-  { id:"exercice_diction_face_classe", tier:"moyen", emoji:"🗣️", label:"Techniques de communication orale : lire une histoire à voix haute",
-    text:"Chaque élève doit lire à voix haute un court conte devant la classe, en variant intentionnellement le ton, le rythme et le volume à trois moments précis du texte pour maintenir l'attention d'un public jeune — la lecture à voix haute comme véritable compétence technique à travailler.",
-    fact:"Une lecture monotone perd l'attention d'un jeune enfant en quelques minutes seulement : varier consciemment sa voix n'est donc pas un supplément décoratif, mais un outil professionnel concret pour tout futur enseignant du primaire.",
+  { id:"pedagogie_2_4", tier:"moyen", emoji:"🎭", label:"Étape 4 — Gère un petit conflit entre enfants (jeu de rôle)",
+    text:"Par trois, joue une dispute entre deux enfants (fictifs) pour un jouet, le troisième joue l'adulte qui doit calmer la situation sans juger qui a commencé. Notez ce qui a aidé.",
+    fact:"Gérer un conflit sans désigner de coupable est une compétence relationnelle essentielle en pédagogie.",
+    anchor:{distance:5.2,angle:40,height:DESK_H} },
+  { id:"pedagogie_2_5", tier:"moyen", emoji:"🗂️", label:"Étape 5 — Observe et documente un apprentissage",
+    text:"Observe (vidéo ou scène jouée) un enfant en train d'apprendre à faire quelque chose de nouveau et rédige une fiche d'observation factuelle de cinq lignes, comme le ferait un professionnel.",
+    fact:"Documenter précisément un apprentissage permet de suivre les progrès d'un enfant dans la durée.",
     anchor:{distance:1.8,angle:210,height:DESK_H} },
-  { id:"preparation_sejour_linguistique_immersion", tier:"long", emoji:"🇩🇪", label:"Vers la MS : préparer son séjour linguistique",
-    text:"En amont du séjour linguistique obligatoire de six semaines exigé pour la maturité spécialisée pédagogie, l'élève prépare un carnet d'objectifs personnels précis (vocabulaire pédagogique en allemand, observation d'une classe locale) plutôt que de partir sans but pédagogique défini.",
-    fact:"Un séjour linguistique préparé avec des objectifs pédagogiques précis, et pas seulement touristiques, permet de revenir avec un vocabulaire professionnel réellement utile pour une future carrière d'enseignant, au-delà de la simple pratique conversationnelle générale.",
-    anchor:{distance:6.0,angle:70,height:SHELF_H} },
-  { id:"simulation_reunion_parents", tier:"long", emoji:"👨‍👩‍👧", label:"Mise en situation : la réunion de parents simulée",
-    text:"Un groupe d'élèves joue le rôle de parents aux attentes contradictoires (l'un veut plus de devoirs, l'autre moins de pression scolaire) face à un élève jouant l'enseignant, qui doit gérer la discussion sans donner raison uniquement à un seul camp.",
-    fact:"Cette simulation révèle rapidement aux futurs enseignants une réalité du métier souvent sous-estimée : gérer des attentes parentales contradictoires demande une diplomatie aussi importante que la seule compétence pédagogique face aux élèves eux-mêmes.",
-    anchor:{distance:4.4,angle:185,height:DESK_H} },
+  { id:"pedagogie_2_6", tier:"long", emoji:"🏫", label:"Étape 6 — Conçois une matinée type",
+    text:"Construis le programme d'une matinée pour un groupe d'enfants (accueil, activité, collation, jeu libre) en précisant un objectif pour chaque moment, pas seulement une occupation.",
+    fact:"Une matinée bien construite alterne les types d'activités pour respecter le rythme de l'enfant.",
+    anchor:{distance:4.6,angle:250,height:WALL_H} },
+  { id:"pedagogie_2_7", tier:"long", emoji:"🎤", label:"Étape 7 — Présente ta matinée et anticipe un imprévu",
+    text:"Présente ton programme de l'étape 6 à la classe et réponds à une question sur un imprévu réaliste (un enfant pleure, il pleut) : comment adaptes-tu ton programme ?",
+    fact:"Savoir adapter un programme prévu à un imprévu est aussi important que de bien le préparer au départ.",
+    anchor:{distance:3.9,angle:130,height:DESK_H} },
 ];
 const TIER_ORDER = { court:1, moyen:2, long:3 };
-function getPedagogie2EcgObjectsForParcours(p){ const m=TIER_ORDER[p]||1; return MUSEE_PEDAGOGIE_ECG_2_OBJECTS.filter(o=>TIER_ORDER[o.tier]<=m); }
-window.MUSEE_PEDAGOGIE_ECG_2_OBJECTS = MUSEE_PEDAGOGIE_ECG_2_OBJECTS;
+function getPedagogie2EcgObjectsForParcours(p){ const m=TIER_ORDER[p]||1; return MUSEE_PEDAGOGIE_2_ECG_OBJECTS.filter(o=>TIER_ORDER[o.tier]<=m); }
+window.MUSEE_PEDAGOGIE_2_ECG_OBJECTS = MUSEE_PEDAGOGIE_2_ECG_OBJECTS;
 window.getPedagogie2EcgObjectsForParcours = getPedagogie2EcgObjectsForParcours;
