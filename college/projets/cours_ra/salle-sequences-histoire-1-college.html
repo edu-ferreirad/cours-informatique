@@ -70,7 +70,7 @@
 
   <section class="screen" id="screen-done" data-screen="done">
     <div class="screen-inner">
-      <div class="eyebrow">Histoire — 1ère année — terminée</div>
+      <div class="eyebrow">Français — 1ère année — terminée</div>
       <h2 class="display-title-sm">Tous les objets ont été trouvés !</h2>
       <p class="subtitle">Passez maintenant au questionnaire de la salle.</p>
       <a href="quiz-sequences-histoire-1-college.html" id="quiz-link" class="btn-primary" style="text-decoration:none; display:inline-block;">📝 Faire le questionnaire</a>
@@ -107,7 +107,7 @@ const objects = window.getSeqHistoire1CollegeObjectsForParcours(parcours);
 const objectsById = Object.fromEntries(objects.map(o => [o.id, o]));
 const found = new Set();
 
-const PARCOURS_LABEL = { court: "court (1 objet)", moyen: "moyen (2 objets)", long: "long (3 objets)" };
+const PARCOURS_LABEL = { court: "court (3 étapes, ~10 min)", moyen: "moyen (5 étapes, ~20 min)", long: "long (7 étapes, ~30 min)" };
 $("#parcours-desc").textContent =
   `Parcours ${PARCOURS_LABEL[parcours] || PARCOURS_LABEL.court} — cherchez chaque objet caché dans la salle, touchez-le pour découvrir son histoire.`;
 

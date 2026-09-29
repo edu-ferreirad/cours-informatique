@@ -52,7 +52,7 @@
 
   <section class="screen active" id="screen-intro" data-screen="intro">
     <div class="screen-inner">
-      <div class="eyebrow">🧭 Séquences — 4e année</div>
+      <div class="eyebrow">🧭 Séquences — 1ère année</div>
       <h1 class="display-title">Allemand — 4e année</h1>
       <p class="subtitle" id="parcours-desc">Chargement du parcours…</p>
       <div class="room-object-list" id="chip-list"></div>
@@ -70,7 +70,7 @@
 
   <section class="screen" id="screen-done" data-screen="done">
     <div class="screen-inner">
-      <div class="eyebrow">Allemand — 4e année — terminée</div>
+      <div class="eyebrow">Français — 1ère année — terminée</div>
       <h2 class="display-title-sm">Tous les objets ont été trouvés !</h2>
       <p class="subtitle">Passez maintenant au questionnaire de la salle.</p>
       <a href="quiz-sequences-allemand-4-college.html" id="quiz-link" class="btn-primary" style="text-decoration:none; display:inline-block;">📝 Faire le questionnaire</a>
@@ -107,7 +107,7 @@ const objects = window.getSeqAllemand4CollegeObjectsForParcours(parcours);
 const objectsById = Object.fromEntries(objects.map(o => [o.id, o]));
 const found = new Set();
 
-const PARCOURS_LABEL = { court: "court (1 objet)", moyen: "moyen (2 objets)", long: "long (2 objets)" };
+const PARCOURS_LABEL = { court: "court (3 étapes, ~10 min)", moyen: "moyen (5 étapes, ~20 min)", long: "long (7 étapes, ~30 min)" };
 $("#parcours-desc").textContent =
   `Parcours ${PARCOURS_LABEL[parcours] || PARCOURS_LABEL.court} — cherchez chaque objet caché dans la salle, touchez-le pour découvrir son histoire.`;
 
