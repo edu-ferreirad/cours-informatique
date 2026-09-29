@@ -1,25 +1,36 @@
-// SALLE SÉQUENCES — MATHÉMATIQUES — 3e année
-// Régénéré à partir du contenu déjà rédigé, réorganisé en paliers court/moyen/long.
-const DESK_H = 0.6, WALL_H = 1.4, SHELF_H = 1.1;
-
+// SALLE SÉQUENCES — MATHÉMATIQUES — 3e année — texte adressé à l'élève, étape par étape
+const DESK_H=0.6, WALL_H=1.4, SHELF_H=1.1;
 const MUSEE_SEQ_MATHS_3_COLLEGE_OBJECTS = [
-  { id:"ma3_derivee_sens_physique", tier:"court", emoji:"🚗", label:"Analyse : la dérivée comme vitesse instantanée",
-    text:"À partir d'un graphique de position d'une voiture en fonction du temps, les élèves calculent d'abord des vitesses moyennes sur des intervalles de plus en plus courts, jusqu'à percevoir intuitivement la notion de limite, avant que la dérivée ne soit formalisée.",
-    fact:"Le plan d'études demande explicitement de caractériser les variations d'une grandeur à l'aide du taux de variation puis de sa limite ; partir d'un exemple physique concret évite que la dérivée ne reste un symbole abstrait sans signification.",
-    anchor:{distance:4.6, angle:250, height:WALL_H} },
-  { id:"ma3_vecteurs_probleme_geometrie", tier:"moyen", emoji:"➡️", label:"Géométrie vectorielle : résoudre sans mesurer",
-    text:"Les élèves reçoivent un problème de géométrie dans l'espace (alignement, parallélisme) à résoudre uniquement par le calcul vectoriel, sans jamais mesurer ou dessiner à l'échelle — la validité de la solution doit reposer entièrement sur le raisonnement.",
-    fact:"Interdire volontairement la mesure directe force les élèves à mobiliser la notion de vecteur comme véritable outil de démonstration, et pas seulement comme une notation pour décrire un dessin déjà fait.",
-    anchor:{distance:3.9, angle:130, height:DESK_H} },
-  { id:"ma3_contre_exemple_graphique", tier:"long", emoji:"🧭", label:"Analyse : chasser le contre-exemple",
-    text:"Face à une affirmation générale sur les fonctions (« si la dérivée est positive, la fonction croît toujours »), les élèves doivent chercher un contre-exemple graphique ou, s'ils n'en trouvent pas, expliquer pourquoi l'affirmation résiste à leurs essais.",
-    fact:"Le plan d'études recommande d'exploiter les représentations graphiques pour chercher des exemples ou des contre-exemples aux résultats théoriques — un exercice qui muscle l'esprit critique autant que le calcul.",
-    anchor:{distance:2.3, angle:340, height:WALL_H} },
+  { id:"maths_3_1", tier:"court", emoji:"🚗", label:"Étape 1 — Découvre la dérivée par la vitesse",
+    text:"À partir d'un graphique de position d'une voiture, calcule des vitesses moyennes sur des intervalles de plus en plus courts. Note ce qui se passe quand l'intervalle devient très petit.",
+    fact:"Cette approche progressive te fait sentir intuitivement la notion de limite avant même que la dérivée ne soit formalisée.",
+    anchor:{distance:2.0,angle:20,height:SHELF_H} },
+  { id:"maths_3_2", tier:"court", emoji:"➡️", label:"Étape 2 — Résous sans mesurer, uniquement par le calcul",
+    text:"Face à un problème de géométrie dans l'espace, résous-le uniquement par le calcul vectoriel, sans jamais dessiner à l'échelle ni mesurer. Ta solution doit reposer entièrement sur le raisonnement.",
+    fact:"S'interdire la mesure directe t'oblige à vraiment utiliser le vecteur comme outil de démonstration.",
+    anchor:{distance:3.4,angle:95,height:DESK_H} },
+  { id:"maths_3_3", tier:"court", emoji:"🧭", label:"Étape 3 — Cherche un contre-exemple",
+    text:"Face à l'affirmation « si la dérivée est positive, la fonction croît toujours », cherche un contre-exemple graphique. Si tu n'en trouves pas, explique pourquoi l'affirmation résiste à tes essais.",
+    fact:"Chercher activement un contre-exemple muscle ton esprit critique autant que ta capacité de calcul.",
+    anchor:{distance:2.6,angle:300,height:SHELF_H} },
+  { id:"maths_3_4", tier:"moyen", emoji:"📊", label:"Étape 4 — Étudie une fonction complète, étape par étape",
+    text:"Mène une étude complète d'une fonction : domaine, dérivée, variations, courbe. Fais chaque étape avant de passer à la suivante, sans sauter.",
+    fact:"Une étude de fonction complète, faite dans l'ordre, prépare directement aux exercices d'examen de maturité.",
+    anchor:{distance:5.2,angle:40,height:DESK_H} },
+  { id:"maths_3_5", tier:"moyen", emoji:"🎯", label:"Étape 5 — Calcule l'impact d'une petite erreur",
+    text:"Prends un calcul en plusieurs étapes et introduis volontairement une petite erreur au départ. Calcule comment cette erreur se propage jusqu'au résultat final.",
+    fact:"Comprendre comment une erreur se propage t'aide à savoir où vérifier en priorité dans un calcul long.",
+    anchor:{distance:1.8,angle:210,height:DESK_H} },
+  { id:"maths_3_6", tier:"long", emoji:"📐", label:"Étape 6 — Compare deux méthodes pour le même problème",
+    text:"Résous un même problème géométrique par deux méthodes différentes (vectorielle et analytique) et compare leur longueur et leur facilité.",
+    fact:"Comparer deux méthodes sur un même problème t'aide à choisir la bonne méthode plus vite la prochaine fois.",
+    anchor:{distance:4.6,angle:250,height:WALL_H} },
+  { id:"maths_3_7", tier:"long", emoji:"🔬", label:"Étape 7 — Simule un phénomène et fais varier un paramètre",
+    text:"À l'aide d'un tableur ou d'un logiciel, simule un phénomène physique modélisé par une fonction et fais varier un seul paramètre. Note l'effet observé sur le résultat.",
+    fact:"Faire varier un seul paramètre à la fois te permet de vraiment comprendre son rôle isolé dans le modèle.",
+    anchor:{distance:3.9,angle:130,height:DESK_H} },
 ];
-function getSeqMaths3CollegeObjectsForParcours(parcours) {
-  const TIER_ORDER = { court: 1, moyen: 2, long: 3 };
-  const maxLevel = TIER_ORDER[parcours] || 1;
-  return MUSEE_SEQ_MATHS_3_COLLEGE_OBJECTS.filter(o => TIER_ORDER[o.tier] <= maxLevel);
-}
-window.MUSEE_SEQ_MATHS_3_COLLEGE_OBJECTS = MUSEE_SEQ_MATHS_3_COLLEGE_OBJECTS;
-window.getSeqMaths3CollegeObjectsForParcours = getSeqMaths3CollegeObjectsForParcours;
+const TIER_ORDER={court:1,moyen:2,long:3};
+function getSeqMaths3CollegeObjectsForParcours(p){const m=TIER_ORDER[p]||1;return MUSEE_SEQ_MATHS_3_COLLEGE_OBJECTS.filter(o=>TIER_ORDER[o.tier]<=m);}
+window.MUSEE_SEQ_MATHS_3_COLLEGE_OBJECTS=MUSEE_SEQ_MATHS_3_COLLEGE_OBJECTS;
+window.getSeqMaths3CollegeObjectsForParcours=getSeqMaths3CollegeObjectsForParcours;

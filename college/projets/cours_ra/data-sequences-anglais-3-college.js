@@ -1,25 +1,36 @@
-// SALLE SÉQUENCES — ANGLAIS — 3e année
-// Régénéré à partir du contenu déjà rédigé, réorganisé en paliers court/moyen/long.
-const DESK_H = 0.6, WALL_H = 1.4, SHELF_H = 1.1;
-
+// SALLE SÉQUENCES — ANGLAIS — 3e année — texte adressé à l'élève, étape par étape
+const DESK_H=0.6, WALL_H=1.4, SHELF_H=1.1;
 const MUSEE_SEQ_ANGLAIS_3_COLLEGE_OBJECTS = [
-  { id:"an3_explication_texte_litteraire", tier:"court", emoji:"📚", label:"Explication de texte littéraire guidée",
-    text:"Face à un court extrait d'une œuvre littéraire anglophone étudiée, les élèves doivent, en autonomie puis en groupe, repérer trois procédés stylistiques précis et expliquer leur effet sur le lecteur, avant de présenter leur analyse à l'oral.",
-    fact:"Le plan d'études mentionne explicitement expliquer un texte littéraire comme situation d'expression orale attendue en discipline fondamentale ; travailler d'abord seul puis en groupe permet à chacun de construire une première lecture personnelle avant la mise en commun.",
-    anchor:{distance:4.6, angle:250, height:WALL_H} },
-  { id:"an3_interview_reportage_fictif", tier:"moyen", emoji:"🎙️", label:"Oral : formuler une interview sur un sujet culturel",
-    text:"Par binômes, les élèves préparent puis jouent une interview fictive entre un journaliste et une personnalité liée à un sujet culturel ou socio-économique d'un pays anglophone, en s'appuyant sur des faits vérifiés dans une brève recherche préalable.",
-    fact:"Le plan d'études cite précisément formuler une interview parmi les situations orales attendues dès la 3e année ; adosser l'exercice à une recherche documentaire réelle évite que l'interview ne reste un jeu de rôle sans contenu.",
-    anchor:{distance:3.9, angle:130, height:DESK_H} },
-  { id:"an3_commentaire_texte_actualite", tier:"long", emoji:"🗞️", label:"Écriture : commenter un texte d'actualité anglophone",
-    text:"À partir d'un article de presse anglophone récent, les élèves rédigent un commentaire structuré exprimant et justifiant un point de vue personnel, avec une exigence explicite de nuancer leur position par au moins un contre-argument.",
-    fact:"Exiger un contre-argument dans un texte qui exprime pourtant une opinion personnelle pousse les élèves vers la nuance attendue en discipline fondamentale, plutôt que vers une prise de position à sens unique plus facile à rédiger.",
-    anchor:{distance:2.3, angle:340, height:WALL_H} },
+  { id:"anglais_3_1", tier:"court", emoji:"📚", label:"Étape 1 — Explique un texte littéraire",
+    text:"Face à un court extrait d'une œuvre anglophone étudiée, repère en autonomie trois procédés stylistiques et explique leur effet sur le lecteur, avant de présenter ton analyse à l'oral.",
+    fact:"Travailler seul avant la mise en commun te permet de construire ta propre lecture avant de la confronter à celle des autres.",
+    anchor:{distance:2.0,angle:20,height:SHELF_H} },
+  { id:"anglais_3_2", tier:"court", emoji:"🎙️", label:"Étape 2 — Formule une interview culturelle",
+    text:"Avec un camarade, prépare puis joue une interview fictive entre un journaliste et une personnalité liée à un sujet culturel anglophone, après une brève recherche préalable de faits réels.",
+    fact:"Adosser l'interview à une vraie recherche documentaire évite qu'elle ne reste un jeu de rôle sans contenu réel.",
+    anchor:{distance:3.4,angle:95,height:DESK_H} },
+  { id:"anglais_3_3", tier:"court", emoji:"🗞️", label:"Étape 3 — Commente un texte d'actualité",
+    text:"À partir d'un article de presse anglophone récent, rédige un commentaire structuré exprimant et justifiant ton avis, avec au moins un contre-argument pour nuancer ta position.",
+    fact:"Exiger un contre-argument dans un texte d'opinion te pousse vers la nuance, plutôt que vers une position à sens unique.",
+    anchor:{distance:2.6,angle:300,height:SHELF_H} },
+  { id:"anglais_3_4", tier:"moyen", emoji:"🎧", label:"Étape 4 — Écoute active à plusieurs niveaux",
+    text:"Écoute un document sonore trois fois avec trois consignes différentes à chaque fois (informations générales, détails précis, ton de l'orateur).",
+    fact:"Changer de consigne à chaque écoute développe une compréhension orale plus fine qu'une écoute unique et globale.",
+    anchor:{distance:5.2,angle:40,height:DESK_H} },
+  { id:"anglais_3_5", tier:"moyen", emoji:"✍️", label:"Étape 5 — Rédige un texte argumentatif structuré",
+    text:"Rédige un texte argumentatif de deux paragraphes sur un sujet culturel, avec une thèse claire dès la première phrase et un exemple précis pour chaque argument.",
+    fact:"Annoncer sa thèse dès la première phrase, à l'anglo-saxonne, est une structure que tu retrouveras dans tes études futures.",
+    anchor:{distance:1.8,angle:210,height:DESK_H} },
+  { id:"anglais_3_6", tier:"long", emoji:"🎤", label:"Étape 6 — Prépare un exposé sur un sujet culturel",
+    text:"Choisis un sujet culturel anglophone et prépare un exposé de trois minutes avec un support visuel simple, en t'appuyant sur au moins deux sources fiables.",
+    fact:"Combiner recherche documentaire et expression orale prépare directement aux exigences de 4e année.",
+    anchor:{distance:4.6,angle:250,height:WALL_H} },
+  { id:"anglais_3_7", tier:"long", emoji:"🔍", label:"Étape 7 — Vérifie et présente ton exposé",
+    text:"Présente ton exposé de l'étape 6 à la classe, puis réponds à deux questions improvisées de tes camarades sur ton sujet.",
+    fact:"Répondre à des questions improvisées, pas seulement réciter, montre que tu maîtrises vraiment ton sujet.",
+    anchor:{distance:3.9,angle:130,height:DESK_H} },
 ];
-function getSeqAnglais3CollegeObjectsForParcours(parcours) {
-  const TIER_ORDER = { court: 1, moyen: 2, long: 3 };
-  const maxLevel = TIER_ORDER[parcours] || 1;
-  return MUSEE_SEQ_ANGLAIS_3_COLLEGE_OBJECTS.filter(o => TIER_ORDER[o.tier] <= maxLevel);
-}
-window.MUSEE_SEQ_ANGLAIS_3_COLLEGE_OBJECTS = MUSEE_SEQ_ANGLAIS_3_COLLEGE_OBJECTS;
-window.getSeqAnglais3CollegeObjectsForParcours = getSeqAnglais3CollegeObjectsForParcours;
+const TIER_ORDER={court:1,moyen:2,long:3};
+function getSeqAnglais3CollegeObjectsForParcours(p){const m=TIER_ORDER[p]||1;return MUSEE_SEQ_ANGLAIS_3_COLLEGE_OBJECTS.filter(o=>TIER_ORDER[o.tier]<=m);}
+window.MUSEE_SEQ_ANGLAIS_3_COLLEGE_OBJECTS=MUSEE_SEQ_ANGLAIS_3_COLLEGE_OBJECTS;
+window.getSeqAnglais3CollegeObjectsForParcours=getSeqAnglais3CollegeObjectsForParcours;

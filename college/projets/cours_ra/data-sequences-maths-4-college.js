@@ -1,25 +1,36 @@
-// SALLE SÉQUENCES — MATHÉMATIQUES — 4e année
-// Régénéré à partir du contenu déjà rédigé, réorganisé en paliers court/moyen/long.
-const DESK_H = 0.6, WALL_H = 1.4, SHELF_H = 1.1;
-
+// SALLE SÉQUENCES — MATHÉMATIQUES — 4e année — texte adressé à l'élève, étape par étape
+const DESK_H=0.6, WALL_H=1.4, SHELF_H=1.1;
 const MUSEE_SEQ_MATHS_4_COLLEGE_OBJECTS = [
-  { id:"ma4_probabilite_modele_reel", tier:"court", emoji:"🎲", label:"Probabilités : choisir le bon modèle",
-    text:"Face à une situation aléatoire réelle décrite en une phrase (file d'attente, contrôle qualité), les élèves doivent d'abord identifier quel modèle probabiliste simple s'applique avant même de commencer le moindre calcul.",
-    fact:"Le plan d'études met l'accent sur la capacité à identifier une situation aléatoire pour la relier à un modèle probabiliste simple — une compétence de reconnaissance souvent négligée au profit du seul calcul une fois le modèle déjà donné.",
-    anchor:{distance:6.0, angle:70, height:SHELF_H} },
-  { id:"ma4_etude_fonction_complete", tier:"moyen", emoji:"📊", label:"Analyse : l'étude complète, de A à Z",
-    text:"En temps limité et sans correction intermédiaire, les élèves mènent seuls une étude complète d'une fonction (domaine, dérivée, variations, courbe) puis comparent leur courbe finale à celle d'un camarade avant la correction commune.",
-    fact:"Enchaîner toutes les étapes d'une étude de fonction sans étayage intermédiaire reproduit fidèlement les conditions de l'examen de maturité, où aucune aide progressive n'est fournie entre les différentes parties d'un exercice.",
-    anchor:{distance:5.7, angle:15, height:SHELF_H} },
-  { id:"ma4_atelier_erreurs_frequentes", tier:"long", emoji:"❌", label:"Révisions maturité : l'atelier des erreurs classiques",
-    text:"L'enseignant présente une copie fictive contenant plusieurs erreurs typiques accumulées au fil des quatre années (signe oublié, confusion de dérivée, mauvaise lecture d'un graphique) ; les élèves doivent les repérer et rédiger la correction exacte.",
-    fact:"Revoir des erreurs caractéristiques accumulées sur quatre ans, plutôt que de refaire uniquement des exercices neufs, cible directement les pièges qui reviennent le plus souvent le jour de l'examen final.",
-    anchor:{distance:4.4, angle:185, height:DESK_H} },
+  { id:"maths_4_1", tier:"court", emoji:"🎲", label:"Étape 1 — Identifie le bon modèle avant de calculer",
+    text:"Face à une situation aléatoire décrite en une phrase (file d'attente, contrôle qualité), identifie d'abord quel modèle probabiliste s'applique, avant même de commencer le moindre calcul.",
+    fact:"Se tromper de modèle rend tout calcul suivant inutile, même s'il est fait parfaitement bien.",
+    anchor:{distance:2.0,angle:20,height:SHELF_H} },
+  { id:"maths_4_2", tier:"court", emoji:"📊", label:"Étape 2 — Mène une étude de fonction sans aide intermédiaire",
+    text:"En temps limité et sans correction intermédiaire, mène seul une étude complète d'une fonction. Compare ta courbe finale à celle d'un camarade avant la correction commune.",
+    fact:"Cette absence d'aide intermédiaire reproduit fidèlement les conditions réelles de l'examen de maturité.",
+    anchor:{distance:3.4,angle:95,height:DESK_H} },
+  { id:"maths_4_3", tier:"court", emoji:"❌", label:"Étape 3 — Repère les erreurs classiques dans une copie fictive",
+    text:"Ton enseignant te donne une copie fictive contenant des erreurs typiques (signe oublié, mauvaise lecture de graphique). Repère-les et rédige la correction exacte pour chacune.",
+    fact:"Revoir des erreurs caractéristiques cible directement les pièges qui reviennent le plus souvent le jour de l'examen.",
+    anchor:{distance:2.6,angle:300,height:SHELF_H} },
+  { id:"maths_4_4", tier:"moyen", emoji:"🧮", label:"Étape 4 — Résous un problème de probabilités en contexte réel",
+    text:"Choisis une situation réelle simple (tirage, sondage) et calcule une probabilité en expliquant clairement chaque étape de ton raisonnement, pas seulement le résultat final.",
+    fact:"Expliquer chaque étape, pas seulement donner le résultat, est ce que les correcteurs cherchent vraiment à l'examen.",
+    anchor:{distance:5.2,angle:40,height:DESK_H} },
+  { id:"maths_4_5", tier:"moyen", emoji:"📈", label:"Étape 5 — Compare données réelles et prédiction théorique",
+    text:"Effectue cent tirages aléatoires (dé, pièce) et compare les fréquences observées aux probabilités théoriques. Explique les écarts observés.",
+    fact:"Comparer l'expérience à la théorie prépare à l'idée de convergence vers la probabilité théorique sur un grand nombre d'essais.",
+    anchor:{distance:1.8,angle:210,height:DESK_H} },
+  { id:"maths_4_6", tier:"long", emoji:"🗂️", label:"Étape 6 — Prépare ta fiche de révision personnelle",
+    text:"Reprends tes quatre années de mathématiques et prépare une fiche d'une page listant les cinq techniques que tu maîtrises le moins bien, avec un exemple corrigé pour chacune.",
+    fact:"Une fiche construite à partir de tes propres faiblesses est bien plus efficace qu'une fiche générique de révision.",
+    anchor:{distance:4.6,angle:250,height:WALL_H} },
+  { id:"maths_4_7", tier:"long", emoji:"⏱️", label:"Étape 7 — Passe un examen blanc en conditions réelles",
+    text:"Passe un examen blanc de mathématiques dans les conditions réelles de l'examen (temps, matériel autorisé). Corrige-toi ensuite avec le corrigé officiel et note tes trois erreurs principales.",
+    fact:"S'entraîner en conditions réelles, avec une vraie correction après coup, est la meilleure préparation possible à l'examen final.",
+    anchor:{distance:3.9,angle:130,height:DESK_H} },
 ];
-function getSeqMaths4CollegeObjectsForParcours(parcours) {
-  const TIER_ORDER = { court: 1, moyen: 2, long: 3 };
-  const maxLevel = TIER_ORDER[parcours] || 1;
-  return MUSEE_SEQ_MATHS_4_COLLEGE_OBJECTS.filter(o => TIER_ORDER[o.tier] <= maxLevel);
-}
-window.MUSEE_SEQ_MATHS_4_COLLEGE_OBJECTS = MUSEE_SEQ_MATHS_4_COLLEGE_OBJECTS;
-window.getSeqMaths4CollegeObjectsForParcours = getSeqMaths4CollegeObjectsForParcours;
+const TIER_ORDER={court:1,moyen:2,long:3};
+function getSeqMaths4CollegeObjectsForParcours(p){const m=TIER_ORDER[p]||1;return MUSEE_SEQ_MATHS_4_COLLEGE_OBJECTS.filter(o=>TIER_ORDER[o.tier]<=m);}
+window.MUSEE_SEQ_MATHS_4_COLLEGE_OBJECTS=MUSEE_SEQ_MATHS_4_COLLEGE_OBJECTS;
+window.getSeqMaths4CollegeObjectsForParcours=getSeqMaths4CollegeObjectsForParcours;
