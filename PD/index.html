@@ -13,7 +13,7 @@
             margin: 0;
             overflow-x: hidden;
         }
-        /* Canvas pour la pluie Matrix orange */
+
         canvas {
             position: fixed;
             top: 0;
@@ -81,7 +81,6 @@
             box-shadow: 0 0 20px #ffffff, 0 0 30px #ff5500;
         }
 
-        /* Nouveaux styles pour les PDF adaptés au thème orange */
         .cours-card {
             background: rgba(25, 12, 0, 0.9);
             border: 1px solid #ff5500;
@@ -131,7 +130,7 @@
             text-shadow: 0 0 8px #ff69b4;
             text-decoration: underline;
         }
-    
+
         .docs { display: grid; gap: 12px; margin-top: 25px; }
         .doc { display: flex; gap: 14px; align-items: center; padding: 14px 16px; background: rgba(25,12,0,.9);
                border: 1px solid #ff5500; border-radius: 8px; box-shadow: 0 0 12px rgba(255,85,0,.2); }
@@ -144,9 +143,9 @@
     <canvas id="matrix"></canvas>
 
     <div class="container">
-        
+
         <h1>// Jeux de rôles</h1>
-        
+
         <div class="btn-container">
             <a href="Debut_enfant.html" class="btn-jdr">▶ Version Enfant</a>
             <a href="Debut_parent.html" class="btn-jdr">▶ Version Parent</a>
@@ -185,7 +184,6 @@
         window.addEventListener('resize', resizeCanvas);
 
         const characters = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ<>/\\{}[]*&é"\'(-)=+';
-
 
         function drawMatrix() {
             ctx.fillStyle = 'rgba(9, 5, 0, 0.08)';

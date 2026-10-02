@@ -4,7 +4,6 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Protection des données</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 <style>
 * {
     box-sizing: border-box;
@@ -67,7 +66,6 @@ body {
     right: 0;
 }
 
-/* Bouton pour ouvrir la pop-up des consignes */
 .info-btn {
     position: fixed;
     top: 20px;
@@ -95,7 +93,6 @@ body {
     transform: scale(1.1);
 }
 
-/* Lien discret en bas à droite (Sources & Création) */
 .credits-link {
     position: fixed;
     bottom: 15px;
@@ -112,7 +109,6 @@ body {
     text-decoration: underline;
 }
 
-/* Styles de la Pop-up (Modale) */
 .modal {
     display: none;
     position: fixed;
@@ -167,22 +163,21 @@ body {
 @media (max-aspect-ratio: 1/1) {
   body { background-size: cover; background-position: 80% 50%; }
 }
+.animate__animated{animation-duration:1s;animation-fill-mode:both}
+.animate__pulse{animation-name:pdPulse;animation-timing-function:ease-in-out}
+.animate__infinite{animation-iteration-count:infinite}
+@keyframes pdPulse{from{transform:scale3d(1,1,1)}50%{transform:scale3d(1.05,1.05,1.05)}to{transform:scale3d(1,1,1)}}
 </style>
-<script src="title-scroll.js" data-start="5000" data-speed="250"></script>
 </head>
 
 <body>
 
-    <!-- Bouton pour afficher les consignes -->
     <button class="info-btn" onclick="openModal('introModal')" title="Consignes du jeu">?</button>
 
-    <!-- Bouton principal du jeu -->
     <a href="jeu_enfant/jeu.html" class="button animate__animated animate__pulse animate__infinite"><span>Jouer</span></a>
 
-    <!-- Lien discret en bas à droite pour les sources et créations -->
     <a href="javascript:void(0);" class="credits-link" onclick="openModal('creditsModal')">Sources & Création</a>
 
-    <!-- Pop-up des consignes (texte de l'image) -->
     <div id="introModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('introModal')">&times;</span>
@@ -196,7 +191,6 @@ body {
         </div>
     </div>
 
-    <!-- Pop-up Sources & Création -->
     <div id="creditsModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('creditsModal')">&times;</span>
@@ -220,14 +214,12 @@ body {
             document.getElementById(modalId).style.display = "none";
         }
 
-        // Fermer la modale si on clique en dehors de la boîte de contenu
         window.onclick = function(event) {
             if (event.target.classList.contains('modal')) {
                 event.target.style.display = "none";
             }
         }
 
-        // Ouvrir automatiquement la modale des consignes dès le chargement de la page
         window.onload = function() {
             openModal('introModal');
         }
