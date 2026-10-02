@@ -1,0 +1,111 @@
+/* Scénarios du jeu "Protection des données" — Créé par David Ferreira (CO Drize / SEM Lab)
+   Pour modifier un texte ou un choix, il suffit d'éditer ce fichier. */
+window.CONFIG = {
+  BROCHURE: "../Brochure conseils avec sources-VF4neutre.pdf",
+  CREDITS: "Idée et création : David Ferreira (CO Drize / SEM Lab) · Optimisé par Claude (IA)"
+};
+
+window.GAMES = {
+
+enfant: {
+  home: "../Debut_enfant.html", index: "../index.html", other: ["../Debut_parent.html", "Jouer la version Parent"],
+  stats: { conf: ["🤝", "Confiance", 60], data: ["🔒", "Données protégées", 70], calme: ["😌", "Calme", 60] },
+  start: "s1",
+  discuss: ["À quel moment aurais-tu pu en parler à tes parents ?",
+            "Quelles règles te semblent justes pour ton smartphone ? Lesquelles ne le sont pas ?",
+            "Que pourraient faire tes parents pour que tu te confies plus facilement ?"],
+  scenes: {
+    s1: { img: "maison1", fx: 58, sp: 50,
+      text: "Tu viens de recevoir ton smartphone, mais tu n'as pas accès à internet. Toi, tu veux la connexion pour t'inscrire sur les réseaux. Tu décides de demander un abonnement 5G à tes parents.",
+      q: "Leur donnes-tu les vraies raisons ?",
+      a: [{ l: "Oui, je dis la vérité", log: "Tu as été honnête sur tes raisons", good: 1, next: "s2", fx: { conf: 10 } },
+          { l: "Non, je garde mes raisons", log: "Tu as caché tes vraies raisons", next: "M1", fx: { conf: -30 } }] },
+    s2: { img: "chambre", fx: 72, sp: 26,
+      text: "Une fois l'abonnement conclu, tu t'inscris sur les réseaux et tu suis tes copains. L'un d'eux te conseille de créer un autre compte « où rien ne se passe », pour être tranquille avec tes parents.",
+      q: "Suis-tu le conseil de ton ami ?",
+      a: [{ l: "Oui, je crée un compte caché", log: "Tu as créé un compte caché", next: "M2", fx: { conf: -20, data: -15 } },
+          { l: "Non, je garde un seul compte", log: "Tu as refusé le compte caché", good: 1, next: "s3", fx: { data: 10 } }] },
+    s3: { img: "maison2", fx: 50, sp: 62,
+      text: "Après des semaines d'utilisation, les notifications deviennent très nombreuses. Tes parents décident, dans la hâte, de mettre un contrôle parental. Énervé, tu scannes le réseau et tu repères un WiFi gratuit. Tu ne sais pas à qui il appartient : tu ne maîtrises pas la situation.",
+      q: "Te connectes-tu à ce WiFi ?",
+      a: [{ l: "Oui, je me connecte", log: "Tu t'es connecté à un WiFi inconnu", next: "r1", fx: { data: -25, calme: 10 } },
+          { l: "Non, je ne me connecte pas", log: "Tu as évité le WiFi inconnu", good: 1, next: "s5", fx: { data: 10, calme: -10 } }] },
+    r1: { img: "maison2", fx: 50, sp: 62, text: "Tu appuies sur « Se connecter »… Maintenant, c'est le hasard qui décide.",
+      roll: { pass: 4, hint: "Il faut obtenir 4 ou moins : sinon, le réseau est malveillant.", ok: "V1", ko: "M3" } },
+    s5: { img: "maison3", fx: 52, sp: 38,
+      text: "Tu as décidé de ne pas te connecter. Le temps passe, mais tes parents ne cèdent pas. Tu deviens de plus en plus irritable.",
+      q: "Malgré ta colère, entames-tu le dialogue ?",
+      a: [{ l: "Oui, je veux en parler", log: "Tu as voulu ouvrir le dialogue", good: 1, next: "s6", fx: { calme: -5 } },
+          { l: "Non, je boude dans mon coin", log: "Tu as évité le dialogue", next: "M4", fx: { conf: -20 } }] },
+    s6: { img: "maison3", fx: 52, sp: 38,
+      text: "Tes parents sont là, devant toi. Tu sens la colère monter.",
+      q: "Comment t'y prends-tu ?",
+      a: [{ l: "🧘 Je respire, puis je demande un moment calme pour en parler", log: "Tu as pris le temps de te calmer", good: 1, next: "r2", fx: { calme: 25, conf: 15 } },
+          { l: "😤 Je dis tout ce que j'ai sur le cœur, tout de suite", log: "Tu as parlé sous le coup de la colère", next: "r3", fx: { calme: -25, conf: -10 } }] },
+    r2: { img: "maison3", fx: 52, sp: 38, text: "Tu prends une grande inspiration et tu proposes d'en parler tranquillement. Vont-ils t'écouter ?",
+      roll: { pass: 4, hint: "Avec du calme, tes chances sont bonnes : 4 ou moins.", ok: "V2", ko: "M5" } },
+    r3: { img: "maison3", fx: 52, sp: 38, text: "Les mots sortent tout seuls, la voix monte… Comment vont-ils réagir ?",
+      roll: { pass: 1, hint: "Sous le coup de la colère, il faut un 1 pour que ça passe.", ok: "V2", ko: "M5" } },
+
+    M1: { end: 1, kind: "lose", title: "Cachotteries", msg: "Afin d'éviter tout conflit, ne prends pas d'initiative dans le dos de tes parents. Privilégie toujours le dialogue. Pour plus de conseils, regarde la brochure avec tes parents." },
+    M2: { end: 2, kind: "lose", title: "Le compte secret", msg: "Il ne s'agit ici pas d'une erreur en tant que telle, car tu peux avoir ton jardin secret. Néanmoins, un dialogue sincère est toujours préférable à des cachotteries. Pour plus de conseils, regarde la brochure et refais le jeu avec tes parents !" },
+    M3: { end: 3, kind: "lose", title: "Le WiFi inconnu", msg: "Comme tu t'es connecté au réseau d'un inconnu, tu as laissé le hasard décider à ta place, ce qui comporte certains risques (par exemple, de donner des informations personnelles à des personnes malveillantes...). Un dialogue sincère est toujours préférable à des cachotteries. Pour plus de conseils, regarde la brochure et refais le jeu avec tes parents !" },
+    M4: { end: 4, kind: "lose", title: "Le silence", msg: "Le dialogue est fondamental. Tes parents sont là pour t'accompagner quoi qu'il arrive, n'hésite donc pas à parler avec eux. Pour plus de conseils, regarde la brochure et refais le jeu avec tes parents !" },
+    M5: { end: 5, kind: "lose", title: "La dispute", msg: "Bien que le dialogue soit fondamental, ta colère a fait que t'es emporté et la communication est rompue. Ton intention était bonne, mais lorsque tu souhaites instaurer un dialogue, prends bien ton temps, regarde la brochure et refais le jeu avec tes parents !" },
+    V1: { end: 6, kind: "mixed", title: "Sauvé par la chance", msg: "Bien que tu aies laissé le hasard intervenir, tu as eu de la chance que le Wifi auquel t'es connecté ne soit pas malveillant. N'oublie pas que tes parents sont là pour t'accompagner quoi qu'il arrive; n'hésite donc pas à parler avec eux. Pour plus de conseils, regarde la brochure et refais le jeu avec tes parents !" },
+    V2: { end: 7, kind: "win", title: "Le dialogue gagnant", msg: "Bravo ! Malgré ta colère, ta capacité de dialogue a permis de désamorcer une situation tendue. N'oublie pas que tes parents sont là pour t'accompagner quoi qu'il arrive, n'hésite donc pas à parler avec eux. Pour plus de conseils, regarde la brochure et refais le jeu avec tes parents !" }
+  }
+},
+
+parent: {
+  home: "../Debut_parent.html", index: "../index.html", other: ["../Debut_enfant.html", "Jouer la version Enfant"],
+  stats: { conf: ["🤝", "Confiance de votre enfant", 60], secu: ["🛡️", "Sécurité numérique", 50], calme: ["😮‍💨", "Sérénité", 60] },
+  start: "p1",
+  discuss: ["À quel moment avez-vous anticipé… ou auriez-vous dû anticiper ?",
+            "Quelles règles sont négociables avec votre enfant, lesquelles ne le sont pas ?",
+            "Que pourriez-vous faire pour que votre enfant se confie plus facilement à vous ?"],
+  scenes: {
+    p1: { img: "smartphone1", fx: 48, sp: 46,
+      text: "Vous êtes dans le magasin de smartphones. Le vendeur vous informe que vous pouvez installer un logiciel d'écoute sur le téléphone de votre fils, si cela peut vous rassurer.",
+      q: "Acceptez-vous ?",
+      a: [{ l: "Oui, j'installe l'écoute", log: "Vous avez installé un logiciel d'écoute", next: "M1", fx: { conf: -35, secu: 5 } },
+          { l: "Non, je refuse", log: "Vous avez refusé la surveillance cachée", good: 1, next: "p2", fx: { conf: 10 } }] },
+    p2: { img: "maison1", fx: 58, sp: 50,
+      text: "Une fois à la maison, vous donnez le smartphone à votre enfant. Il vous supplie de lui acheter un abonnement 5G « pour que vous puissiez mieux le contacter », dit-il.",
+      q: "Acceptez-vous de conclure cet abonnement ?",
+      a: [{ l: "Oui, je prends l'abonnement", log: "Vous avez pris l'abonnement 5G", good: 1, next: "p3", fx: { conf: 10, secu: -10 } },
+          { l: "Non, pas d'abonnement", log: "Vous avez refusé l'abonnement", next: "M2", fx: { conf: -10 } }] },
+    p3: { img: "maison2", fx: 50, sp: 62,
+      text: "Après des semaines d'utilisation, les notifications sont très fréquentes. Vous constatez aussi que vous avez omis de mettre un contrôle parental : vous ne maîtrisez pas les événements. C'est un peu tardif…",
+      q: "Configurez-vous le contrôle parental dans la hâte ?",
+      a: [{ l: "Oui, je l'installe maintenant", log: "Vous avez installé le contrôle parental (un peu tard)", good: 1, next: "r1", fx: { secu: 25, calme: -5 } },
+          { l: "Non, je laisse faire", log: "Vous n'avez pas installé de contrôle parental", next: "r4", fx: { secu: -20, calme: 5 } }] },
+    r1: { img: "maison2", fx: 50, sp: 62, text: "Le contrôle parental est en place. Reste à savoir si vous avez anticipé à temps : le hasard s'en mêle.",
+      roll: { pass: 4, hint: "Il faut obtenir 4 ou moins.", ok: "V1", ko: "M3" } },
+    r4: { img: "maison2", fx: 50, sp: 62, text: "Vous laissez le temps passer sans rien installer. Le hasard va décider pour vous…",
+      roll: { pass: 4, hint: "Il faut obtenir 4 ou moins.", ok: "p5", ko: "M3" } },
+    p5: { img: "maison3", fx: 52, sp: 38,
+      text: "Vous n'avez pas installé de contrôle parental. Le temps passe et votre enfant est de plus en plus irritable. Malgré une longue journée de travail…",
+      q: "Entamez-vous le dialogue, malgré la fatigue ?",
+      a: [{ l: "Oui, on en parle", log: "Vous avez voulu ouvrir le dialogue", good: 1, next: "p6", fx: { calme: -5 } },
+          { l: "Non, je suis trop fatigué(e)", log: "Vous avez reporté le dialogue", next: "M4", fx: { conf: -20 } }] },
+    p6: { img: "maison3", fx: 52, sp: 38,
+      text: "Votre enfant est devant vous. La fatigue pèse et l'agacement monte.",
+      q: "Comment vous y prenez-vous ?",
+      a: [{ l: "🧘 Je respire, puis je propose un moment calme pour en parler", log: "Vous avez pris le temps de vous calmer", good: 1, next: "r2", fx: { calme: 25, conf: 15 } },
+          { l: "😤 Je dis tout ce que j'ai à dire, tout de suite", log: "Vous avez parlé sous le coup de la fatigue", next: "r3", fx: { calme: -25, conf: -10 } }] },
+    r2: { img: "maison3", fx: 52, sp: 38, text: "Vous prenez une grande inspiration et proposez d'en parler tranquillement. Votre enfant va-t-il s'ouvrir ?",
+      roll: { pass: 4, hint: "Avec du calme, vos chances sont bonnes : 4 ou moins.", ok: "V2", ko: "M5" } },
+    r3: { img: "maison3", fx: 52, sp: 38, text: "Les mots sortent tout seuls, le ton monte… Comment votre enfant va-t-il réagir ?",
+      roll: { pass: 1, hint: "Sous le coup de la fatigue, il faut un 1 pour que ça passe.", ok: "V2", ko: "M5" } },
+
+    M1: { end: 1, kind: "lose", title: "L'espionnage", msg: "Afin d'éviter tout conflit, ne prenez pas d'initiative dans le dos de votre enfant. Privilégiez toujours le dialogue. Pour plus de conseils, référez-vous à la brochure !" },
+    M2: { end: 2, kind: "lose", title: "Pas d'abonnement", msg: "Il ne s'agit ici pas d'une erreur, surtout si vous n'avez pas les moyens de payer un abonnement. Cependant, votre adolescent arrivera toujours à trouver une connexion (Wifi de la ville, partage d'un ami, ...). Avec un abonnement, vous pourrez donc au moins garder un certain contrôle. Afin d'avoir plus de conseils, référez-vous à la brochure !" },
+    M3: { end: 3, kind: "lose", title: "Le hasard décide", msg: "N'ayant pas anticipé, vous avez laissé le hasard décider à votre place, ce qui comporte certains risques (harcèlement, addiction, ...). Afin de pouvoir anticiper un éventuel problème, référez-vous à la brochure !" },
+    M4: { end: 4, kind: "lose", title: "Le silence", msg: "Le dialogue est fondamental pour accompagner votre enfant : s'il ne peut pas se confier à vous, il risque de le faire sur les réseaux... Afin d'avoir plus de conseils, référez-vous à la brochure !" },
+    M5: { end: 5, kind: "lose", title: "L'emportement", msg: "Bien que le dialogue, fondamental pour accompagner votre enfant, ait été entamé, votre fatigue a fait que vous vous êtes emporté. La communication étant rompue, votre enfant pourrait ne plus se confier à vous et le faire sur les réseaux. Votre intention était bonne, mais lorsque vous souhaitez instaurer un dialogue, prenez bien votre temps. Afin d'avoir plus de conseils, référez-vous à la brochure !" },
+    V1: { end: 6, kind: "mixed", title: "Bien joué, avec un peu de chance", msg: "Bien que vous ayez laissé le hasard intervenir, vous avez su prendre les bonnes décisions, au bon moment. Anticipez, dialoguez et n'oubliez pas que vous êtes le modèle. Pour plus de conseils, référez-vous à la brochure !" },
+    V2: { end: 7, kind: "win", title: "Le dialogue gagnant", msg: "Bravo, malgré la fatigue, votre capacité de dialogue a permis de désamorcer la situation tendue. Anticipez, dialoguez et n'oubliez pas que vous êtes le modèle. Pour plus de conseils, référez-vous à la brochure !" }
+  }
+}
+};

@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Protection des données</title>
     <style>
         body {
@@ -130,6 +131,12 @@
             text-shadow: 0 0 8px #ff69b4;
             text-decoration: underline;
         }
+    
+        .docs { display: grid; gap: 12px; margin-top: 25px; }
+        .doc { display: flex; gap: 14px; align-items: center; padding: 14px 16px; background: rgba(25,12,0,.9);
+               border: 1px solid #ff5500; border-radius: 8px; box-shadow: 0 0 12px rgba(255,85,0,.2); }
+        .doc b { display: block; color: #ffaa00; } .doc small { opacity: .75; } .di { font-size: 1.6em; }
+        @media (max-width: 600px) { body { padding: 12px; } .btn-jdr { width: 100%; } .container { padding: 18px; } h1 { font-size: 1.3em; } }
     </style>
 </head>
 <body>
@@ -146,62 +153,17 @@
         </div>
 
         <h1 style="margin-top: 60px;">// Brochures utiles</h1>
-        
-        <!-- PDF 1 -->
-        <div class="cours-card">
-            <div class="cours-title">📄 Brochure de conseils (Neutre)</div>
-            <div class="pdf-container">
-                <iframe src="Brochure conseils avec sources-VF4neutre.pdf"></iframe>
-            </div>
-        </div>
+<div class="docs">
+  <a class="doc" href="Brochure conseils avec sources-VF4neutre.pdf" target="_blank" rel="noopener"><span class="di">📄</span><span><b>Brochure de conseils (version neutre)</b><small>Les conseils de référence du jeu · PDF</small></span></a>
+  <a class="doc" href="Présentation_à_faire pour_formation_en_ligne.pdf" target="_blank" rel="noopener"><span class="di">📄</span><span><b>Présentation de la formation en ligne</b><small>Support de formation · PDF</small></span></a>
+  <a class="doc" href="318_852_F_Broschuere_Medienkompetenz_im_Schulalltag_FR_MDL_WEB_d09f0eb63f.pdf" target="_blank" rel="noopener"><span class="di">📄</span><span><b>Compétences médiatiques au quotidien scolaire</b><small>Brochure Jeunes et médias · PDF</small></span></a>
+  <a class="doc" href="Jeunes_et_medias_Brochure_Competences_numeriques_ZHAW_2024_415639a0ee.pdf" target="_blank" rel="noopener"><span class="di">📄</span><span><b>Jeunes et médias – Compétences numériques</b><small>Brochure ZHAW 2024 · PDF</small></span></a>
+  <a class="doc" href="Ju_M_Flyer_12_18_FR_3fc825d5bc.pdf" target="_blank" rel="noopener"><span class="di">📄</span><span><b>Jeunes et médias – Flyer 12-18 ans</b><small>Flyer · PDF</small></span></a>
+  <a class="doc" href="Ju_M_Flyer_Bildrecht_Eltern_A5_FR_UA_020891a40e.pdf" target="_blank" rel="noopener"><span class="di">📄</span><span><b>Droit à l'image – Parents</b><small>Flyer A5 · PDF</small></span></a>
+  <a class="doc" href="Ju_M_Flyer_Bildrecht_Jugendliche_A5_FR_UA_dff8929f4b.pdf" target="_blank" rel="noopener"><span class="di">📄</span><span><b>Droit à l'image – Jeunes</b><small>Flyer A5 · PDF</small></span></a>
+</div>
 
-        <!-- PDF 2 -->
-        <div class="cours-card">
-            <div class="cours-title">📄 Présentation formation en ligne</div>
-            <div class="pdf-container">
-                <iframe src="Présentation_à_faire pour_formation_en_ligne.pdf"></iframe>
-            </div>
-        </div>
-
-        <!-- PDF 3 -->
-        <div class="cours-card">
-            <div class="cours-title">📄 318_852_F_Broschuere_Medienkompetenz_im_Schulalltag_FR_MDL_WEB_d09f0eb63f.pdf</div>
-            <div class="pdf-container">
-                <iframe src="318_852_F_Broschuere_Medienkompetenz_im_Schulalltag_FR_MDL_WEB_d09f0eb63f.pdf"></iframe>
-            </div>
-        </div>
-
-        <!-- PDF 4 -->
-        <div class="cours-card">
-            <div class="cours-title">📄 Jeunes_et_medias_Brochure_Competences_numeriques_ZHAW_2024_415639a0ee.pdf</div>
-            <div class="pdf-container">
-                <iframe src="Jeunes_et_medias_Brochure_Competences_numeriques_ZHAW_2024_415639a0ee.pdf"></iframe>
-            </div>
-        </div>
-
-        <!-- PDF 5 -->
-        <div class="cours-card">
-            <div class="cours-title">📄 Ju_M_Flyer_12_18_FR_3fc825d5bc.pdf</div>
-            <div class="pdf-container">
-                <iframe src="Ju_M_Flyer_12_18_FR_3fc825d5bc.pdf"></iframe>
-            </div>
-        </div>
-
-        <!-- PDF 6 -->
-        <div class="cours-card">
-            <div class="cours-title">📄 Ju_M_Flyer_Bildrecht_Eltern_A5_FR_UA_020891a40e.pdf</div>
-            <div class="pdf-container">
-                <iframe src="Ju_M_Flyer_Bildrecht_Eltern_A5_FR_UA_020891a40e.pdf"></iframe>
-            </div>
-        </div>
-
-        <!-- PDF 7 -->
-        <div class="cours-card">
-            <div class="cours-title">📄 Ju_M_Flyer_Bildrecht_Jugendliche_A5_FR_UA_dff8929f4b.pdf</div>
-            <div class="pdf-container">
-                <iframe src="Ju_M_Flyer_Bildrecht_Jugendliche_A5_FR_UA_dff8929f4b.pdf"></iframe>
-            </div>
-        </div>
+        <p style="text-align:center;opacity:.7;font-size:.85em;margin-top:40px">Idée et création : David Ferreira (CO Drize / SEM Lab) · Optimisé par Claude (IA)</p>
 
         <div class="back-link">
             <p><a href="../index.html">⬅ Retour à l'accueil général</a></p>
@@ -212,21 +174,18 @@
         const canvas = document.getElementById('matrix');
         const ctx = canvas.getContext('2d');
 
+        var columns, drops = [], fontSize = 16;
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
+            columns = Math.ceil(canvas.width / fontSize);
+            while (drops.length < columns) drops.push(1);
         }
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
 
         const characters = '0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ<>/\\{}[]*&é"\'(-)=+';
-        const fontSize = 16;
-        let columns = canvas.width / fontSize;
-        let drops = [];
 
-        for (let i = 0; i < columns; i++) {
-            drops[i] = 1;
-        }
 
         function drawMatrix() {
             ctx.fillStyle = 'rgba(9, 5, 0, 0.08)';
@@ -235,7 +194,7 @@
             ctx.fillStyle = '#ff7700';
             ctx.font = fontSize + 'px monospace';
 
-            for (let i = 0; i < drops.length; i++) {
+            for (let i = 0; i < columns; i++) {
                 const text = characters.charAt(Math.floor(Math.random() * characters.length));
                 ctx.fillText(text, i * fontSize, drops[i] * fontSize);
 

@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Protection des données</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 <style>
@@ -17,7 +17,7 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-image: url("jeu_parent/intro.jpg");
+    background-image: url("shared/img/intro_parent.webp");
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
@@ -161,6 +161,9 @@ body {
 .close-btn:hover {
     color: #fff;
 }
+@media (max-aspect-ratio: 1/1) {
+  body { background-size: cover; background-position: 83% 50%; }
+}
 </style>
 <script src="title-scroll.js" data-start="5000" data-speed="250"></script>
 </head>
@@ -178,7 +181,7 @@ body {
             <span class="close-btn" onclick="closeModal('introModal')">&times;</span>
             <h2>Consignes de l'aventure</h2>
             <p>Vous êtes le parent d’un adolescent de 12 ans. Vous souhaitez lui offrir son premier smartphone. Inquiet, vous souhaitez mettre en place la sécurité la plus absolue afin d’éviter toutes dérives.</p>
-            <p>Il s’agit d’un jeu à la première personne. Vous aurez des choix à faire. Ecrivez « o » pour oui et « n » pour non.</p>
+            <p>Il s’agit d’un jeu à la première personne. Vous aurez des choix à faire : touchez le bouton de votre choix.</p>
             <p><strong>Bon jeu ;)</strong></p>
             <br>
             <button class="button" style="width: 100%; font-size: 1.1em; padding: 12px;" onclick="closeModal('introModal')">C'est parti !</button>
@@ -189,7 +192,8 @@ body {
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('creditsModal')">&times;</span>
             <h2>Sources & Création</h2>
-            <p><strong>Créé par :</strong> David Ferreira (CO Drize / SEM Lab)</p>
+            <p><strong>Idée et création :</strong> David Ferreira (CO Drize / SEM Lab)</p>
+            <p><strong>Optimisé par :</strong> Claude (IA)</p>
             <p><strong>Sources :</strong></p>
             <ul>
                 <li>Personnages : <a href="https://www.freepng.fr" target="_blank" style="color: #1ac0a7;">https://www.freepng.fr</a></li>

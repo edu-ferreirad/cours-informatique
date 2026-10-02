@@ -2,40 +2,14 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="author" content="Ferreira">
     <title>Protection des données</title>
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100vh;
-            background-color: #050914;
-            background-repeat: no-repeat;
-            background-size: cover;
-            background-position: center;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-        }
-        canvas {
-            display: block;
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-    </style>
+    <link rel="stylesheet" href="../shared/jeu.css">
 </head>
-<body>
-    <canvas id="dessin" width="2000" height="1000">
-        Your browser does not support the HTML canvas tag.
-    </canvas>
-
-    <script src="jeu.js"></script>
+<body data-role="parent">
+    <div id="app"></div>
+    <script src="../shared/scenarios.js"></script>
+    <script src="../shared/engine.js"></script>
 </body>
 </html>
