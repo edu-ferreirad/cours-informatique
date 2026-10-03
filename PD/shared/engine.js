@@ -8,8 +8,10 @@
   var esc = function (t) { return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
   var total = 0;
   Object.keys(S).forEach(function (k) { if (S[k].end) total++; });
-  var stats, path, code, busy, curFx = 50, curSp = 40, manualFit = null, muted = false, ac = null, prof = false, fsIdx = 0;
+  var moodEl, stats, path, code, busy, curFx = 50, curSp = 40, manualFit = null, muted = false, ac = null, prof = false, fsIdx = 0;
   var FS = [1, 1.2, 1.4];
+  var T = ROLE === "enfant" ? { par: "Mon parcours", code: "Mon code", me: "Ma partie" } : { par: "Votre parcours", code: "Votre code", me: "Votre partie" };
+  var fmt = function (c) { return ROLE.charAt(0).toUpperCase() + "-" + c; };
 
   $("app").innerHTML =
     '<div id="stage">' +
@@ -21,7 +23,7 @@
       '<div id="dice" hidden></div>' +
       '<div id="rot" hidden>↻ ' + (ROLE === "enfant" ? "Tourne" : "Tournez") + ' le téléphone pour voir toute l\'image</div>' +
     '</div>' +
-    '<div id="panel"><div id="txt"></div><div id="q"></div><div id="btns"></div></div>' +
+    '<div id="panel"><div id="txt"></div><div id="oth" hidden></div><div id="q"></div><div id="btns"></div></div>' +
     '<div id="end" hidden></div>';
 
   function beep(f, d, type, delay) {
@@ -105,6 +107,13 @@
     bs[1].onclick = function () { n++; out.textContent = n; };
     return v;
   }
+  function moodLegend() {
+    var d = document.createElement("div");
+    d.className = "mood";
+    d.innerHTML = "<small>Le dé représente l'état du moment, pour chacun :</small><span>⚀⚁<br>😌 Journée reposée</span><span>⚂⚃<br>🙂 Journée ordinaire</span><span>⚄⚅<br>😵 Journée fatigante ou tendue</span>";
+    moodEl = d;
+    return d;
+  }
   function show(id) {
     var s = S[id];
     busy = false;
@@ -113,10 +122,12 @@
     if (s.end) { ending(s); return; }
     setImg(s.img, s.fx, s.sp);
     animPanel();
+    $("oth").hidden = true;
     $("txt").textContent = s.text;
     var box = $("btns"); box.innerHTML = "";
     if (s.roll) {
       $("q").textContent = s.roll.hint;
+      if (s.roll.mood) box.appendChild(moodLegend());
       box.appendChild(btn("🎲 Lancer le dé", function () { roll(s.roll); }));
     } else {
       $("q").textContent = s.q;
@@ -138,8 +149,9 @@
     apply(a.fx);
     if (a.why) {
       animPanel();
-      $("txt").textContent = a.why;
-      $("q").textContent = "💡 À savoir";
+      $("txt").innerHTML = "<b>💡 À savoir</b><br>" + esc(a.why);
+      $("q").textContent = "";
+      if (a.oth) { $("oth").innerHTML = "<b>🔁 Dans la tête de l'autre</b><br>" + esc(a.oth); $("oth").hidden = false; }
       var box = $("btns"); box.innerHTML = "";
       box.appendChild(btn("Continuer ›", function () { show(a.next); }));
     } else {
@@ -150,6 +162,7 @@
     if (busy) return;
     busy = true;
     $("btns").innerHTML = "";
+    if (r.mood && moodEl) $("btns").appendChild(moodEl);
     var d = $("dice"), faces = ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"], n = 0;
     var res = Math.floor(Math.random() * 6) + 1, ok = res <= r.pass;
     d.hidden = false; d.className = "rolling";
@@ -161,6 +174,7 @@
         d.textContent = faces[res - 1]; d.className = ok ? "okd" : "kod";
         $("q").textContent = "🎲 " + res + " — " + (ok ? (r.okt || "Le hasard est favorable.") : (r.kot || "Cette fois, le hasard en décide autrement."));
         beep(ok ? 784 : 220, 0.25);
+        if (r.mood && moodEl) moodEl.querySelectorAll("span")[res <= 2 ? 0 : res <= 4 ? 1 : 2].classList.add("on");
         path.push({ log: "Dé : " + res, dice: 1 });
         code += res;
         setTimeout(function () { d.hidden = true; show(ok ? r.ok : r.ko); }, 2200);
@@ -178,6 +192,19 @@
     return a.join(" · ");
   }
 
+  function exportCsv() {
+    var rows = ["Version;Fin;Nombre d'atteintes"];
+    ["enfant", "parent"].forEach(function (r) {
+      var t = {};
+      try { t = JSON.parse(localStorage.getItem("pd_prof_" + r)) || {}; } catch (x) {}
+      for (var i = 1; i <= total; i++) rows.push(r + ";" + i + ";" + (t[i] || 0));
+    });
+    var blob = new Blob(["\ufeff" + rows.join("\r\n")], { type: "text/csv;charset=utf-8" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "resultats-classe.csv";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  }
   function replay(role, c) {
     var g = window.GAMES[role], id, out = [], i = 0, guard = 0;
     if (!g) return null;
@@ -220,10 +247,11 @@
         '<div class="ico">🌟</div><h2>Chapitre bonus terminé</h2>' +
         '<p class="msg">' + esc(s.msg) + "</p>" +
         '<div id="gend" class="gauges"></div>' +
-        "<h3>Mon parcours</h3>" + listHtml(path) +
+        "<h3>" + T.par + "</h3>" + listHtml(path) +
         '<div class="actions">' +
           '<button class="b" id="again" type="button">↺ Rejouer le chapitre</button>' +
           '<a class="b alt" target="_blank" href="' + G.flyer + '">📄 Flyer droit à l\'image</a>' +
+          '<a class="b alt" target="_blank" href="../contrat.html">📝 Contrat de famille</a>' +
           '<a class="b alt" href="' + G.home + '">Recommencer l\'histoire</a>' +
           '<a class="b alt" href="' + G.index + '">⌂ Accueil</a>' +
         '</div><p class="credits">' + esc(C.CREDITS) + "</p></div>";
@@ -244,7 +272,7 @@
     var chips = "";
     for (var i = 1; i <= total; i++) chips += '<span class="chip' + (un.indexOf(i) >= 0 ? " on" : "") + (i === s.end ? " cur" : "") + '">' + i + "</span>";
     chips += '<span class="chip' + (star ? " on" : "") + '">' + (star ? "⭐" : "?") + "</span>";
-    var myCode = ROLE.charAt(0).toUpperCase() + code;
+    var myCode = fmt(code);
     var defi = stats.conf >= 70;
     var e = $("end");
     e.innerHTML =
@@ -255,40 +283,49 @@
         '<p class="msg">' + esc(s.msg) + "</p>" +
         '<div id="gend" class="gauges"></div>' +
         '<p class="defi">🎯 Défi optionnel : terminer avec une confiance de 70 % ou plus — ' + (defi ? "relevé" : "à retenter") + "</p>" +
-        "<h3>Mon parcours</h3>" + listHtml(path) +
+        "<h3>" + T.par + "</h3>" + listHtml(path) +
         "<h3>Fins débloquées <small>" + un.filter(function (n) { return n <= total; }).length + "/" + total + "</small></h3><div class=\"chips\">" + chips + "</div>" +
         (star ? '<p class="secret">⭐ ' + esc(G.secret) + "</p>" : "") +
-        (prof ? '<div class="tally">🎓 Fins atteintes en classe<br><span id="tt">' + tallyText() + '</span> <button id="treset" class="lnk" type="button">remettre à zéro</button></div>' : "") +
+        (prof ? '<div class="tally">🎓 Fins atteintes en classe<br><span id="tt">' + tallyText() + '</span> <button id="treset" class="lnk" type="button">remettre à zéro</button> · <button id="texp" class="lnk" type="button">exporter (CSV)</button></div>' : "") +
         "<details class=\"discuss\"><summary>💬 À discuter à deux</summary><ol>" + G.discuss.map(function (q) { return "<li>" + esc(q) + "</li>"; }).join("") + "</ol></details>" +
-        '<details class="duo"><summary>👥 Jouer à deux</summary>' +
-          "<p>Chacun joue sa version (Enfant et Parent), puis vous comparez vos parcours. Il n'y a pas de bonne ou de mauvaise réponse : l'idée est d'en parler.</p>" +
-          '<p>Mon code : <b id="mycode">' + myCode + '</b></p>' +
+        '<div class="duo"><h3>👥 Jouer à deux</h3>' +
+          '<ol class="steps"><li>Chacun joue sa version (Enfant et Parent), sur deux appareils ou l\'un après l\'autre.</li>' +
+          '<li>À la fin de chaque partie, un code est généré : c\'est celui-ci.</li>' +
+          '<li>Échangez vos codes, puis saisissez celui de l\'autre joueur pour comparer vos parcours.</li></ol>' +
+          '<p class="codebox">' + T.code + ' : <b id="mycode">' + myCode + '</b> <button id="cpy" class="lnk" type="button">copier</button></p>' +
           '<div class="row"><input id="oc" placeholder="Code de l\'autre joueur" autocapitalize="characters"><button id="cmp" class="b" type="button">Comparer</button></div>' +
-          '<div id="cmpout"></div></details>' +
+          '<div id="cmpout"></div></div>' +
         '<div class="actions">' +
           '<a class="b" href="' + G.home + '">↺ Recommencer</a>' +
           '<button class="b alt" id="bon" type="button">➕ Chapitre bonus</button>' +
           '<button class="b alt" id="prt" type="button">🖨️ Imprimer ma fiche</button>' +
           '<a class="b alt" target="_blank" href="' + C.BROCHURE + '">📄 Ouvrir la brochure</a>' +
+          '<a class="b alt" target="_blank" href="../contrat.html">📝 Contrat de famille</a>' +
           '<a class="b alt" href="' + G.other[0] + '">' + G.other[1] + "</a>" +
           '<a class="b alt" href="' + G.index + '">⌂ Accueil</a>' +
         '</div><p class="credits">' + esc(C.CREDITS) + "</p></div>";
     drawGauges(null, $("gend"), true);
     $("bon").onclick = startBonus;
+    $("cpy").onclick = function () {
+      try { navigator.clipboard.writeText(myCode); $("cpy").textContent = "copié ✓"; } catch (x) { $("cpy").textContent = "à recopier à la main"; }
+    };
     $("prt").onclick = function () {
       var ds = e.getElementsByTagName("details");
       for (var k = 0; k < ds.length; k++) ds[k].open = true;
       window.print();
     };
     $("cmp").onclick = function () {
-      var v = $("oc").value.replace(/\s/g, "").toUpperCase(), role = v.charAt(0) === "E" ? "enfant" : v.charAt(0) === "P" ? "parent" : null;
+      var v = $("oc").value.replace(/[^A-Za-z0-9]/g, "").toUpperCase(), role = v.charAt(0) === "E" ? "enfant" : v.charAt(0) === "P" ? "parent" : null;
       var mine = replay(ROLE, code), other = role ? replay(role, v.slice(1)) : null;
       $("cmpout").innerHTML = (!mine || !other)
         ? "<p>Code non reconnu. Il commence par E ou P, suivi de chiffres.</p>"
-        : '<div class="cols"><div><h4>Ma partie (' + ROLE + ")</h4>" + listHtml(mine.steps) + "<p>Fin n°" + mine.end + "</p></div>" +
-          '<div><h4>L\'autre partie (' + role + ")</h4>" + listHtml(other.steps) + "<p>Fin n°" + other.end + "</p></div></div>";
+        : '<div class="cols"><div><h4>' + T.me + '</h4>' + listHtml(mine.steps) + '<p>Fin n°' + mine.end + '</p></div>' +
+          '<div><h4>L\'autre partie</h4>' + listHtml(other.steps) + '<p>Fin n°' + other.end + '</p></div></div>';
     };
-    if (prof) $("treset").onclick = function () { tallySet({}); $("tt").textContent = tallyText(); };
+    if (prof) {
+      $("treset").onclick = function () { tallySet({}); $("tt").textContent = tallyText(); };
+      $("texp").onclick = exportCsv;
+    }
     e.hidden = false; e.scrollTop = 0;
   }
 

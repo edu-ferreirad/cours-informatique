@@ -47,38 +47,56 @@
   var B = {
     enfant: {
       flyer: "../Ju_M_Flyer_Bildrecht_Jugendliche_A5_FR_UA_dff8929f4b.pdf",
-      end: "Photos, mots de passe, messages, achats : il y a rarement une seule bonne réponse, mais en parler avec quelqu'un de confiance aide presque toujours.",
+      end: "Photos, mots de passe, messages, achats, sommeil, inconnus en ligne, fausses informations : il y a rarement une seule bonne réponse, mais en parler avec quelqu'un de confiance aide presque toujours.",
       sc: [
-        ["chambre", 72, 26, "À la récré, vous prenez une photo de groupe. Un copain veut la publier sur son compte, avec toi dessus. Il ne t'a pas demandé ton avis.",
+        ["bonus_photo", 52, 73, "À la récré, vous prenez une photo de groupe. Un copain veut la publier sur son compte, avec toi dessus. Il ne t'a pas demandé ton avis.",
           ["Je lui dis que je préfère qu'il demande avant", "Tu as demandé à être consulté avant la publication", { data: 10, conf: 5 }, "Chacun peut demander à être consulté avant la publication d'une photo où il apparaît. Le flyer « Que montres-tu ? » propose 10 questions à se poser avant de publier, dont : toutes les personnes étaient-elles d'accord ?"],
           ["Je le laisse faire", "Tu as laissé la photo être publiée", { data: -10 }, "Ça arrive, et c'est parfois sans importance. Si une photo te gêne, tu peux toujours en parler après coup et demander qu'elle soit retirée : en parler avec la personne ou un adulte de confiance est un bon début."]],
-        ["smartphone1", 48, 46, "Un ami te demande ton mot de passe de jeu « pour dépanner » : il veut te faire gagner quelques niveaux.",
+        ["bonus_mdp", 52, 73, "Un ami te demande ton mot de passe de jeu « pour dépanner » : il veut te faire gagner quelques niveaux.",
           ["Je préfère le garder pour moi", "Tu as gardé ton mot de passe", { data: 10 }, "Un mot de passe personnel ouvre l'accès à tes informations et à tes achats. Le garder est un réflexe courant, et on peut proposer de jouer ensemble à la place."],
           ["Je le lui donne, c'est un ami", "Tu as donné ton mot de passe", { data: -10, conf: 5 }, "Faire confiance à un ami est naturel. Si l'amitié change, le mot de passe reste connu : le modifier est simple. Autre bonne habitude : un mot de passe différent pour chaque service."]],
-        ["maison3", 52, 38, "Dans le groupe de classe, des messages moqueurs visent un camarade. Certains réagissent avec des emojis rigolos.",
+        ["bonus_chat", 52, 73, "Dans le groupe de classe, des messages moqueurs visent un camarade. Certains réagissent avec des emojis rigolos.",
           ["Je n'y participe pas et j'en parle à quelqu'un de confiance", "Tu n'as pas participé et tu en as parlé", { conf: 10, calme: 5 }, "Ne pas relayer, garder des captures d'écran et en parler à une personne de confiance sont de premiers réflexes. Le 147 (Pro Juventute) offre une écoute gratuite et anonyme, 24 h sur 24."],
           ["Je ne dis rien, je regarde", "Tu es resté en retrait", { calme: -5 }, "Rester en retrait est courant : on ne sait pas toujours quoi faire. Un simple message privé au camarade concerné peut déjà faire du bien, et le 147 reste joignable à tout moment."]],
-        ["maison2", 50, 62, "Dans un jeu, un objet rare coûte 4.90 CHF. Le moyen de paiement enregistré est celui de ta famille.",
+        ["bonus_achat", 52, 73, "Dans un jeu, un objet rare coûte 4.90 CHF. Le moyen de paiement enregistré est celui de ta famille.",
           ["J'en parle avant d'acheter", "Tu as parlé de l'achat avant de le faire", { conf: 10, data: 5 }, "En parler avant permet de s'accorder sur un budget. Beaucoup de téléphones permettent aussi de demander un mot de passe à chaque achat."],
-          ["J'achète vite, ce sera plus simple", "Tu as fait l'achat directement", { conf: -5 }, "Les petits achats s'additionnent vite. Si cela arrive, en parler ensuite permet de trouver une solution ensemble et de convenir d'une règle pour la suite."]]
+          ["J'achète vite, ce sera plus simple", "Tu as fait l'achat directement", { conf: -5 }, "Les petits achats s'additionnent vite. Si cela arrive, en parler ensuite permet de trouver une solution ensemble et de convenir d'une règle pour la suite."]],
+        ["bonus_sommeil", 52, 73, "Il est tard et ton téléphone vibre : un ami t'écrit dans le groupe. Demain, il y a école.",
+          ["Je réponds demain et je pose le téléphone", "Tu as posé le téléphone pour la nuit", { calme: 10 }, "La brochure conseille de convenir ensemble de règles sur la durée et les moments d'utilisation. Un mode « Ne pas déranger » programmé permet de choisir quels messages passent la nuit."],
+          ["Je réponds vite, puis je regarde un peu", "Tu as répondu, puis continué un moment", { calme: -10 }, "Une réponse rapide peut devenir une longue soirée, c'est très courant. En parler en famille aide à trouver une règle qui convient à tous."]],
+        ["bonus_inconnu", 52, 73, "Dans un jeu en ligne, un joueur que tu ne connais pas te propose d'être ami et te demande ton prénom et ton école.",
+          ["Je ne donne aucune information personnelle", "Tu as gardé tes informations pour toi", { data: 10 }, "La brochure conseille de ne pas confier ses coordonnées aux autres joueurs. On peut très bien jouer avec quelqu'un sans rien dire de personnel."],
+          ["Je réponds, il a l'air sympa", "Tu as donné des informations personnelles", { data: -15 }, "Quelqu'un de sympathique en ligne n'est pas toujours celui qu'il prétend. Il est possible d'arrêter l'échange à tout moment et d'en parler à quelqu'un de confiance."]],
+        ["bonus_fake", 52, 73, "Tu vois passer une vidéo choc qui annonce que ton appli préférée va supprimer ton compte demain. Tes amis la partagent.",
+          ["Je vérifie avant de partager", "Tu as vérifié avant de partager", { data: 5, calme: 5 }, "Une information alarmante qui circule vite mérite un coup d'œil sur sa source : qui l'a publiée, d'autres sites en parlent-ils ? On peut aussi demander l'avis d'un adulte."],
+          ["Je partage, au cas où", "Tu as partagé la vidéo", { data: -5 }, "Partager au cas où est un réflexe très répandu, et c'est ainsi que les fausses informations voyagent. Retirer le partage ensuite reste possible."]]
       ]
     },
     parent: {
       flyer: "../Ju_M_Flyer_Bildrecht_Eltern_A5_FR_UA_020891a40e.pdf",
-      end: "Photos, mots de passe, messages, achats : il y a rarement une seule bonne réponse, mais en parler avec son enfant aide presque toujours.",
+      end: "Photos, mots de passe, messages, achats, sommeil, inconnus en ligne, fausses informations : il y a rarement une seule bonne réponse, mais en parler avec son enfant aide presque toujours.",
       sc: [
-        ["chambre", 72, 26, "Vous avez pris de belles photos de l'anniversaire de votre enfant avec ses amis. Vous pensez les publier.",
-          ["Je demande l'accord de mon enfant et des autres familles", "Vous avez demandé l'accord avant de publier", { conf: 10, secu: 10 }, "Chaque personne photographiée a un droit à l'image, enfants compris. Le flyer « Que montres-tu ? » propose 10 questions à se poser avant de publier, dont : toutes les personnes étaient-elles d'accord ?"],
+        ["bonus_photo", 52, 73, "Vous avez pris de belles photos de l'anniversaire de votre enfant avec ses amis. Vous pensez les publier.",
+          ["Je demande l'accord de mon enfant et des autres familles", "Vous avez demandé l'accord avant de publier", { conf: 10, secu: 10 }, "Chaque personne photographiée a un droit à l'image, enfants compris. Le flyer « Que montrez-vous ? » propose 10 étapes pour publier des photos d'enfants de manière plus sûre en ligne, dont : toutes les personnes photographiées étaient-elles d'accord d'être prises en photo ?"],
           ["Je publie, c'est une jolie photo", "Vous avez publié la photo", { secu: -10 }, "C'est une habitude répandue. Une photo peut être retirée à tout moment si votre enfant ou une autre famille le souhaite. Les paramètres de confidentialité aident aussi : qui pourra la voir ?"]],
-        ["smartphone1", 48, 46, "Vous remarquez que votre enfant utilise le même mot de passe pour tous ses comptes.",
+        ["bonus_mdp", 52, 73, "Vous remarquez que votre enfant utilise le même mot de passe pour tous ses comptes.",
           ["On en choisit de nouveaux ensemble", "Vous avez choisi de nouveaux mots de passe ensemble", { conf: 10, secu: 15 }, "Un mot de passe différent par service limite les dégâts si l'un d'eux est découvert. Les choisir ensemble ouvre aussi la discussion sur ce qu'il protège."],
           ["Je laisse comme ça pour l'instant", "Vous avez laissé les mots de passe tels quels", { secu: -10, calme: 5 }, "Chacun avance à son rythme. Reprendre le sujet plus tard, quand l'occasion se présente, fonctionne aussi."]],
-        ["maison3", 52, 38, "Votre enfant vous montre un message blessant reçu dans un groupe de classe.",
+        ["bonus_chat", 52, 73, "Votre enfant vous montre un message blessant reçu dans un groupe de classe.",
           ["J'écoute d'abord et on garde des captures d'écran", "Vous avez écouté, puis gardé des captures d'écran", { conf: 15, calme: 5 }, "Écouter avant de réagir aide l'enfant à se confier. Les captures d'écran permettent ensuite de montrer ce qui s'est passé à l'école si besoin. Le 147 (Pro Juventute) écoute les jeunes, et Elternnotruf soutient les parents."],
           ["Je réponds tout de suite dans le groupe", "Vous avez répondu directement dans le groupe", { calme: -10, conf: -5 }, "Réagir à chaud est naturel quand on veut protéger son enfant. Un échange direct dans le groupe peut toutefois amplifier la situation : quelques minutes de recul, puis en parler avec votre enfant et l'école, laissent plus d'options."]],
-        ["maison2", 50, 62, "Une notification vous informe d'un achat de 4.90 CHF dans un jeu, avec le moyen de paiement de la famille.",
+        ["bonus_achat", 52, 73, "Une notification vous informe d'un achat de 4.90 CHF dans un jeu, avec le moyen de paiement de la famille.",
           ["On en parle et on règle les achats ensemble", "Vous avez parlé des achats avec votre enfant", { conf: 10, secu: 10 }, "Un mot de passe à chaque achat et un budget convenu à l'avance évitent les surprises. La brochure rappelle aussi de vérifier la limite d'âge, qui peut changer avec des extensions."],
-          ["Je supprime le jeu", "Vous avez supprimé le jeu", { conf: -10, calme: 5 }, "C'est une solution rapide. La brochure recommande plutôt de contrôler que d'interdire : un jeu supprimé peut se retrouver chez des copains. En parler garde le lien."]]
+          ["Je supprime le jeu", "Vous avez supprimé le jeu", { conf: -10, calme: 5 }, "C'est une solution rapide. La brochure recommande plutôt de contrôler que d'interdire : un jeu supprimé peut se retrouver chez des copains. En parler garde le lien."]],
+        ["bonus_sommeil", 52, 73, "Il est tard et vous entendez le téléphone de votre enfant vibrer. Demain, il y a école.",
+          ["J'en parle avec lui demain, à un moment calme", "Vous avez choisi d'en parler le lendemain, au calme", { conf: 10, calme: 5 }, "Le choix du moment compte autant que le message. La brochure conseille de convenir ensemble de règles sur la durée et les moments d'utilisation, plutôt que de les imposer."],
+          ["J'interviens tout de suite", "Vous êtes intervenu immédiatement", { calme: -5, conf: -5 }, "Intervenir sur le moment est naturel quand on s'inquiète. Expliquer ensuite pourquoi, et proposer ensemble une règle pour les soirées, aide à ce qu'elle soit acceptée."]],
+        ["bonus_inconnu", 52, 73, "Votre enfant vous dit qu'un joueur inconnu lui demande des informations personnelles dans un jeu.",
+          ["Je le remercie d'en avoir parlé, puis on regarde ensemble", "Vous avez remercié votre enfant puis regardé ensemble", { conf: 15, secu: 10 }, "Remercier d'avoir parlé encourage l'enfant à recommencer. Regarder ensemble les paramètres du jeu (qui peut écrire, bloquer, signaler) est un bon réflexe."],
+          ["Je lui interdis ce jeu", "Vous avez interdit le jeu", { conf: -10 }, "C'est une réaction de protection compréhensible. La brochure recommande toutefois de contrôler plutôt qu'interdire : un jeu interdit peut se retrouver chez des amis, hors de votre regard."]],
+        ["bonus_fake", 52, 73, "Votre enfant vous montre une vidéo alarmante qui circule dans sa classe.",
+          ["On cherche ensemble d'où elle vient", "Vous avez cherché la source ensemble", { conf: 10, secu: 5 }, "Chercher ensemble la source transforme une inquiétude en habitude utile. S'intéresser à ce que l'enfant voit en ligne est un conseil central de la brochure."],
+          ["Je lui dis de ne pas y croire", "Vous avez dit de ne pas y croire", { calme: 5 }, "Rassurer vite est naturel. Expliquer comment on vérifie (source, date, autres sites) donne en plus un outil pour les prochaines fois."]]
       ]
     }
   };
@@ -89,7 +107,7 @@
     b.sc.forEach(function (c, i) {
       var next = i + 1 < n ? "b" + (i + 2) : "bX";
       g.scenes["b" + (i + 1)] = {
-        img: c[0], fx: c[1], sp: c[2], text: c[3], q: "Que fais-tu ?",
+        img: c[0] + "_" + r, fx: c[1], sp: c[2], text: c[3], q: "Que fais-tu ?",
         a: [c[4], c[5]].map(function (o) { return { l: o[0], log: o[1], fx: o[2], why: o[3], next: next }; })
       };
       if (r === "parent") g.scenes["b" + (i + 1)].q = "Que faites-vous ?";
