@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>S02E10 - UNIT nLPD : DONNÉES SENSIBLES</title>
+    <style>
+        body {
+            background-color: #0a0a0a;
+            color: #2ecc71;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+            margin: 0;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, rgba(139, 0, 0, 0.8) 0%, rgba(10, 10, 10, 0) 70%);
+            z-index: -1;
+            animation: alerteCritique 1s infinite alternate;
+            pointer-events: none;
+        }
+
+        @keyframes alerteCritique {
+            0% { opacity: 0.5; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.1); }
+        }
+
+        
+        body.mode-sobre, body.mode-sobre * { animation: none !important; transition: none !important; }
+        body.mode-sobre::before { animation: none !important; }
+        #toggle-sobre-btn {
+            position: fixed; top: 10px; right: 10px; z-index: 10001;
+            background: #000; color: #2ecc71; border: 1px solid #2ecc71;
+            padding: 6px 10px; font-size: 0.7em; cursor: pointer; font-family: inherit; border-radius: 3px;
+        }
+
+        .terminal {
+            background: rgba(17, 17, 17, 0.95);
+            border: 2px solid #2ecc71;
+            padding: 25px;
+            width: 90%;
+            max-width: 900px;
+            box-shadow: 0 0 30px rgba(231, 76, 60, 0.5);
+            border-radius: 8px;
+            z-index: 10;
+        }
+
+        .header-mission { border-bottom: 2px solid #2ecc71; margin-bottom: 20px; padding-bottom: 10px; color: #fff; font-weight: bold; text-transform: uppercase; text-align: center; }
+
+        .story-context {
+            background: rgba(231, 76, 60, 0.1);
+            border-left: 4px solid #e74c3c;
+            padding: 15px;
+            margin-bottom: 25px;
+            color: #bdc3c7;
+            line-height: 1.6;
+        }
+
+        #lock-screen, #prerequisites, #mission-content, #final-zone { display: none; }
+        .active { display: block !important; }
+
+        
+        .annexe-box {
+            background: #001a00;
+            border: 1px solid #00ff00;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 0.8em;
+            color: #00ff00;
+            box-shadow: inset 0 0 5px #000;
+        }
+
+        .code-window {
+            background: #000;
+            border: 1px solid #444;
+            padding: 15px;
+            color: #2ecc71;
+            font-size: 0.85em;
+            margin: 15px 0;
+            border-radius: 4px;
+            position: relative;
+        }
+
+        input { background: #000; border: 1px solid #2ecc71; color: #2ecc71; padding: 12px; width: 300px; font-family: inherit; margin-top: 10px; border-radius: 4px; text-align: center; }
+        button { background: #2ecc71; color: #000; border: none; padding: 12px 25px; font-weight: bold; cursor: pointer; margin-top: 15px; text-transform: uppercase; border-radius: 4px; }
+        button:hover { background: #fff; box-shadow: 0 0 15px #2ecc71; }
+
+        .back-btn { position: absolute; top: 20px; left: 20px; color: #2ecc71; text-decoration: none; border: 1px solid #2ecc71; padding: 5px 10px; font-size: 0.8em; }
+
+        .piliers-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 30px; }
+        .pilier { background: rgba(46, 204, 113, 0.05); border: 1px solid #2ecc71; padding: 10px; font-size: 0.75em; border-radius: 4px; }
+
+        .code-final { color: #ffd700; font-size: 2em; letter-spacing: 5px; display: block; padding: 20px; border: 2px dashed #ffd700; text-align: center; margin: 20px 0; }
+    </style>
+<script id="ss-helpers">
+function ssNorm(s){return String(s==null?'':s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[\u2018\u2019\u00b4`]/g,"'").replace(/\u0153/g,'oe').replace(/\s+/g,' ').trim();}
+function ssSans(s){return ssNorm(s).replace(/[^a-z0-9]/g,'');}
+function ssCle(id){var el=document.getElementById(id);return String(el&&el.value||'').replace(/\s+/g,'').toUpperCase();}
+function ssNb(s){return ssNorm(s).replace(/\b(chf|francs?|fr|ans?|jours?|octets?|mo|secondes?|sec|s)\b/g,'').replace(/['\s]/g,'').replace(/\.-$/,'').replace(',','.').replace(/[^0-9.\-]/g,'');}
+function ssArt(s){var m=ssNorm(s).match(/(\d+)\s*(bis|ter|quater|quinquies|sexies|septies|octies|novies|decies)?/);return m?m[1]+(m[2]||''):'';}
+function ssCmd(s){return String(s==null?'':s).replace(/\s+/g,' ').trim().replace(/^sudo /,'');}
+function ssSha256(ascii){function rr(v,a){return(v>>>a)|(v<<(32-a));}var mp=Math.pow,mw=mp(2,32),L='length',i,j,res='';var words=[],bl=ascii[L]*8;var hash=ssSha256.h=ssSha256.h||[],k=ssSha256.k=ssSha256.k||[],pc=k[L];var ic={};for(var c=2;pc<64;c++){if(!ic[c]){for(i=0;i<313;i+=c){ic[i]=c;}hash[pc]=(mp(c,.5)*mw)|0;k[pc++]=(mp(c,1/3)*mw)|0;}}ascii+='\x80';while(ascii[L]%64-56)ascii+='\x00';for(i=0;i<ascii[L];i++){j=ascii.charCodeAt(i);words[i>>2]|=j<<((3-i)%4)*8;}words[words[L]]=((bl/mw)|0);words[words[L]]=(bl);for(j=0;j<words[L];){var w=words.slice(j,j+=16);var oh=hash;hash=hash.slice(0,8);for(i=0;i<64;i++){var w15=w[i-15],w2=w[i-2];var a=hash[0],e=hash[4];var t1=hash[7]+(rr(e,6)^rr(e,11)^rr(e,25))+((e&hash[5])^((~e)&hash[6]))+k[i]+(w[i]=(i<16)?w[i]:(w[i-16]+(rr(w15,7)^rr(w15,18)^(w15>>>3))+w[i-7]+(rr(w2,17)^rr(w2,19)^(w2>>>10)))|0);var t2=(rr(a,2)^rr(a,13)^rr(a,22))+((a&hash[1])^(a&hash[2])^(hash[1]&hash[2]));hash=[(t1+t2)|0].concat(hash);hash[4]=(hash[4]+t1)|0;}for(i=0;i<8;i++){hash[i]=(hash[i]+oh[i])|0;}}for(i=0;i<8;i++){for(j=3;j+1;j--){var b=(hash[i]>>(j*8))&255;res+=((b<16)?0:'')+b.toString(16);}}return res;}
+function ssH(s){return ssSha256(unescape(encodeURIComponent(s)));}
+var SS_SEL=['Zq7','-sw','1ss','H!k','9r2','_Vx'].join('');
+function ssCanon(o){if(o===null||typeof o!=='object')return JSON.stringify(o);if(Array.isArray(o))return'['+o.map(ssCanon).join(',')+']';return'{'+Object.keys(o).sort().map(function(k){return JSON.stringify(k)+':'+ssCanon(o[k]);}).join(',')+'}';}
+function ssLire(cle,def){try{return JSON.parse(localStorage.getItem(cle)||def);}catch(e){return JSON.parse(def);}}
+function ssSigEtat(){return ssH(SS_SEL+ssCanon([ssLire('swiss_shield_scores','{}'),ssLire('swiss_shield_ajustements','[]')])+SS_SEL);}
+function ssResign(){try{localStorage.setItem('swiss_shield_sig',ssSigEtat());}catch(e){}}
+function ssEtatValide(){var s=localStorage.getItem('swiss_shield_sig');if(!s){return Object.keys(ssLire('swiss_shield_scores','{}')).length===0&&ssLire('swiss_shield_ajustements','[]').length===0;}return s===ssSigEtat();}
+function ssSigFichier(p){return ssH(SS_SEL+ssCanon([p.type,p.version,p.nom_eleve,p.genere_le,p.scores,p.ajustements,p.debrief])+'#'+SS_SEL);}
+</script>
+</head>
+<body>
+    <button id="toggle-sobre-btn" onclick="basculerModeSobre()">Mode sobre</button>
+
+    <a href="../../MENU_PRINCIPAL.html" class="back-btn">< RETOUR TERMINAL</a>
+
+    <div class="terminal">
+        <div id="lock-screen" class="active">
+            <div class="header-mission">SÉCURITÉ FÉDÉRALE - IDENTIFICATION REQUISE</div>
+            <div class="story-context">
+                "Agent, nous sommes sur une affaire de violation massive de la nLPD dans un hôpital universitaire vaudois. Le code de l'épisode précédent est requis pour accéder aux serveurs forensics."
+            </div>
+            <div style="text-align: center;">
+                <input type="text" id="passkey" placeholder="CODE DE FIN S02E09">
+                <br>
+                <button onclick="unlock()">DÉVERROUILLER</button>
+            </div>
+        </div>
+
+        <div id="prerequisites">
+            <div class="header-mission">PROTOCOLE D'ACCÈS nLPD</div>
+            <div class="annexe-box">
+                > INDICE JURIDIQUE : Les données sensibles sont définies dans la première partie de la loi, juste après le champ d'application.<br>
+                > INDICE TECHNIQUE : deux commandes de lecture partielle existent, l'une pour le début d'un fichier, l'autre pour sa fin.
+            </div>
+            <div style="padding: 10px;">
+                <p>1. Selon la nLPD, quel article définit précisément les "données sensibles" ?</p>
+                <input type="text" id="req1" placeholder="Numéro de l'article" onchange="sauvegarderAutomatiquement()">
+
+                <p>2. Commande Linux pour lire uniquement les dernières lignes d'un fichier log :</p>
+                <input type="text" id="req2" placeholder="Commande shell..." onchange="sauvegarderAutomatiquement()">
+            </div>
+            <div style="text-align:center;"><button onclick="checkPrereq()">ENTRER DANS LE DUMP</button></div>
+        </div>
+
+        <div id="mission-content">
+            <div class="header-mission">INVESTIGATION : INTEGRITY_CHECK_X64</div>
+            <div class="story-context">
+                Les pirates ont tenté de corrompre le registre patient pour ralentir l'enquête. Vous devez calculer le <strong>Checksum de Validation</strong> de l'objet JSON ci-dessous en suivant l'algorithme de la Confédération.
+            </div>
+
+            <div class="annexe-box">
+                <strong>ANNEXE A-10 : TABLE DE CALCUL</strong><br>
+                - Valeurs ASCII utiles : C = 67, H = 72, P = 80. Les deux lettres de l'UID sont celles placées avant le tiret.<br>
+                - Multiplicateur de Danger : 1.5 si 'ST' == 'CRITICAL', sinon 1.0.<br>
+                - Formule : (Somme ASCII des 2 lettres de l'UID) * Multiplicateur * (Nombre de clés dans l'objet).
+            </div>
+
+            <div class="code-window">
+                {
+                    "UID": "PH-902",
+                    "ST": "CRITICAL",
+                    "DATA": "ONCOLOGY_REPORT_04",
+                    "SIGNED": true
+                }
+            </div>
+
+            <div style="text-align: center;">
+                <p>CALCULEZ LE RÉSULTAT FINAL :</p>
+                <input type="text" id="investigationInput" placeholder="Valeur entière">
+                <br>
+                <button onclick="verifyInvestigation()">SOUMETTRE L'ANALYSE</button>
+            </div>
+        </div>
+
+        <div id="final-zone">
+            <div class="header-mission">RÉSULTAT DE L'EXPERTISE</div>
+            <div class="story-context">
+                Analyse terminée. L'intégrité est confirmée. La fuite concerne bien des données sensibles au sens de l'Art. 5 nLPD. Le dossier est transmis au Préposé fédéral à la protection des données.
+            </div>
+            <span class="code-final">ART-5-SENSITIVE</span>
+            <div style="text-align:center;">
+                <button onclick="location.href='../../MENU_PRINCIPAL.html'">FERMER LA SESSION</button>
+            </div>
+        </div>
+
+        <div class="piliers-container">
+            <div class="pilier">
+                <h4>INFORMATIQUE</h4>
+                Le calcul de checksum (Somme de contrôle) est la base de la cybersécurité pour détecter toute altération de données.
+            </div>
+            <div class="pilier">
+                <h4>JURIDIQUE</h4>
+                Art. 5 nLPD : "Sont des données sensibles... les données sur la santé, la sphère intime ou l'appartenance à une race."
+            </div>
+            <div class="pilier">
+                <h4>FORENSICS</h4>
+                Analyse de logs : La commande <code>tail -f</code> est l'outil n°1 pour surveiller une attaque en cours sur un serveur suisse.
+            </div>
+        </div>
+
+        <div style="margin-top: 30px; border-top: 3px solid #d80000; padding: 20px; background: #0b0b0b; color: #ddd; border: 1px solid #333; font-family: Arial, sans-serif; position: relative; z-index: 100;">
+            <div id="hint-score-badge" style="background:#111;color:#3fb950;padding:8px 15px;font-weight:bold;text-align:center;">Score de cet épisode : <span id="hint-score-value">5</span> / 5 pts</div>
+            <div style="display:flex; gap:8px; margin:10px 0;">
+                <button id="hintBtn1" onclick="useHint(1)" style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;">Indice 1 (-1 pt)</button>
+                <button id="hintBtn2" onclick="useHint(2)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">Indice 2 (-2 pts)</button>
+                <button id="hintBtn3" onclick="useHint(3)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">Indice 3 (-3 pts)</button>
+            </div>
+
+            <div id="zoneAideScore" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; color: #333;">
+                <p id="hint-tier-1" style="display:none;"><strong>INDICE 1 :</strong> Pré-requis : l'article de la nLPD qui définit les données sensibles, et la commande qui affiche la fin d'un fichier. Ensuite, appliquez la formule de l'annexe A-10 à l'objet JSON.</p>
+                <p id="hint-tier-2" style="display:none;"><strong>INDICE 2 :</strong> Additionnez les codes ASCII des deux lettres de l'UID, appliquez le multiplicateur correspondant à la valeur de ST, puis multipliez par le nombre de clés de l'objet JSON.</p>
+                <p id="hint-tier-3" style="display:none;"><strong>INDICE 3 :</strong> Comptez les clés de premier niveau de l'objet (UID, ST, DATA, SIGNED). Le multiplicateur de danger s'applique car ST a la valeur indiquée dans l'annexe.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function appliquerModeSobre() {
+            const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+            document.body.classList.toggle('mode-sobre', actif);
+            const btn = document.getElementById('toggle-sobre-btn');
+            if (btn) btn.textContent = actif ? 'Mode sobre : ON' : 'Mode sobre';
+        }
+        function basculerModeSobre() {
+            const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+            localStorage.setItem('swiss_shield_mode_sobre', actif ? '0' : '1');
+            appliquerModeSobre();
+        }
+        appliquerModeSobre();
+
+        function unlock() {
+            const pass = ssCle('passkey');
+            if (pass === "NOTIF-LPD-BERNE") {
+                document.getElementById('lock-screen').classList.remove('active');
+                document.getElementById('prerequisites').classList.add('active');
+                currentZone = 'prerequisites';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('entree', pass, 'NOTIF-LPD-BERNE');
+                alert("CODE ERRONÉ : Accès refusé par le serveur de Berne.");
+            }
+        }
+
+        function checkPrereq() {
+            const r1 = document.getElementById('req1').value.trim().replace(/\s/g, '').toUpperCase();
+            const r2 = document.getElementById('req2').value.trim().toLowerCase();
+
+            if (ssArt(r1) === "5" && /^tail( |$)/.test(ssNorm(r2))) {
+                document.getElementById('prerequisites').classList.remove('active');
+                document.getElementById('mission-content').classList.add('active');
+                currentZone = 'mission-content';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('prerequis', 'article="' + r1 + '", commande="' + r2 + '"', 'article="ART.5", commande="tail"');
+                alert("DÉFAUT DE COMPÉTENCE : Revoyez vos annexes.");
+            }
+        }
+
+        function verifyInvestigation() {
+            const val = document.getElementById('investigationInput').value.trim();
+
+            if (ssNb(val) === "912") {
+                document.getElementById('mission-content').classList.remove('active');
+                document.getElementById('final-zone').classList.add('active');
+            } else {
+                enregistrerErreur('investigation', val, '912');
+                alert("ÉCHEC DE VALIDATION : Le checksum ne correspond pas au dump mémoire.");
+            }
+        }
+</script>
+
+    <script>
+        const EP_ID = "S02E10";
+        const HINT_COST = {1:1, 2:2, 3:3};
+        let hintsUsed = {1:false, 2:false, 3:false};
+        let episodeScore = 5;
+        function useHint(level) {
+            if (hintsUsed[level] || (level > 1 && !hintsUsed[level - 1])) return;
+            hintsUsed[level] = true;
+        enregistrerIndiceUsage(level);
+            episodeScore -= HINT_COST[level];
+            document.getElementById('hint-score-value').textContent = episodeScore;
+            document.getElementById('hint-tier-' + level).style.display = 'block';
+            const btn = document.getElementById('hintBtn' + level);
+            btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5';
+            if (level < 3) {
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+            sauvegarderAutomatiquement();
+        }
+        function recordEpisodeSuccess() {
+            let scores = {};
+            try { scores = JSON.parse(localStorage.getItem('swiss_shield_scores') || '{}'); } catch(e) {}
+            if (!(EP_ID in scores) || scores[EP_ID] < episodeScore) scores[EP_ID] = episodeScore;
+            var ssOk = ssEtatValide();
+            localStorage.setItem('swiss_shield_scores', JSON.stringify(scores));
+            if (ssOk) ssResign();
+            localStorage.removeItem('autosave_' + EP_ID);
+        }
+    let currentZone = 'lock-screen';
+    function sauvegarderAutomatiquement() {
+        try {
+            const inputs = {};
+            ['req1', 'req2', 'investigationInput'].forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) inputs[id] = el.value;
+            });
+            localStorage.setItem('autosave_' + EP_ID, JSON.stringify({
+                zone: currentZone,
+                inputs: inputs,
+                hintsUsed: hintsUsed,
+                episodeScore: episodeScore
+            }));
+        } catch(e) {}
+    }
+    function proposerRestaurationAutosave() {
+        let data;
+        try { data = JSON.parse(localStorage.getItem('autosave_' + EP_ID) || 'null'); } catch(e) { return; }
+        if (!data || !data.zone || data.zone === 'lock-screen') return;
+        document.getElementById('lock-screen').classList.remove('active');
+        if (data.zone === 'mission-content') {
+            document.getElementById('prerequisites').classList.remove('active');
+            document.getElementById('mission-content').classList.add('active');
+        } else if (data.zone === 'prerequisites') {
+            document.getElementById('prerequisites').classList.add('active');
+        }
+        currentZone = data.zone;
+        if (data.inputs) {
+            Object.keys(data.inputs).forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) el.value = data.inputs[id];
+            });
+        }
+        hintsUsed = data.hintsUsed || hintsUsed;
+        episodeScore = (typeof data.episodeScore === 'number') ? data.episodeScore : episodeScore;
+        document.getElementById('hint-score-value').textContent = episodeScore;
+        [1, 2, 3].forEach(function(level) {
+            if (hintsUsed[level]) {
+                document.getElementById('hint-tier-' + level).style.display = 'block';
+                const btn = document.getElementById('hintBtn' + level);
+                if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+        });
+    }
+    function enregistrerIndiceUsage(niveau) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + niveau;
+            debrief.indices[cle] = (debrief.indices[cle] || 0) + 1;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+    function enregistrerErreur(phase, reponseEleve, reponseAttendue) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + phase;
+            if (typeof debrief.erreurs[cle] !== 'object' || debrief.erreurs[cle] === null) {
+                debrief.erreurs[cle] = { compte: (debrief.erreurs[cle] || 0), exemples: [] };
+            }
+            debrief.erreurs[cle].compte++;
+            if (reponseEleve !== undefined && debrief.erreurs[cle].exemples.length < 5) {
+                debrief.erreurs[cle].exemples.push({ reponseEleve: String(reponseEleve).slice(0,100), reponseAttendue: String(reponseAttendue||'').slice(0,100) });
+            }
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+        (function pollSuccess(){
+
+            const ids = ['success','success-msg','success-final','final-zone','victory-zone','victory-screen','final-step','final-badge'];
+            let recorded = false;
+            setInterval(function(){
+                if (recorded) return;
+                for (const id of ids) {
+                    const el = document.getElementById(id);
+                    if (el && window.getComputedStyle(el).display === 'block') { recordEpisodeSuccess(); recorded = true; if (!document.getElementById('ss-next-btn')) { var a = document.createElement('a'); a.id = 'ss-next-btn'; a.href = '../E11/index.html'; a.textContent = 'PASSER À L\'ÉPISODE 11'; a.style.cssText = 'display:block;width:max-content;max-width:90%;margin:25px auto;padding:14px 26px;background:#000;color:#fff;border:2px solid #d80000;font-weight:bold;text-align:center;text-decoration:none;font-family:inherit;letter-spacing:1px;cursor:pointer;'; el.appendChild(a); } return; }
+                }
+            }, 500);
+        })();
+        proposerRestaurationAutosave();
+</script>
+</body>
+</html>

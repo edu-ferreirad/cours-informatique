@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>S02E09 - EXFILTRATION nLPD</title>
+    <style>
+        
+        body {
+            background: radial-gradient(circle at center, #0a1a0f 0%, #000 100%);
+            color: #2ecc71;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::after {
+            content: "";
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(46, 204, 113, 0.1), transparent);
+            transform: skewX(-20deg);
+            animation: scan 4s infinite linear;
+            pointer-events: none;
+        }
+
+        @keyframes scan { 0% { left: -100%; } 100% { left: 150%; } }
+
+        
+        body.mode-sobre, body.mode-sobre * { animation: none !important; transition: none !important; }
+        body.mode-sobre::after { animation: none !important; }
+        #toggle-sobre-btn {
+            position: fixed; top: 10px; right: 10px; z-index: 10001;
+            background: #000; color: #2ecc71; border: 1px solid #2ecc71;
+            padding: 6px 10px; font-size: 0.7em; cursor: pointer; font-family: inherit; border-radius: 3px;
+        }
+
+        .terminal {
+            background: rgba(10, 10, 10, 0.95);
+            border: 2px solid #2ecc71;
+            padding: 30px;
+            width: 95%;
+            max-width: 900px;
+            box-shadow: 0 0 40px rgba(46, 204, 113, 0.2);
+            border-radius: 4px;
+            z-index: 10;
+        }
+
+        .header-mission {
+            border-bottom: 2px solid #2ecc71;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            color: #fff;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        
+        #lock-screen, #challenge-zone, #investigation-zone, #final-zone { display: none; }
+        #lock-screen.active, #challenge-zone.active, #investigation-zone.active, #final-zone.active { display: block; }
+
+        .story-context {
+            background: rgba(46, 204, 113, 0.05);
+            border-left: 4px solid #2ecc71;
+            padding: 15px;
+            margin: 20px 0;
+            color: #ecf0f1;
+            line-height: 1.6;
+        }
+
+        .mini-challenge {
+            background: #111;
+            border: 1px solid #333;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        input {
+            background: #000;
+            border: 1px solid #2ecc71;
+            color: #00ff41;
+            padding: 12px;
+            width: 320px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            text-align: center;
+            outline: none;
+        }
+
+        button {
+            background: #2ecc71;
+            color: #000;
+            border: none;
+            padding: 12px 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 15px;
+            text-transform: uppercase;
+        }
+
+        button:hover { background: #fff; box-shadow: 0 0 20px #2ecc71; }
+
+        .back-btn {
+            position: absolute;
+            top: 20px; left: 20px;
+            color: #2ecc71;
+            text-decoration: none;
+            font-size: 0.9em;
+            border: 1px solid #2ecc71;
+            padding: 5px 10px;
+        }
+
+        .piliers-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .pilier {
+            font-size: 0.8em;
+            padding: 10px;
+            border: 1px solid #1a5e3a;
+            background: rgba(0,255,65,0.02);
+            text-align: left;
+        }
+
+        .pilier h4 { color: #fff; margin: 0 0 10px 0; text-decoration: underline; }
+
+        .code-window {
+            background: #050505;
+            border: 1px solid #444;
+            padding: 15px;
+            font-family: monospace;
+            color: #888;
+            font-size: 0.85em;
+            margin: 15px 0;
+            overflow-x: auto;
+            text-align: left;
+        }
+
+        .glitch-text { animation: glitch 2s infinite; }
+        @keyframes glitch {
+            0% { text-shadow: 1px 0 #f00; }
+            50% { text-shadow: -1px 0 #00f; }
+            100% { text-shadow: 1px 0 #f00; }
+        }
+    </style>
+<script id="ss-helpers">
+function ssNorm(s){return String(s==null?'':s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[\u2018\u2019\u00b4`]/g,"'").replace(/\u0153/g,'oe').replace(/\s+/g,' ').trim();}
+function ssSans(s){return ssNorm(s).replace(/[^a-z0-9]/g,'');}
+function ssCle(id){var el=document.getElementById(id);return String(el&&el.value||'').replace(/\s+/g,'').toUpperCase();}
+function ssNb(s){return ssNorm(s).replace(/\b(chf|francs?|fr|ans?|jours?|octets?|mo|secondes?|sec|s)\b/g,'').replace(/['\s]/g,'').replace(/\.-$/,'').replace(',','.').replace(/[^0-9.\-]/g,'');}
+function ssArt(s){var m=ssNorm(s).match(/(\d+)\s*(bis|ter|quater|quinquies|sexies|septies|octies|novies|decies)?/);return m?m[1]+(m[2]||''):'';}
+function ssCmd(s){return String(s==null?'':s).replace(/\s+/g,' ').trim().replace(/^sudo /,'');}
+function ssSha256(ascii){function rr(v,a){return(v>>>a)|(v<<(32-a));}var mp=Math.pow,mw=mp(2,32),L='length',i,j,res='';var words=[],bl=ascii[L]*8;var hash=ssSha256.h=ssSha256.h||[],k=ssSha256.k=ssSha256.k||[],pc=k[L];var ic={};for(var c=2;pc<64;c++){if(!ic[c]){for(i=0;i<313;i+=c){ic[i]=c;}hash[pc]=(mp(c,.5)*mw)|0;k[pc++]=(mp(c,1/3)*mw)|0;}}ascii+='\x80';while(ascii[L]%64-56)ascii+='\x00';for(i=0;i<ascii[L];i++){j=ascii.charCodeAt(i);words[i>>2]|=j<<((3-i)%4)*8;}words[words[L]]=((bl/mw)|0);words[words[L]]=(bl);for(j=0;j<words[L];){var w=words.slice(j,j+=16);var oh=hash;hash=hash.slice(0,8);for(i=0;i<64;i++){var w15=w[i-15],w2=w[i-2];var a=hash[0],e=hash[4];var t1=hash[7]+(rr(e,6)^rr(e,11)^rr(e,25))+((e&hash[5])^((~e)&hash[6]))+k[i]+(w[i]=(i<16)?w[i]:(w[i-16]+(rr(w15,7)^rr(w15,18)^(w15>>>3))+w[i-7]+(rr(w2,17)^rr(w2,19)^(w2>>>10)))|0);var t2=(rr(a,2)^rr(a,13)^rr(a,22))+((a&hash[1])^(a&hash[2])^(hash[1]&hash[2]));hash=[(t1+t2)|0].concat(hash);hash[4]=(hash[4]+t1)|0;}for(i=0;i<8;i++){hash[i]=(hash[i]+oh[i])|0;}}for(i=0;i<8;i++){for(j=3;j+1;j--){var b=(hash[i]>>(j*8))&255;res+=((b<16)?0:'')+b.toString(16);}}return res;}
+function ssH(s){return ssSha256(unescape(encodeURIComponent(s)));}
+var SS_SEL=['Zq7','-sw','1ss','H!k','9r2','_Vx'].join('');
+function ssCanon(o){if(o===null||typeof o!=='object')return JSON.stringify(o);if(Array.isArray(o))return'['+o.map(ssCanon).join(',')+']';return'{'+Object.keys(o).sort().map(function(k){return JSON.stringify(k)+':'+ssCanon(o[k]);}).join(',')+'}';}
+function ssLire(cle,def){try{return JSON.parse(localStorage.getItem(cle)||def);}catch(e){return JSON.parse(def);}}
+function ssSigEtat(){return ssH(SS_SEL+ssCanon([ssLire('swiss_shield_scores','{}'),ssLire('swiss_shield_ajustements','[]')])+SS_SEL);}
+function ssResign(){try{localStorage.setItem('swiss_shield_sig',ssSigEtat());}catch(e){}}
+function ssEtatValide(){var s=localStorage.getItem('swiss_shield_sig');if(!s){return Object.keys(ssLire('swiss_shield_scores','{}')).length===0&&ssLire('swiss_shield_ajustements','[]').length===0;}return s===ssSigEtat();}
+function ssSigFichier(p){return ssH(SS_SEL+ssCanon([p.type,p.version,p.nom_eleve,p.genere_le,p.scores,p.ajustements,p.debrief])+'#'+SS_SEL);}
+</script>
+</head>
+<body>
+    <button id="toggle-sobre-btn" onclick="basculerModeSobre()">Mode sobre</button>
+
+    <a href="../../MENU_PRINCIPAL.html" class="back-btn">< RECULER : MENU_PRINCIPAL</a>
+
+    <div class="terminal">
+        <div id="lock-screen" class="active">
+            <div class="header-mission"><span>STATION-VERROU-S02</span><span>[SECURED]</span></div>
+            <div class="story-context">
+                <strong>ALERTE ADMINISTRATIVE :</strong> Bienvenue dans l'unité nLPD.
+                Un serveur de l'administration fédérale à Berne montre des signes d'exfiltration.
+                Le pare-feu a été contourné. Identifiez l'ampleur du désastre.
+            </div>
+            <p>Initialisation de la Saison 2 (Code de transition) :</p>
+            <input type="text" id="passkey" placeholder="CODE FINAL SAISON 1">
+            <br>
+            <button onclick="unlock()">AUTH_LOGIN_S02</button>
+        </div>
+
+        <div id="challenge-zone">
+            <div class="header-mission"><span>VÉRIFICATION DES COMPÉTENCES AGENT</span></div>
+
+            <div class="mini-challenge">
+                <p><span style="color: #fff;">[CODE PÉNAL 143 bis] :</span> Quiconque s'introduit sans droit dans un système informatique est passible d'une peine privative de liberté de combien d'années maximum ?</p>
+                <input type="text" id="ans1" placeholder="Nombre d'années" onchange="sauvegarderAutomatiquement()">
+            </div>
+
+            <div class="mini-challenge">
+                <p><span style="color: #fff;">[TECH_LOGS] :</span> Quelle extension de fichier est typiquement utilisée pour les journaux d'événements système sous Linux ?</p>
+                <input type="text" id="ans2" placeholder="Extension du fichier" onchange="sauvegarderAutomatiquement()">
+            </div>
+            <button onclick="checkChallenges()">ACCÉDER AUX LOGS CRITIQUES</button>
+        </div>
+
+        <div id="investigation-zone">
+            <div class="header-mission"><span>INVESTIGATION : TRAFFIC_ANALYSIS</span></div>
+            <div class="story-context">
+                <strong>MISSION :</strong> Les données ont été compressées avant l'envoi.
+                Le pirate a utilisé un script SQL pour extraire des fiches patients.
+                Fouillez l'extrait de journal brut ci-dessous pour isoler la bonne ligne d'extraction,
+                puis calculez le volume total de la fuite pour la notification IFPDT.
+            </div>
+
+            <div class="code-window" style="max-height: 260px; overflow-y: auto;">
+                [EXTRAIT BRUT — audit_pare-feu.log — 2847 lignes au total]<br>
+                03:14:02 CONN sql-proxy-04 &lt;- 10.22.8.117:51422 (TLS OK)<br>
+                03:14:02 QUERY TABLE: STAGING_LOGS_TEMP | ROWS_EXTRACTED: 340 | ROW_SIZE_AVG: 96 bytes<br>
+                03:14:03 QUERY TABLE: CH_FEDERAL_HEALTH_2026 | ROWS_EXTRACTED: 12 | ROW_SIZE_AVG: 512 bytes<br>
+                03:14:05 WARN  seuil de requêtes anormal détecté sur sql-proxy-04<br>
+                03:14:06 QUERY TABLE: BACKUP_ARCHIVE_2019 | ROWS_EXTRACTED: 8840 | ROW_SIZE_AVG: 128 bytes<br>
+                03:14:09 CONN sql-proxy-04 &lt;- 10.22.8.117:51430 (TLS OK)<br>
+                03:14:11 QUERY TABLE: CH_FEDERAL_HEALTH_2026 | ROWS_EXTRACTED: <span class="glitch-text" style="color:#fff">12500</span> | ROW_SIZE_AVG: 512 bytes<br>
+                03:14:14 QUERY TABLE: STAGING_LOGS_TEMP | ROWS_EXTRACTED: 22 | ROW_SIZE_AVG: 96 bytes<br>
+                03:14:15 COMPRESSION_RATIO: 1:1 (Aucune) — flux non compressé avant envoi<br>
+                03:14:16 PACKET_LOSS_ADJUSTMENT: +0%<br>
+                03:14:18 CONN sql-proxy-04 -&gt; 185.220.101.44:443 (transfert sortant)<br>
+                03:14:22 DISCONNECT sql-proxy-04<br>
+                <br>
+                // Repère la ligne d'extraction correspondant à la table CH_FEDERAL_HEALTH_2026 sur la<br>
+                // connexion ayant réellement abouti à un transfert sortant (03:14:18) — les autres lignes<br>
+                // sont des requêtes de routine ou des pistes sans rapport avec la fuite.<br>
+                // FORMULE : (Lignes * Taille_Moyenne) / 1024 / 1024 = Volume en Mo
+            </div>
+
+            <p>Certifiez le volume exfiltré en MegaOctets (Mo) :</p>
+            <input type="text" inputmode="decimal" autocomplete="off" step="0.1" id="finalAns" placeholder="Volume en Mo (arrondi à 1 décimale, point ou virgule)">
+            <br>
+            <button onclick="checkInvestigation()">CERTIFIER ET TRANSMETTRE</button>
+        </div>
+
+        <div id="final-zone">
+            <div class="header-mission"><span>S02E09 : DOSSIER CLOTURÉ</span></div>
+            <p>Volume de <strong>6.1 Mo</strong> (arrondi) certifié. Le rapport a été envoyé au Préposé Fédéral.</p>
+            <div class="story-context" style="border-color: #ffd700; color: #ffd700; text-align: center;">
+                CLÉ DE SORTIE : <span style="font-size: 1.5em; letter-spacing: 5px;">NOTIF-LPD-BERNE</span>
+            </div>
+            <p>Utilisez cette clé pour déverrouiller l'E10.</p>
+            <button onclick="location.href='../../MENU_PRINCIPAL.html'">RETOUR AU TERMINAL</button>
+        </div>
+
+        <div class="piliers-container">
+            <div class="pilier">
+                <h4>INFORMATIQUE</h4>
+                Le calcul d'un volume de données dépend du nombre d'unités (lignes) et de la taille de chaque unité. 1 Mo = 1024 Ko = 1'048'576 octets.
+            </div>
+            <div class="pilier">
+                <h4>JURIDIQUE</h4>
+                Art. 143 bis CP : L'accès indu à un système informatique est passible de 3 ans. nLPD : Les risques élevés doivent être notifiés.
+            </div>
+            <div class="pilier">
+                <h4>FORENSICS</h4>
+                L'analyse des journaux de base de données permet de compter précisément le nombre de requêtes 'SELECT' et les lignes renvoyées.
+            </div>
+        </div>
+
+        <div style="margin-top: 30px; border-top: 3px solid #d80000; padding: 20px; background: #0b0b0b; color: #ddd; border: 1px solid #333; font-family: Arial, sans-serif; position: relative; z-index: 100;">
+            <div id="hint-score-badge" style="background:#111;color:#3fb950;padding:8px 15px;font-weight:bold;text-align:center;">Score de cet épisode : <span id="hint-score-value">5</span> / 5 pts</div>
+            <div style="display:flex; gap:8px; margin:10px 0;">
+                <button id="hintBtn1" onclick="useHint(1)" style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;">Indice 1 (-1 pt)</button>
+                <button id="hintBtn2" onclick="useHint(2)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">Indice 2 (-2 pts)</button>
+                <button id="hintBtn3" onclick="useHint(3)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">Indice 3 (-3 pts)</button>
+            </div>
+
+            <div id="zoneAideScore" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; color: #333;">
+                <p id="hint-tier-1" style="display:none;"><strong>INDICE 1 :</strong> Pré-requis : la peine maximale (en années) prévue pour l'accès indu par le Code pénal, et l'extension de fichier des journaux système sous Linux. Ensuite, repérez dans le journal la bonne ligne d'extraction.</p>
+                <p id="hint-tier-2" style="display:none;"><strong>INDICE 2 :</strong> La bonne ligne concerne la table fédérale de santé et correspond à la connexion qui a abouti à un transfert sortant. Plusieurs lignes portent le même nom de table : lisez les horaires.</p>
+                <p id="hint-tier-3" style="display:none;"><strong>INDICE 3 :</strong> Multipliez le nombre de lignes par la taille moyenne d'une ligne (en octets), puis divisez deux fois par 1024 pour obtenir des mégaoctets. Arrondissez à une décimale.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function appliquerModeSobre() {
+            const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+            document.body.classList.toggle('mode-sobre', actif);
+            const btn = document.getElementById('toggle-sobre-btn');
+            if (btn) btn.textContent = actif ? 'Mode sobre : ON' : 'Mode sobre';
+        }
+        function basculerModeSobre() {
+            const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+            localStorage.setItem('swiss_shield_mode_sobre', actif ? '0' : '1');
+            appliquerModeSobre();
+        }
+        appliquerModeSobre();
+
+        function showScreen(id) {
+            document.querySelectorAll('.terminal > div').forEach(div => {
+                if(div.id) div.classList.remove('active');
+            });
+            document.getElementById(id).classList.add('active');
+        }
+
+        function unlock() {
+            const code = ssCle('passkey');
+            if (code === 'SHIELD-SEASON-2') {
+                showScreen('challenge-zone');
+                currentZone = 'challenge-zone';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('entree', code, 'SHIELD-SEASON-2');
+                alert("ACCÈS REFUSÉ : Clé S01 invalide.");
+            }
+        }
+
+        function checkChallenges() {
+            const a1 = document.getElementById('ans1').value.trim();
+            const a2 = document.getElementById('ans2').value.trim().toLowerCase();
+
+            if (ssNb(a1) === "3" && ssSans(a2) === "log") {
+                showScreen('investigation-zone');
+                currentZone = 'investigation-zone';
+                sauvegarderAutomatiquement();
+            } else {
+                enregistrerErreur('prerequis', 'années="' + a1 + '", extension="' + a2 + '"', 'années="3", extension=".log"');
+                alert("ERREUR : Réponses incorrectes. Consultez les piliers d'aide.");
+            }
+        }
+
+        function checkInvestigation() {
+            const val = ssNb(document.getElementById('finalAns').value);
+
+            if (parseFloat(val) >= 6.1 && parseFloat(val) <= 6.2) {
+                showScreen('final-zone');
+            } else {
+                enregistrerErreur('investigation', val, '≈6.1');
+                alert("ÉCHEC DE CERTIFICATION : Le volume calculé est erroné.");
+            }
+        }
+</script>
+
+    <script>
+        const EP_ID = "S02E09";
+        const HINT_COST = {1:1, 2:2, 3:3};
+        let hintsUsed = {1:false, 2:false, 3:false};
+        let episodeScore = 5;
+        function useHint(level) {
+            if (hintsUsed[level] || (level > 1 && !hintsUsed[level - 1])) return;
+            hintsUsed[level] = true;
+        enregistrerIndiceUsage(level);
+            episodeScore -= HINT_COST[level];
+            document.getElementById('hint-score-value').textContent = episodeScore;
+            document.getElementById('hint-tier-' + level).style.display = 'block';
+            const btn = document.getElementById('hintBtn' + level);
+            btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5';
+            if (level < 3) {
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+            sauvegarderAutomatiquement();
+        }
+        function recordEpisodeSuccess() {
+            let scores = {};
+            try { scores = JSON.parse(localStorage.getItem('swiss_shield_scores') || '{}'); } catch(e) {}
+            if (!(EP_ID in scores) || scores[EP_ID] < episodeScore) scores[EP_ID] = episodeScore;
+            var ssOk = ssEtatValide();
+            localStorage.setItem('swiss_shield_scores', JSON.stringify(scores));
+            if (ssOk) ssResign();
+            localStorage.removeItem('autosave_' + EP_ID);
+        }
+    let currentZone = 'lock-screen';
+    function sauvegarderAutomatiquement() {
+        try {
+            const inputs = {};
+            ['ans1', 'ans2', 'finalAns'].forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) inputs[id] = el.value;
+            });
+            localStorage.setItem('autosave_' + EP_ID, JSON.stringify({
+                zone: currentZone,
+                inputs: inputs,
+                hintsUsed: hintsUsed,
+                episodeScore: episodeScore
+            }));
+        } catch(e) {}
+    }
+    function proposerRestaurationAutosave() {
+        let data;
+        try { data = JSON.parse(localStorage.getItem('autosave_' + EP_ID) || 'null'); } catch(e) { return; }
+        if (!data || !data.zone || data.zone === 'lock-screen') return;
+        showScreen(data.zone);
+        currentZone = data.zone;
+        if (data.inputs) {
+            Object.keys(data.inputs).forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) el.value = data.inputs[id];
+            });
+        }
+        hintsUsed = data.hintsUsed || hintsUsed;
+        episodeScore = (typeof data.episodeScore === 'number') ? data.episodeScore : episodeScore;
+        document.getElementById('hint-score-value').textContent = episodeScore;
+        [1, 2, 3].forEach(function(level) {
+            if (hintsUsed[level]) {
+                document.getElementById('hint-tier-' + level).style.display = 'block';
+                const btn = document.getElementById('hintBtn' + level);
+                if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+        });
+    }
+    function enregistrerIndiceUsage(niveau) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + niveau;
+            debrief.indices[cle] = (debrief.indices[cle] || 0) + 1;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+    function enregistrerErreur(phase, reponseEleve, reponseAttendue) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + phase;
+            if (typeof debrief.erreurs[cle] !== 'object' || debrief.erreurs[cle] === null) {
+                debrief.erreurs[cle] = { compte: (debrief.erreurs[cle] || 0), exemples: [] };
+            }
+            debrief.erreurs[cle].compte++;
+            if (reponseEleve !== undefined && debrief.erreurs[cle].exemples.length < 5) {
+                debrief.erreurs[cle].exemples.push({ reponseEleve: String(reponseEleve).slice(0,100), reponseAttendue: String(reponseAttendue||'').slice(0,100) });
+            }
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+        (function pollSuccess(){
+
+            const ids = ['success','success-msg','success-final','final-zone','victory-zone','victory-screen','final-step','final-badge'];
+            let recorded = false;
+            setInterval(function(){
+                if (recorded) return;
+                for (const id of ids) {
+                    const el = document.getElementById(id);
+                    if (el && window.getComputedStyle(el).display === 'block') { recordEpisodeSuccess(); recorded = true; if (!document.getElementById('ss-next-btn')) { var a = document.createElement('a'); a.id = 'ss-next-btn'; a.href = '../E10/index.html'; a.textContent = 'PASSER À L\'ÉPISODE 10'; a.style.cssText = 'display:block;width:max-content;max-width:90%;margin:25px auto;padding:14px 26px;background:#000;color:#fff;border:2px solid #d80000;font-weight:bold;text-align:center;text-decoration:none;font-family:inherit;letter-spacing:1px;cursor:pointer;'; el.appendChild(a); } return; }
+                }
+            }, 500);
+        })();
+        proposerRestaurationAutosave();
+</script>
+</body>
+</html>

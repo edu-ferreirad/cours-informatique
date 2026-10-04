@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>S00E02 - SWISS SHIELD - DATA_EXFILTRATION</title>
+    <style>
+        :root {
+            --matrix-green: #00ff41;
+            --terminal-bg: #050a05;
+            --warning-orange: #ffaa00;
+            --system-blue: #3498db;
+            --legal-gold: #ffcc00;
+            --forensic-red: #ff3333;
+        }
+
+        body {
+            background-color: var(--terminal-bg);
+            color: var(--matrix-green);
+            font-family: 'Consolas', 'Lucida Console', monospace;
+            padding: 20px; margin: 0;
+            overflow-x: hidden;
+        }
+
+        
+        #effect-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; opacity: 0.3;
+        }
+
+        .radar-sweep {
+            position: fixed; top: 50%; left: 50%;
+            width: 200vw; height: 200vw;
+            background: conic-gradient(from 0deg, transparent 0%, rgba(0, 255, 65, 0.1) 10%, transparent 20%);
+            transform: translate(-50%, -50%);
+            animation: sweep 6s linear infinite;
+            pointer-events: none; z-index: -1;
+        }
+
+        @keyframes sweep {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        
+        body.mode-sobre, body.mode-sobre * { animation: none !important; transition: none !important; }
+        body.mode-sobre #effect-canvas, body.mode-sobre .radar-sweep { display: none !important; }
+        #toggle-sobre-btn {
+            position: fixed; top: 10px; right: 10px; z-index: 10001;
+            background: #000; color: var(--matrix-green); border: 1px solid var(--matrix-green);
+            padding: 6px 10px; font-size: 0.7em; cursor: pointer; font-family: inherit; border-radius: 3px;
+        }
+
+        .pwn-container {
+            border: 1px solid var(--matrix-green);
+            max-width: 1000px; margin: 0 auto;
+            background: rgba(0, 10, 0, 0.95);
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.2);
+            position: relative; z-index: 1;
+        }
+
+        #lock-screen, #pre-req-screen, #main-content { display: none; }
+
+        .header {
+            background: var(--matrix-green); color: #000;
+            padding: 5px 15px; font-weight: bold;
+            display: flex; justify-content: space-between;
+        }
+
+        .content { padding: 25px; }
+
+        .story-container {
+            background: rgba(0, 20, 0, 0.8); border-left: 4px solid var(--system-blue);
+            padding: 20px; margin: 20px; text-align: left; line-height: 1.5; font-size: 0.95em;
+        }
+
+        .annexe-window {
+            background: #000; border: 1px solid #333; padding: 10px; font-size: 0.8em; color: #888; margin: 15px 0;
+        }
+
+        .network-log {
+            background: #000; border: 1px solid #333; height: 180px; overflow-y: auto;
+            padding: 10px; font-size: 0.85em; color: #888; margin: 20px 0;
+        }
+
+        .packet { border-bottom: 1px solid #111; padding: 4px 0; }
+        .suspicious { color: var(--warning-orange); font-weight: bold; }
+
+        .console-area {
+            background: #001; border: 1px solid var(--system-blue); padding: 20px; margin-top: 20px;
+        }
+
+        .input-cmd {
+            background: transparent; border: none; color: #fff; width: 80%;
+            font-family: inherit; outline: none; font-size: 1.1em;
+            border-bottom: 1px solid #333;
+        }
+
+        .btn {
+            background: var(--matrix-green); color: #000; border: none;
+            padding: 12px 25px; cursor: pointer; font-weight: bold; text-transform: uppercase;
+        }
+
+        .btn-secondary {
+            background: transparent; color: var(--matrix-green); border: 1px solid var(--matrix-green);
+            padding: 8px 15px; text-decoration: none; font-size: 0.8em; display: inline-block; margin-top: 10px;
+        }
+
+        .success-msg {
+            display: none; border: 2px solid var(--matrix-green); padding: 20px;
+            text-align: center; margin-top: 20px; background: rgba(0,255,65,0.1);
+        }
+
+        .help-grid {
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 30px;
+        }
+
+        .help-card {
+            background: rgba(0, 15, 0, 0.7); border: 1px solid #222; padding: 15px; font-size: 0.85em;
+        }
+
+        .help-card h4 { margin-top: 0; text-transform: uppercase; font-size: 0.9em; display: flex; align-items: center; gap: 8px; }
+    </style>
+<script id="ss-helpers">
+function ssNorm(s){return String(s==null?'':s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[\u2018\u2019\u00b4`]/g,"'").replace(/\u0153/g,'oe').replace(/\s+/g,' ').trim();}
+function ssSans(s){return ssNorm(s).replace(/[^a-z0-9]/g,'');}
+function ssCle(id){var el=document.getElementById(id);return String(el&&el.value||'').replace(/\s+/g,'').toUpperCase();}
+function ssNb(s){return ssNorm(s).replace(/\b(chf|francs?|fr|ans?|jours?|octets?|mo|secondes?|sec|s)\b/g,'').replace(/['\s]/g,'').replace(/\.-$/,'').replace(',','.').replace(/[^0-9.\-]/g,'');}
+function ssArt(s){var m=ssNorm(s).match(/(\d+)\s*(bis|ter|quater|quinquies|sexies|septies|octies|novies|decies)?/);return m?m[1]+(m[2]||''):'';}
+function ssCmd(s){return String(s==null?'':s).replace(/\s+/g,' ').trim().replace(/^sudo /,'');}
+function ssSha256(ascii){function rr(v,a){return(v>>>a)|(v<<(32-a));}var mp=Math.pow,mw=mp(2,32),L='length',i,j,res='';var words=[],bl=ascii[L]*8;var hash=ssSha256.h=ssSha256.h||[],k=ssSha256.k=ssSha256.k||[],pc=k[L];var ic={};for(var c=2;pc<64;c++){if(!ic[c]){for(i=0;i<313;i+=c){ic[i]=c;}hash[pc]=(mp(c,.5)*mw)|0;k[pc++]=(mp(c,1/3)*mw)|0;}}ascii+='\x80';while(ascii[L]%64-56)ascii+='\x00';for(i=0;i<ascii[L];i++){j=ascii.charCodeAt(i);words[i>>2]|=j<<((3-i)%4)*8;}words[words[L]]=((bl/mw)|0);words[words[L]]=(bl);for(j=0;j<words[L];){var w=words.slice(j,j+=16);var oh=hash;hash=hash.slice(0,8);for(i=0;i<64;i++){var w15=w[i-15],w2=w[i-2];var a=hash[0],e=hash[4];var t1=hash[7]+(rr(e,6)^rr(e,11)^rr(e,25))+((e&hash[5])^((~e)&hash[6]))+k[i]+(w[i]=(i<16)?w[i]:(w[i-16]+(rr(w15,7)^rr(w15,18)^(w15>>>3))+w[i-7]+(rr(w2,17)^rr(w2,19)^(w2>>>10)))|0);var t2=(rr(a,2)^rr(a,13)^rr(a,22))+((a&hash[1])^(a&hash[2])^(hash[1]&hash[2]));hash=[(t1+t2)|0].concat(hash);hash[4]=(hash[4]+t1)|0;}for(i=0;i<8;i++){hash[i]=(hash[i]+oh[i])|0;}}for(i=0;i<8;i++){for(j=3;j+1;j--){var b=(hash[i]>>(j*8))&255;res+=((b<16)?0:'')+b.toString(16);}}return res;}
+function ssH(s){return ssSha256(unescape(encodeURIComponent(s)));}
+var SS_SEL=['Zq7','-sw','1ss','H!k','9r2','_Vx'].join('');
+function ssCanon(o){if(o===null||typeof o!=='object')return JSON.stringify(o);if(Array.isArray(o))return'['+o.map(ssCanon).join(',')+']';return'{'+Object.keys(o).sort().map(function(k){return JSON.stringify(k)+':'+ssCanon(o[k]);}).join(',')+'}';}
+function ssLire(cle,def){try{return JSON.parse(localStorage.getItem(cle)||def);}catch(e){return JSON.parse(def);}}
+function ssSigEtat(){return ssH(SS_SEL+ssCanon([ssLire('swiss_shield_scores','{}'),ssLire('swiss_shield_ajustements','[]')])+SS_SEL);}
+function ssResign(){try{localStorage.setItem('swiss_shield_sig',ssSigEtat());}catch(e){}}
+function ssEtatValide(){var s=localStorage.getItem('swiss_shield_sig');if(!s){return Object.keys(ssLire('swiss_shield_scores','{}')).length===0&&ssLire('swiss_shield_ajustements','[]').length===0;}return s===ssSigEtat();}
+function ssSigFichier(p){return ssH(SS_SEL+ssCanon([p.type,p.version,p.nom_eleve,p.genere_le,p.scores,p.ajustements,p.debrief])+'#'+SS_SEL);}
+</script>
+</head>
+<body onload="initApp()">
+<button id="toggle-sobre-btn" onclick="basculerModeSobre()">Mode sobre</button>
+
+<canvas id="effect-canvas"></canvas>
+<div class="radar-sweep"></div>
+
+<div class="pwn-container">
+    <div class="header">
+        <span>UNIT: SWISS-SHIELD-TRAJECTORY | S00E02</span>
+        <span>STATUS: <span id="status-text" style="color:red">LOCKED</span></span>
+    </div>
+
+    <div id="lock-screen" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 550px;">
+        <h2 style="color: var(--system-blue);">[ DOSSIER RECRUTEMENT : ANALYSTE X ]</h2>
+        <div class="story-container">
+            <span style="color: var(--matrix-green)">> NARRATION :</span><br>
+            La Swiss Shield vous a tracé après votre patch du kernel. Vos anciens alliés de **COTL** exfiltrent des données fédérales. Prouvez votre valeur en interceptant le flux.
+        </div>
+        <p>Entrez la clé de l'épisode précédent :</p>
+        <input type="text" id="unlock-key" placeholder="VULN-PATCH-XXXX" style="background:#000; border:1px solid var(--matrix-green); color:#fff; padding:10px; text-align:center;">
+        <br>
+        <button class="btn" onclick="validateUnlock()">DÉVERROUILLER</button>
+        <br>
+        <a href="../../MENU_PRINCIPAL.html" class="btn-secondary">RETOUR MENU PRINCIPAL</a>
+    </div>
+
+    <div id="pre-req-screen" class="content">
+        <h3 style="color:var(--legal-gold)">[ PRÉ-REQUIS : ANALYSE DE TRACES ]</h3>
+        <div class="annexe-window">
+            <b>DOC_INTERNE_RFC :</b><br>
+            - Le recel de données numériques est puni par un article du Code Pénal (CP), parmi les infractions contre le patrimoine.<br>
+            - Pour identifier la route d'un pirate, on utilise l'outil <b>traceroute</b>, qui repose sur un protocole de contrôle de la couche réseau.
+        </div>
+        <p>1. Numéro de l'article CP sur le recel :</p>
+        <input type="text" id="pre-req-1" class="input-cmd" placeholder="Numéro de l'article" onchange="sauvegarderAutomatiquement()">
+        <p>2. Acronyme du protocole de contrôle utilisé par Traceroute :</p>
+        <input type="text" id="pre-req-2" class="input-cmd" placeholder="Acronyme" onchange="sauvegarderAutomatiquement()">
+        <br><br>
+        <button class="btn" onclick="validatePreReq()">ACCÉDER AU TERMINAL</button>
+    </div>
+
+    <div id="main-content" class="content">
+        <div style="border-left: 3px solid var(--system-blue); padding-left: 15px;">
+            <b>>> ALERTE EXFILTRATION :</b> Identifiez l'IP suspecte (port 443), tracez-la et coupez le flux.
+        </div>
+
+        <div class="network-log" id="net-log" style="height: 220px;">
+            <div class="packet">[09:43:51] IP 10.0.2.15 > 216.58.212.142.443: TLS Handshake</div>
+            <div class="packet">[09:44:02] IP 10.0.2.22 > 192.168.1.1.53: DNS Query</div>
+            <div class="packet">[09:44:05] IP 10.0.2.15 > 8.8.8.8.53: DNS Query</div>
+            <div class="packet">[09:44:09] IP 10.0.2.31 > 91.198.174.192.443: TLS Handshake</div>
+            <div class="packet suspicious">[09:44:12] IP 10.0.2.15 > 141.95.12.88.443: Flags [P.], DATA EXFIL</div>
+            <div class="packet">[09:44:15] IP 10.0.2.15 > 192.168.1.1.80: HTTP GET</div>
+            <div class="packet">[09:44:19] IP 10.0.2.44 > 172.67.0.12.443: TLS Handshake</div>
+            <div class="packet">[09:44:23] IP 10.0.2.15 > 8.8.4.4.53: DNS Query</div>
+            <div class="packet">[09:44:27] IP 10.0.2.19 > 40.90.4.1.443: TLS Handshake</div>
+        </div>
+
+        <div class="console-area">
+            <div id="console-output" style="color:#aaa; font-size:0.9em; margin-bottom:10px; height:80px; overflow-y:auto;">
+                En attente de commandes (traceroute [IP] / iptables -A OUTPUT -d [IP] -j DROP)
+            </div>
+            <span style="color:var(--system-blue)">admin@shield:~$</span>
+            <input type="text" id="console-input" class="input-cmd" onkeydown="handleConsole(event)">
+        </div>
+
+        <div class="help-grid">
+            <div class="help-card">
+                <h4 style="color:var(--system-blue)"> Informatique</h4>
+                <p><b>iptables</b> est l'outil standard sous Linux pour filtrer les paquets réseau entrant et sortant.</p>
+            </div>
+            <div class="help-card">
+                <h4 style="color:var(--forensic-red)"> Forensics</h4>
+                <p>L'IP 141.95.x.x appartient souvent à des VPS utilisés comme relais pour l'exfiltration.</p>
+            </div>
+            <div class="help-card">
+                <h4 style="color:var(--legal-gold)"> Juridique</h4>
+                <p>La <b>LPD</b> révisée exige une réaction immédiate en cas de violation de la sécurité des données.</p>
+            </div>
+        </div>
+
+        <div id="success" class="success-msg">
+            [+] FLUX INTERCEPTÉ : 141.95.12.88 (Bloqué).<br>
+            [+] CODE DE PROGRESSION : <b>SHIELD-NET-INTERCEPT-202</b><br><br>
+            <a href="../../MENU_PRINCIPAL.html" class="btn">TERMINER LA MISSION</a>
+        </div>
+    </div>
+</div>
+
+<div style="margin-top: 30px; border-top: 3px solid #d80000; padding: 20px; background: #0b0b0b; color: #ddd; border: 1px solid #333; font-family: Arial, sans-serif; position: relative; z-index: 100; width: 90%; max-width: 1000px; margin-left:auto; margin-right:auto;">
+    <div id="hint-score-badge" style="background:#111;color:#3fb950;padding:8px 15px;font-weight:bold;text-align:center;">Score de cet épisode : <span id="hint-score-value">5</span> / 5 pts</div>
+    <div style="display:flex; gap:8px; margin:10px 0;">
+        <button id="hintBtn1" onclick="useHint(1)" style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;">Indice 1 (-1 pt)</button>
+        <button id="hintBtn2" onclick="useHint(2)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">Indice 2 (-2 pts)</button>
+        <button id="hintBtn3" onclick="useHint(3)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">Indice 3 (-3 pts)</button>
+    </div>
+
+    <div id="zoneAide" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; color: #333;">
+        <p id="hint-tier-1" style="display:none;"><strong>INDICE 1 :</strong> Le pré-requis porte sur l'infraction de recel de données (Code pénal) et sur le protocole qu'utilise l'outil de traçage réseau. Ensuite, cherchez dans le journal l'adresse qui émet vers le port 443 avec la mention d'exfiltration.</p>
+        <p id="hint-tier-2" style="display:none;"><strong>INDICE 2 :</strong> Dans le terminal, la démarche est en deux temps : d'abord tracer l'adresse suspecte avec l'outil de traçage, puis seulement la bloquer avec une règle de pare-feu.</p>
+        <p id="hint-tier-3" style="display:none;"><strong>INDICE 3 :</strong> Règle de pare-feu : tableau OUTPUT (trafic sortant), ajout en fin de chaîne, destination l'adresse suspecte, cible DROP. Le LEXIQUE et la CENTRAL_TOOLBOX détaillent la syntaxe d'iptables.</p>
+    </div>
+</div>
+
+<script>
+    const EP_ID = "S00E02";
+    const HINT_COST = {1:1, 2:2, 3:3};
+    let hintsUsed = {1:false, 2:false, 3:false};
+    let episodeScore = 5;
+    function useHint(level) {
+        if (hintsUsed[level] || (level > 1 && !hintsUsed[level - 1])) return;
+        hintsUsed[level] = true;
+        enregistrerIndiceUsage(level);
+        episodeScore -= HINT_COST[level];
+        document.getElementById('hint-score-value').textContent = episodeScore;
+        document.getElementById('hint-tier-' + level).style.display = 'block';
+        const btn = document.getElementById('hintBtn' + level);
+        btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5';
+        if (level < 3) {
+            const next = document.getElementById('hintBtn' + (level + 1));
+            if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+        }
+        sauvegarderAutomatiquement();
+    }
+    function recordEpisodeSuccess() {
+        let scores = {};
+        try { scores = JSON.parse(localStorage.getItem('swiss_shield_scores') || '{}'); } catch(e) {}
+        if (!(EP_ID in scores) || scores[EP_ID] < episodeScore) scores[EP_ID] = episodeScore;
+        var ssOk = ssEtatValide();
+            localStorage.setItem('swiss_shield_scores', JSON.stringify(scores));
+            if (ssOk) ssResign();
+        localStorage.removeItem('autosave_' + EP_ID);
+    }
+    let currentZone = 'lock-screen';
+    function sauvegarderAutomatiquement() {
+        try {
+            const inputs = {};
+            ['pre-req-1', 'pre-req-2'].forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) inputs[id] = el.value;
+            });
+            localStorage.setItem('autosave_' + EP_ID, JSON.stringify({
+                zone: currentZone,
+                inputs: inputs,
+                traceDone: traceDone,
+                hintsUsed: hintsUsed,
+                episodeScore: episodeScore
+            }));
+        } catch(e) {}
+    }
+    function proposerRestaurationAutosave() {
+        let data;
+        try { data = JSON.parse(localStorage.getItem('autosave_' + EP_ID) || 'null'); } catch(e) { return; }
+        if (!data || !data.zone || data.zone === 'lock-screen') return;
+        document.getElementById('lock-screen').style.display = 'none';
+        if (data.zone === 'main-content') {
+            document.getElementById('pre-req-screen').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+            document.getElementById('status-text').innerText = "AUTHORIZED";
+            document.getElementById('status-text').style.color = "var(--matrix-green)";
+            traceDone = !!data.traceDone;
+            if (traceDone) {
+                document.getElementById('console-output').innerHTML += '<br><span style="color:#3498db">[INFO] Progression restaurée — IP déjà tracée.</span>';
+            }
+        } else if (data.zone === 'pre-req-screen') {
+            document.getElementById('pre-req-screen').style.display = 'block';
+        }
+        currentZone = data.zone;
+        if (data.inputs) {
+            Object.keys(data.inputs).forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) el.value = data.inputs[id];
+            });
+        }
+        hintsUsed = data.hintsUsed || hintsUsed;
+        episodeScore = (typeof data.episodeScore === 'number') ? data.episodeScore : episodeScore;
+        document.getElementById('hint-score-value').textContent = episodeScore;
+        [1, 2, 3].forEach(function(level) {
+            if (hintsUsed[level]) {
+                document.getElementById('hint-tier-' + level).style.display = 'block';
+                const btn = document.getElementById('hintBtn' + level);
+                if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+        });
+    }
+    function enregistrerIndiceUsage(niveau) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + niveau;
+            debrief.indices[cle] = (debrief.indices[cle] || 0) + 1;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+    function enregistrerErreur(phase, reponseEleve, reponseAttendue) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + phase;
+            if (typeof debrief.erreurs[cle] !== 'object' || debrief.erreurs[cle] === null) {
+                debrief.erreurs[cle] = { compte: (debrief.erreurs[cle] || 0), exemples: [] };
+            }
+            debrief.erreurs[cle].compte++;
+            if (reponseEleve !== undefined && debrief.erreurs[cle].exemples.length < 5) {
+                debrief.erreurs[cle].exemples.push({ reponseEleve: String(reponseEleve).slice(0,100), reponseAttendue: String(reponseAttendue||'').slice(0,100) });
+            }
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+    (function pollSuccess(){
+        const ids = ['success','success-msg','success-final','final-zone','victory-zone','victory-screen','final-step','final-badge'];
+        let recorded = false;
+        setInterval(function(){
+            if (recorded) return;
+            for (const id of ids) {
+                const el = document.getElementById(id);
+                if (el && el.style.display === 'block') { recordEpisodeSuccess(); recorded = true; if (!document.getElementById('ss-next-btn')) { var a = document.createElement('a'); a.id = 'ss-next-btn'; a.href = '../E03/index.html'; a.textContent = 'PASSER À L\'ÉPISODE 3'; a.style.cssText = 'display:block;width:max-content;max-width:90%;margin:25px auto;padding:14px 26px;background:#000;color:#fff;border:2px solid #d80000;font-weight:bold;text-align:center;text-decoration:none;font-family:inherit;letter-spacing:1px;cursor:pointer;'; el.appendChild(a); } return; }
+            }
+        }, 500);
+    })();
+</script>
+
+<script>
+
+    const canvas = document.getElementById('effect-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function initApp() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        for (let i = 0; i < 100; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 2,
+                speedX: Math.random() * 0.5 - 0.25,
+                speedY: Math.random() * 0.5 - 0.25
+            });
+        }
+        appliquerModeSobre();
+        if (localStorage.getItem('swiss_shield_mode_sobre') !== '1') animate();
+        document.getElementById('lock-screen').style.display = 'flex';
+        proposerRestaurationAutosave();
+    }
+
+    function appliquerModeSobre() {
+        const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+        document.body.classList.toggle('mode-sobre', actif);
+        const btn = document.getElementById('toggle-sobre-btn');
+        if (btn) btn.textContent = actif ? 'Mode sobre : ON' : 'Mode sobre';
+    }
+
+    function basculerModeSobre() {
+        const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+        localStorage.setItem('swiss_shield_mode_sobre', actif ? '0' : '1');
+        appliquerModeSobre();
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#00ff41';
+        particles.forEach(p => {
+            p.x += p.speedX; p.y += p.speedY;
+            if(p.x < 0 || p.x > canvas.width) p.speedX *= -1;
+            if(p.y < 0 || p.y > canvas.height) p.speedY *= -1;
+            ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill();
+        });
+        requestAnimationFrame(animate);
+    }
+
+    function validateUnlock() {
+        if (ssCle('unlock-key') === "VULN-PATCH-COMPLETE") {
+            document.getElementById('lock-screen').style.display = 'none';
+            document.getElementById('pre-req-screen').style.display = 'block';
+            currentZone = 'pre-req-screen';
+            sauvegarderAutomatiquement();
+        } else { enregistrerErreur('entree', document.getElementById('unlock-key').value.trim(), 'VULN-PATCH-COMPLETE'); alert("ACCÈS REFUSÉ"); }
+    }
+
+    function validatePreReq() {
+        const r1 = document.getElementById('pre-req-1').value.trim();
+        const r2 = document.getElementById('pre-req-2').value.trim().toUpperCase();
+        if (ssArt(r1) === "160" && ssSans(r2) === "icmp") {
+            document.getElementById('pre-req-screen').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+            document.getElementById('status-text').innerText = "AUTHORIZED";
+            document.getElementById('status-text').style.color = "var(--matrix-green)";
+            currentZone = 'main-content';
+            sauvegarderAutomatiquement();
+        } else { enregistrerErreur('prerequis', 'art="' + r1 + '", protocole="' + r2 + '"', 'art="160", protocole="ICMP"'); alert("ANALYSE INCORRECTE"); }
+    }
+
+    let traceDone = false;
+    function handleConsole(e) {
+        if (e.key === 'Enter') {
+            const input = document.getElementById('console-input');
+            const cmd = input.value.trim();
+            const output = document.getElementById('console-output');
+            const ip = "141.95.12.88";
+            const c = ssCmd(cmd);
+
+            output.innerHTML += `<br><span style="color:#fff">> ${cmd.replace(/</g,'&lt;')}</span>`;
+
+            if (c === `traceroute ${ip}` || c === `traceroute -n ${ip}`) {
+                output.innerHTML += `<br>[*] Route identifiée : 10.0.2.1 -> 194.2.0.1 -> ${ip}`;
+                traceDone = true;
+                sauvegarderAutomatiquement();
+            } else if (/^iptables -A OUTPUT -d 141\.95\.12\.88(\/32)? -j DROP$/.test(c)) {
+                if (!traceDone) {
+                    enregistrerErreur('investigation', cmd, `traceroute ${ip} (d'abord)`);
+                    output.innerHTML += `<br><span style="color:red">[!] Erreur : IP non tracée.</span>`;
+                } else {
+                    output.innerHTML += `<br><span style="color:var(--matrix-green)">[+] Flux coupé.</span>`;
+                    document.getElementById('success').style.display = 'block';
+                }
+            } else {
+                enregistrerErreur('investigation', cmd, `traceroute ${ip} / iptables -A OUTPUT -d ${ip} -j DROP`);
+                output.innerHTML += `<br><span style="color:red">Erreur de syntaxe ou IP incorrecte.</span>`;
+            }
+            input.value = '';
+            output.scrollTop = output.scrollHeight;
+        }
+    }
+</script>
+</body>
+</html>

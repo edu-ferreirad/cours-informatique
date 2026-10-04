@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>S00E01 - SWISS SHIELD - ZERO-DAY</title>
+    <style>
+        :root {
+            --matrix-green: #00ff41;
+            --terminal-bg: #050a05;
+            --error-red: #ff3333;
+            --system-blue: #3498db;
+            --gold: #ffcc00;
+        }
+
+        body {
+            background-color: var(--terminal-bg);
+            color: var(--matrix-green);
+            font-family: 'Consolas', 'Lucida Console', monospace;
+            padding: 20px; margin: 0;
+            overflow-x: hidden;
+        }
+
+        #matrix-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; opacity: 0.15;
+        }
+
+        .pwn-container {
+            border: 1px solid var(--matrix-green);
+            max-width: 950px; margin: 0 auto;
+            background: rgba(0, 10, 0, 0.95);
+            box-shadow: 0 0 25px rgba(0, 255, 65, 0.2);
+            position: relative; z-index: 2;
+        }
+
+        #lock-screen, #pre-req-screen, #main-content { display: none; }
+
+        .header {
+            background: var(--matrix-green); color: #000;
+            padding: 5px 15px; font-weight: bold;
+            display: flex; justify-content: space-between;
+        }
+
+        .content { padding: 25px; }
+
+        .annexe-container {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0;
+        }
+        .annexe-window {
+            background: #000; border: 1px solid #444; padding: 10px; font-size: 0.75em; color: #aaa;
+            max-height: 150px; overflow-y: auto;
+        }
+        .annexe-header { color: var(--gold); border-bottom: 1px solid #333; margin-bottom: 5px; font-weight: bold; }
+
+        .code-window { background: #000; border: 1px solid #333; border-radius: 5px; margin: 20px 0; }
+        .code-header { background: #1a1a1a; padding: 5px 15px; color: #888; font-size: 0.8em; }
+
+        .line-input {
+            background: transparent; border: none; border-bottom: 1px solid var(--system-blue);
+            color: #fff; width: 450px; font-family: inherit; font-size: 1em;
+            outline: none; padding: 2px 5px;
+        }
+
+        .btn {
+            background: var(--matrix-green); color: #000;
+            border: none; padding: 12px 25px; cursor: pointer;
+            font-weight: bold; text-transform: uppercase; margin: 10px;
+        }
+
+        .btn-secondary {
+            background: transparent; color: var(--matrix-green);
+            border: 1px solid var(--matrix-green); padding: 8px 15px;
+            text-decoration: none; font-size: 0.8em; display: inline-block;
+        }
+
+        .success-msg {
+            display: none; border: 2px solid var(--matrix-green);
+            padding: 20px; text-align: center; margin-top: 20px;
+            background: rgba(0, 255, 65, 0.1);
+        }
+
+        .help-grid {
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 30px;
+        }
+
+        .help-card {
+            background: rgba(0, 0, 0, 0.6); border: 1px solid #333; padding: 15px; font-size: 0.8em;
+        }
+
+        .glitch-text { animation: glitch 1s linear infinite; color: var(--error-red); }
+        @keyframes glitch { 2%, 64% { transform: translate(2px, 0); } 4%, 60% { transform: translate(-2px, 0); } }
+
+        
+        body.mode-sobre, body.mode-sobre * { animation: none !important; transition: none !important; }
+        body.mode-sobre #matrix-canvas { display: none !important; }
+        #toggle-sobre-btn {
+            position: fixed; top: 10px; right: 10px; z-index: 10001;
+            background: #000; color: var(--matrix-green); border: 1px solid var(--matrix-green);
+            padding: 6px 10px; font-size: 0.7em; cursor: pointer; font-family: inherit; border-radius: 3px;
+        }
+    </style>
+<script id="ss-helpers">
+function ssNorm(s){return String(s==null?'':s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[\u2018\u2019\u00b4`]/g,"'").replace(/\u0153/g,'oe').replace(/\s+/g,' ').trim();}
+function ssSans(s){return ssNorm(s).replace(/[^a-z0-9]/g,'');}
+function ssCle(id){var el=document.getElementById(id);return String(el&&el.value||'').replace(/\s+/g,'').toUpperCase();}
+function ssNb(s){return ssNorm(s).replace(/\b(chf|francs?|fr|ans?|jours?|octets?|mo|secondes?|sec|s)\b/g,'').replace(/['\s]/g,'').replace(/\.-$/,'').replace(',','.').replace(/[^0-9.\-]/g,'');}
+function ssArt(s){var m=ssNorm(s).match(/(\d+)\s*(bis|ter|quater|quinquies|sexies|septies|octies|novies|decies)?/);return m?m[1]+(m[2]||''):'';}
+function ssCmd(s){return String(s==null?'':s).replace(/\s+/g,' ').trim().replace(/^sudo /,'');}
+function ssSha256(ascii){function rr(v,a){return(v>>>a)|(v<<(32-a));}var mp=Math.pow,mw=mp(2,32),L='length',i,j,res='';var words=[],bl=ascii[L]*8;var hash=ssSha256.h=ssSha256.h||[],k=ssSha256.k=ssSha256.k||[],pc=k[L];var ic={};for(var c=2;pc<64;c++){if(!ic[c]){for(i=0;i<313;i+=c){ic[i]=c;}hash[pc]=(mp(c,.5)*mw)|0;k[pc++]=(mp(c,1/3)*mw)|0;}}ascii+='\x80';while(ascii[L]%64-56)ascii+='\x00';for(i=0;i<ascii[L];i++){j=ascii.charCodeAt(i);words[i>>2]|=j<<((3-i)%4)*8;}words[words[L]]=((bl/mw)|0);words[words[L]]=(bl);for(j=0;j<words[L];){var w=words.slice(j,j+=16);var oh=hash;hash=hash.slice(0,8);for(i=0;i<64;i++){var w15=w[i-15],w2=w[i-2];var a=hash[0],e=hash[4];var t1=hash[7]+(rr(e,6)^rr(e,11)^rr(e,25))+((e&hash[5])^((~e)&hash[6]))+k[i]+(w[i]=(i<16)?w[i]:(w[i-16]+(rr(w15,7)^rr(w15,18)^(w15>>>3))+w[i-7]+(rr(w2,17)^rr(w2,19)^(w2>>>10)))|0);var t2=(rr(a,2)^rr(a,13)^rr(a,22))+((a&hash[1])^(a&hash[2])^(hash[1]&hash[2]));hash=[(t1+t2)|0].concat(hash);hash[4]=(hash[4]+t1)|0;}for(i=0;i<8;i++){hash[i]=(hash[i]+oh[i])|0;}}for(i=0;i<8;i++){for(j=3;j+1;j--){var b=(hash[i]>>(j*8))&255;res+=((b<16)?0:'')+b.toString(16);}}return res;}
+function ssH(s){return ssSha256(unescape(encodeURIComponent(s)));}
+var SS_SEL=['Zq7','-sw','1ss','H!k','9r2','_Vx'].join('');
+function ssCanon(o){if(o===null||typeof o!=='object')return JSON.stringify(o);if(Array.isArray(o))return'['+o.map(ssCanon).join(',')+']';return'{'+Object.keys(o).sort().map(function(k){return JSON.stringify(k)+':'+ssCanon(o[k]);}).join(',')+'}';}
+function ssLire(cle,def){try{return JSON.parse(localStorage.getItem(cle)||def);}catch(e){return JSON.parse(def);}}
+function ssSigEtat(){return ssH(SS_SEL+ssCanon([ssLire('swiss_shield_scores','{}'),ssLire('swiss_shield_ajustements','[]')])+SS_SEL);}
+function ssResign(){try{localStorage.setItem('swiss_shield_sig',ssSigEtat());}catch(e){}}
+function ssEtatValide(){var s=localStorage.getItem('swiss_shield_sig');if(!s){return Object.keys(ssLire('swiss_shield_scores','{}')).length===0&&ssLire('swiss_shield_ajustements','[]').length===0;}return s===ssSigEtat();}
+function ssSigFichier(p){return ssH(SS_SEL+ssCanon([p.type,p.version,p.nom_eleve,p.genere_le,p.scores,p.ajustements,p.debrief])+'#'+SS_SEL);}
+</script>
+</head>
+<body>
+<button id="toggle-sobre-btn" onclick="basculerModeSobre()">Mode sobre</button>
+
+<canvas id="matrix-canvas"></canvas>
+
+<div class="pwn-container">
+    <div class="header">
+        <span>UNIT: MATU-SWISS-UNIT | S00E01</span>
+        <span>SECURITY: <span id="status-text" style="color:var(--error-red)">LOCKED</span></span>
+    </div>
+
+    <div id="lock-screen" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 600px;">
+        <h2 class="glitch-text">[ ACCÈS RESTREINT : INFRASTRUCTURE FÉDÉRALE ]</h2>
+        <p>Insérez la clé de session (Épisode 00) :</p>
+        <input type="text" id="unlock-key" placeholder="SESSION-XXXX-XXXX"
+               style="background:#000; border:1px solid var(--matrix-green); color:#fff; padding:10px; text-align:center; width:300px;">
+        <button class="btn" onclick="checkUnlock()">DÉVERROUILLER</button>
+        <br>
+        <a href="../../MENU_PRINCIPAL.html" class="btn-secondary">RETOUR MENU PRINCIPAL</a>
+    </div>
+
+    <div id="pre-req-screen" class="content">
+        <h3 style="color:var(--system-blue)">[ PRÉ-REQUIS DE SÉCURITÉ ]</h3>
+
+        <div class="annexe-container">
+            <div class="annexe-window">
+                <div class="annexe-header">EXTRAITS LÉGAUX (CH)</div>
+                - Art. 143 CP : Soustraction de données.<br>
+                - Art. 143 bis CP : Accès indu à un système informatique.<br>
+                - Art. 144 CP : Détérioration de données.
+            </div>
+            <div class="annexe-window">
+                <div class="annexe-header">REGISTRES PROCESSEUR</div>
+                - EAX : Accumulateur<br>
+                - EIP : Instruction Pointer (Contrôle du flux)<br>
+                - ESP : Stack Pointer
+            </div>
+        </div>
+
+        <p>1. Référence de l'article CP sur l'accès indu (ex: 123 bis) :</p>
+        <input type="text" id="pre-req-law" class="line-input" placeholder="Réponse attendue" onchange="sauvegarderAutomatiquement()">
+
+        <p>2. Registre de pointeur d'instruction (3 lettres) :</p>
+        <input type="text" id="pre-req-tech" class="line-input" placeholder="Réponse attendue" onchange="sauvegarderAutomatiquement()">
+
+        <br><br>
+        <button class="btn" onclick="checkPreReq()">VÉRIFIER</button>
+    </div>
+
+    <div id="main-content" class="content">
+        <h3 style="color:var(--gold)">TASK : CORRECTIF KERNEL</h3>
+
+        <div class="code-window">
+            <div class="code-header">vuln_service.c</div>
+            <pre style="padding:15px; margin:0; color:#888;">
+void process_data(char *user_input) {
+  char buffer[64];
+  [CODE_A_SAISIR]
+}</pre>
+        </div>
+
+        <p>> Saisissez la ligne de code complète qui remplace l'appel vulnérable :</p>
+        <input type="text" id="code-patch" class="line-input" placeholder="Ligne de code" onchange="sauvegarderAutomatiquement()">
+
+        <p style="margin-top:20px;">Loi applicable pour la protection des données (Suisse, 2023) :</p>
+        <select id="law-select" style="background:#000; color:#fff; padding:10px; border: 1px solid var(--matrix-green); width: 100%;" onchange="sauvegarderAutomatiquement()">
+            <option value="none">-- Choisir --</option>
+            <option value="cp">Code Pénal</option>
+            <option value="lpd">LPD</option>
+        </select>
+
+        <button class="btn" style="width: 100%; margin-top: 30px;" onclick="verifyAll()">APPLIQUER LE PATCH</button>
+
+        <div class="help-grid">
+            <div class="help-card">
+                <h4 style="color:var(--system-blue)">Informatique</h4>
+                <p>Le paramètre de taille empêche d'écrire plus d'octets que le buffer n'en contient.</p>
+            </div>
+            <div class="help-card">
+                <h4 style="color:var(--gold)">Juridique</h4>
+                <p>La LPD révisée impose des mesures techniques pour protéger les données.</p>
+            </div>
+            <div class="help-card">
+                <h4 style="color:var(--error-red)">Forensics</h4>
+                <p>Un crash lors de l'écrasement de EIP est un indicateur fort d'une tentative d'overflow.</p>
+            </div>
+        </div>
+
+        <div id="success" class="success-msg">
+            <h2>MISSION ACCOMPLIE</h2>
+            <p>Code de progression : <b style="color:white;">VULN-PATCH-COMPLETE</b></p>
+            <a href="../../MENU_PRINCIPAL.html" class="btn">TERMINER</a>
+        </div>
+    </div>
+</div>
+
+<div style="margin-top: 30px; border-top: 3px solid #d80000; padding: 20px; background: #0b0b0b; color: #ddd; border: 1px solid #333; font-family: Arial, sans-serif; position: relative; z-index: 100; width: 90%; max-width: 950px; margin-left:auto; margin-right:auto;">
+    <div id="hint-score-badge" style="background:#111;color:#3fb950;padding:8px 15px;font-weight:bold;text-align:center;">Score de cet épisode : <span id="hint-score-value">5</span> / 5 pts</div>
+    <div style="display:flex; gap:8px; margin:10px 0;">
+        <button id="hintBtn1" onclick="useHint(1)" style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;">Indice 1 (-1 pt)</button>
+        <button id="hintBtn2" onclick="useHint(2)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">Indice 2 (-2 pts)</button>
+        <button id="hintBtn3" onclick="useHint(3)" disabled style="flex:1;background:#d80000;color:#fff;border:none;padding:10px;cursor:pointer;font-weight:bold;opacity:0.5;">Indice 3 (-3 pts)</button>
+    </div>
+
+    <div id="zoneAide" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; color: #333;">
+        <p id="hint-tier-1" style="display:none;"><strong>INDICE 1 :</strong> Après le déverrouillage, deux éléments sont demandés : l'article du Code pénal suisse sur l'accès indu à un système (voir les extraits légaux affichés) et le registre du processeur qui contrôle le flux d'exécution.</p>
+        <p id="hint-tier-2" style="display:none;"><strong>INDICE 2 :</strong> Pour le patch : remplacez la fonction vulnérable <code>strcpy</code> par sa version avec limite de taille. Elle prend trois arguments : destination, source, nombre maximal d'octets.</p>
+        <p id="hint-tier-3" style="display:none;"><strong>INDICE 3 :</strong> Écrivez la ligne complète dans l'ordre destination, source, taille, terminée par un point-virgule. La taille doit correspondre à celle déclarée pour le tampon. Pour la loi, choisissez celle qui est spécifique à la protection des données.</p>
+    </div>
+</div>
+
+<script>
+    const EP_ID = "S00E01";
+    const HINT_COST = {1:1, 2:2, 3:3};
+    let hintsUsed = {1:false, 2:false, 3:false};
+    let episodeScore = 5;
+    function useHint(level) {
+        if (hintsUsed[level] || (level > 1 && !hintsUsed[level - 1])) return;
+        hintsUsed[level] = true;
+        enregistrerIndiceUsage(level);
+        episodeScore -= HINT_COST[level];
+        document.getElementById('hint-score-value').textContent = episodeScore;
+        document.getElementById('hint-tier-' + level).style.display = 'block';
+        const btn = document.getElementById('hintBtn' + level);
+        btn.disabled = true; btn.style.cursor = 'default'; btn.style.opacity = '0.5';
+        if (level < 3) {
+            const next = document.getElementById('hintBtn' + (level + 1));
+            if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+        }
+        sauvegarderAutomatiquement();
+    }
+    function recordEpisodeSuccess() {
+        let scores = {};
+        try { scores = JSON.parse(localStorage.getItem('swiss_shield_scores') || '{}'); } catch(e) {}
+        if (!(EP_ID in scores) || scores[EP_ID] < episodeScore) scores[EP_ID] = episodeScore;
+        var ssOk = ssEtatValide();
+            localStorage.setItem('swiss_shield_scores', JSON.stringify(scores));
+            if (ssOk) ssResign();
+        localStorage.removeItem('autosave_' + EP_ID);
+    }
+    let currentZone = 'lock-screen';
+    function sauvegarderAutomatiquement() {
+        try {
+            const inputs = {};
+            ['pre-req-law', 'pre-req-tech', 'code-patch', 'law-select'].forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) inputs[id] = el.value;
+            });
+            localStorage.setItem('autosave_' + EP_ID, JSON.stringify({
+                zone: currentZone,
+                inputs: inputs,
+                hintsUsed: hintsUsed,
+                episodeScore: episodeScore
+            }));
+        } catch(e) {}
+    }
+    function proposerRestaurationAutosave() {
+        let data;
+        try { data = JSON.parse(localStorage.getItem('autosave_' + EP_ID) || 'null'); } catch(e) { return; }
+        if (!data || !data.zone || data.zone === 'lock-screen') return;
+        document.getElementById('lock-screen').style.display = 'none';
+        if (data.zone === 'main-content') {
+            document.getElementById('pre-req-screen').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+        } else if (data.zone === 'pre-req-screen') {
+            document.getElementById('pre-req-screen').style.display = 'block';
+        }
+        currentZone = data.zone;
+        if (data.inputs) {
+            Object.keys(data.inputs).forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) el.value = data.inputs[id];
+            });
+        }
+        hintsUsed = data.hintsUsed || hintsUsed;
+        episodeScore = (typeof data.episodeScore === 'number') ? data.episodeScore : episodeScore;
+        document.getElementById('hint-score-value').textContent = episodeScore;
+        [1, 2, 3].forEach(function(level) {
+            if (hintsUsed[level]) {
+                document.getElementById('hint-tier-' + level).style.display = 'block';
+                const btn = document.getElementById('hintBtn' + level);
+                if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+                const next = document.getElementById('hintBtn' + (level + 1));
+                if (next) { next.disabled = false; next.style.opacity = '1'; next.style.cursor = 'pointer'; }
+            }
+        });
+    }
+    function enregistrerIndiceUsage(niveau) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + niveau;
+            debrief.indices[cle] = (debrief.indices[cle] || 0) + 1;
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+    function enregistrerErreur(phase, reponseEleve, reponseAttendue) {
+        try {
+            let debrief = JSON.parse(localStorage.getItem('swiss_shield_debrief') || '{"erreurs":{},"indices":{}}');
+            const cle = EP_ID + ':' + phase;
+            if (typeof debrief.erreurs[cle] !== 'object' || debrief.erreurs[cle] === null) {
+                debrief.erreurs[cle] = { compte: (debrief.erreurs[cle] || 0), exemples: [] };
+            }
+            debrief.erreurs[cle].compte++;
+            if (reponseEleve !== undefined && debrief.erreurs[cle].exemples.length < 5) {
+                debrief.erreurs[cle].exemples.push({ reponseEleve: String(reponseEleve).slice(0,100), reponseAttendue: String(reponseAttendue||'').slice(0,100) });
+            }
+            localStorage.setItem('swiss_shield_debrief', JSON.stringify(debrief));
+        } catch(e) {}
+    }
+    (function pollSuccess(){
+        const ids = ['success','success-msg','success-final','final-zone','victory-zone','victory-screen','final-step','final-badge'];
+        let recorded = false;
+        setInterval(function(){
+            if (recorded) return;
+            for (const id of ids) {
+                const el = document.getElementById(id);
+                if (el && el.style.display === 'block') { recordEpisodeSuccess(); recorded = true; if (!document.getElementById('ss-next-btn')) { var a = document.createElement('a'); a.id = 'ss-next-btn'; a.href = '../E02/index.html'; a.textContent = 'PASSER À L\'ÉPISODE 2'; a.style.cssText = 'display:block;width:max-content;max-width:90%;margin:25px auto;padding:14px 26px;background:#000;color:#fff;border:2px solid #d80000;font-weight:bold;text-align:center;text-decoration:none;font-family:inherit;letter-spacing:1px;cursor:pointer;'; el.appendChild(a); } return; }
+            }
+        }, 500);
+    })();
+</script>
+
+<script>
+    const canvas = document.getElementById('matrix-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+    const rainDrops = Array.from({ length: Math.floor(canvas.width / 16) }).fill(1);
+    let matrixIntervalId = null;
+    function demarrerMatrix() {
+        if (localStorage.getItem('swiss_shield_mode_sobre') === '1') return;
+        matrixIntervalId = setInterval(() => {
+            ctx.fillStyle = 'rgba(5, 10, 5, 0.05)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#0F0'; ctx.font = '16px monospace';
+            rainDrops.forEach((y, i) => {
+                ctx.fillText(Math.floor(Math.random()*2), i*16, y*16);
+                if (y*16 > canvas.height && Math.random() > 0.975) rainDrops[i] = 0;
+                rainDrops[i]++;
+            });
+        }, 30);
+    }
+    function appliquerModeSobre() {
+        const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+        document.body.classList.toggle('mode-sobre', actif);
+        const btn = document.getElementById('toggle-sobre-btn');
+        if (btn) btn.textContent = actif ? 'Mode sobre : ON' : 'Mode sobre';
+        if (actif && matrixIntervalId) { clearInterval(matrixIntervalId); matrixIntervalId = null; }
+    }
+    function basculerModeSobre() {
+        const actif = localStorage.getItem('swiss_shield_mode_sobre') === '1';
+        localStorage.setItem('swiss_shield_mode_sobre', actif ? '0' : '1');
+        appliquerModeSobre();
+        if (!actif) {  }
+    }
+    appliquerModeSobre();
+    demarrerMatrix();
+    proposerRestaurationAutosave();
+
+    function checkUnlock() {
+        if (ssCle('unlock-key') === "SESSION-SHIELD-OPEN-01") {
+            document.getElementById('lock-screen').style.display = 'none';
+            document.getElementById('pre-req-screen').style.display = 'block';
+            currentZone = 'pre-req-screen';
+            sauvegarderAutomatiquement();
+        } else { enregistrerErreur('entree', document.getElementById('unlock-key').value.trim(), 'SESSION-SHIELD-OPEN-01'); alert("ACCÈS REFUSÉ"); }
+    }
+
+    function checkPreReq() {
+        const l = document.getElementById('pre-req-law').value.trim().toLowerCase();
+        const t = document.getElementById('pre-req-tech').value.trim().toUpperCase();
+        if (ssArt(l) === "143bis" && ssSans(t) === "eip") {
+            document.getElementById('pre-req-screen').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+            currentZone = 'main-content';
+            sauvegarderAutomatiquement();
+        } else { enregistrerErreur('prerequis', 'article="' + l + '", registre="' + t + '"', 'article="143 bis", registre="EIP"'); alert("ERREUR D'ANALYSE"); }
+    }
+
+    function verifyAll() {
+        const p = document.getElementById('code-patch').value.trim();
+        const l = document.getElementById('law-select').value;
+
+        const regex = /strncpy\s*\(\s*buffer\s*,\s*user_input\s*,\s*64\s*\)\s*;?/;
+
+        if (regex.test(p) && l === "lpd") {
+            document.getElementById('success').style.display = 'block';
+            document.getElementById('success').scrollIntoView();
+        } else { enregistrerErreur('investigation', 'code="' + p + '", loi="' + l + '"', 'code="strncpy(buffer, user_input, 64);", loi="lpd"'); alert("ERREUR : Code incomplet ou loi incorrecte."); }
+    }
+</script>
+</body>
+</html>
