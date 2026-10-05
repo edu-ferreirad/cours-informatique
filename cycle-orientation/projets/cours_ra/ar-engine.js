@@ -38,8 +38,6 @@ const ArEngine = (() => {
       videoEl.srcObject = stream;
       await videoEl.play();
       resizeCanvas();
-      window.addEventListener("resize", resizeCanvas);
-      window.addEventListener("orientationchange", resizeCanvas);
       loop();
       return { ok: true };
     } catch (err) {
@@ -57,8 +55,6 @@ const ArEngine = (() => {
   function detach() {
     if (rafId) cancelAnimationFrame(rafId);
     rafId = null;
-    window.removeEventListener("resize", resizeCanvas);
-    window.removeEventListener("orientationchange", resizeCanvas);
     if (stream) {
       stream.getTracks().forEach(t => t.stop());
       stream = null;
@@ -66,12 +62,59 @@ const ArEngine = (() => {
     darkSince = null;
     darkTriggered = false;
     onDarkCallback = null;
+    unwatchHeading();
   }
 
   function watchDarkness(callback) {
     onDarkCallback = callback;
     darkTriggered = false;
     darkSince = null;
+  }
+
+  // ---------------------------------------------------------------
+  // CAP BOUSSOLE (mode "boussole" iPad/iPhone sans WebXR) — même esprit
+  // que watchDarkness : un flux continu de valeurs, jamais bloquant si le
+  // capteur est absent ou refusé (le mode boussole a son propre repli).
+  // iOS 13+ exige un geste utilisateur explicite avant d'autoriser
+  // l'accès au capteur d'orientation — d'où requestHeadingPermission(),
+  // à appeler depuis un clic.
+  // ---------------------------------------------------------------
+  let headingCallback = null;
+  let orientationHandler = null;
+
+  function headingSupported() {
+    return typeof DeviceOrientationEvent !== "undefined";
+  }
+
+  async function requestHeadingPermission() {
+    if (typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function") {
+      try { return (await DeviceOrientationEvent.requestPermission()) === "granted"; }
+      catch { return false; }
+    }
+    return headingSupported(); // Android/desktop : pas de porte de permission séparée
+  }
+
+  function watchHeading(callback) {
+    headingCallback = callback;
+    if (orientationHandler) return; // déjà à l'écoute
+    orientationHandler = (e) => {
+      let heading = null;
+      if (typeof e.webkitCompassHeading === "number") {
+        heading = e.webkitCompassHeading; // Safari iOS : déjà un cap compas utilisable tel quel
+      } else if (typeof e.alpha === "number") {
+        heading = (360 - e.alpha) % 360; // Android/Chrome : alpha tourne dans l'autre sens
+      }
+      if (heading !== null && headingCallback) headingCallback(heading);
+    };
+    window.addEventListener("deviceorientation", orientationHandler, true);
+  }
+
+  function unwatchHeading() {
+    if (orientationHandler) {
+      window.removeEventListener("deviceorientation", orientationHandler, true);
+      orientationHandler = null;
+    }
+    headingCallback = null;
   }
 
   function sampleLuminance() {
@@ -93,10 +136,6 @@ const ArEngine = (() => {
     rafId = requestAnimationFrame(loop);
     if (!ctx || !canvasEl) return;
     ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
-
-    // BUGFIX écran noir (hors Android/WebXR) : la <video> est display:none et le fond est #000,
-    // donc le flux caméra n'était jamais visible en mode boussole/repli. On le dessine ici (cover).
-    drawVideoFrame();
 
     // reticle / anchoring effect
     drawReticle(ts || 0);
@@ -121,16 +160,6 @@ const ArEngine = (() => {
         }
       }
     }
-  }
-
-  function drawVideoFrame() {
-    if (!videoEl || videoEl.readyState < 2) return;
-    const vw = videoEl.videoWidth, vh = videoEl.videoHeight;
-    if (!vw || !vh) return;
-    const cw = canvasEl.width, ch = canvasEl.height;
-    const scale = Math.max(cw / vw, ch / vh);
-    const dw = vw * scale, dh = vh * scale;
-    ctx.drawImage(videoEl, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
   }
 
   function drawReticle(ts) {
@@ -198,7 +227,7 @@ const ArEngine = (() => {
     tick();
   }
 
-  return { attach, detach, watchDarkness, scan, setMode, setTestMode, resizeCanvas };
+  return { attach, detach, watchDarkness, scan, setMode, setTestMode, resizeCanvas, headingSupported, requestHeadingPermission, watchHeading, unwatchHeading };
 })();
 
 // exposition explicite (compat multi-<script> et environnements de test)
@@ -429,20 +458,14 @@ const ArXR = (() => {
 
   // ---- cache d'images préchargées pour les panneaux RA (échelle, ascenseur, rébus, écussons...) ----
   const imageCache = {};
-  function preloadImage(assetKeyOrUrl) {
-    if (!assetKeyOrUrl) return Promise.resolve(null);
-    // Le musée n'a pas de registre GAME_ASSETS : ses objets passent directement
-    // une URL d'image (http... ou assets/...). L'escalade continue de passer
-    // une assetKey résolue via GAME_ASSETS, comme avant.
-    const isDirectUrl = /^https?:\/\//.test(assetKeyOrUrl) || assetKeyOrUrl.startsWith("assets/");
-    const cacheKey = assetKeyOrUrl;
-    if (imageCache[cacheKey]) return Promise.resolve(imageCache[cacheKey]);
-    const url = isDirectUrl ? assetKeyOrUrl : (typeof GAME_ASSETS !== "undefined" ? GAME_ASSETS[assetKeyOrUrl] : null);
+  function preloadImage(assetKey) {
+    if (!assetKey) return Promise.resolve(null);
+    if (imageCache[assetKey]) return Promise.resolve(imageCache[assetKey]);
+    const url = typeof GAME_ASSETS !== "undefined" ? GAME_ASSETS[assetKey] : null;
     if (!url) return Promise.resolve(null);
     return new Promise((resolve) => {
       const img = new Image();
-      img.crossOrigin = "anonymous"; // requis pour dessiner une image d'un autre domaine (Wikimedia) sur un <canvas>
-      img.onload = () => { imageCache[cacheKey] = img; resolve(img); };
+      img.onload = () => { imageCache[assetKey] = img; resolve(img); };
       img.onerror = () => resolve(null);
       img.src = url;
     });
@@ -475,7 +498,7 @@ const ArXR = (() => {
   function recalibrate() { if (currentRecalibrate) currentRecalibrate(); }
 
   async function exploreChapter({ canvas, overlayRoot, anchors, onCalibrated, onCorrect, onWrong, onHint, onInspect, onEnd, multiFind, onFound }) {
-    const preloaded = await Promise.all(anchors.map(a => preloadImage(a.assetKey || a.imageUrl)));
+    const preloaded = await Promise.all(anchors.map(a => preloadImage(a.assetKey)));
     initRenderer(canvas);
     await openSession(overlayRoot);
 
@@ -693,85 +716,3 @@ const ArXR = (() => {
 })();
 
 if (typeof window !== "undefined") window.ArXR = ArXR;
-
-// ============================================================================
-// AR COMPASS — mode caméra + boussole (repli iPad/iOS, sans WebXR)
-//
-// iOS/iPadOS ne supporte WebXR sur aucun navigateur (restriction Apple, pas
-// une limite de ce projet). En revanche, la caméra (getUserMedia, via
-// ArEngine) et la boussole du téléphone (DeviceOrientationEvent, avec
-// event.webkitCompassHeading sur iOS Safari) fonctionnent très bien.
-// Ce module donne donc, sans WebXR, une expérience "chasse au trésor" avec
-// caméra live + direction à suivre — pas un vrai suivi spatial 3D, mais
-// nettement plus immersif qu'une simple liste de boutons.
-// ============================================================================
-const ArCompass = (() => {
-  let calibHeading = null;
-  let currentHeading = null;
-  let listening = false;
-  let onHeadingUpdate = null;
-  let evtName = null;
-
-  async function requestPermission() {
-    if (typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function") {
-      try {
-        const state = await DeviceOrientationEvent.requestPermission();
-        return state === "granted";
-      } catch (e) {
-        return false;
-      }
-    }
-    return "DeviceOrientationEvent" in window;
-  }
-
-  function handleOrientation(event) {
-    let heading = null;
-    if (typeof event.webkitCompassHeading === "number") {
-      heading = event.webkitCompassHeading; // iOS Safari : cap boussole direct, 0-360
-    } else if (event.alpha !== null && event.alpha !== undefined) {
-      heading = (360 - event.alpha) % 360; // approximation, autres plateformes
-    }
-    if (heading === null || Number.isNaN(heading)) return;
-    currentHeading = heading;
-    if (onHeadingUpdate) onHeadingUpdate(heading);
-  }
-
-  function start(callback) {
-    onHeadingUpdate = callback;
-    if (listening) return;
-    listening = true;
-    evtName = ("ondeviceorientationabsolute" in window) ? "deviceorientationabsolute" : "deviceorientation";
-    window.addEventListener(evtName, handleOrientation, true);
-  }
-
-  function stop() {
-    listening = false;
-    onHeadingUpdate = null;
-    if (evtName) window.removeEventListener(evtName, handleOrientation, true);
-  }
-
-  function calibrate() {
-    calibHeading = currentHeading;
-    return calibHeading;
-  }
-
-  function isCalibrated() { return calibHeading !== null; }
-  function resetCalibration() { calibHeading = null; }
-
-  function targetHeadingFor(angleDeg) {
-    if (calibHeading === null) return null;
-    return (calibHeading + angleDeg + 360) % 360;
-  }
-
-  // différence signée -180..180 : positif = tourner à droite, négatif = à gauche
-  function signedDiff(target, current) {
-    return ((target - current + 540) % 360) - 180;
-  }
-
-  return {
-    requestPermission, start, stop, calibrate, isCalibrated, resetCalibration,
-    targetHeadingFor, signedDiff, getCurrentHeading: () => currentHeading
-  };
-})();
-
-if (typeof window !== "undefined") window.ArCompass = ArCompass;
