@@ -51,7 +51,7 @@
 // ============================================================================
 
 const CALIBRATION_POINT_DESC =
-  "Tenez-vous sur le seuil de la porte, près de l'armoire grise, et regardez la porte en face.";
+  "Tenez-vous sur le seuil de la porte, près de l'armoire grise, téléphone à hauteur de poitrine, et regardez la porte en face.";
 
 const DESK_H = 0.6;   // hauteur bureau élève
 const PROF_H = 0.9;   // hauteur bureau du professeur

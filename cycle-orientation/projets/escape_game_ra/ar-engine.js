@@ -342,7 +342,7 @@ const ArXR = (() => {
       const up = new THREE.Vector3(0, 1, 0);
       const right = new THREE.Vector3().crossVectors(camDir, up).normalize();
 
-      calib = { pos, forward: camDir, right, up, floorY };
+      calib = { pos, forward: camDir, right, up, floorY, eyeY: floorY + ASSUMED_HEAD_HEIGHT };
       if (onCalibrated) onCalibrated();
     });
 
@@ -499,6 +499,11 @@ const ArXR = (() => {
   const DECOY_JITTER_METERS = 0.08; // rejouabilité : les leurres bougent légèrement à chaque partie — réduit (était 0.18) : certains objets ne sont qu'à ~1m l'un de l'autre, un jitter trop large pouvait les rapprocher encore plus et fausser la visée
   let jitterEnabled = true; // mode "libre" : toutes les classes jouent en même temps avec les mêmes objets physiques → pas de décalage aléatoire, positions parfaitement fixes
   function setJitterEnabled(v) { jitterEnabled = v; }
+  let heightOffset = 0; // réglage manuel (mètres) via les boutons ⬆️ / ⬇️
+  function adjustHeight(delta) {
+    heightOffset = Math.max(-1.2, Math.min(1.2, heightOffset + delta));
+    anchorMeshes.forEach(m => { m.position.y += delta; });
+  }
   let currentRecalibrate = null; // pointe vers la fonction de la session RA en cours (une seule à la fois)
   function recalibrate() { if (currentRecalibrate) currentRecalibrate(); }
 
@@ -563,7 +568,13 @@ const ArXR = (() => {
           .copy(calib.pos)
           .addScaledVector(calib.forward, jf)
           .addScaledVector(calib.right, jr);
-        worldPos.y = (calib.floorY || 0) + (a.height || 0); // hauteur relative au sol réel (voir correctif au calibrage)
+        // ANTI-PLAFOND : un objet n'est jamais placé plus haut que le téléphone au moment
+        // du calibrage (moins 15 cm). Même si le suivi vertical dérive ou si le sol est mal
+        // estimé, rien ne peut finir au plafond ; l'élève peut aussi corriger à la main
+        // avec les boutons ⬆️/⬇️ (heightOffset).
+        const rawY = (calib.floorY || 0) + (a.height || 0);
+        const maxY = (typeof calib.eyeY === "number") ? calib.eyeY - 0.15 : rawY;
+        worldPos.y = Math.min(rawY, maxY) + heightOffset;
         panel.position.copy(worldPos);
         panel.userData.anchor = a;
         panel.lookAt(calib.pos.x, worldPos.y, calib.pos.z);
@@ -602,7 +613,7 @@ const ArXR = (() => {
         camDir.normalize();
         const up = new THREE.Vector3(0, 1, 0);
         const right = new THREE.Vector3().crossVectors(camDir, up).normalize();
-        calib = { pos, forward: camDir, right, up, floorY };
+        calib = { pos, forward: camDir, right, up, floorY, eyeY: floorY + ASSUMED_HEAD_HEIGHT };
         placeAnchors();
         if (onCalibrated) onCalibrated();
         return;
@@ -719,7 +730,13 @@ const ArXR = (() => {
     };
   }
 
-  return { isAvailable, calibrate, isCalibrated, exploreChapter, endSession, resetCalibration, fakeCalibrate, setJitterEnabled, recalibrate };
+  return { isAvailable, calibrate, isCalibrated, exploreChapter, endSession, resetCalibration, fakeCalibrate, setJitterEnabled, recalibrate, adjustHeight };
 })();
 
 if (typeof window !== "undefined") window.ArXR = ArXR;
+
+// Boutons ⬆️ / ⬇️ de l'overlay RA : remontent / descendent tous les objets de 20 cm
+document.addEventListener("click", (e) => {
+  const b = e.target && e.target.closest ? e.target.closest("#xr-height-up, #xr-height-down") : null;
+  if (b && typeof ArXR !== "undefined") ArXR.adjustHeight(b.id === "xr-height-up" ? 0.2 : -0.2);
+});
