@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<link rel="stylesheet" href="style.css?v=4">
+<link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
 
@@ -28,6 +28,7 @@
   </div>
   <button id="xr-exit-btn" class="btn-secondary xr-exit-btn">Quitter la RA</button>
   <button id="xr-recalibrate-btn" class="btn-secondary xr-recalibrate-btn">↺ Recalibrer</button>
+  <div class="xr-height-btns"><button id="xr-height-up" class="btn-secondary" aria-label="Monter les objets">⬆️</button><button id="xr-height-down" class="btn-secondary" aria-label="Descendre les objets">⬇️</button></div>
 </div>
 
 <div id="zoom-root"></div>
@@ -64,7 +65,7 @@
 </div>
 
 <script src="data-maths-10e.js"></script>
-<script src="ar-engine.js?v=4"></script>
+<script src="ar-engine.js?v=5"></script>
 <script>
 const $ = (sel, root=document) => root.querySelector(sel);
 const params = new URLSearchParams(location.search);
@@ -85,7 +86,7 @@ if (isAndroid) {
 const isTest = params.get("test") === "1";
 if (isTest) $("#test-banner").classList.remove("hidden");
 
-const CALIBRATION_POINT_DESC = "Tenez-vous sur le seuil de la porte, près de l'armoire grise, et regardez la porte en face.";
+const CALIBRATION_POINT_DESC = "Tenez-vous sur le seuil de la porte, près de l'armoire grise, téléphone à hauteur de poitrine, et regardez la porte en face.";
 
 const objects = window.getMaths10eObjectsForParcours(parcours);
 const objectsById = Object.fromEntries(objects.map(o => [o.id, o]));
