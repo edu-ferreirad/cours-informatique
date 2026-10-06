@@ -721,23 +721,40 @@ function renderMinimalArGate(container, ch, onFoundFn, introText) {
   const label = target ? target.label : "l'indice";
   const hasAngles = group.length > 0 && group.every(a => typeof a.angle === "number");
 
-  container.appendChild(el("div", "chapter-text", introText || `<strong>📷 Pointez la caméra dans la salle et scannez pour révéler l'indice.</strong>`));
-  const block = el("div", "ar-block");
+  const introHtml = introText || `<strong>📷 Pointez la caméra dans la salle et scannez pour révéler l'indice.</strong>`;
+  const block = el("div", "ar-block ar-full");
   block.innerHTML = `
     <div class="ar-video-wrap">
       <video playsinline muted></video>
       <canvas class="ar-overlay"></canvas>
-      <div class="ar-compass-arrow hidden">🡹</div>
+      <div class="ar-compass-arrow hidden">
+        <svg class="ar-arrow-svg" viewBox="0 0 100 100" width="130" height="130" aria-hidden="true">
+          <path d="M50 6 L88 62 L62 62 L62 94 L38 94 L38 62 L12 62 Z" fill="#f6cf8a" stroke="#0a0d13" stroke-width="5" stroke-linejoin="round"/>
+        </svg>
+        <span class="ar-target">🎯</span>
+      </div>
       <div class="ar-clue-overlay"></div>
       <div class="ar-status">Caméra inactive</div>
+      <div class="ar-intro-panel hidden"></div>
     </div>
-    <div class="ar-actions">
-      <button type="button" class="btn-secondary btn-cam-start">Activer la caméra</button>
-      <button type="button" class="btn-secondary btn-calibrate hidden">🧭 Calibrer le cap</button>
-      <button type="button" class="btn-primary btn-scan" disabled>Scanner la salle</button>
+    <div class="ar-bottom">
+      <p class="ar-guide"></p>
+      <div class="ar-actions">
+        <button type="button" class="btn-secondary btn-cam-start">Activer la caméra</button>
+        <button type="button" class="btn-secondary btn-calibrate hidden">🧭 Calibrer le cap</button>
+        <button type="button" class="btn-primary btn-scan" disabled>Scanner la salle</button>
+      </div>
+      <p class="ar-calib-desc">${window.CALIBRATION_POINT_DESC || ""}</p>
+      <div class="ar-actions ar-actions-extra"><button type="button" class="btn-secondary btn-intro">ℹ️ Consigne</button></div>
     </div>
   `;
   container.appendChild(block);
+  const introPanel = $(".ar-intro-panel", block);
+  introPanel.innerHTML = introHtml;
+  $(".btn-intro", block).addEventListener("click", () => introPanel.classList.toggle("hidden"));
+  introPanel.addEventListener("click", () => introPanel.classList.add("hidden"));
+  const guideEl = $(".ar-guide", block);
+  const extraActions = $(".ar-actions-extra", block);
 
   const video = $("video", block);
   const canvas = $(".ar-overlay", block);
@@ -753,10 +770,19 @@ function renderMinimalArGate(container, ch, onFoundFn, introText) {
   let aimedAnchor = null;   // objet du groupe actuellement visé (correct OU leurre)
   let beeper = null;        // détecteur de métaux (Web Audio)
 
+  let sharedCtx = null; // créé / réveillé DANS un clic (Safari l'exige)
+  function unlockBeepAudio() {
+    try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch (e) {} // iOS : ignore le bouton silencieux
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC && !sharedCtx) sharedCtx = new AC();
+      if (sharedCtx && sharedCtx.state === "suspended") sharedCtx.resume();
+    } catch (e) {}
+  }
   function startBeeper() {
     if (beeper || !window.AudioContext && !window.webkitAudioContext) return;
     const AC = window.AudioContext || window.webkitAudioContext;
-    const actx = new AC();
+    const actx = sharedCtx || new AC();
     let nextBeepAt = 0;
     function tick(ts) {
       if (!beeper) return;
@@ -780,7 +806,7 @@ function renderMinimalArGate(container, ch, onFoundFn, introText) {
     beeper = { actx, raf: requestAnimationFrame(tick) };
   }
   function stopBeeper() {
-    if (beeper) { cancelAnimationFrame(beeper.raf); try { beeper.actx.close(); } catch (e) {} beeper = null; }
+    if (beeper) { cancelAnimationFrame(beeper.raf); beeper = null; }
   }
 
   // L'objet "visé" est celui du groupe (correct OU leurre) le plus proche du
@@ -798,13 +824,20 @@ function renderMinimalArGate(container, ch, onFoundFn, introText) {
     });
     aimedAnchor = best;
     lastDelta = bestDelta;
-    arrow.style.transform = `translateX(-50%) rotate(${bestDelta}deg)`;
     const aligned = Math.abs(bestDelta) < 15;
-    arrow.textContent = aligned ? "🎯" : "🡹";
+    const svg = $(".ar-arrow-svg", arrow);
+    const tgt = $(".ar-target", arrow);
+    svg.style.display = aligned ? "none" : "block";
+    tgt.style.display = aligned ? "block" : "none";
+    arrow.style.transform = aligned ? "translateX(-50%) scale(1.15)" : `translateX(-50%) rotate(${bestDelta}deg)`;
     arrow.classList.toggle("aligned", aligned);
+    guideEl.textContent = aligned
+      ? "🎯 Vous visez un objet — touchez « Scanner la salle »"
+      : (bestDelta > 0 ? `➡️ Tournez à droite (${Math.round(Math.abs(bestDelta))}°)` : `⬅️ Tournez à gauche (${Math.round(Math.abs(bestDelta))}°)`);
   }
 
   async function startCamera() {
+    unlockBeepAudio();
     status.textContent = "Connexion à la caméra…";
     const res = await ArEngine.attach(video, canvas);
     if (res.ok) {
@@ -830,6 +863,7 @@ function renderMinimalArGate(container, ch, onFoundFn, introText) {
   if (state.testMode) { btnScan.disabled = false; aimedAnchor = target; }
 
   btnCalibrate.addEventListener("click", async () => {
+    unlockBeepAudio();
     const granted = await ArEngine.requestHeadingPermission();
     if (!granted) {
       status.textContent = "Boussole refusée — vous pouvez quand même scanner directement.";
@@ -845,14 +879,24 @@ function renderMinimalArGate(container, ch, onFoundFn, introText) {
         arrow.classList.remove("hidden");
         btnScan.disabled = false;
         status.textContent = "Cap calibré ✓ — suivez la flèche, visez bien avant de scanner.";
+        playTone("right"); // bip de confirmation
         startBeeper();
       }
       updateArrow(heading);
     });
     btnCalibrate.classList.add("hidden");
+    // Garde-fou : aucun cap reçu en 3 s (http, capteur bloqué…) → jamais bloquant
+    setTimeout(() => {
+      if (calibrated) return;
+      aimedAnchor = target;
+      btnScan.disabled = false;
+      status.textContent = "Boussole sans signal — scannez directement.";
+      guideEl.textContent = "⚠️ Vérifiez : page en https et Réglages › Safari › Mouvement et orientation activé.";
+    }, 3000);
   });
 
   btnScan.addEventListener("click", () => {
+    unlockBeepAudio();
     btnScan.disabled = true;
     stopBeeper();
     status.textContent = "Analyse en cours…" + (state.testMode ? "" : " (0%)");
@@ -872,10 +916,20 @@ function renderMinimalArGate(container, ch, onFoundFn, introText) {
           clueOverlay.classList.add("visible", "flash");
           playTone("right");
           if (navigator.vibrate) navigator.vibrate(200);
+          guideEl.textContent = "";
           const btn = el("button", "btn-primary", "Continuer →");
-          btn.style.marginTop = "12px";
-          btn.addEventListener("click", () => (onFoundFn || (() => renderPuzzle(container, ch)))());
-          container.appendChild(btn);
+          btn.style.flex = "1";
+          btn.addEventListener("click", () => {
+            // Fermeture COMPLÈTE de la vue RA avant de continuer : bips, boussole, caméra
+            // et bloc plein écran (sinon il resterait par-dessus la suite du jeu).
+            stopBeeper();
+            ArEngine.unwatchHeading();
+            ArEngine.detach();
+            block.remove();
+            (onFoundFn || (() => renderPuzzle(container, ch)))();
+          });
+          extraActions.innerHTML = "";
+          extraActions.appendChild(btn);
         } else if (hit) {
           // Un leurre, exactement comme taper le mauvais objet sur Android
           // (compté pareil pour le bonus "trouvé du premier coup").

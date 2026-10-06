@@ -613,3 +613,35 @@ input{font-family:inherit;}
 .sn-uv-glow .sn-sense-icon, #sn-icon-row.sn-uv-glow{ color:#7dffb0; }
 button.sn-elem-btn.sn-uv-glow{ color:#7dffb0; }
 .sn-sense-icon{ text-shadow:0 0 8px rgba(125,255,176,0.7); }
+
+/* ---------- RA boussole (iOS / autres navigateurs) : plein écran, flèche et cible toujours visibles ---------- */
+.ar-block.ar-full{position:fixed; inset:0; z-index:95; margin:0; background:#000;}
+.ar-full .ar-video-wrap{position:absolute; inset:0; max-width:none; aspect-ratio:auto; border:0; border-radius:0;}
+.ar-full .ar-status{top:calc(10px + env(safe-area-inset-top)); bottom:auto;}
+.ar-full .ar-compass-arrow{
+  top:calc(70px + env(safe-area-inset-top)); width:150px; height:150px;
+  display:flex; align-items:center; justify-content:center; transform-origin:50% 50%;
+  filter:drop-shadow(0 0 10px rgba(0,0,0,0.85)); pointer-events:none;
+}
+.ar-full .ar-compass-arrow.hidden{display:none !important;}
+.ar-full .ar-arrow-svg{display:block;}
+.ar-full .ar-target{display:none; font-size:110px; line-height:1; animation:ar-target-pulse 0.9s ease-in-out infinite;}
+@keyframes ar-target-pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.18);}}
+.ar-full .ar-bottom{
+  position:absolute; left:0; right:0; bottom:0;
+  padding:30px 14px calc(14px + env(safe-area-inset-bottom));
+  background:linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,0.82) 35%);
+}
+.ar-full .ar-guide{margin:0 0 6px; min-height:24px; font-size:18px; font-weight:700; text-align:center; color:#fff; text-shadow:0 1px 6px rgba(0,0,0,0.9);}
+.ar-full .ar-calib-desc{margin:8px 0 0; font-size:12px; text-align:center; color:#d9d2c3;}
+.ar-full .ar-actions{margin-top:8px;}
+.ar-intro-panel{
+  position:absolute; left:12px; right:12px; top:calc(52px + env(safe-area-inset-top)); max-height:55%; overflow:auto;
+  background:rgba(10,13,19,0.92); border-radius:12px; padding:14px; font-size:14px; line-height:1.5; color:#f2ead8; z-index:3;
+}
+.ar-intro-panel.hidden{display:none;}
+
+/* ---------- boutons de réglage de hauteur des objets (RA immersive) ---------- */
+.xr-height-btns{position:absolute; right:12px; top:50%; transform:translateY(-50%); display:flex; flex-direction:column; gap:10px; pointer-events:auto;}
+.xr-height-btns button{width:46px; height:46px; padding:0; font-size:20px; border-radius:50%; background:rgba(10,13,19,0.65); backdrop-filter:blur(4px);}
+.xr-overlay-root.panel-only .xr-height-btns{display:none;}
