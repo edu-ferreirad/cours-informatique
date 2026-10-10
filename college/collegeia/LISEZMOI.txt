@@ -1,0 +1,6 @@
+Collège : dépose ces 4 fichiers dans le dossier « college » de ton GitHub (ne mets pas ce LISEZMOI en ligne).
+- index.html : accueil du dossier.
+- pixel.html : construire une vraie IA (réseau de neurones), expliqué pas à pas.
+- predicteur.html : construire un mini-chatbot (mot suivant).
+- evaluation.html : évaluation en ligne VERROUILLÉE par mot de passe (donne le mot de passe aux élèves au début de l'épreuve).
+Pour changer le mot de passe : ouvre mot-de-passe.html sur ton ordinateur (outil séparé).
