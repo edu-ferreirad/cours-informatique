@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pixel Académie : apprends à une IA à reconnaître</title>
+<style>
+:root{--bg:#f4f1ea;--tx:#1b2a3a;--ac:#4f46e5;--btn:#fff;--ok:#0b7a6f;--no:#b42318;--card:#fff;--bd:#ddd6c8;--mu:#5b6770}
+@media(prefers-color-scheme:dark){:root{--bg:#121a24;--tx:#eef1f5;--ac:#a5a0ff;--btn:#121a24;--ok:#5fd4c4;--no:#ff9b8f;--card:#1c2733;--bd:#33414f;--mu:#a9b4bf}}
+*{box-sizing:border-box}body{margin:0;font:16px/1.55 system-ui,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--tx)}
+main{max-width:1060px;margin:0 auto;padding:12px}h1{font-size:24px;margin:4px 0}h2{font-size:20px;margin:0 0 6px}h3{font-size:16px;margin:12px 0 4px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin:10px 0}
+button{font:inherit;font-weight:600;background:var(--ac);color:var(--btn);border:0;border-radius:10px;padding:8px 14px;cursor:pointer;margin:2px}
+button.alt{background:transparent;color:var(--ac);border:2px solid var(--ac)}button:disabled{opacity:.45;cursor:not-allowed}
+.grid{display:grid;grid-template-columns:minmax(300px,440px) 1fr;gap:12px;align-items:start}@media(max-width:820px){.grid{grid-template-columns:1fr}}
+canvas{width:100%;max-width:440px;border-radius:12px;border:1px solid var(--bd);background:#fff;touch-action:manipulation;cursor:crosshair;display:block}
+.bar{height:12px;background:var(--bd);border-radius:6px;overflow:hidden}.bar>i{display:block;height:100%;background:var(--ok);width:0}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.step{display:none}.step.on{display:block}
+.sl{display:grid;grid-template-columns:150px 1fr 40px;gap:8px;align-items:center;margin:4px 0}.sl input{width:100%}
+.adv{display:none}body.hi .adv{display:block}body.hi span.adv{display:inline}.co{display:block}body.hi .co{display:none}
+.why,.real,.todo,.pr{border-radius:10px;padding:8px 12px;margin:8px 0}.why{background:var(--bg)}.real{border-left:5px solid var(--ok)}.todo{border-left:5px solid var(--ac)}.pr{background:var(--bg);border:1px dashed var(--bd)}
+.todo ol{margin:4px 0;padding-left:20px}.qz{border:2px solid var(--ac);border-radius:12px;padding:10px;margin:12px 0}.qz.d{border-color:var(--ok)}
+.qz .qq{font-weight:700;margin:0 0 6px}.qz button{display:block;width:100%;text-align:left;margin:4px 0;background:transparent;color:var(--tx);border:2px solid var(--bd)}.qz button.good{border-color:var(--ok);background:var(--ok);color:var(--btn)}.qz button.bad{border-color:var(--no);text-decoration:line-through}
+.fb{margin:6px 0 0;font-weight:600}.st{display:flex;gap:14px;flex-wrap:wrap;font-weight:600;margin-top:6px}.leg{font-size:14px;color:var(--mu);margin:6px 0 0}.leg b{color:var(--tx)}
+#pix{font-size:46px;line-height:1}#say{background:var(--bg);border-radius:12px;padding:8px 12px;flex:1;min-width:200px}#toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--ok);color:var(--btn);padding:10px 18px;border-radius:12px;font-weight:700;display:none;z-index:9}
+.f{font-family:Consolas,monospace;background:var(--bg);padding:2px 6px;border-radius:6px}details{margin:6px 0}summary{cursor:pointer;font-weight:700}
+</style><style id="matrix-theme">:root{--bg:#07121f;--tx:#e6f3ff;--ac:#5cc8ff;--btn:#04121f;--ok:#59e0c0;--no:#ff9b9b;--card:rgba(6,16,30,.88);--bd:#1f4a6e;--mu:#9bb8d0}body{background:#02070f}main>h1,main>h2,main>p{text-shadow:0 1px 4px #000,0 0 10px #000}a.c{background:var(--card)!important;border-color:var(--bd)!important;color:var(--tx)!important}a.c h2{color:var(--ac)!important}@media print{#matrix{display:none}:root{--tx:#000;--card:#fff;--bd:#bbb;--mu:#444;--ac:#1b2a8a;--ok:#0b6a3a;--no:#b42318;--bg:#fff}body{background:#fff}main>h1,main>h2,main>p{text-shadow:none}}</style></head><body class=""><main>
+<h1>🤖 Pixel Académie</h1>
+<div class="card"><div class="row"><span id="pix">🥚</span><div id="say">Salut ! Je suis Pixel, un robot tout neuf. Je ne sais encore rien : tu vas être mon professeur !</div></div>
+<div class="row" style="margin-top:8px"><span class="leg">Cycle d'orientation · 12–15 ans</span><span style="margin-left:auto"><b id="xp">0</b> points</span></div><div class="bar" style="margin:6px 0"><i id="xpb"></i></div><div id="badges">Badges : aucun pour l'instant</div></div>
+<div class="grid"><div><div class="card"><canvas id="cv" width="420" height="420" aria-label="Carte des créatures : taille en horizontal, vitesse en vertical"></canvas>
+<div class="st"><span>Époque : <b id="ep">0</b></span><span class="adv">Perte : <b id="ls">–</b></span><span>Réussite : <b id="ac">–</b></span><span>Créatures : <b id="nn">0</b></span></div>
+<p class="leg"><b>Comment lire la carte ?</b> Chaque point est une créature déjà connue (un <i>exemple</i>) : 😇 bleue = gentille, 👹 orange = méchante. Plus un point est à <b>droite</b>, plus la créature est <b>grande</b> ; plus il est <b>haut</b>, plus elle est <b>rapide</b>. Le <b>fond coloré</b> montre ce que Pixel pense à cet endroit (bleu : « gentil », orange : « méchant »). Un <b>cercle rouge</b> = une erreur de Pixel.</p>
+<div class="pr" id="probe">👆 Clique sur la carte (à partir de l'étape 2) : Pixel t'explique ce qu'il pense de cette créature.</div></div></div>
+<div><nav class="row" id="tabs"></nav>
+<section class="step on card" id="s0"><h2>Bienvenue : c'est quoi une IA ?</h2>
+<div class="why"><b>Un programme normal</b> suit des règles écrites à l'avance par un humain. <b>Une IA</b>, elle, <b>apprend</b> : on lui montre beaucoup d'<b>exemples</b> et elle trouve toute seule la règle.</div>
+<div class="why"><b>L'histoire :</b> des créatures arrivent à la porte du village. Les <b>gentilles 😇</b> peuvent entrer, les <b>méchantes 👹</b> doivent rester dehors. Personne ne sait écrire la règle exacte… alors tu vas montrer des exemples à Pixel, le robot gardien, et il va apprendre à choisir seul.</div>
+<div class="real">🌍 <b>Dans la vraie vie, c'est pareil pour :</b> trier un message en « spam / pas spam », reconnaître un chat ou un chien sur une photo, repérer une maladie sur une radio. « Gentil » et « méchant » sont juste deux <b>catégories</b> à distinguer.</div>
+<div class="why"><b>Chaque créature est décrite par 2 mesures :</b> sa <b>taille</b> et sa <b>vitesse</b>. En IA, on appelle ça des <b>caractéristiques</b>.</div>
+<div class="todo"><b>Ton parcours (6 étapes) :</b> 1 Les exemples → 2 Un neurone → 3 Apprendre tout seul → 4 Le mur → 5 Des couches → 6 Test et biais. À chaque étape : <b>tu lis</b>, <b>tu fais</b>, puis <b>tu réponds à une question</b>. Les points se gagnent en <b>comprenant</b>, pas en cliquant !</div>
+<button id="start">Commencer l'étape 1 →</button>
+<details><summary>📚 Mots à retenir</summary><p><b>Exemple</b> : un cas connu. <b>Étiquette</b> : la bonne réponse donnée avec l'exemple. <b>Caractéristique</b> : une mesure (taille, vitesse). <b>Entraîner</b> : apprendre à partir des exemples. <b>Époque</b> : un passage de Pixel sur tous les exemples. <b>Biais</b> : une erreur qui vient d'exemples incomplets.</p></details></section>
+<section class="step card" id="s1"><h2>1 · Les exemples</h2>
+<div class="why">Pour apprendre, Pixel a besoin d'exemples <b>avec la bonne réponse</b>. Chaque point que tu poses est une créature dont on connaît la taille, la vitesse <b>et</b> si elle est gentille ou méchante. Cette bonne réponse s'appelle une <b>étiquette</b>.</div>
+<div class="todo"><b>À faire :</b><ol><li>Choisis 😇 Gentil ou 👹 Méchant.</li><li>Clique sur la carte pour poser une créature.</li><li>Pose au moins <b>6 gentils et 6 méchants</b>. Les gardiens du village ont remarqué que les gentils sont plutôt <b>petits et lents</b> (en bas à gauche) et les méchants plutôt <b>grands et rapides</b> (en haut à droite).</li></ol></div>
+<div class="row"><button id="c0">😇 Gentil</button><button class="alt" id="c1">👹 Méchant</button><button class="alt" id="clr">Tout effacer</button><button class="alt" id="pf">Charger 70 exemples</button></div>
+<div class="real">🌍 Pour reconnaître le spam, on montre à l'IA des milliers de messages déjà marqués « spam » ou « pas spam ».</div>
+<div class="qz" data-k="m1" data-a="0" data-e="Exactement : Pixel compare sa réponse avec la bonne, et il corrige quand il se trompe. Sans étiquette, il ne pourrait pas apprendre." data-h="Pense à un élève qui corrige son exercice avec le corrigé."><p class="qq">Question : pourquoi donne-t-on la bonne réponse (gentil ou méchant) avec chaque exemple ?</p><div><button>Pour que Pixel compare sa réponse à la bonne et apprenne de ses erreurs</button><button>Pour décorer la carte</button><button>Parce que Pixel connaît déjà la règle</button></div><p class="fb"></p></div></section>
+<section class="step card" id="s2"><h2>2 · Un neurone : les réglages de Pixel</h2>
+<div class="why">Pour décider, Pixel fait un petit calcul et obtient un <b>score</b> : <b>taille × importance de la taille</b> + <b>vitesse × importance de la vitesse</b> + <b>seuil</b>. Score positif → « méchant » (orange). Sinon → « gentil » (bleu). Les 3 boutons sont les <b>réglages</b> de Pixel. En IA, on les appelle des <b>paramètres</b> (ou poids). Ce petit calcul s'appelle un <b>neurone artificiel</b>.</div>
+<div class="todo"><b>À faire :</b><ol><li>Clique sur la carte : Pixel détaille son calcul pour cette créature.</li><li>Mets « importance taille » à 5, « importance vitesse » à 0 et « seuil » à 0. Regarde la frontière entre bleu et orange.</li><li>Puis règle les 3 boutons pour atteindre <b>90 %</b> de réussite.</li></ol></div>
+<div class="sl"><span>Importance taille</span><input type="range" id="w1" min="-8" max="8" step="0.1" value="0.5"><b id="w1v"></b></div>
+<div class="sl"><span>Importance vitesse</span><input type="range" id="w2" min="-8" max="8" step="0.1" value="-0.5"><b id="w2v"></b></div>
+<div class="sl"><span>Seuil</span><input type="range" id="b0" min="-8" max="8" step="0.1" value="0"><b id="b0v"></b></div>
+<div class="qz" data-a="0" data-e="Oui : quand seule la taille compte, la frontière est une ligne verticale." data-h="Si la vitesse ne compte pas, la hauteur n'a aucune importance."><p class="qq">Observation (sans points) : quand seule la taille compte, la frontière entre bleu et orange est…</p><div><button>verticale</button><button>horizontale</button><button>en diagonale</button></div><p class="fb"></p></div>
+<div class="real">🌍 Un neurone artificiel = ce petit calcul. Une IA en utilise des millions, reliés entre eux.</div>
+<p class="adv">Formule : <span class="f">z = w₁·taille + w₂·vitesse + b</span>, puis <span class="f">p = 1 / (1 + e<sup>−z</sup>)</span> (fonction sigmoïde, p entre 0 et 1). Si p &gt; 0,5 : « méchant ».</p>
+<div class="qz" data-k="m2" data-a="1" data-e="Oui : apprendre, c'est trouver les bons réglages. Ici tu les as cherchés à la main ; à l'étape suivante, Pixel va les chercher seul." data-h="Les boutons changent la façon dont Pixel décide."><p class="qq">Question : à quoi servent les 3 boutons ?</p><div><button>À choisir la couleur de la carte</button><button>À régler la façon dont Pixel décide : apprendre, c'est trouver les bons réglages</button><button>À ajouter des créatures</button></div><p class="fb"></p></div></section>
+<section class="step card" id="s3"><h2>3 · Apprendre tout seul</h2>
+<div class="why">Régler à la main, c'est long. Pixel peut s'<b>entraîner</b> : <b>1)</b> il essaie, <b>2)</b> il repère ses erreurs (cercles rouges), <b>3)</b> il corrige un tout petit peu ses réglages, <b>4)</b> il recommence. Une <b>époque</b> = Pixel a revu une fois tous les exemples.</div>
+<div class="todo"><b>À faire :</b><ol><li>Clique sur ▶ Entraîner.</li><li>Regarde le fond de la carte bouger et les cercles rouges disparaître.</li><li>Attends d'arriver à <b>90 %</b>.</li></ol></div>
+<div class="row"><button id="go">▶ Entraîner</button><button class="alt" id="rs">↺ Nouveau cerveau</button></div>
+<div class="sl adv"><span>Taux d'apprentissage</span><input type="range" id="lr" min="0.05" max="3" step="0.05" value="0.8"><b id="lrv"></b></div>
+<div class="real">🌍 C'est comme t'entraîner au basket : tu rates, tu corriges, tu recommences.</div>
+<p class="adv">La <b>perte</b> mesure l'erreur. Le <b>gradient</b> indique dans quel sens modifier chaque réglage pour la réduire : <span class="f">w ← w − η · ∂perte/∂w</span> (η = taux d'apprentissage : trop petit, c'est lent ; trop grand, Pixel dépasse l'objectif).</p>
+<div class="qz" data-k="m3" data-a="0" data-e="Exact : Pixel ne change ni les exemples ni la carte, seulement ses réglages, pour faire moins d'erreurs." data-h="Qu'est-ce qui bouge dans le calcul de Pixel ?"><p class="qq">Question : pendant l'entraînement, qu'est-ce que Pixel modifie ?</p><div><button>Ses réglages (paramètres), pour faire moins d'erreurs</button><button>Les exemples</button><button>La taille de la carte</button></div><p class="fb"></p></div></section>
+<section class="step card" id="s4"><h2>4 · Le mur</h2>
+<div class="why">Nouveau terrain : les gentils vivent <b>au centre</b>, les méchants tout autour. Or un neurone ne sait tracer qu'<b>une ligne droite</b>.</div>
+<div class="todo"><b>À faire :</b><ol><li>Réponds d'abord à la prédiction.</li><li>Clique sur ▶ Entraîner et laisse Pixel travailler <b>300 époques</b>.</li><li>Observe sa réussite.</li></ol></div>
+<div class="qz" data-a="1" data-e="Non : une ligne droite ne peut pas entourer le centre. Regarde ce qui va se passer." data-h="Essaie d'imaginer une droite qui sépare un cercle de ce qui l'entoure."><p class="qq">Prédiction (sans points) : une seule ligne droite peut-elle séparer le centre de l'extérieur ?</p><div><button>Oui</button><button>Non</button></div><p class="fb"></p></div>
+<div class="row"><button id="go4">▶ Entraîner</button><button class="alt" id="rs4">↺ Nouveau cerveau</button></div>
+<div class="qz" data-k="m4" data-a="0" data-e="Exact : un neurone ne trace qu'une droite. Il faudrait une forme courbe : c'est le rôle des couches de neurones (étape suivante)." data-h="Pense à la forme de la frontière dont Pixel aurait besoin."><p class="qq">Question : pourquoi Pixel reste-t-il bloqué à environ 75 % ?</p><div><button>Une seule ligne droite ne peut pas entourer le centre</button><button>Il n'a pas assez dormi</button><button>Les exemples sont faux</button></div><p class="fb"></p></div>
+<p class="adv">Un neurone seul est un classifieur linéaire : il ne sépare que des données séparables par une droite.</p></section>
+<section class="step card" id="s5"><h2>5 · Des couches de neurones</h2>
+<div class="why">Solution : utiliser <b>plusieurs neurones</b>. Chaque neurone « caché » trace sa propre droite ; un dernier neurone combine leurs avis. Ensemble, ils dessinent une <b>forme courbe</b>. Un <b>réseau de neurones</b>, ce sont des neurones rangés en <b>couches</b>.</div>
+<div class="todo"><b>À faire :</b><ol><li>Mets <b>1</b> neurone caché, entraîne, et note la réussite.</li><li>Mets <b>4</b> neurones cachés, entraîne, compare.</li><li>Atteins <b>92 %</b>.</li></ol></div>
+<div class="sl"><span>Neurones cachés</span><input type="range" id="hn" min="1" max="8" step="1" value="4"><b id="hnv"></b></div>
+<div class="row"><button id="go5">▶ Entraîner</button><button class="alt" id="rs5">↺ Nouveau cerveau</button><button class="alt" id="dm">Terrain « damier »</button><button class="alt" id="ce">Terrain « cercle »</button></div>
+<div class="real">🌍 ChatGPT, la reconnaissance de visages, la traduction automatique : c'est la même idée, avec des milliards de réglages.</div>
+<p class="adv">Réseau 2 → N → 1, activation tanh. La rétropropagation calcule le gradient couche par couche, de la sortie vers l'entrée.</p>
+<div class="qz" data-k="m5" data-a="0" data-e="Exact : chaque neurone trace une droite, et leur combinaison permet de dessiner une courbe qui entoure le centre." data-h="Une droite ne suffit pas : que permet d'obtenir la combinaison de plusieurs droites ?"><p class="qq">Question : pourquoi 4 neurones réussissent-ils mieux qu'un seul ?</p><div><button>Chacun trace une droite et leur combinaison forme une courbe</button><button>Ils vont plus vite</button><button>Ils changent les exemples</button></div><p class="fb"></p></div></section>
+<section class="step card" id="s6"><h2>6 · Le test et les biais</h2>
+<div class="why">Réussir avec les exemples qu'il a déjà vus ne prouve rien : Pixel pourrait les avoir appris « par cœur ». Le vrai test, ce sont des créatures <b>jamais vues</b>. Et si un cas manque dans les exemples, Pixel se trompera dessus : c'est un <b>biais</b>.<br>Exemple réel : un système de reconnaissance de visages entraîné surtout avec des visages clairs reconnaît moins bien les autres.</div>
+<div class="todo"><b>À faire :</b><ol><li>Clique sur 🧪 Tester et note les deux résultats.</li><li>Clique sur 🙈 Cacher la droite : Pixel se ré-entraîne <b>sans aucun exemple à droite</b> de la carte.</li><li>Quand il a fini, reclique sur 🧪 Tester et compare.</li></ol></div>
+<div class="row"><button id="t1">🧪 Tester sur 120 créatures jamais vues</button><button class="alt" id="t2">🙈 Cacher la droite et ré-entraîner</button></div>
+<p id="tr" style="font-weight:600"></p>
+<div class="qz" data-k="m6" data-a="0" data-e="Exact : Pixel se trompe sur les cas qu'il n'a jamais vus. Pour une IA fiable, il faut des exemples variés ET la tester sur du neuf. Un bon score sur les exemples d'entraînement ne suffit pas." data-h="Compare le score sur les exemples connus et le score sur les cas jamais vus."><p class="qq">Question : Pixel a 100 % sur ses exemples mais bien moins au test sans la droite. Que conclure ?</p><div><button>Il généralise mal les cas absents de ses exemples : il faut des exemples variés et un test sur du neuf</button><button>Il est parfait, le test est faux</button><button>Il faut simplement l'entraîner plus longtemps</button></div><p class="fb"></p></div></section>
+<section class="step card" id="fin"><h2>🏆 Bilan : tu as entraîné une vraie IA !</h2>
+<p>Voici ce que tu as fait, exactement comme les chercheurs :</p><ol><li>Tu as donné des <b>exemples avec étiquettes</b>.</li><li>Pixel a utilisé un <b>neurone</b> avec des <b>réglages</b>.</li><li>Il a <b>appris seul</b> en réduisant ses erreurs.</li><li>Un seul neurone ne trace qu'une <b>droite</b> : il faut des <b>couches</b>.</li><li>On <b>teste</b> sur du neuf, et des exemples incomplets créent un <b>biais</b>.</li></ol>
+<div class="real">🌍 Un chatbot comme ChatGPT fonctionne sur le même principe : des milliards de réglages appris à partir de gigantesques quantités de textes.</div></section>
+<details class="card"><summary>📚 Mots à retenir</summary><p><b>Exemple</b> · <b>Étiquette</b> (la bonne réponse) · <b>Caractéristique</b> (taille, vitesse) · <b>Paramètre / poids</b> (un réglage) · <b>Neurone</b> (un petit calcul) · <b>Entraîner</b> · <b>Époque</b> · <b>Couche</b> · <b>Test</b> · <b>Biais</b> · <span class="adv">Perte · Gradient · Taux d'apprentissage · Généralisation</span></p></details>
+</div></div><div id="toast" role="status"></div></main>
+<script>
+"use strict";
+var sig=function(z){return 1/(1+Math.exp(-z));};
+function mk(h){var r=function(){return Math.random()*2-1;},m={h:h};if(h===0){m.w=[r()*.5,r()*.5];m.b=0;}else{m.W1=[];m.b1=[];m.W2=[];for(var j=0;j<h;j++){m.W1.push([r()*2,r()*2]);m.b1.push(r());m.W2.push(r());}m.b2=0;}return m;}
+function fwd(m,x,y){var u=(x-.5)*2,v=(y-.5)*2;if(m.h===0)return sig(m.w[0]*u+m.w[1]*v+m.b);var z=m.b2;for(var j=0;j<m.h;j++)z+=m.W2[j]*Math.tanh(m.W1[j][0]*u+m.W1[j][1]*v+m.b1[j]);return sig(z);}
+function step(m,D,lr){var n=D.length,loss=0,k;if(!n)return 0;
+ if(m.h===0){var g0=0,g1=0,gb=0;D.forEach(function(d){var u=(d.x-.5)*2,v=(d.y-.5)*2,p=sig(m.w[0]*u+m.w[1]*v+m.b),e=p-d.c;g0+=e*u;g1+=e*v;gb+=e;loss-=Math.log((d.c?p:1-p)+1e-9);});m.w[0]-=lr*g0/n;m.w[1]-=lr*g1/n;m.b-=lr*gb/n;return loss/n;}
+ var h=m.h,G1=[],Gb=[],G2=[],G2b=0;for(k=0;k<h;k++){G1.push([0,0]);Gb.push(0);G2.push(0);}
+ D.forEach(function(d){var u=(d.x-.5)*2,v=(d.y-.5)*2,a=[],z=m.b2,j;for(j=0;j<h;j++){a[j]=Math.tanh(m.W1[j][0]*u+m.W1[j][1]*v+m.b1[j]);z+=m.W2[j]*a[j];}
+  var p=sig(z),e=p-d.c;loss-=Math.log((d.c?p:1-p)+1e-9);G2b+=e;for(j=0;j<h;j++){G2[j]+=e*a[j];var dz=e*m.W2[j]*(1-a[j]*a[j]);G1[j][0]+=dz*u;G1[j][1]+=dz*v;Gb[j]+=dz;}});
+ for(k=0;k<h;k++){m.W2[k]-=lr*G2[k]/n;m.W1[k][0]-=lr*G1[k][0]/n;m.W1[k][1]-=lr*G1[k][1]/n;m.b1[k]-=lr*Gb[k]/n;}m.b2-=lr*G2b/n;return loss/n;}
+function acc(m,D){if(!D.length)return 0;var ok=0;D.forEach(function(d){if((fwd(m,d.x,d.y)>.5?1:0)===d.c)ok++;});return ok/D.length;}
+function gen(name,n){var D=[],t=0,x,y,c,ok;while(D.length<n&&t++<9999){x=Math.random();y=Math.random();ok=true;
+ if(name==="facile"){c=x+y>1?1:0;ok=Math.abs(x+y-1)>.14;}else if(name==="cercle"){var r=Math.sqrt((x-.5)*(x-.5)+(y-.5)*(y-.5));c=r>.3?1:0;ok=Math.abs(r-.3)>.05;}else{c=(x>.5)!==(y>.5)?1:0;ok=Math.abs(x-.5)>.05&&Math.abs(y-.5)>.05;}
+ if(ok)D.push({x:x,y:y,c:c});}return D;}
+//==UI==
+function $(i){return document.getElementById(i);}
+var S={xp:0,done:{},data:[],m:mk(0),ep:0,loss:0,run:false,lr:.8,cls:0,lvl:1,cur:0,preset:null,tBase:null,tBias:null,bias:false,max:3000,probe:null};
+var BAD={m1:"🗂️ Professeur",m2:"🎛️ Réglage",m3:"⚙️ Apprenti",m4:"🧱 Mur",m5:"🧠 Couches",m6:"🧪 Testeur"};
+var AV=["🥚","🐣","🤖","🦾","🧠"];
+var cv=$("cv"),cx=cv.getContext("2d"),G=30;
+function say(t){$("say").textContent=t;}
+function toast(t){var e=$("toast");e.textContent=t;e.style.display="block";setTimeout(function(){e.style.display="none";},2400);}
+function unl(n){return n===0||n===1||!!S.done["m"+(n-1)];}
+function nd(){return Object.keys(S.done).length;}
+function refresh(){var T=$("tabs");T.innerHTML="";for(var i=0;i<=6;i++)(function(i){var b=document.createElement("button");b.className=i===S.cur?"":"alt";b.textContent=i===0?"Intro":i+(S.done["m"+i]?" ✓":"");b.disabled=!unl(i);b.onclick=function(){go(i);};T.appendChild(b);})(i);
+ $("xp").textContent=S.xp;$("xpb").style.width=Math.min(100,S.xp/1.2)+"%";$("pix").textContent=AV[Math.min(4,Math.floor(nd()*5/6))];
+ var g=Object.keys(BAD).filter(function(k){return S.done[k];}).map(function(k){return BAD[k];});$("badges").textContent=g.length?"Badges : "+g.join("  "):"Badges : aucun pour l'instant";
+ $("fin").className="step card"+(nd()===6&&S.cur===6?" on":"");}
+function need(k){var a=sync(),n0=S.data.filter(function(d){return d.c===0;}).length,n1=S.data.length-n0;
+ if(k==="m1")return (n0>=6&&n1>=6)?"":"Fais d'abord l'activité : pose au moins 6 gentils et 6 méchants (ou clique sur « Charger 70 exemples »).";
+ if(k==="m2")return (a!==null&&a>=90)?"":"Fais d'abord l'activité : règle les boutons jusqu'à 90 % (tu es à "+(a===null?0:a)+" %).";
+ if(k==="m3")return (S.ep>=20&&a>=90)?"":"Fais d'abord l'activité : entraîne Pixel jusqu'à 90 % (tu es à "+a+" %).";
+ if(k==="m4")return S.ep>=300?"":"Fais d'abord l'activité : entraîne Pixel au moins 300 époques (tu en es à "+S.ep+").";
+ if(k==="m5")return (S.m.h>=2&&a>=92&&S.preset!=="facile")?"":"Fais d'abord l'activité : atteins 92 % avec au moins 2 neurones cachés (tu es à "+a+" %).";
+ if(k==="m6")return (S.tBase!==null&&S.tBias!==null)?"":"Fais d'abord l'activité : le test normal, puis le test sans la droite.";return "";}
+document.addEventListener("click",function(e){var b=e.target.closest?e.target.closest(".qz button"):null;if(!b)return;var q=b.closest(".qz"),k=q.getAttribute("data-k"),a=+q.getAttribute("data-a"),i=Array.prototype.indexOf.call(b.parentNode.children,b),fb=q.querySelector(".fb");
+ if(q.getAttribute("data-done")||b.disabled)return;if(k){var r=need(k);if(r){fb.textContent="🔒 "+r;return;}}
+ if(i===a){q.setAttribute("data-done","1");q.className="qz d";b.className="good";fb.textContent="✅ "+q.getAttribute("data-e");
+  if(k){var n=+q.getAttribute("data-n")||0,pts=[20,10,5][Math.min(n,2)];S.xp+=pts;S.done[k]=1;toast("🎉 Bien joué ! +"+pts+" points");say(q.getAttribute("data-e"));refresh();}}
+ else{b.className="bad";b.disabled=true;q.setAttribute("data-n",(+q.getAttribute("data-n")||0)+1);fb.textContent="❌ Pas tout à fait. Indice : "+q.getAttribute("data-h");}});
+function go(n){if(!unl(n))return;S.cur=n;S.run=false;S.probe=null;for(var i=0;i<=6;i++)$("s"+i).className="step card"+(i===n?" on":"");
+ if(n===2){S.m=mk(0);S.ep=0;man();say("Voici le neurone de Pixel. Déplace les curseurs et clique sur la carte !");}
+ if(n===3){S.m=mk(0);S.ep=0;say("Appuie sur Entraîner et regarde Pixel apprendre seul.");}
+ if(n===4){S.data=gen("cercle",70);S.preset="cercle";S.bias=false;S.m=mk(0);S.ep=0;say("Mmh, ce terrain est plus difficile…");}
+ if(n===5){S.m=mk(+$("hn").value);S.ep=0;say("Plus de neurones, plus de formes possibles !");}
+ if(n===6){S.data=gen("cercle",70);S.preset="cercle";S.bias=false;S.tBase=null;S.tBias=null;S.m=mk(4);for(var j=0;j<1500;j++)S.loss=step(S.m,S.data,S.lr);S.ep=1500;$("tr").textContent="Pixel s'est entraîné avant d'arriver ici (4 neurones cachés).";say("Teste Pixel sur des créatures qu'il n'a jamais vues.");}
+ $("probe").textContent=n>=2?"👆 Clique sur la carte : Pixel t'explique ce qu'il pense de cette créature.":"👆 Clique sur la carte (à partir de l'étape 2) : Pixel t'explique ce qu'il pense de cette créature.";
+ sync();refresh();window.scrollTo&&window.scrollTo(0,0);}
+function sync(){$("nn").textContent=S.data.length;$("ep").textContent=S.ep;$("ls").textContent=S.ep?S.loss.toFixed(3):"–";var a=S.data.length?Math.round(100*acc(S.m,S.data)):null;$("ac").textContent=a===null?"–":a+" %";return a;}
+function man(){$("w1v").textContent=$("w1").value;$("w2v").textContent=$("w2").value;$("b0v").textContent=$("b0").value;S.m.w=[+$("w1").value,+$("w2").value];S.m.b=+$("b0").value;sync();if(S.probe)explain();}
+function explain(){var p=S.probe,u=((p.x-.5)*2).toFixed(2),v=((p.y-.5)*2).toFixed(2),pr=fwd(S.m,p.x,p.y),lab=pr>.5?"méchant 👹":"gentil 😇",t;
+ if(S.m.h===0){var z=S.m.w[0]*u+S.m.w[1]*v+S.m.b;t="Cette créature : taille "+u+" (de −1 petite à +1 grande), vitesse "+v+" (de −1 lente à +1 rapide). Score = "+S.m.w[0].toFixed(1)+" × "+u+" + "+S.m.w[1].toFixed(1)+" × "+v+" + "+S.m.b.toFixed(1)+" = "+z.toFixed(2)+(z>0?" (positif) → Pixel dit « "+lab+" »":" (négatif ou nul) → Pixel dit « "+lab+" »")+".";}
+ else t="Pixel pense à "+Math.round(pr*100)+" % que cette créature est méchante → il dit « "+lab+" ».";
+ $("probe").textContent="🔎 "+t;}
+function draw(){cx.clearRect(0,0,420,420);var s=420/G,i,j,p;for(i=0;i<G;i++)for(j=0;j<G;j++){p=fwd(S.m,(i+.5)/G,1-(j+.5)/G);cx.fillStyle="rgba("+Math.round(59+190*p)+","+Math.round(130-15*p)+","+Math.round(246-224*p)+",.38)";cx.fillRect(i*s,j*s,s+1,s+1);}
+ cx.font="16px sans-serif";cx.textAlign="center";cx.textBaseline="middle";S.data.forEach(function(d){var X=d.x*420,Y=(1-d.y)*420;cx.beginPath();cx.arc(X,Y,11,0,6.3);cx.fillStyle=d.c?"#f97316":"#3b82f6";cx.fill();cx.strokeStyle="#fff";cx.lineWidth=2;cx.stroke();cx.fillStyle="#fff";cx.fillText(d.c?"👹":"😇",X,Y+1);
+  if(S.cur>=2&&(fwd(S.m,d.x,d.y)>.5?1:0)!==d.c){cx.beginPath();cx.arc(X,Y,15,0,6.3);cx.strokeStyle="#e11d48";cx.lineWidth=3;cx.stroke();}});
+ if(S.probe){var X2=S.probe.x*420,Y2=(1-S.probe.y)*420;cx.strokeStyle="#111";cx.lineWidth=3;cx.beginPath();cx.moveTo(X2-9,Y2);cx.lineTo(X2+9,Y2);cx.moveTo(X2,Y2-9);cx.lineTo(X2,Y2+9);cx.stroke();}
+ cx.fillStyle="#334";cx.font="13px sans-serif";cx.textAlign="left";cx.fillText("↑ vitesse",6,12);cx.textAlign="right";cx.fillText("taille →",414,408);}
+function loop(){if(S.run){for(var i=0;i<8;i++)S.loss=step(S.m,S.data,S.lr);S.ep+=8;if(S.cur===6&&S.bias&&S.ep>=1500){S.run=false;say("Pixel a fini sans les créatures de droite. Re-teste-le !");}if(S.ep>=S.max){S.run=false;btns();}if(S.probe)explain();}draw();sync();requestAnimationFrame(loop);}
+function btns(){["go","go4","go5"].forEach(function(i){$(i).textContent=S.run?"⏸ Pause":"▶ Entraîner";});}
+function toggle(){if(!S.data.length){say("Il faut d'abord des exemples (étape 1) !");return;}S.run=!S.run;if(S.run&&S.ep>=S.max)S.ep=0;btns();}
+function reset(){S.run=false;S.m=mk(S.cur===5?+$("hn").value:0);S.ep=0;btns();}
+function preset(n){S.data=gen(n,70);S.preset=n;S.bias=false;S.m=mk(S.cur===5?+$("hn").value:0);S.ep=0;S.run=false;btns();sync();}
+function test(){if(!S.preset){say("Charge d'abord un terrain.");return;}var T=gen(S.preset,120),a=Math.round(100*acc(S.m,T)),tr=Math.round(100*acc(S.m,S.data));
+ if(S.bias)S.tBias=a;else S.tBase=a;$("tr").textContent="Résultat : "+tr+" % sur ses exemples d'entraînement, mais "+a+" % sur 120 créatures jamais vues"+(S.bias?" (après avoir caché la droite).":".");}
+cv.addEventListener("pointerdown",function(e){var r=cv.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=1-(e.clientY-r.top)/r.height;
+ if(S.cur===1){S.data.push({x:x,y:y,c:S.cls});S.preset=null;sync();}else if(S.cur>=2){S.probe={x:x,y:y};explain();}});
+$("start").onclick=function(){go(1);};
+$("c0").onclick=function(){S.cls=0;$("c0").className="";$("c1").className="alt";};$("c1").onclick=function(){S.cls=1;$("c1").className="";$("c0").className="alt";};$("c0").className="";
+$("clr").onclick=function(){S.data=[];S.preset=null;sync();};$("pf").onclick=function(){preset("facile");say("70 exemples chargés. Regarde où sont les gentils et les méchants !");};
+["w1","w2","b0"].forEach(function(i){$(i).oninput=man;});$("go").onclick=$("go4").onclick=$("go5").onclick=toggle;$("rs").onclick=$("rs4").onclick=$("rs5").onclick=reset;
+$("lr").oninput=function(){S.lr=+$("lr").value;$("lrv").textContent=S.lr;};$("hn").oninput=function(){$("hnv").textContent=$("hn").value;S.m=mk(+$("hn").value);S.ep=0;S.run=false;btns();};
+$("dm").onclick=function(){preset("damier");};$("ce").onclick=function(){preset("cercle");};
+$("t1").onclick=function(){test();};$("t2").onclick=function(){if(S.tBase===null){say("Fais d'abord le test normal avec le bouton de gauche.");return;}S.data=S.data.filter(function(d){return d.x<=.6;});S.bias=true;S.m=mk(S.m.h);S.ep=0;S.run=true;sync();};
+$("lrv").textContent=S.lr;$("hnv").textContent=$("hn").value;refresh();man();loop();
+</script><script id="matrix-js">(function(){var c=document.createElement("canvas");c.id="matrix";c.setAttribute("aria-hidden","true");c.style.cssText="position:fixed;left:0;top:0;width:100vw;height:100vh;max-width:none;border:0;border-radius:0;background:transparent;pointer-events:none;z-index:-1;display:block";document.body.insertBefore(c,document.body.firstChild);
+var x=c.getContext("2d"),COL="#3fb6ff",F="2,8,20",BG="#02070f",ch="01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワン",fs=16,W,H,n,d;
+function size(){W=c.width=window.innerWidth;H=c.height=window.innerHeight;n=Math.ceil(W/fs);d=[];for(var i=0;i<n;i++)d[i]=Math.random()*H/fs;x.fillStyle=BG;x.fillRect(0,0,W,H);}
+function tick(){x.fillStyle="rgba("+F+",.13)";x.fillRect(0,0,W,H);x.font=fs+"px monospace";for(var i=0;i<n;i++){x.fillStyle=Array.isArray(COL)?(i<n/2?COL[0]:COL[1]):COL;x.fillText(ch.charAt(Math.floor(Math.random()*ch.length)),i*fs,d[i]*fs);if(d[i]*fs>H&&Math.random()>.975)d[i]=0;d[i]++;}}
+size();window.addEventListener("resize",size);
+if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches){for(var k=0;k<60;k++)tick();}else{setInterval(tick,55);}})();</script></body></html>

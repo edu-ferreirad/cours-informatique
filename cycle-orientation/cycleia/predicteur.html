@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Le prédicteur de mots : construis un mini-chatbot</title>
+<style>
+:root{--bg:#f4f1ea;--tx:#1b2a3a;--ac:#4f46e5;--btn:#fff;--ok:#0b7a6f;--no:#b42318;--card:#fff;--bd:#ddd6c8;--mu:#5b6770}
+@media(prefers-color-scheme:dark){:root{--bg:#121a24;--tx:#eef1f5;--ac:#a5a0ff;--btn:#121a24;--ok:#5fd4c4;--no:#ff9b8f;--card:#1c2733;--bd:#33414f;--mu:#a9b4bf}}
+*{box-sizing:border-box}body{margin:0;font:17px/1.55 system-ui,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--tx)}
+main{max-width:860px;margin:0 auto;padding:12px}h1{font-size:24px;margin:4px 0}h2{font-size:20px;margin:0 0 6px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin:10px 0}
+button{font:inherit;font-weight:600;background:var(--ac);color:var(--btn);border:0;border-radius:10px;padding:8px 14px;cursor:pointer;margin:2px}button.alt{background:transparent;color:var(--ac);border:2px solid var(--ac)}button:disabled{opacity:.45;cursor:not-allowed}
+textarea,input,select{font:inherit;width:100%;padding:8px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--tx)}textarea{min-height:110px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.row>*{flex:0 0 auto}.bar{height:12px;background:var(--bd);border-radius:6px;overflow:hidden}.bar>i{display:block;height:100%;background:var(--ok);width:0}
+.step{display:none}.step.on{display:block}.adv{display:none}body.hi .adv{display:block}
+.why,.real,.todo{border-radius:10px;padding:8px 12px;margin:8px 0}.why{background:var(--bg)}.real{border-left:5px solid var(--ok)}.todo{border-left:5px solid var(--ac)}.todo ol{margin:4px 0;padding-left:20px}
+.qz{border:2px solid var(--ac);border-radius:12px;padding:10px;margin:12px 0}.qz.d{border-color:var(--ok)}.qz .qq{font-weight:700;margin:0 0 6px}.qz button.o{display:block;width:100%;text-align:left;background:transparent;color:var(--tx);border:2px solid var(--bd);margin:4px 0}.qz button.good{border-color:var(--ok);background:var(--ok);color:var(--btn)}.qz button.bad{border-color:var(--no);text-decoration:line-through}
+.qz input{width:120px;display:inline-block}.fb{margin:6px 0 0;font-weight:600}.chip{display:inline-block;background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:1px 8px;margin:2px;font-family:Consolas,monospace}
+.pr{display:flex;align-items:center;gap:8px;margin:4px 0}.pr b{width:110px;overflow:hidden;text-overflow:ellipsis}.pr .bar{flex:1}.pr span{width:70px;text-align:right}
+#toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--ok);color:var(--btn);padding:10px 18px;border-radius:12px;font-weight:700;display:none;z-index:9}#out{font-size:20px;min-height:60px}.mu{color:var(--mu);font-size:15px}
+</style><style id="matrix-theme">:root{--bg:#07121f;--tx:#e6f3ff;--ac:#5cc8ff;--btn:#04121f;--ok:#59e0c0;--no:#ff9b9b;--card:rgba(6,16,30,.88);--bd:#1f4a6e;--mu:#9bb8d0}body{background:#02070f}main>h1,main>h2,main>p{text-shadow:0 1px 4px #000,0 0 10px #000}a.c{background:var(--card)!important;border-color:var(--bd)!important;color:var(--tx)!important}a.c h2{color:var(--ac)!important}@media print{#matrix{display:none}:root{--tx:#000;--card:#fff;--bd:#bbb;--mu:#444;--ac:#1b2a8a;--ok:#0b6a3a;--no:#b42318;--bg:#fff}body{background:#fff}main>h1,main>h2,main>p{text-shadow:none}}</style></head><body class=""><main>
+<h1>✍️ Le prédicteur de mots</h1>
+<div class="card"><div class="row"><b>Cycle d'orientation · 12–15 ans</b><span style="margin-left:auto"><b id="xp">0</b> points</span></div><div class="bar" style="margin:6px 0"><i id="xpb"></i></div><div id="badges">Badges : aucun pour l'instant</div></div>
+<nav class="row" id="tabs"></nav>
+<section class="step on card" id="s0"><h2>Comment un chatbot choisit-il ses mots ?</h2>
+<div class="why">Quand tu écris un message sur ton téléphone, il te <b>propose le mot suivant</b>. C'est une petite IA ! ChatGPT fait la même chose en beaucoup plus puissant : il écrit sa réponse <b>mot après mot</b>, en choisissant à chaque fois un mot <b>probable</b>.</div>
+<div class="why"><b>Dans cet atelier</b>, tu construis la version miniature, en 5 étapes : <b>1</b> lui donner des textes à lire · <b>2</b> les découper en mots · <b>3</b> compter quels mots se suivent · <b>4</b> calculer des probabilités · <b>5</b> lui faire écrire une phrase.</div>
+<div class="todo">À chaque étape : <b>tu lis</b>, <b>tu fais</b>, puis <b>tu réponds à une question</b>. Les points se gagnent en comprenant, pas en cliquant !</div>
+<div class="real">🌍 Ton clavier de téléphone, la saisie automatique d'un moteur de recherche, ChatGPT : tous prédisent la suite d'un texte.</div>
+<button id="start">Commencer l'étape 1 →</button></section>
+<section class="step card" id="s1"><h2>1 · Les textes à lire</h2>
+<div class="why">Ton mini-modèle <b>ne sait que ce qu'il a lu</b>. Ici, il lira les phrases ci-dessous. Plus il lit, plus il connaît de mots.</div>
+<div class="todo"><b>À faire :</b><ol><li>Lis les phrases.</li><li>Ajoute <b>une phrase de ton invention</b>, qui se termine par un point (par exemple : « mon chat mange du poisson. »).</li><li>Clique sur « Valider les textes ».</li></ol></div>
+<textarea id="corpus" aria-label="Phrases à lire"></textarea>
+<div class="row" style="margin-top:8px"><button id="b1">Valider les textes</button><button class="alt" id="r1">Remettre le texte de départ</button></div><p class="mu" id="m1"></p>
+<div class="qz" data-k="m1" data-a="0" data-e="Exactement : un modèle ne connaît que ce qu'il a lu. Les textes d'entraînement déterminent ce qu'il sait… et ses défauts." data-h="Peut-il parler de choses qu'il n'a jamais lues ?"><p class="qq">Question : si la mini-IA ne lit que des phrases sur les chats, que saura-t-elle écrire ?</p><div><button class="o">Seulement des choses liées aux chats : elle ne connaît que ce qu'elle a lu</button><button class="o">N'importe quel sujet</button><button class="o">Rien du tout</button></div><p class="fb"></p></div></section>
+<section class="step card" id="s2"><h2>2 · Découper en mots</h2>
+<div class="why">L'ordinateur ne lit pas des phrases comme nous : il les <b>découpe en petits morceaux</b> appelés <b>tokens</b>. Ici, un token = un mot ou un signe de ponctuation (le point compte aussi).</div>
+<div class="todo"><b>À faire :</b><ol><li>Clique sur « Découper le texte ».</li><li>Regarde les étiquettes : chacune est un token.</li><li>Compte les mots <b>différents</b> (« le » écrit 5 fois ne compte qu'une fois).</li></ol></div>
+<button id="b2">Découper le texte</button><p id="t2" style="margin-top:10px"></p>
+<p class="adv">Les vrais modèles découpent souvent en morceaux de mots (« mang » + « eons »), pas toujours en mots entiers.</p>
+<div class="qz" data-k="m2" data-num="1"><p class="qq" id="qq2">Question : combien de tokens <b>différents</b> y a-t-il dans ton texte ?</p><input type="number" id="n2" min="0"> <button id="v2">Vérifier</button><p class="fb"></p></div></section>
+<section class="step card" id="s3"><h2>3 · S'entraîner : compter les suites</h2>
+<div class="why"><b>Entraîner</b>, ici, c'est <b>compter</b> : pour chaque mot, quels mots viennent juste après, et combien de fois.</div>
+<div class="todo"><b>À faire :</b><ol><li>Clique sur « Entraîner le modèle ».</li><li>Choisis le mot « le » dans la liste.</li><li>Lis les barres : plus une barre est longue, plus ce mot suit souvent « le ».</li></ol></div>
+<button id="b3">Entraîner le modèle</button>
+<div id="w3" style="display:none;margin-top:10px"><label>Mot choisi : <select id="sel3"></select></label><div id="tb3"></div></div>
+<p class="adv">On appelle ça un modèle « bigramme » (paires de mots). Les réseaux de neurones font la même chose avec des centaines de mots de contexte et des milliards de réglages.</p>
+<div class="qz" data-k="m3" data-num="1"><p class="qq" id="qq3"></p><input type="number" id="n3" min="0"> <button id="v3">Vérifier</button><p class="fb"></p></div></section>
+<section class="step card" id="s4"><h2>4 · Prédire : des probabilités</h2>
+<div class="why">Le modèle transforme les comptages en <b>probabilités</b> : <b>(nombre de fois que le mot suit) ÷ (total)</b>. Exemple : 3 fois sur 9 → 33 chances sur 100. Un mot qu'il n'a jamais lu ? Il ne peut que deviner.</div>
+<div class="todo"><b>À faire :</b><ol><li>Écris un mot (essaie « le », puis « chat », puis un mot inventé).</li><li>Lis les pourcentages.</li></ol></div>
+<input id="w4" placeholder="ex : le" autocomplete="off" aria-label="Mot à prédire"><div id="p4" style="margin-top:10px"></div>
+<p class="adv">P(suivant | mot) = nombre de fois où « suivant » vient après « mot » ÷ nombre de fois où « mot » apparaît.</p>
+<div class="qz" data-k="m4" data-num="1"><p class="qq" id="qq4"></p><input type="number" id="n4" min="0" max="100"> <button id="v4">Vérifier</button><p class="fb"></p></div></section>
+<section class="step card" id="s5"><h2>5 · Écrire comme un chatbot</h2>
+<div class="why">Pour écrire, le modèle <b>choisit un mot</b>, l'ajoute, puis <b>recommence</b> avec ce nouveau mot. La <b>créativité</b> règle la part de hasard : à 0, il prend toujours le mot le plus probable ; plus haut, il tente des mots moins probables.</div>
+<div class="todo"><b>À faire :</b><ol><li>Choisis un premier mot.</li><li>Génère un texte avec une créativité de <b>0</b>, puis un autre avec <b>100</b>.</li><li>Compare les deux.</li></ol></div>
+<div class="row"><label>Premier mot <select id="st5"></select></label><label>Longueur <input id="n5" type="range" min="5" max="30" value="12"></label><label>Créativité <input id="c5" type="range" min="0" max="100" value="50"></label></div>
+<p class="mu" id="cl5"></p><button id="b5">Générer</button><div id="out" class="card"></div>
+<p class="adv">Créativité = « température ». Plus elle est haute, plus les mots peu probables sont tirés, et plus le risque d'absurdité monte.</p>
+<div class="qz" data-k="m5" data-a="0" data-e="Exact : à 0, le modèle répète le mot le plus probable ; à 100, il surprend mais peut dire n'importe quoi. Attention : un vrai chatbot choisit un mot PROBABLE, pas forcément VRAI. C'est pour ça qu'il peut inventer des faits (hallucination)." data-h="Compare les deux textes : lequel se répète ? lequel surprend ?"><p class="qq">Question : que remarques-tu entre créativité 0 et créativité 100 ?</p><div><button class="o">À 0 le texte se répète ; à 100 il surprend mais peut devenir absurde</button><button class="o">Aucune différence</button><button class="o">À 100, le texte est toujours vrai</button></div><p class="fb"></p></div></section>
+<section class="step card" id="fin"><h2>🏆 Bilan : tu as construit un mini-chatbot !</h2><ol><li>Il a <b>lu des textes</b> : il ne sait que ça.</li><li>Il les a <b>découpés</b> en tokens.</li><li>Il a <b>compté</b> quels mots se suivent.</li><li>Il en a déduit des <b>probabilités</b>.</li><li>Il <b>écrit</b> mot après mot en choisissant un mot probable.</li></ol>
+<div class="real">🌍 ChatGPT = la même idée avec des milliards de réglages et d'énormes quantités de textes. Comme il choisit des mots <b>probables</b>, il peut aussi <b>se tromper avec aplomb</b> : toujours vérifier !</div></section>
+<div id="toast" role="status"></div></main>
+<script>
+"use strict";
+var DEFAULT="le chat boit du lait. le chat dort sur le canapé. le chien boit de l'eau. le chien dort dans le jardin. le chat joue dans le jardin. le chien joue avec la balle.";
+var S={xp:0,done:{},tokens:[],counts:null,gen:{lo:false,hi:false},lvl:1,cur:0,valid:false,typed:false};
+var BAD={m1:"🗂️ Lecteur",m2:"✂️ Découpeur",m3:"🧮 Compteur",m4:"🔮 Devin",m5:"✍️ Écrivain"};
+function $(i){return document.getElementById(i);}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function tok(t){return t.toLowerCase().replace(/([.!?,;:])/g," $1 ").split(/\s+/).filter(Boolean);}
+function train(tokens){var c=Object.create(null);for(var i=0;i<tokens.length-1;i++){var a=tokens[i],b=tokens[i+1];if(!c[a])c[a]=Object.create(null);c[a][b]=(c[a][b]||0)+1;}return c;}
+function total(o){var s=0;for(var k in o)s+=o[k];return s;}
+function sorted(o){return Object.keys(o).sort(function(x,y){return o[y]-o[x]||(x<y?-1:1);});}
+function pick(o,creat){var keys=Object.keys(o);if(!keys.length)return null;if(creat===0)return sorted(o)[0];var tau=creat/50,w=keys.map(function(k){return Math.pow(o[k],1/tau);}),s=w.reduce(function(a,b){return a+b;},0),r=Math.random()*s;for(var i=0;i<keys.length;i++){r-=w[i];if(r<=0)return keys[i];}return keys[keys.length-1];}
+function join(a){return a.join(" ").replace(/ ([.!?,;:])/g,"$1");}
+function toast(m){var t=$("toast");t.textContent=m;t.style.display="block";setTimeout(function(){t.style.display="none";},2400);}
+function uniq(){return Object.keys(S.tokens.reduce(function(o,w){o[w]=1;return o;},Object.create(null))).length;}
+function ref(){if(!S.counts)return null;var w=S.counts.le?"le":Object.keys(S.counts).filter(function(k){return Object.keys(S.counts[k]).length>=2&&!/^[.!?,;:]$/.test(k);}).sort()[0];if(!w)return null;var o=S.counts[w],x=sorted(o)[0];return {w:w,x:x,n:o[x],t:total(o),p:Math.round(100*o[x]/total(o))};}
+function unl(n){return n<=1||!!S.done["m"+(n-1)];}
+function refresh(){var T=$("tabs");T.innerHTML="";for(var i=0;i<=5;i++)(function(i){var b=document.createElement("button");b.className=i===S.cur?"":"alt";b.textContent=i===0?"Intro":i+(S.done["m"+i]?" ✓":"");b.disabled=!unl(i);b.onclick=function(){go(i);};T.appendChild(b);})(i);
+ $("xp").textContent=S.xp;$("xpb").style.width=Math.min(100,S.xp)+"%";var g=Object.keys(BAD).filter(function(k){return S.done[k];}).map(function(k){return BAD[k];});$("badges").textContent=g.length?"Badges : "+g.join("  "):"Badges : aucun pour l'instant";
+ $("fin").className="step card"+(Object.keys(S.done).length===5&&S.cur===5?" on":"");}
+function go(n){if(!unl(n))return;S.cur=n;for(var i=0;i<=5;i++)$("s"+i).className="step card"+(i===n?" on":"");
+ if(n===3){var r=null;}if(n>=3&&S.counts){q3();}if(n===4)q4();refresh();window.scrollTo&&window.scrollTo(0,0);}
+function need(k){
+ if(k==="m1")return (S.valid)?"":"Fais d'abord l'activité : ajoute une phrase de toi puis clique sur « Valider les textes ».";
+ if(k==="m2")return S.tokens.length&&$("t2").textContent?"":"Fais d'abord l'activité : clique sur « Découper le texte ».";
+ if(k==="m3")return S.counts?"":"Fais d'abord l'activité : clique sur « Entraîner le modèle ».";
+ if(k==="m4")return (S.counts&&S.typed)?"":"Fais d'abord l'activité : entraîne le modèle puis écris un mot dans la case.";
+ if(k==="m5")return (S.gen.lo&&S.gen.hi)?"":"Fais d'abord l'activité : génère un texte à créativité 0 puis un autre à 100.";return "";}
+function award(q,k,msg){var n=+q.getAttribute("data-n")||0,pts=[20,10,5][Math.min(n,2)];q.setAttribute("data-done","1");q.className="qz d";S.xp+=pts;S.done[k]=1;toast("🎉 Bien joué ! +"+pts+" points");q.querySelector(".fb").textContent="✅ "+msg;refresh();}
+document.addEventListener("click",function(e){var b=e.target.closest?e.target.closest(".qz button.o"):null;if(!b)return;var q=b.closest(".qz"),k=q.getAttribute("data-k"),a=+q.getAttribute("data-a"),i=Array.prototype.indexOf.call(b.parentNode.children,b),fb=q.querySelector(".fb");
+ if(q.getAttribute("data-done")||b.disabled)return;var r=need(k);if(r){fb.textContent="🔒 "+r;return;}
+ if(i===a){b.className="o good";award(q,k,q.getAttribute("data-e"));}else{b.className="o bad";b.disabled=true;q.setAttribute("data-n",(+q.getAttribute("data-n")||0)+1);fb.textContent="❌ Pas tout à fait. Indice : "+q.getAttribute("data-h");}});
+function numq(k,exp,okmsg,hint,tol){var q=document.querySelector('.qz[data-k="'+k+'"]'),fb=q.querySelector(".fb"),r=need(k);if(q.getAttribute("data-done"))return;if(r){fb.textContent="🔒 "+r;return;}
+ var v=$("n"+k.slice(1)).value;if(v===""){fb.textContent="Écris un nombre.";return;}if(Math.abs(+v-exp)<=(tol||0))award(q,k,okmsg);else{q.setAttribute("data-n",(+q.getAttribute("data-n")||0)+1);fb.textContent="❌ Pas tout à fait. Indice : "+hint;}}
+function q3(){var r=ref();$("qq3").innerHTML=r?"Question : dans le tableau, combien de fois « <b>"+esc(r.x)+"</b> » vient-il juste après « <b>"+esc(r.w)+"</b> » ?":"Entraîne d'abord le modèle.";}
+function q4(){var r=ref();$("qq4").innerHTML=r?"Question : après « <b>"+esc(r.w)+"</b> », « <b>"+esc(r.x)+"</b> » est suivi "+r.n+" fois sur "+r.t+". Quelle est sa probabilité, en pourcentage (arrondi) ?":"Entraîne d'abord le modèle (étape 3).";}
+function validate(){var t=tok($("corpus").value);S.tokens=t;S.counts=null;S.valid=false;$("t2").textContent="";$("w3").style.display="none";$("p4").innerHTML="";$("out").textContent="";
+ if(t.length>=10&&$("corpus").value.trim()!==DEFAULT){S.valid=true;$("m1").textContent="✅ Textes validés : "+t.length+" tokens. Réponds à la question ci-dessous.";}else{$("m1").textContent="Il faut au moins 10 mots et une phrase de toi.";}}
+function split(){if(!S.tokens.length){$("t2").textContent="Valide d'abord les textes (étape 1).";return;}
+ $("t2").innerHTML=S.tokens.slice(0,80).map(function(w){return '<span class="chip">'+esc(w)+"</span>";}).join("")+(S.tokens.length>80?" …":"")+"<br>Il y a <b>"+S.tokens.length+"</b> tokens au total.";}
+function fill(){var opts=Object.keys(S.counts).filter(function(w){return !/^[.!?,;:]$/.test(w);}).sort().map(function(w){return "<option>"+esc(w)+"</option>";}).join("");$("sel3").innerHTML=opts;$("st5").innerHTML=opts;if(S.counts.le)$("sel3").value="le";}
+function table3(){var w=$("sel3").value,o=S.counts[w];if(!o){$("tb3").textContent="Aucun mot après celui-ci.";return;}var t=total(o);$("tb3").innerHTML="<p>Après <b>« "+esc(w)+" »</b>, on trouve :</p>"+sorted(o).map(function(k){return '<div class="pr"><b>'+esc(k)+'</b><div class="bar"><i style="width:'+(100*o[k]/t)+'%"></i></div><span>'+o[k]+" fois</span></div>";}).join("");}
+function train3(){if(!S.valid||!$("t2").textContent){$("tb3").textContent="Fais d'abord les étapes 1 et 2.";$("w3").style.display="block";return;}S.counts=train(S.tokens);fill();$("w3").style.display="block";table3();q3();}
+function predict(){var w=$("w4").value.trim().toLowerCase(),box=$("p4");if(!S.counts){box.textContent="Entraîne d'abord le modèle (étape 3).";return;}if(!w){box.textContent="";return;}S.typed=true;
+ var o=S.counts[w];if(!o){box.innerHTML="<p>🤔 Le modèle ne connaît pas « "+esc(w)+" » : il ne l'a jamais lu. Il ne peut que deviner au hasard.</p>";return;}
+ var t=total(o);box.innerHTML=sorted(o).slice(0,6).map(function(k){var p=Math.round(100*o[k]/t);return '<div class="pr"><b>'+esc(k)+'</b><div class="bar"><i style="width:'+p+'%"></i></div><span>'+p+" %</span></div>";}).join("")+'<p class="mu">'+o[sorted(o)[0]]+" sur "+t+" pour le premier : "+o[sorted(o)[0]]+" ÷ "+t+"</p>";}
+function gen(){if(!S.counts){$("out").textContent="Entraîne d'abord le modèle (étape 3).";return;}var cr=+$("c5").value,n=+$("n5").value,cur=$("st5").value,res=[cur];for(var i=0;i<n;i++){var nx=pick(S.counts[cur]||{},cr);if(nx===null)break;res.push(nx);cur=nx;}$("out").textContent=join(res);if(cr===0)S.gen.lo=true;if(cr===100)S.gen.hi=true;}
+function lab(){var c=+$("c5").value;$("cl5").textContent="Créativité "+c+" : "+(c===0?"toujours le mot le plus probable.":c<50?"prudente.":c===50?"proportionnelle aux comptages.":"audacieuse, plus de surprises.");}
+$("corpus").value=DEFAULT;$("start").onclick=function(){go(1);};$("b1").onclick=validate;$("r1").onclick=function(){$("corpus").value=DEFAULT;};$("b2").onclick=split;$("b3").onclick=train3;$("sel3").onchange=table3;
+$("w4").oninput=predict;$("b5").onclick=gen;$("c5").oninput=lab;
+$("v2").onclick=function(){numq("m2",uniq(),"Oui : "+uniq()+" tokens différents. Un mot répété n'est compté qu'une fois : le modèle a besoin de connaître chaque mot une seule fois.","compte chaque mot une seule fois, même s'il est répété (le point compte aussi).",0);};
+$("v3").onclick=function(){var r=ref();if(!r)return numq("m3",-1,"","");numq("m3",r.n,"Oui : "+r.n+" fois. C'est ce comptage qui permet de calculer des probabilités à l'étape suivante.","regarde la barre de « "+r.x+" » dans le tableau de « "+r.w+" ».",0);};
+$("v4").onclick=function(){var r=ref();if(!r)return numq("m4",-1,"","");numq("m4",r.p,"Oui : "+r.n+" ÷ "+r.t+" ≈ "+r.p+" %. Plus un mot suit souvent, plus il est probable.","calcule "+r.n+" ÷ "+r.t+" puis multiplie par 100.",1);};
+lab();refresh();
+</script><script id="matrix-js">(function(){var c=document.createElement("canvas");c.id="matrix";c.setAttribute("aria-hidden","true");c.style.cssText="position:fixed;left:0;top:0;width:100vw;height:100vh;max-width:none;border:0;border-radius:0;background:transparent;pointer-events:none;z-index:-1;display:block";document.body.insertBefore(c,document.body.firstChild);
+var x=c.getContext("2d"),COL="#3fb6ff",F="2,8,20",BG="#02070f",ch="01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワン",fs=16,W,H,n,d;
+function size(){W=c.width=window.innerWidth;H=c.height=window.innerHeight;n=Math.ceil(W/fs);d=[];for(var i=0;i<n;i++)d[i]=Math.random()*H/fs;x.fillStyle=BG;x.fillRect(0,0,W,H);}
+function tick(){x.fillStyle="rgba("+F+",.13)";x.fillRect(0,0,W,H);x.font=fs+"px monospace";for(var i=0;i<n;i++){x.fillStyle=Array.isArray(COL)?(i<n/2?COL[0]:COL[1]):COL;x.fillText(ch.charAt(Math.floor(Math.random()*ch.length)),i*fs,d[i]*fs);if(d[i]*fs>H&&Math.random()>.975)d[i]=0;d[i]++;}}
+size();window.addEventListener("resize",size);
+if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches){for(var k=0;k<60;k++)tick();}else{setInterval(tick,55);}})();</script></body></html>
