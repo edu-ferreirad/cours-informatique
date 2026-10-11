@@ -1,8 +1,0 @@
-Site IA Collège (accès par mot de passe).
-Dépose dans le dossier « college » de ton GitHub : index.html et evaluation.html (les cours et les exercices, chiffrés, sont dans index.html). Ne mets pas ce LISEZMOI en ligne.
-Pour renommer un titre, modifie le texte entre les balises <b> dans index.html (ne renomme pas les fichiers du dossier data).
-- index.html : page d'entrée (mot de passe), puis Cours (3 PDF), Exercices (Pixel, prédicteur, cartes) et Évaluation.
-- evaluation.html : évaluation, avec son propre mot de passe (change-le avec mot-de-passe.html).
-- Les PDF et les exercices sont chiffrés dans index.html : ils ne s'ouvrent qu'avec le mot de passe d'entrée.
-Le site fonctionne en ligne (GitHub Pages) et aussi en double-cliquant sur index.html.
-Note : la page des corrigés enseignant a été retirée du PDF des cartes mis à disposition des élèves.
