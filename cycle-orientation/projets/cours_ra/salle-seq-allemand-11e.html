@@ -9,7 +9,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <link rel="stylesheet" href="style.css?v=5">
-<script src="anti-capture.js"></script>
 </head>
 <body>
 
@@ -107,25 +106,12 @@ renderChips();
 
 let currentInspectObj = null;
 
-function pickFrVoice() {
-  try {
-    const voices = window.speechSynthesis.getVoices ? window.speechSynthesis.getVoices() : [];
-    const lg = v => (v.lang || "").replace("_", "-").toLowerCase();
-    return voices.find(v => lg(v) === "fr-ch")
-        || voices.find(v => lg(v) === "fr-fr")
-        || voices.find(v => lg(v).indexOf("fr") === 0)
-        || null;
-  } catch (e) { return null; }
-}
-if ("speechSynthesis" in window) { try { window.speechSynthesis.getVoices(); } catch (e) {} }
-
 function speakObject(obj) {
   if (!("speechSynthesis" in window) || !obj) return;
   window.speechSynthesis.cancel();
   const fullText = obj.fact ? `${obj.label}. ${obj.text} Le sais-tu ? ${obj.fact}` : `${obj.label}. ${obj.text}`;
   const utter = new SpeechSynthesisUtterance(fullText);
-  const frVoice = pickFrVoice();
-  if (frVoice) { utter.voice = frVoice; utter.lang = frVoice.lang; } else { utter.lang = "fr-FR"; }
+  utter.lang = "fr-FR";
   utter.rate = 0.95;
   window.speechSynthesis.speak(utter);
 }
@@ -440,7 +426,6 @@ async function tryStartCompassMode() {
     ArEngine.watchHeading((heading) => {
       if (!calibrated) {
         calibrated = true;
-        noHeadingSignal = false;
         headingOffset = heading;
         arrow.classList.remove("hidden");
         btnScan.disabled = false;
@@ -467,8 +452,6 @@ async function tryStartCompassMode() {
 
   btnScan.addEventListener("click", () => {
     unlockAudio();
-    // Scan iOS : on mémorise l'objet réellement visé (écart < 15°) au moment du clic
-    const startObj = (lastDelta !== null && Math.abs(lastDelta) < 15) ? aimedObj : null;
     btnScan.disabled = true;
     stopBeeper();
     status.textContent = "Analyse en cours… (0%)";
@@ -476,9 +459,7 @@ async function tryStartCompassMode() {
       durationMs: 1400,
       onProgress: (pct) => { status.textContent = `Analyse en cours… (${Math.round(pct * 100)}%)`; },
       onDone: () => {
-        // L'objet n'apparaît que si l'élève vise vraiment la cible (au clic ET à la fin de l'analyse)
-        const alignedNow = lastDelta !== null && Math.abs(lastDelta) < 15;
-        const hit = ((startObj && alignedNow && aimedObj === startObj) ? startObj : null) || (noHeadingSignal ? (objects.find(o => !found.has(o.id)) || null) : null);
+        const hit = aimedObj || (noHeadingSignal ? (objects.find(o => !found.has(o.id)) || null) : null);
         if (hit) {
           status.textContent = "Objet trouvé ✓";
           status.className = "ar-status ok";
