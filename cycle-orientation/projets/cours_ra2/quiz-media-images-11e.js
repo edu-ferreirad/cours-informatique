@@ -1,0 +1,16 @@
+const QUIZ_MEDIA_IMAGES_11E = [
+  { id:"q1", tier:"court", type:"qcm", prompt:"Pourquoi de nombreuses applications sont-elles conçues pour capter le plus longtemps possible l'attention ?", options:["Par accident", "Car ce temps génère des revenus publicitaires", "Pour économiser de l'énergie", "Ce n'est pas le cas"], correct:1 },
+  { id:"q2", tier:"court", type:"qcm", prompt:"Quelle différence sépare la mésinformation de la désinformation ?", options:["Aucune différence", "La désinformation est volontaire, la mésinformation est une erreur", "La mésinformation est toujours pire", "Les deux sont toujours vraies"], correct:1 },
+  { id:"q3", tier:"court", type:"texte", prompt:"Quelle est la meilleure protection contre une information biaisée ou incomplète ?", answers:["croiser plusieurs sources", "croiser les sources", "verifier plusieurs sources"] },
+  { id:"q4", tier:"moyen", type:"qcm", prompt:"Sur les réseaux sociaux, qui décide de ce que voit réellement chaque utilisateur dans son fil ?", options:["L'utilisateur uniquement", "Un algorithme pensé pour maximiser l'engagement", "Le hasard total", "Un journaliste"], correct:1 },
+  { id:"q5", tier:"moyen", type:"qcm", prompt:"Comment appelle-t-on une image ou vidéo hyperréaliste générée par IA représentant une personne disant/faisant quelque chose de faux ?", options:["Un montage", "Un deepfake", "Un screenshot", "Un mème"], correct:1 },
+  { id:"q6", tier:"moyen", type:"texte", prompt:"Quelle qualité de streaming vidéo consomme le plus d'énergie et de données ?", answers:["haute definition", "tres haute definition", "hd", "4k"] },
+  { id:"q7", tier:"long", type:"qcm", prompt:"Une image documentaire non retouchée est-elle toujours totalement neutre ?", options:["Oui, toujours", "Non, le cadrage et l'angle orientent déjà l'interprétation", "Seulement si elle est truquée", "Cela n'a pas d'importance"], correct:1 },
+  { id:"q8", tier:"long", type:"qcm", prompt:"Qu'est-ce qu'un gros plan sur le visage d'un personnage cherche souvent à provoquer chez le spectateur ?", options:["De l'ennui", "L'identification émotionnelle", "De la confusion", "Rien de particulier"], correct:1 },
+  { id:"q9", tier:"long", type:"qcm", prompt:"Qu'est-ce qui distingue fondamentalement un jeu vidéo d'un film ?", options:["La couleur", "L'interactivité : le joueur agit sur le déroulement", "La durée", "Le prix"], correct:1 },
+  { id:"q10", tier:"long", type:"qcm", prompt:"Analyser une publicité (cadrage, personnages, slogan) peut révéler quoi, au-delà du produit vendu ?", options:["Rien d'autre", "Des stéréotypes et représentations sociales", "Uniquement le prix", "Le nom de l'agence"], correct:1 },
+];
+function normalizeAnswer(s){return (s||"").toString().trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9 ]/g,"").replace(/\s+/g," ");}
+const QUIZ_TIER_ORDER = { court:1, moyen:2, long:3 };
+function getQuizForParcours(parcours){ const maxLevel = QUIZ_TIER_ORDER[parcours] || 1; return QUIZ_MEDIA_IMAGES_11E.filter(q => QUIZ_TIER_ORDER[q.tier] <= maxLevel); }
+window.QUIZ_MEDIA_IMAGES_11E = QUIZ_MEDIA_IMAGES_11E; window.getQuizForParcours = getQuizForParcours; window.normalizeAnswer = normalizeAnswer;
