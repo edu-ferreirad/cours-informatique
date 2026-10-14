@@ -23,6 +23,7 @@
   .quiz-feedback.ko{color:#e08a83;}
   .quiz-score{font-family:var(--font-display); font-size:24px; font-weight:700; text-align:center; margin:20px 0;}
 </style>
+<script src="anti-capture.js"></script>
 </head>
 <body>
 
@@ -57,6 +58,49 @@ const params = new URLSearchParams(location.search);
 const parcours = params.get("parcours") || "riche";
 const QUIZ_FRANCAIS_ACTIVE = window.getQuizForParcours ? window.getQuizForParcours(parcours) : QUIZ_FRANCAIS_9E;
 const answers = {}; // id -> {value, isQcm}
+
+// --- Correction souple des réponses texte (mots présents, accents/casse/articles tolérés) ---
+function flexMatch(given, accepted) {
+  const clean = s => normalizeAnswer(String(s == null ? "" : s)
+    .replace(/[œŒ]/g, "oe").replace(/[æÆ]/g, "ae").replace(/['’`´\-–—_\/]/g, " "));
+  const STOP = new Set(["le","la","les","l","un","une","des","de","du","d","en","au","aux","a","et","ce","cet","cette","ces"]);
+  const NEG = new Set(["pas","non","ni","jamais","sauf","aucun","aucune"]);
+  const toks = s => clean(s).split(" ").filter(Boolean);
+  const withinOne = (a, b) => {
+    if (a === b) return true;
+    if (Math.abs(a.length - b.length) > 1) return false;
+    let i = 0, j = 0, diff = 0;
+    while (i < a.length && j < b.length) {
+      if (a[i] === b[j]) { i++; j++; continue; }
+      if (++diff > 1) return false;
+      if (a.length > b.length) i++; else if (a.length < b.length) j++; else { i++; j++; }
+    }
+    return diff + (a.length - i) + (b.length - j) <= 1;
+  };
+  const tokMatch = (want, got) => want === got || (want.length >= 7 && !/\d/.test(want) && withinOne(want, got));
+  const g = toks(given);
+  if (!g.length) return false;
+  const gj = g.join(" ");
+  const gCore = g.filter(t => !STOP.has(t));
+  for (const a of accepted) {
+    const at = toks(a);
+    if (!at.length) continue;
+    if (gj === at.join(" ")) return true;
+    if (g.length > at.length + 4) continue;
+    if (g.some(t => NEG.has(t)) && !at.some(t => NEG.has(t))) continue;
+    const aCore = at.filter(t => !STOP.has(t));
+    const need = aCore.length ? aCore : at;
+    const pool = aCore.length ? gCore : g;
+    if (need.some(t => /\d/.test(t))) {
+      const nd = need.filter(t => /\d/.test(t));
+      const gd = pool.filter(t => /\d/.test(t));
+      if (nd.length === gd.length && nd.every(t => gd.includes(t)) && need.every(t => pool.includes(t))) return true;
+      continue;
+    }
+    if (need.every(t => pool.some(p => tokMatch(t, p)))) return true;
+  }
+  return false;
+}
 
 const form = $("#quiz-form");
 QUIZ_FRANCAIS_ACTIVE.forEach((q, i) => {
@@ -109,7 +153,7 @@ $("#btn-check").addEventListener("click", () => {
       const input = $(".quiz-input", box);
       input.disabled = true;
       const given = input.value;
-      const isRight = q.answers.includes(normalizeAnswer(given));
+      const isRight = flexMatch(given, q.answers);
       if (isRight) score++;
       fb.textContent = isRight ? "✓ Bonne réponse" : `✗ Réponse attendue : ${q.answers[0]}`;
       fb.className = "quiz-feedback " + (isRight ? "ok" : "ko");
