@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Pas d'évaluation - 1ère matu</title>
+<style>
+body{background-color:#090000;color:#ff9999;font-family:'Courier New',Courier,monospace;text-align:center;margin:0;padding-top:50px;overflow-x:hidden}
+canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1}
+.container{max-width:860px;margin:0 auto 50px auto;position:relative;z-index:10;padding:40px;background:rgba(20,0,5,.85);border:1px solid #ff6666;box-shadow:0 0 20px rgba(255,102,102,.3);border-radius:8px}
+h1{color:#fff;text-shadow:0 0 10px #ff6666,0 0 20px #880022;margin-bottom:20px}
+h4{color:#fff;text-align:left;margin:22px 0 4px;text-shadow:0 0 8px #ff6666}
+p{color:#ff9999;font-size:1.1em;text-shadow:0 0 5px #ff6666;margin-bottom:30px}
+.q{font-size:1em;margin:6px 0 10px;text-align:left;text-shadow:none}
+.semester-block{background:rgba(40,0,10,.6);border:1px solid rgba(255,102,102,.4);border-radius:6px;padding:20px;margin:20px 0;text-align:left}
+.semester-block h3{color:#ff9999;margin-top:0;margin-bottom:15px;text-shadow:0 0 5px #ff6666;font-size:1.15em;border-left:3px solid #ff6666;padding-left:10px}
+.item-row{display:flex;justify-content:space-between;align-items:center;background:rgba(20,0,5,.9);padding:10px 15px;margin:10px 0;border-radius:4px;border:1px solid #880022}
+.item-name{color:#fff;font-weight:bold}
+.back-btn{display:inline-block;padding:10px 20px;background-color:#880022;color:#fff;text-decoration:none;border-radius:5px;border:1px solid #ff6666;transition:all .3s;font-weight:bold;margin-top:20px;font-family:inherit;font-size:1em;cursor:pointer}
+.back-btn:hover{background-color:#ff6666;box-shadow:0 0 15px #ff6666}
+input,select{background:#140005;color:#fff;border:1px solid #880022;border-radius:4px;padding:8px;font-family:inherit;font-size:1em;max-width:100%;box-sizing:border-box}
+input[type=checkbox],input[type=radio]{margin-right:8px;accent-color:#ff6666}
+input:focus,select:focus,button:focus-visible{outline:2px solid #ff9999}
+.op{display:block;color:#ff9999;margin:7px 0;text-align:left;line-height:1.4}
+img.cp{height:100px;background:#fff;border-radius:4px;padding:4px}
+#chrono{position:fixed;top:8px;right:12px;z-index:20;background:#880022;color:#fff;padding:6px 12px;border-radius:5px;border:1px solid #ff6666;font-weight:bold}
+#msg{color:#ff6666;min-height:1.4em}
+</style>
+</head>
+<body>
+<canvas id="matrix"></canvas>
+<div class="container">
+<h1>Évaluation</h1>
+<p>Tu pensais vraiment qu'il y aurait une évaluation aujourd'hui ? ;)</p>
+<p style="font-size:.95em">Rien à rendre, rien à réviser… profite, ça ne durera pas.</p>
+<a class="back-btn" href="index.html">⬅ Retour</a>
+</div>
+<script>
+const canvas=document.getElementById('matrix'),ctx=canvas.getContext('2d');
+function resizeCanvas(){canvas.width=window.innerWidth;canvas.height=window.innerHeight}
+resizeCanvas();window.addEventListener('resize',resizeCanvas);
+const characters='0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ<>/\\{}[]*&é"\'(-)=+',fontSize=16;
+let columns=canvas.width/fontSize,drops=[];
+for(let i=0;i<columns;i++)drops[i]=1;
+function drawMatrix(){
+ ctx.fillStyle='rgba(9,0,5,0.08)';ctx.fillRect(0,0,canvas.width,canvas.height);
+ const colors=['#ffffff','#ff9999','#ff6666'];ctx.font=fontSize+'px monospace';
+ for(let i=0;i<drops.length;i++){
+  ctx.fillStyle=colors[Math.floor(Math.random()*colors.length)];
+  ctx.fillText(characters.charAt(Math.floor(Math.random()*characters.length)),i*fontSize,drops[i]*fontSize);
+  if(drops[i]*fontSize>canvas.height&&Math.random()>0.975)drops[i]=0;
+  drops[i]++;
+ }
+}
+setInterval(drawMatrix,50);
+</script>
+</body>
+</html>
