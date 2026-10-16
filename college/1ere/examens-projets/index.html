@@ -119,7 +119,7 @@
             <h3>1er semestre</h3>
             <div class="item-row">
                 <span class="item-name">Examen écrit</span>
-                <span class="item-status">Contenu à venir</span>
+                <a class="back-btn exam-btn" data-exam="s1" style="margin-top:0;padding:6px 14px;font-size:0.9em" href="examen-off.html">Accéder</a>
             </div>
             <div class="item-row">
                 <span class="item-name">Projet</span>
@@ -132,7 +132,7 @@
             <h3>Deuxième semestre</h3>
             <div class="item-row">
                 <span class="item-name">Examen écrit</span>
-                <span class="item-status">Contenu à venir</span>
+                <a class="back-btn exam-btn" data-exam="s2" style="margin-top:0;padding:6px 14px;font-size:0.9em" href="examen-off.html">Accéder</a>
             </div>
             <div class="item-row">
                 <span class="item-name">Projet</span>
@@ -140,16 +140,6 @@
             </div>
         </div>
         
-        <!-- DEBUT EXAMEN : supprimer de DEBUT à FIN le lendemain -->
-        <div class="semester-block">
-            <h3>Évaluation en cours</h3>
-            <div class="item-row">
-                <span class="item-name">Hardware – arborescence</span>
-                <a class="back-btn" style="margin-top:0" href="examen.html">Accéder à l'examen</a>
-            </div>
-        </div>
-        <!-- FIN EXAMEN -->
-
         <a class="back-btn" href="../index.html">⬅ Retour au menu</a>
     </div>
 
@@ -193,6 +183,16 @@
         }
 
         setInterval(drawMatrix, 50);
+    </script>
+    <script>
+        // Évaluations : mettre true la veille (et déposer le fichier de l'examen), remettre false le lendemain.
+        // s1 = examen.html (1er semestre) · s2 = examen-s2.html (2e semestre) · sinon : page examen-off.html
+        const EXAMEN_ACTIF = { s1: false, s2: false };
+        const EXAMEN_PAGE = { s1: 'examen.html', s2: 'examen-s2.html' };
+        document.querySelectorAll('.exam-btn').forEach(a => {
+            const k = a.getAttribute('data-exam');
+            a.href = EXAMEN_ACTIF[k] ? EXAMEN_PAGE[k] : 'examen-off.html';
+        });
     </script>
 </body>
 </html>
