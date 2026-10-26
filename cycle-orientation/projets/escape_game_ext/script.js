@@ -144,7 +144,7 @@ const STEPS = [
     title: "ÉNIGME 5 — La charade de Dame Piaget",
     transition: "Mais la Mère Royaume n'est pas la seule à avoir lancé quelque chose ce soir-là. Notre seconde héroïne, Dame Piaget (Jeanne Baud), fit de même avec un autre objet, depuis sa fenêtre, pour aider les défenseurs à ouvrir un passage secret dans la muraille.",
     brief: "Charade : je rentre toujours en premier, et je sors toujours en dernier. Qui suis-je ? Le passage qu'elle a permis d'ouvrir existe encore aujourd'hui, tout près de la tour de la Corraterie : le Passage de la Petite-Corraterie, entièrement rénové, mais qui garde près de son entrée un souvenir de cette nuit-là (source : Ville de Genève).",
-    gps: { lat: 46.20096, lng: 6.14690, label: "Passage de la Petite-Corraterie (Rue de la Corraterie / Rue de la Cité)" },
+    gps: { lat: 46.20333, lng: 6.14333, label: "Passage de la Petite-Corraterie (Rue de la Corraterie / Rue de la Cité)" },
     question: "Je rentre toujours en premier, et je sors toujours en dernier : quel est cet objet ?",
     answer: "CLE",
     altAnswers: ["UNE CLE", "LA CLE"],
@@ -178,7 +178,7 @@ const STEPS = [
     title: "ÉNIGME 6 — Le héros de la Porte-Neuve",
     transition: "Bravo, vous avez deviné : une clé ! En jetant depuis sa fenêtre la clef de l'allée traversante de son immeuble, Dame Piaget permit aux Genevois d'ouvrir le passage et de contre-attaquer. Venons-en à notre troisième héros, Isaac Mercier. Les combats continuaient au nord de la cité, à la Porte-Neuve, où l'ennemi comptait faire sauter l'entrée pour laisser passer le gros de ses troupes.",
     brief: "Consultez l'annexe « Cé qu'è lainô » de votre porte-documents : une strophe précise raconte l'exploit d'Isaac Mercier, qui fit tomber la coulisse (herse) juste à temps. La place actuelle occupe l'emplacement exact de cette ancienne porte de ville, où une vraie plaque commémore encore aujourd'hui son exploit.",
-    gps: { lat: 46.2009, lng: 6.1434, label: "Place Neuve (ancienne Porte-Neuve)" },
+    gps: { lat: 46.20141, lng: 6.14425, label: "Place Neuve (ancienne Porte-Neuve)" },
     question: "Quel est le numéro de cette strophe ? (calcul : (4×7)×(36/18), puis vérifiez avec 1+4/2+(8-5-2))",
     answer: "14",
     hint: "Cherchez dans l'annexe le mot « coulisse » — la strophe qui le contient est votre réponse.",
@@ -199,7 +199,7 @@ const STEPS = [
     title: "ÉNIGME 7 — La déroute des envahisseurs",
     transition: "Félicitations ! Isaac Mercier est resté aussi célèbre que la herse qu'il libéra sur la Porte-Neuve. Entendant le bruit, les soldats ennemis restés hors les murs se précipitèrent, croyant la porte enfin ouverte — grave erreur. Après trois ou quatre heures de combat, un dernier coup décisif mit fin à l'assaut. Le canon utilisé venait d'ici.",
     brief: "Le canon décisif — parti du boulevard de l'Oye, tout près de la Treille — avait été acheminé depuis l'arsenal de l'époque. Sous les arcades de l'Ancien Arsenal, cinq canons d'époque sont toujours visibles aujourd'hui.",
-    gps: { lat: 46.2013, lng: 6.1478, label: "Ancien Arsenal (Rue de l'Hôtel-de-Ville 1 — ⚠ à vérifier sur place)" },
+    gps: { lat: 46.20112, lng: 6.14710, label: "Ancien Arsenal (Rue de l'Hôtel-de-Ville 1)" },
     question: "Par quel moyen les Genevois ont-ils fait fuir les envahisseurs ?",
     answer: "CANONNADE",
     altAnswers: ["CANNONADE"],
@@ -266,11 +266,19 @@ const HINT_PENALTY = 5;
 const BONUS_POINTS = 5;
 const MAX_SCORE = ALL_STEPS.length * POINTS_PER_STEP + STEPS.filter((s) => s.bonus).length * BONUS_POINTS;
 
-// Tolérance GPS : remontée à 20 m (contre 3 m avant) pour éviter les
+// Tolérance GPS : remontée à 60 m (contre 20 m, et 3 m avant) pour éviter les
 // faux blocages — un smartphone en Vieille Ville (rues étroites,
 // façades hautes) tombe rarement sous 5-20 m de précision réelle. Une
 // tolérance trop serrée bloquait des équipes pourtant bien placées.
-const GEO_TOLERANCE_M = 20;
+const GEO_TOLERANCE_M = 60;
+// Marge adaptative : on ajoute la précision annoncée par le téléphone
+// (un GPS qui se déclare imprécis est jugé avec plus d'indulgence),
+// plafonnée à 100 m pour que la vérification garde un sens.
+const GEO_MAX_TOLERANCE_M = 100;
+function geoLimit(pos) {
+  const acc = pos && pos.coords && Number.isFinite(pos.coords.accuracy) ? pos.coords.accuracy : 0;
+  return Math.min(GEO_TOLERANCE_M + Math.max(0, acc), GEO_MAX_TOLERANCE_M);
+}
 
 /* ---- Annexe : table de conversion + Cé qu'è lainô (domaine public) */
 const ROMAN_TABLE = [
@@ -1257,10 +1265,11 @@ function renderTextStep(step, container) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           const d = haversine(pos.coords.latitude, pos.coords.longitude, step.gps.lat, step.gps.lng);
-          if (d <= GEO_TOLERANCE_M) {
+          const lim = geoLimit(pos);
+          if (d <= lim) {
             finishPhoto(`✔ Position confirmée (≈${d.toFixed(1)} m du repère).`, "ok");
           } else {
-            extraGeoStatus.textContent = `✘ Trop loin du repère (≈${d.toFixed(1)} m, tolérance ${GEO_TOLERANCE_M} m). Rapprochez-vous et réessayez.`;
+            extraGeoStatus.textContent = `✘ Trop loin du repère (≈${d.toFixed(1)} m, tolérance ${Math.round(lim)} m). Rapprochez-vous et réessayez.`;
             extraGeoStatus.className = "geo-status extra-geo-status warn";
           }
         },
@@ -1431,13 +1440,14 @@ function renderPhotoStep(step, container) {
       (pos) => {
         const d = haversine(pos.coords.latitude, pos.coords.longitude, step.gps.lat, step.gps.lng);
         const acc = pos.coords.accuracy ? Math.round(pos.coords.accuracy) : null;
-        if (d <= GEO_TOLERANCE_M) {
+        const lim = geoLimit(pos);
+        if (d <= lim) {
           geoStatus.textContent = `✔ Position confirmée (≈${d.toFixed(1)} m du repère).`;
           geoStatus.className = "geo-status ok";
           completePhotoStep();
         } else {
           state.photoRetries[step.id] = (state.photoRetries[step.id] || 0) + 1; persist();
-          geoStatus.textContent = `✘ Trop loin du repère (≈${d.toFixed(1)} m, tolérance ${GEO_TOLERANCE_M} m` +
+          geoStatus.textContent = `✘ Trop loin du repère (≈${d.toFixed(1)} m, tolérance ${Math.round(lim)} m` +
             (acc ? `, précision GPS actuelle ≈${acc} m` : "") + `). Rapprochez-vous et réessayez.`;
           geoStatus.className = "geo-status warn";
           feedback.textContent = "✘ Secteur non validé : vous n'êtes pas assez près du repère GPS.";
