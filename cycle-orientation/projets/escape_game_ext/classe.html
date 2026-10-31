@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MATRIX_1602 // Vue de classe</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="scanlines" aria-hidden="true"></div>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <span class="dot"></span>
+    <span class="brand">MATRIX_1602</span>
+    <span class="sub">// vue de classe — comparaison des équipes</span>
+  </div>
+</header>
+
+<main class="game">
+  <section class="prologue">
+    <h2>👩‍🏫 Vue de classe</h2>
+    <p>Chargez ici les fichiers <code>.json</code> exportés par chaque équipe
+       (bouton 💾 pendant leur partie) pour obtenir un classement comparatif.
+       Cette page reste privée : rien n'est envoyé sur Internet, tout se
+       passe dans le navigateur.</p>
+    <label class="file-btn">
+      Charger un ou plusieurs fichiers de sauvegarde
+      <input type="file" id="file-input" accept=".json" multiple class="hidden">
+    </label>
+  </section>
+
+  <section class="step" id="results" style="display:none;">
+    <div class="step-head">
+      <h2 class="step-title">Classement</h2>
+    </div>
+    <button type="button" id="btn-generique" class="btn-secondary">🎬 Lancer le générique de fin</button>
+    <p id="alltime-record" class="alltime-record hidden"></p>
+    <table class="classe-table">
+      <thead>
+        <tr>
+          <th>Équipe</th>
+          <th>Secteurs</th>
+          <th>Score</th>
+          <th>Indices</th>
+          <th>Bonus réussis</th>
+          <th>Temps</th>
+        </tr>
+      </thead>
+      <tbody id="results-body"></tbody>
+    </table>
+  </section>
+
+  <section class="step generique-screen hidden" id="generique-screen">
+    <div class="generique-content" id="generique-content"></div>
+    <button type="button" id="btn-generique-close" class="btn-secondary">✕ Fermer le générique</button>
+  </section>
+</main>
+
+<script src="script.js" defer></script>
+<script>
+// Cette page réutilise les constantes STEPS / ALL_STEPS / MAX_SCORE / etc.
+// définies dans script.js (chargé juste au-dessus), mais N'exécute PAS son
+// démarrage automatique du jeu (voir garde ci-dessous dans script.js si vous
+// séparez complètement les deux ; pour l'instant, ce fichier tourne côté
+// enseignant uniquement — pas de risque puisque la page n'a ni écran
+// d'accueil ni formulaire de jeu).
+
+document.addEventListener("DOMContentLoaded", () => {
+  const input = document.getElementById("file-input");
+  const resultsSection = document.getElementById("results");
+  const tbody = document.getElementById("results-body");
+  const rows = [];
+  let lastRanking = [];
+
+  input.addEventListener("change", () => {
+    const files = Array.from(input.files || []);
+    let pending = files.length;
+    files.forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = JSON.parse(e.target.result);
+          rows.push(data);
+        } catch (err) {
+          console.warn("Fichier invalide ignoré :", file.name);
+        }
+        pending--;
+        if (pending === 0) renderRows();
+      };
+      reader.readAsText(file);
+    });
+  });
+
+  function fmtTime(sec) {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${m} min ${s.toString().padStart(2, "0")} s`;
+  }
+
+  function renderRows() {
+    resultsSection.style.display = "";
+    const withScore = rows.map((r) => {
+      const hints = (r.hintsUsed || []).length;
+      const bonus = (r.bonusCorrect || []).length;
+      const completed = (r.completed || []).length;
+      const totalSteps = typeof ALL_STEPS !== "undefined" ? ALL_STEPS.length : 9;
+      const maxScore = typeof MAX_SCORE !== "undefined" ? MAX_SCORE : 90;
+      const score = maxScore - hints * 5 + bonus * 5;
+      const durationSec = r.startedAt ? null : null; // pas de fin enregistrée séparément : approximatif
+      return {
+        name: r.teamName || "(sans nom)",
+        codename: r.teamCodename || "",
+        completed,
+        totalSteps,
+        score,
+        maxScore,
+        hints,
+        bonus
+      };
+    }).sort((a, b) => b.score - a.score || b.completed - a.completed);
+
+    lastRanking = withScore;
+
+    tbody.innerHTML = withScore.map((r) => `
+      <tr>
+        <td>${r.name}</td>
+        <td>${r.completed} / ${r.totalSteps}</td>
+        <td>${r.score} / ${r.maxScore}</td>
+        <td>${r.hints}</td>
+        <td>${r.bonus}</td>
+        <td>—</td>
+      </tr>
+    `).join("");
+
+    updateAllTimeRecord(withScore);
+  }
+
+  // ---- Tableau des records inter-années -----------------------------
+  // Stocké dans le navigateur (localStorage) : si vous rechargez des
+  // exports .json d'années précédentes sur ce même appareil/navigateur,
+  // le record absolu se met à jour automatiquement. Pour un vrai suivi
+  // pluriannuel, gardez aussi vos fichiers .json d'une année sur l'autre.
+  const RECORD_KEY = "matrix1602_alltime_record";
+  function updateAllTimeRecord(ranking) {
+    if (ranking.length === 0) return;
+    const best = ranking[0];
+    let record = null;
+    try { record = JSON.parse(localStorage.getItem(RECORD_KEY) || "null"); } catch (e) { record = null; }
+    const box = document.getElementById("alltime-record");
+    let beaten = false;
+    if (!record || best.score > record.score) {
+      record = { name: best.name, score: best.score, maxScore: best.maxScore, date: new Date().toISOString().slice(0, 10) };
+      localStorage.setItem(RECORD_KEY, JSON.stringify(record));
+      beaten = true;
+    }
+    if (box) {
+      box.innerHTML = beaten
+        ? `🏆 <strong>Nouveau record absolu !</strong> ${record.name} — ${record.score} / ${record.maxScore} pts (${record.date})`
+        : `🏆 Record absolu (toutes années confondues, sur cet appareil) : <strong>${record.name}</strong> — ${record.score} / ${record.maxScore} pts (${record.date})`;
+      box.classList.remove("hidden");
+    }
+  }
+
+  // ---- Générique de fin : révélation dramatique, du dernier au premier ----
+  const generiqueBtn = document.getElementById("btn-generique");
+  const generiqueScreen = document.getElementById("generique-screen");
+  const generiqueContent = document.getElementById("generique-content");
+  const generiqueClose = document.getElementById("btn-generique-close");
+
+  generiqueBtn.addEventListener("click", () => {
+    if (lastRanking.length === 0) return;
+    generiqueScreen.classList.remove("hidden");
+    generiqueContent.innerHTML = "";
+    const ordered = [...lastRanking].reverse(); // du dernier au premier
+    let i = 0;
+    function revealNext() {
+      if (i >= ordered.length) return;
+      const r = ordered[i];
+      const rank = lastRanking.length - i;
+      const isWinner = i === ordered.length - 1;
+      const card = document.createElement("div");
+      card.className = "generique-card" + (isWinner ? " winner" : "");
+      card.innerHTML = `
+        <span class="generique-rank">${isWinner ? "🏆" : "#" + rank}</span>
+        <span class="generique-name">${r.name}${r.codename ? ` <em>(${r.codename})</em>` : ""}</span>
+        <span class="generique-score">${r.score} pts</span>
+      `;
+      generiqueContent.appendChild(card);
+      card.scrollIntoView({ behavior: "smooth", block: "end" });
+      i++;
+      setTimeout(revealNext, isWinner ? 400 : 1100);
+    }
+    revealNext();
+  });
+
+  generiqueClose.addEventListener("click", () => {
+    generiqueScreen.classList.add("hidden");
+  });
+});
+</script>
+</body>
+</html>
