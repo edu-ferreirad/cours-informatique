@@ -1,0 +1,23 @@
+AIDE AU DÉBOGAGE — notes pour l'enseignant
+===========================================
+
+Ce que voit l'élève, sous chaque éditeur Python / JavaScript :
+  🔴 Erreurs   : erreur de syntaxe, indentation, parenthèse/guillemet non fermé,
+                 « : » oublié, nom inconnu (avec « tu voulais écrire … ? »),
+                 const modifié, faute dans ctx.fillRect, mauvais nombre de valeurs
+                 passées à une fonction, oubli de « global », etc.
+                 → ligne surlignée en rouge dans l'éditeur + explication + correction.
+  🟡 Conseils  : variable jamais utilisée, fonction jamais appelée ou définie deux
+                 fois, import inutile, boucle infinie, « = » dans une condition,
+                 trous « ___ » restants, etc.  (ne bloquent jamais l'exécution)
+  💥 À l'exécution : l'erreur renvoyée par Python / le navigateur est traduite en
+                 français et reliée à sa ligne.
+
+L'analyse se fait pendant la frappe. Cliquer sur un message place le curseur sur la ligne.
+Le bouton « Conseils : oui/non » masque les 🟡 (réglage mémorisé dans le navigateur).
+
+Évaluation : ajouter  ?aide=0  à l'adresse de la page masque entièrement l'aide.
+   ex.  .../turtle/index.html?aide=0     .../pygame/cours.html?aide=0
+
+Fichiers ajoutés : lib/debogueur.js (+ lib/acorn.min.js pour le JavaScript).
+Aucun accès Internet nécessaire. Godot (GDScript) n'est pas concerné.
