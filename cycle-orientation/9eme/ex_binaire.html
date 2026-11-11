@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Binaire - 9ème</title>
+<link rel="stylesheet" href="ex_commun.css">
+<style>
+#cards{text-align:center}
+.c{display:inline-block;vertical-align:top;width:104px;height:92px;margin:5px;border:2px solid #00e5ff;border-radius:6px;background:#fff;color:#000;cursor:pointer;padding:4px;box-sizing:border-box}
+.c.off{background:#14233f;border-color:#456;color:#14233f}
+.d{display:grid;gap:1px;font-size:13px;line-height:1.1;justify-items:center}
+.q{margin:14px 0}
+.q b{color:#9fdcff}
+input[type=number]{width:90px}
+</style>
+</head>
+<body>
+<canvas id="matrix"></canvas>
+<div class="wrap">
+  <h1>Binaire</h1>
+  <p style="text-align:center"><a class="back" href="exercices.html">⬅ Retour aux exercices</a></p>
+  <p style="text-align:center" class="note">Temps conseillé : 30 minutes — aucun document.</p>
+
+  <div class="card">
+    <h2>Les cartes</h2>
+    <p class="note">Les cartes sont dans l'ordre décroissant (16 à gauche). Clique sur une carte pour la retourner : une carte face visible compte ses points.</p>
+    <div id="cards"></div>
+    <p style="text-align:center">Total : <b id="tot">0</b> &nbsp;|&nbsp; en binaire : <b id="bin">00000</b></p>
+  </div>
+
+  <div class="card">
+    <h2>Question 1</h2>
+    <p>Quelle(s) carte(s) dois-tu retourner pour faire exactement 5, 3, 12 et 19 ? Retourne les cartes puis valide chaque nombre.</p>
+    <div id="q1"></div>
+  </div>
+
+  <div class="card">
+    <h2>Questions 2 à 9</h2>
+    <div class="q"><b>Question 2.</b> Y a-t-il plusieurs manières de représenter ces nombres grâce aux cartes ?
+      <select id="q2"><option value="">—</option><option>Oui</option><option>Non</option></select> <span id="rq2"></span></div>
+    <div class="q"><b>Question 3.</b> Quel est le plus grand nombre qui peut être trouvé grâce aux cartes ?
+      <input type="number" id="q3"> <span id="rq3"></span></div>
+    <div class="q"><b>Question 4.</b> Quel est le plus petit nombre qui peut être trouvé grâce aux cartes ?
+      <input type="number" id="q4"> <span id="rq4"></span></div>
+    <div class="q"><b>Question 5.</b> Y a-t-il un nombre, entre le plus petit et le plus grand, qui ne peut pas être représenté ?
+      <select id="q5"><option value="">—</option><option>Oui</option><option>Non</option></select> <span id="rq5"></span></div>
+    <div class="q"><b>Question 6.</b> Convertis en base décimale les nombres 10101 et 1111.
+      10101 = <input type="number" id="q6a"> et 1111 = <input type="number" id="q6b"> <span id="rq6"></span></div>
+    <div class="q"><b>Question 7.</b> Combien de points doit contenir la sixième carte pour que le système fonctionne ?
+      <input type="number" id="q7"> <span id="rq7"></span></div>
+    <div class="q"><b>Question 8.</b> Quel système mathématique te permet de trouver cette sixième carte ?
+      <input type="text" id="q8" size="30"> <span id="rq8"></span></div>
+    <div class="q"><b>Question 9.</b> Quelle dimension physique impose le langage binaire aux ordinateurs ?
+      <input type="text" id="q9" size="30"> <span id="rq9"></span></div>
+    <button class="btn" id="v">Vérifier mes réponses</button>
+    <span id="score"></span>
+  </div>
+</div>
+<script src="ex_commun.js"></script>
+<script>
+var VAL = [16, 8, 4, 2, 1], COLS = { 16: 4, 8: 4, 4: 2, 2: 2, 1: 1 }, on = [false, false, false, false, false];
+var cards = document.getElementById("cards");
+
+function total() {
+  var s = 0, b = "";
+  VAL.forEach(function (v, i) { if (on[i]) s += v; b += on[i] ? "1" : "0"; });
+  document.getElementById("tot").textContent = s;
+  document.getElementById("bin").textContent = b;
+  return s;
+}
+VAL.forEach(function (v, i) {
+  var c = document.createElement("div");
+  c.className = "c off";
+  var d = document.createElement("div");
+  d.className = "d";
+  d.style.gridTemplateColumns = "repeat(" + COLS[v] + ",1fr)";
+  for (var k = 0; k < v; k++) { var s = document.createElement("span"); s.textContent = "●"; d.appendChild(s); }
+  c.appendChild(d);
+  c.onclick = function () { on[i] = !on[i]; c.classList.toggle("off", !on[i]); total(); };
+  cards.appendChild(c);
+});
+
+var q1 = document.getElementById("q1");
+[5, 3, 12, 19].forEach(function (n) {
+  var p = document.createElement("div");
+  p.className = "q";
+  p.innerHTML = "Pour faire <b>" + n + "</b> : <button class=\"btn\">Valider avec mes cartes</button> <span></span>";
+  p.querySelector("button").onclick = function () {
+    var t = total(), s = p.querySelector("span");
+    s.innerHTML = t === n ? '<span class="ok">✔ Correct</span>' : '<span class="ko">✘ Tu as ' + t + ", il faut " + n + "</span>";
+  };
+  q1.appendChild(p);
+});
+
+// [id, test sur la valeur, réponse attendue affichée]
+var Q = [
+  ["q2", function (v) { return v === "non"; }, "Non : une seule combinaison par nombre"],
+  ["q3", function (v) { return v === "31"; }, "31 (16+8+4+2+1)"],
+  ["q4", function (v) { return v === "0"; }, "0 (aucune carte retournée)"],
+  ["q5", function (v) { return v === "non"; }, "Non : tous les nombres de 0 à 31 sont possibles"],
+  ["q7", function (v) { return v === "32"; }, "32 (le double de 16)"],
+  ["q8", function (v) { return /puissance|binaire|base ?2|doubl|×2|x2/.test(v); }, "Les puissances de 2 (chaque carte double la précédente)"],
+  ["q9", function (v) { return /électr|courant|tension|volt|signal|interrupteur|transistor|deux états|2 états|allum|éteint/.test(v); }, "L'électricité : le courant passe ou ne passe pas (2 états)"]
+];
+document.getElementById("v").onclick = function () {
+  var ok = 0, tot = Q.length + 1;
+  Q.forEach(function (q) {
+    var v = document.getElementById(q[0]).value.trim().toLowerCase(), r = document.getElementById("r" + q[0]);
+    if (q[1](v)) { ok++; r.innerHTML = '<span class="ok">✔</span>'; }
+    else r.innerHTML = '<span class="ko">✘</span> <span class="note">' + q[2] + "</span>";
+  });
+  var a = document.getElementById("q6a").value.trim(), b = document.getElementById("q6b").value.trim(), r6 = document.getElementById("rq6");
+  if (a === "21" && b === "15") { ok++; r6.innerHTML = '<span class="ok">✔</span>'; }
+  else r6.innerHTML = '<span class="ko">✘</span> <span class="note">10101 = 21 et 1111 = 15</span>';
+  document.getElementById("score").innerHTML = '<span class="' + (ok === tot ? "ok" : "ko") + '">' + ok + " / " + tot + "</span>";
+};
+</script>
+</body>
+</html>

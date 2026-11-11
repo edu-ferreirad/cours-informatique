@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Caractères spéciaux - 9ème</title>
+<link rel="stylesheet" href="ex_commun.css">
+<style>
+.ref img{width:100%;display:block;border-radius:4px}
+td input[type=text]{width:90px;text-align:center}
+</style>
+</head>
+<body>
+<canvas id="matrix"></canvas>
+<div class="wrap">
+  <h1>Caractères spéciaux</h1>
+  <p style="text-align:center"><a class="back" href="exercices.html">⬅ Retour aux exercices</a></p>
+
+  <div class="card ref">
+    <h2>Le clavier suisse</h2>
+    <img src="clavier_suisse.png" alt="Clavier suisse">
+    <p class="note">Les caractères en bleu s'obtiennent avec Alt Gr. Ceux du haut d'une touche s'obtiennent avec Maj.</p>
+  </div>
+
+  <div class="card">
+    <h2>Quelle(s) touche(s) faut-il faire ?</h2>
+    <p class="note">Pour chaque caractère, choisis la touche modificatrice (ou « aucune »), puis écris le symbole gravé sur la touche principale (ex. : pour Alt Gr + 2, écris 2). Pour le ^, il faut ensuite appuyer sur la barre d'espace.</p>
+    <table id="t"></table>
+    <button class="btn" id="v">Vérifier</button>
+    <span id="r"></span>
+  </div>
+</div>
+<script src="ex_commun.js"></script>
+<script>
+// [caractère, modificateur (aucune|maj|altgr), touches acceptées]
+// À valider par l'enseignant : "Ö" (accepté : Maj + touche é/ö) et "^" (touche morte).
+var R = [
+  ["^", "aucune", ["^", "~"]],
+  ["@", "altgr", ["2"]],
+  ["]", "altgr", ["¨", "!"]],
+  ["£", "maj", ["$", "£"]],
+  ["~", "altgr", ["^", "~"]],
+  ["!", "maj", ["¨", "!"]],
+  ["}", "altgr", ["$", "£"]],
+  ["+", "maj", ["1"]],
+  ["\\", "altgr", ["<", ">"]],
+  ["Ö", "maj", ["é", "ö"]],
+  ["|", "altgr", ["1"]],
+  ["€", "altgr", ["e"]]
+];
+var MOD = { aucune: "touche seule", maj: "Maj (Shift)", altgr: "Alt Gr" };
+var t = document.getElementById("t");
+t.innerHTML = "<tr><th>Caractère</th><th>Touche modificatrice</th><th>Touche</th><th></th></tr>";
+R.forEach(function (r, i) {
+  var tr = document.createElement("tr");
+  tr.innerHTML = '<td style="font-size:1.4em;text-align:center">' + r[0] + '</td>' +
+    '<td><select id="m' + i + '"><option value="">— choisir —</option><option value="aucune">Aucune</option><option value="maj">Maj (Shift)</option><option value="altgr">Alt Gr</option></select></td>' +
+    '<td><input type="text" id="k' + i + '" maxlength="6" autocomplete="off"></td><td id="o' + i + '"></td>';
+  t.appendChild(tr);
+});
+document.getElementById("v").onclick = function () {
+  var ok = 0;
+  R.forEach(function (r, i) {
+    var m = document.getElementById("m" + i).value;
+    var n = document.getElementById("k" + i).value.replace(/\s/g, "").toLowerCase();
+    var acc = r[2].map(function (a) { return a.toLowerCase(); });
+    var kOk = n.length > 0 && n.split("").every(function (c) { return acc.indexOf(c) >= 0; });
+    var o = document.getElementById("o" + i);
+    if (m === r[1] && kOk) { ok++; o.innerHTML = '<span class="ok">✔</span>'; }
+    else o.innerHTML = '<span class="ko">✘</span> <span class="note">' + MOD[r[1]] + " + " + r[2][0] + "</span>";
+  });
+  document.getElementById("r").innerHTML = '<span class="' + (ok === R.length ? "ok" : "ko") + '">' + ok + " / " + R.length + "</span>";
+};
+</script>
+</body>
+</html>

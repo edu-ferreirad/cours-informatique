@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Le clavier suisse - 9ème</title>
+<link rel="stylesheet" href="ex_commun.css">
+<style>
+.kb{position:relative;width:100%;margin:10px 0}
+.kb img{width:100%;display:block;border-radius:4px}
+.z{position:absolute;box-sizing:border-box;border:2px dashed #00b2ff;background:rgba(0,178,255,.15);color:#000;font-weight:bold;font-size:clamp(7px,1.3vw,13px);display:flex;align-items:center;justify-content:center;text-align:center;cursor:pointer;overflow:hidden;padding:0}
+.z.sel{border:3px solid #ffb020;background:rgba(255,176,32,.35)}
+.z.good{border:3px solid #2ee66b;background:rgba(46,230,107,.35)}
+.z.bad{border:3px solid #ff4d4d;background:rgba(255,77,77,.35)}
+</style>
+</head>
+<body>
+<canvas id="matrix"></canvas>
+<div class="wrap">
+  <h1>Le clavier suisse</h1>
+  <p style="text-align:center"><a class="back" href="exercices.html">⬅ Retour aux exercices</a></p>
+
+  <div class="card">
+    <h2>Partie A : place le nom des touches spéciales</h2>
+    <p class="note">1. Clique sur une touche du clavier (elle s'entoure en orange). 2. Clique sur son nom dans la liste. Les deux touches Maj portent le même nom.</p>
+    <div class="kb" id="kb"><img src="clavier_suisse.png" alt="Clavier suisse"></div>
+    <div id="pal"></div>
+    <button class="btn" id="vA">Vérifier la partie A</button>
+    <span id="rA"></span>
+  </div>
+
+  <div class="card">
+    <h2>Partie B : quelle touche pour quel effet ?</h2>
+    <table id="tB"></table>
+    <button class="btn" id="vB">Vérifier la partie B</button>
+    <span id="rB"></span>
+  </div>
+</div>
+<script src="ex_commun.js"></script>
+<script>
+var NOMS = ["Barre d'espace", "Majuscule (Shift)", "Retour (Enter)", "Tabulation", "Alt Grafic", "Effacement arrière (Backspace)", "Verrouillage majuscules"];
+// zone : [bonne réponse, gauche %, haut %, largeur %, hauteur %]
+var Z = [
+  ["Tabulation", 0, 20.5, 10.2, 19.2],
+  ["Verrouillage majuscules", 0, 41, 11.4, 18.7],
+  ["Majuscule (Shift)", 0, 60.8, 8.1, 18.7],
+  ["Majuscule (Shift)", 81.8, 60.8, 18.2, 18.7],
+  ["Effacement arrière (Backspace)", 86.9, 0, 13.1, 19.2],
+  ["Retour (Enter)", 90.3, 20.5, 9.7, 39.2],
+  ["Barre d'espace", 26.7, 80.8, 39.8, 19.2],
+  ["Alt Grafic", 66.5, 80.8, 10.2, 19.2]
+];
+var kb = document.getElementById("kb"), pal = document.getElementById("pal"), rep = [], cur = -1, zs = [];
+
+Z.forEach(function (z, i) {
+  var b = document.createElement("button");
+  b.className = "z";
+  b.style.cssText = "left:" + z[1] + "%;top:" + z[2] + "%;width:" + z[3] + "%;height:" + z[4] + "%";
+  b.onclick = function () {
+    cur = i;
+    zs.forEach(function (e, j) { e.classList.toggle("sel", j === i); });
+  };
+  kb.appendChild(b);
+  zs.push(b);
+  rep.push("");
+});
+
+NOMS.forEach(function (n) {
+  var b = document.createElement("button");
+  b.className = "btn";
+  b.textContent = n;
+  b.onclick = function () {
+    if (cur < 0) { alert("Clique d'abord sur une touche du clavier."); return; }
+    rep[cur] = n;
+    zs[cur].textContent = n.split(" ")[0];
+    zs[cur].classList.remove("good", "bad");
+  };
+  pal.appendChild(b);
+});
+
+document.getElementById("vA").onclick = function () {
+  var ok = 0;
+  zs.forEach(function (e, i) {
+    var g = rep[i] === Z[i][0];
+    if (g) ok++;
+    e.classList.remove("good", "bad", "sel");
+    e.classList.add(g ? "good" : "bad");
+  });
+  document.getElementById("rA").innerHTML = '<span class="' + (ok === Z.length ? "ok" : "ko") + '">' + ok + " / " + Z.length + " touches correctes</span>";
+};
+
+var B = [
+  ["Pour mettre la 1re ligne d'un paragraphe en retrait", "Tabulation"],
+  ["Pour produire une lettre majuscule", "Majuscule (Shift)"],
+  ["Pour bloquer le clavier en majuscule", "Verrouillage majuscules"],
+  ["Pour mettre un espace entre les mots", "Barre d'espace"],
+  ["Pour produire le troisième caractère gravé sur une touche", "Alt Grafic"],
+  ["Pour ouvrir un nouveau paragraphe (éventuellement vide)", "Retour (Enter)"],
+  ["Pour effacer les derniers caractères tapés", "Effacement arrière (Backspace)"]
+];
+var tB = document.getElementById("tB");
+tB.innerHTML = "<tr><th>Effet</th><th>Nom de la touche</th></tr>";
+B.forEach(function (r, i) {
+  var tr = document.createElement("tr");
+  var opts = '<option value="">— choisir —</option>' + NOMS.map(function (n) { return "<option>" + n + "</option>"; }).join("");
+  tr.innerHTML = "<td>" + r[0] + '</td><td><select id="b' + i + '">' + opts + '</select> <span id="rb' + i + '"></span></td>';
+  tB.appendChild(tr);
+});
+document.getElementById("vB").onclick = function () {
+  var ok = 0;
+  B.forEach(function (r, i) {
+    var v = document.getElementById("b" + i).value, s = document.getElementById("rb" + i);
+    if (v === r[1]) { ok++; s.innerHTML = '<span class="ok">✔</span>'; }
+    else s.innerHTML = '<span class="ko">✘</span>';
+  });
+  document.getElementById("rB").innerHTML = '<span class="' + (ok === B.length ? "ok" : "ko") + '">' + ok + " / " + B.length + "</span>";
+};
+</script>
+</body>
+</html>
