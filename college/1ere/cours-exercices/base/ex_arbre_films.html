@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arborescence : les genres de films - 1ère matu</title>
+<link rel="stylesheet" href="ex_rouge.css">
+</head>
+<body>
+<canvas id="matrix"></canvas>
+<div class="wrap">
+  <h1>Classer des films selon leur genre</h1>
+  <p class="noprint" style="text-align:center"><a class="back" href="index.html">⬅ Retour au menu</a></p>
+
+  <div class="card noprint">
+    <p><b>Consigne :</b> classe ces films selon leur genre en construisant une arborescence (Genres cinématographiques → genre → sous-genre).</p>
+    <ol class="note">
+      <li>Crée tes catégories avec le bouton <b>＋</b> (renomme avec ✎, supprime avec ✕).</li>
+      <li>Clique sur une affiche (elle s'entoure en jaune), puis sur le bouton <b>📥</b> de la catégorie choisie.</li>
+      <li>Quand tous les films sont classés, imprime ton arbre.</li>
+    </ol>
+    <p class="note">Il n'y a pas une seule bonne classification : un film peut relever de plusieurs genres. Justifie ton choix en bas de page.</p>
+    <div id="pool"></div>
+  </div>
+
+  <div class="card">
+    <div class="pi">Nom : <input type="text"> Prénom : <input type="text"> Classe : <input type="text" style="width:80px"> Date : <input type="text" style="width:100px"></div>
+    <h2>Mon arborescence</h2>
+    <div id="arbre"></div>
+    <p class="pi">Justification de mes choix :</p>
+    <textarea rows="4" style="width:100%;box-sizing:border-box"></textarea>
+  </div>
+
+  <p class="noprint" style="text-align:center">
+    <button class="btn alt" id="ex">Voir un exemple de classification</button>
+    <button class="btn alt" id="rz">Tout effacer</button>
+    <button class="btn" id="pr">🖨️ Imprimer l'arbre</button>
+  </p>
+  <p class="noprint note" style="text-align:center">L'exemple est une proposition parmi d'autres : d'autres classements sont valables.</p>
+</div>
+<script src="ex_rouge.js"></script>
+<script src="ex_arbre.js"></script>
+<script>
+var FILMS = [
+  { id: 1, t: "Le Fabuleux Destin d'Amélie Poulain", img: "img_films/film1.jpg" },
+  { id: 2, t: "The Grand Budapest Hotel", img: "img_films/film2.jpg" },
+  { id: 3, t: "Inception", img: "img_films/film3.jpg" },
+  { id: 4, t: "The Social Network", img: "img_films/film4.jpg" },
+  { id: 5, t: "Démineurs", img: "img_films/film5.jpg" },
+  { id: 6, t: "Mad Max: Fury Road", img: "img_films/film6.jpg" },
+  { id: 7, t: "La vie d'Adèle", img: "img_films/film7.jpg" },
+  { id: 8, t: "Le Loup de Wall Street", img: "img_films/film8.jpg" }
+];
+var A = Arbre({
+  box: "arbre", pool: "pool", films: FILMS, rootName: "Genres cinématographiques", maxDepth: 3,
+  addTitle: "Ajouter une catégorie", addMsg: "Nom de la catégorie (ex. : comédie) :",
+  exemple: {
+    n: "Genres cinématographiques", c: [
+      { n: "Comédie", c: [{ n: "Comédie romantique", f: [1] }, { n: "Comédie dramatique", f: [2, 8] }] },
+      { n: "Drame", c: [{ n: "Drame biographique", f: [4] }, { n: "Drame romantique", f: [7] }] },
+      { n: "Science-fiction et action", c: [{ n: "Science-fiction", f: [3] }, { n: "Action post-apocalyptique", f: [6] }] },
+      { n: "Guerre", f: [5] }
+    ]
+  }
+});
+document.getElementById("ex").onclick = function () { A.exemple(); };
+document.getElementById("rz").onclick = function () { if (confirm("Tout effacer ?")) A.reset(); };
+document.getElementById("pr").onclick = function () { window.print(); };
+A.render();
+</script>
+</body>
+</html>

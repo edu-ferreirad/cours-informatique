@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>9 points - 1ère matu</title>
+<link rel="stylesheet" href="ex_rouge.css">
+<style>
+#c{background:#12000a;border:1px solid #ff6666;max-width:100%;touch-action:none;cursor:crosshair;display:block;margin:10px auto}
+#info{text-align:center;font-size:1.1em;color:#fff}
+</style>
+</head>
+<body>
+<canvas id="matrix"></canvas>
+<div class="wrap">
+  <h1>Les 9 points</h1>
+  <p style="text-align:center"><a class="back" href="index.html">⬅ Retour au menu</a></p>
+
+  <div class="card">
+    <p>Relie les <b>9 points</b> avec <b>4 traits droits maximum</b>, <b>sans lever le crayon</b> : chaque trait part de la fin du précédent.</p>
+    <p class="note">Clique pour poser le début du premier trait, puis clique pour chaque changement de direction. Tu peux sortir de la grille. Un clic près d'un point se place exactement dessus.</p>
+    <canvas id="c" width="600" height="600"></canvas>
+    <div id="info"></div>
+    <p style="text-align:center">
+      <button class="btn alt" id="undo">↩ Annuler le dernier point</button>
+      <button class="btn alt" id="clr">Effacer</button>
+      <button class="btn" id="chk">Vérifier</button>
+      <button class="btn alt" id="sol">Voir la solution</button>
+    </p>
+    <p id="msg" style="text-align:center;font-size:1.1em"></p>
+  </div>
+</div>
+<script src="ex_rouge.js"></script>
+<script>
+var c = document.getElementById("c"), x = c.getContext("2d"), U = 110, O = 150;
+var P = [], V = [], showSol = false;
+for (var j = 0; j < 3; j++) for (var i = 0; i < 3; i++) P.push([O + i * U, O + j * U]);
+var SOL = [[0, 0], [3, 0], [0, 3], [0, 0], [2, 2]].map(function (p) { return [O + p[0] * U, O + p[1] * U]; });
+
+function dist(p, a, b) {
+  var dx = b[0] - a[0], dy = b[1] - a[1], l = dx * dx + dy * dy;
+  var t = l ? Math.max(0, Math.min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / l)) : 0;
+  return Math.hypot(p[0] - a[0] - t * dx, p[1] - a[1] - t * dy);
+}
+function covered() {
+  var n = 0;
+  P.forEach(function (p) {
+    for (var k = 0; k < V.length - 1; k++) {
+      if (dist(p, V[k], V[k + 1]) <= 8) { n++; break; }
+    }
+  });
+  return n;
+}
+function line(pts, col, dash) {
+  if (pts.length < 2) return;
+  x.setLineDash(dash || []);
+  x.strokeStyle = col; x.lineWidth = 3;
+  x.beginPath();
+  pts.forEach(function (p, i) { if (i) x.lineTo(p[0], p[1]); else x.moveTo(p[0], p[1]); });
+  x.stroke();
+  x.setLineDash([]);
+}
+function draw() {
+  x.clearRect(0, 0, c.width, c.height);
+  if (showSol) line(SOL, "#7dffb0", [8, 6]);
+  line(V, "#ff6666");
+  V.forEach(function (p) { x.fillStyle = "#ffd400"; x.beginPath(); x.arc(p[0], p[1], 5, 0, 7); x.fill(); });
+  P.forEach(function (p) { x.fillStyle = "#fff"; x.beginPath(); x.arc(p[0], p[1], 8, 0, 7); x.fill(); });
+  var tr = Math.max(0, V.length - 1);
+  document.getElementById("info").textContent = "Traits : " + tr + " / 4 — points touchés : " + covered() + " / 9";
+}
+c.addEventListener("click", function (e) {
+  if (V.length - 1 >= 4) { document.getElementById("msg").innerHTML = '<span class="ko">4 traits maximum : annule un point ou efface.</span>'; return; }
+  var r = c.getBoundingClientRect();
+  var p = [(e.clientX - r.left) * c.width / r.width, (e.clientY - r.top) * c.height / r.height];
+  P.forEach(function (q) { if (Math.hypot(q[0] - p[0], q[1] - p[1]) < 16) p = q.slice(); });
+  V.push(p);
+  document.getElementById("msg").textContent = "";
+  draw();
+});
+document.getElementById("undo").onclick = function () { V.pop(); draw(); };
+document.getElementById("clr").onclick = function () { V = []; showSol = false; document.getElementById("msg").textContent = ""; draw(); };
+document.getElementById("sol").onclick = function () { showSol = !showSol; draw(); };
+document.getElementById("chk").onclick = function () {
+  var m = document.getElementById("msg"), tr = V.length - 1, n = covered();
+  if (tr < 1) m.innerHTML = '<span class="ko">Trace d\'abord quelques traits.</span>';
+  else if (n === 9 && tr <= 4) m.innerHTML = '<span class="ok">✔ Bravo : 9 points reliés avec ' + tr + " traits !</span>";
+  else m.innerHTML = '<span class="ko">✘ ' + n + " points sur 9 touchés avec " + tr + " trait(s). Essaie de sortir de la grille.</span>";
+};
+draw();
+</script>
+</body>
+</html>

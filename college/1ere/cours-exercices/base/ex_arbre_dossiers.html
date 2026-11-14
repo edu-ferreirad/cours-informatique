@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arborescence de dossiers - 1ère matu</title>
+<link rel="stylesheet" href="ex_rouge.css">
+</head>
+<body>
+<canvas id="matrix"></canvas>
+<div class="wrap">
+  <h1>Arborescence de dossiers</h1>
+  <p class="noprint" style="text-align:center"><a class="back" href="index.html">⬅ Retour au menu</a></p>
+
+  <div class="card noprint">
+    <p><b>Consigne :</b> sur le même principe que l'exercice des films, construis l'arborescence sur <b>trois niveaux</b> du lecteur C (les dossiers de l'ordinateur).</p>
+    <ul class="note">
+      <li>Ajoute un dossier dans un autre avec le bouton <b>＋</b>.</li>
+      <li>Renomme avec ✎, supprime avec ✕.</li>
+      <li>Tu peux aussi t'entraîner avec des dossiers nommés a, b, c, d, e, f, g (bouton « Voir un exemple »).</li>
+      <li>Quand ton arbre est terminé, imprime-le.</li>
+    </ul>
+    <p class="note">L'important est que ton arbre soit logique : chaque dossier est rangé dans le dossier qui le contient.</p>
+  </div>
+
+  <div class="card">
+    <div class="pi">Nom : <input type="text"> Prénom : <input type="text"> Classe : <input type="text" style="width:80px"> Date : <input type="text" style="width:100px"></div>
+    <h2>Mon arborescence</h2>
+    <div id="arbre"></div>
+  </div>
+
+  <p class="noprint" style="text-align:center">
+    <button class="btn alt" id="ex">Voir un exemple (dossiers a à g)</button>
+    <button class="btn alt" id="rz">Tout effacer</button>
+    <button class="btn" id="pr">🖨️ Imprimer l'arbre</button>
+  </p>
+</div>
+<script src="ex_rouge.js"></script>
+<script src="ex_arbre.js"></script>
+<script>
+var A = Arbre({
+  box: "arbre", rootName: "C:", maxDepth: 3,
+  addTitle: "Ajouter un dossier ici", addMsg: "Nom du dossier :",
+  exemple: {
+    n: "C:", c: [
+      { n: "a", c: [{ n: "b" }, { n: "c" }] },
+      { n: "d", c: [{ n: "e" }] },
+      { n: "f", c: [{ n: "g" }] }
+    ]
+  }
+});
+document.getElementById("ex").onclick = function () { A.exemple(); };
+document.getElementById("rz").onclick = function () { if (confirm("Tout effacer ?")) A.reset(); };
+document.getElementById("pr").onclick = function () { window.print(); };
+A.render();
+</script>
+</body>
+</html>
