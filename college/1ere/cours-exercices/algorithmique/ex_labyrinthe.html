@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Labyrinthes - Programmation débranchée - 1ère matu</title>
+<link rel="stylesheet" href="ex_rouge.css">
+<style>
+.stage{position:relative;max-width:760px;margin:10px auto}
+.stage img{width:100%;display:block;background:#fff}
+.stage canvas{position:absolute;left:0;top:0;width:100%;height:100%;cursor:crosshair}
+#noir{position:fixed;top:0;left:0;right:0;bottom:0;background:#000;z-index:9999;pointer-events:none;display:none}
+.role{text-align:center;font-size:1.3em;margin:6px 0}
+.warn{border-color:#ffb020;box-shadow:0 0 15px rgba(255,176,32,.35)}
+.guide{color:#ffd400}
+.guide2{color:#7dffb0}
+ol li,ul li{margin:6px 0}
+label{margin-right:14px}
+</style>
+</head>
+<body>
+<canvas id="matrix"></canvas>
+<div id="noir"></div>
+<div class="wrap">
+  <h1>Programmation débranchée : les labyrinthes</h1>
+  <p style="text-align:center"><a class="back" href="index.html">⬅ Retour au menu</a></p>
+
+  <div class="card">
+    <h2>Consignes générales (30 minutes)</h2>
+    <p>Vous travaillez à deux, <b>chacun sur son ordinateur</b>, sans voir l'écran de l'autre (placez un classeur debout entre vous). L'un est le <b>guide</b> qui « programme », l'autre est le <b>guidé</b> qui exécute.</p>
+    <p><b>Alternance :</b></p>
+    <ul>
+      <li>Labyrinthe 1 : l'élève 1 guide, l'élève 2 est guidé.</li>
+      <li>Labyrinthe 2 : on inverse, l'élève 2 guide, l'élève 1 est guidé.</li>
+      <li>Labyrinthe 3 : comme le 1 (élève 1 guide). Labyrinthe 4 : comme le 2 (élève 2 guide).</li>
+    </ul>
+    <p><b>Le guide</b> n'a le droit de donner que 5 ordres : <b>En haut</b> ou 🍎 (pomme) · <b>En bas</b> ou 🍐 (poire) · <b>À gauche</b> ou 🍋 (citron) · <b>À droite</b> ou 🍓 (fraise) · <b>Stop</b>.</p>
+    <p class="warn card" style="margin:10px 0"><b>Le guidé fait EXACTEMENT ce que dit son camarade</b> : ni plus, ni moins, même s'il pense que c'est une erreur. Pour éviter tout biais, il ne regarde pas le labyrinthe : <b>souris posée au départ, écran éteint</b>, il trace en aveugle.</p>
+  </div>
+
+  <div class="card">
+    <h2>Qui es-tu ?</h2>
+    <p>
+      <label><input type="radio" name="el" value="1" checked> Élève 1</label>
+      <label><input type="radio" name="el" value="2"> Élève 2</label>
+      &nbsp; Labyrinthe :
+      <select id="maze"><option value="1">1 (Pirates des Caraïbes)</option><option value="2">2 (Cars 2)</option><option value="3">3 (cheval)</option><option value="4">4 (rond)</option></select>
+      <button class="btn" id="go">Commencer</button>
+    </p>
+  </div>
+
+  <div id="zone" class="hide">
+    <div class="role" id="role"></div>
+
+    <div class="card hide" id="cGuide">
+      <h2>Tu es le guide</h2>
+      <ol>
+        <li>Ne montre pas ton écran à ton camarade.</li>
+        <li>Attends qu'il te dise qu'il est prêt (souris au départ, écran éteint).</li>
+        <li>Guide-le le long du trait bleu avec uniquement : 🍎 haut · 🍐 bas · 🍋 gauche · 🍓 droite · Stop.</li>
+        <li>Arrivé au point d'arrivée, dis « Stop », puis comparez son tracé avec ce trait bleu.</li>
+      </ol>
+    </div>
+
+    <div class="card hide" id="cGuide2">
+      <h2>Tu es le guidé</h2>
+      <ol>
+        <li>Place ta souris <b>exactement sur le point de départ</b> du labyrinthe. Ne la bouge plus.</li>
+        <li>Sans toucher à la souris, appuie sur la touche <b>Espace</b> du clavier : l'écran devient noir.</li>
+        <li>Dis « prêt ». Maintiens le <b>clic gauche</b> et fais <b>exactement</b> ce que dit ton camarade, ni plus, ni moins.</li>
+        <li>Quand il dit « Stop », relâche le clic puis appuie sur <b>Échap</b> pour rallumer l'écran.</li>
+        <li>Comparez ton tracé avec le trait bleu de ton camarade.</li>
+      </ol>
+      <p class="note">Tu peux aussi éteindre physiquement ton écran si ton ordinateur le permet.</p>
+      <button class="btn alt" id="clr">Effacer et recommencer</button>
+      <button class="btn" id="png">Télécharger mon tracé (PNG)</button>
+    </div>
+
+    <div class="stage"><img id="img" alt="Labyrinthe"><canvas id="cv" class="hide"></canvas></div>
+  </div>
+</div>
+<script src="ex_rouge.js"></script>
+<script>
+var img = document.getElementById("img"), cv = document.getElementById("cv"), ctx = cv.getContext("2d");
+var noir = document.getElementById("noir"), armed = false, dn = false, isGuide = true, ready = false;
+
+function role(m, el) {
+  return (m % 2 === 1) ? el === 1 : el === 2;
+}
+function show(id, on) { document.getElementById(id).classList.toggle("hide", !on); }
+
+document.getElementById("go").onclick = function () {
+  if (document.activeElement) document.activeElement.blur();
+  var el = +document.querySelector("input[name=el]:checked").value;
+  var m = +document.getElementById("maze").value;
+  isGuide = role(m, el);
+  armed = false; ready = false;
+  noir.style.display = "none";
+  show("zone", true); show("cGuide", isGuide); show("cGuide2", !isGuide);
+  cv.classList.toggle("hide", isGuide);
+  var r = document.getElementById("role");
+  r.innerHTML = "Labyrinthe " + m + " — élève " + el + " : tu es le <b class=\"" + (isGuide ? "guide\">GUIDE" : "guide2\">GUIDÉ") + "</b>";
+  img.onload = function () {
+    cv.width = img.naturalWidth; cv.height = img.naturalHeight;
+    ctx.strokeStyle = "#1a3cff"; ctx.lineWidth = 4; ctx.lineCap = "round"; ctx.lineJoin = "round";
+    ready = !isGuide;
+  };
+  img.src = "img_labyrinthes/laby" + m + (isGuide ? "_solution" : "_vide") + ".jpg";
+};
+
+function pos(e) {
+  var r = cv.getBoundingClientRect();
+  return [(e.clientX - r.left) * cv.width / r.width, (e.clientY - r.top) * cv.height / r.height];
+}
+addEventListener("pointerdown", function (e) {
+  if (!armed) return;
+  dn = true;
+  var p = pos(e);
+  ctx.beginPath(); ctx.moveTo(p[0], p[1]);
+});
+addEventListener("pointermove", function (e) {
+  if (!armed || !dn) return;
+  var p = pos(e);
+  ctx.lineTo(p[0], p[1]); ctx.stroke();
+});
+addEventListener("pointerup", function () { dn = false; });
+
+function eteindre() { armed = true; noir.style.display = "block"; document.body.style.touchAction = "none"; }
+function allumer() { armed = false; dn = false; noir.style.display = "none"; document.body.style.touchAction = ""; }
+addEventListener("keydown", function (e) {
+  if (isGuide || !ready) return;
+  if (e.key === " " && !armed) { e.preventDefault(); eteindre(); }
+  else if (e.key === "Escape" && armed) allumer();
+});
+
+document.getElementById("clr").onclick = function () {
+  allumer();
+  ctx.clearRect(0, 0, cv.width, cv.height);
+};
+document.getElementById("png").onclick = function () {
+  var t = document.createElement("canvas");
+  t.width = cv.width; t.height = cv.height;
+  var c = t.getContext("2d");
+  c.drawImage(img, 0, 0); c.drawImage(cv, 0, 0);
+  var a = document.createElement("a");
+  a.href = t.toDataURL("image/png");
+  a.download = "mon_trace_labyrinthe.png";
+  a.click();
+};
+</script>
+</body>
+</html>

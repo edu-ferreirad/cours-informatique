@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ordinogramme : le lapin de Pâques - 1ère matu</title>
+<link rel="stylesheet" href="ex_rouge.css">
+<style>
+svg.board{width:100%;height:auto;background:#fff;border-radius:6px;display:block;touch-action:none;user-select:none}
+.tools{text-align:center}
+.tools .btn{padding:8px 14px;margin:4px 3px}
+.tab.on{background:#ff6666;box-shadow:0 0 12px #ff6666}
+.lk.on{background:#ffd400;color:#000}
+#st{min-height:1.4em;text-align:center}
+.legend span{display:inline-block;margin:4px 12px}
+.sh{display:inline-block;vertical-align:middle;margin-right:6px;background:#e3f5e7;border:2px solid #2e9a54;width:34px;height:20px}
+.sh.o{border-radius:50%}
+.sh.d{transform:rotate(45deg) scale(.7);width:24px;height:24px}
+.sh.k{background:#000;border-color:#000;border-radius:50%}
+.pi input{width:140px}
+.game{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start}
+.rc{background:#e3f5e7;color:#111;border:2px solid #2e9a54;border-radius:22px;padding:16px;min-height:200px;text-align:left}
+.rc .nb{display:inline-block;border:2px solid #2e9a54;border-radius:20px;padding:2px 14px;background:#fff;font-weight:bold;margin-bottom:8px}
+.rc .tx{background:#fff;border:1px dotted #2e9a54;padding:10px;margin:8px 0;font-size:.97em}
+.rc .qq{background:#bfe8c8;border:1px solid #2e9a54;padding:4px 10px;text-align:center;font-weight:bold;margin:8px 0}
+.rc .op{display:flex;justify-content:space-between;width:100%;box-sizing:border-box;background:#f2f2f2;color:#111;border:1px solid #999;padding:7px 10px;margin:4px 0;cursor:pointer;font-size:.92em;font-family:inherit;text-align:left}
+.rc .op.sel{outline:3px solid #ff8800;background:#fff3d6}
+.rc .op i{font-style:normal;color:#555;white-space:nowrap;margin-left:10px}
+.rc .nxt{background:#f2f2f2;border:1px solid #999;padding:8px;text-align:center;margin-top:8px}
+.rc.fin{background:#222;color:#fff;border-color:#000}
+.rc.fin .tx{background:#111;color:#fff;border-color:#888}
+.rc.fin .nxt{background:#333;color:#fff;border-color:#666}
+.tag{font-size:.8em;color:#777}
+.deck{flex:2 1 320px;display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px}
+.dc{aspect-ratio:3/4;background:#fff;color:#2e9a54;border:2px solid #2e9a54;border-radius:10px;font-size:1.5em;font-weight:bold;cursor:pointer;position:relative;font-family:inherit}
+.dc.on{border-color:#ff8800;box-shadow:0 0 12px #ff8800}
+.dc.gr{opacity:.35;background:#bbb}
+.dc.gr::after{content:"✔";position:absolute;right:6px;top:2px;font-size:.6em}
+</style>
+</head>
+<body>
+<canvas id="matrix"></canvas>
+<div class="wrap">
+  <h1>Ordinogramme : le lapin de Pâques</h1>
+  <p style="text-align:center"><a class="back" href="index.html">⬅ Retour au menu</a></p>
+
+  <div class="card">
+    <h2>Consignes</h2>
+    <ol>
+      <li>Lis d'abord la carte <b>Indications</b> (les règles), puis prends la carte <b>0</b> dans le tas en cliquant dessus.</li>
+      <li>Une seule carte est face visible à la fois. Choisis une réponse sur la carte, puis clique sur la carte portant le numéro indiqué par la flèche.</li>
+      <li><b>Étape 1</b> : construis ici l'ordinogramme d'<b>une histoire</b>, au fur et à mesure que les cartes se dévoilent, jusqu'à une fin.</li>
+      <li><b>Étape 2</b> : rejoue pour découvrir les autres fins et construis l'ordinogramme de <b>toutes les histoires</b>. Les cartes déjà découvertes sont alors grisées et les choix déjà pris sont marqués, pour t'aider à trouver ce qu'il reste à explorer.</li>
+      <li>Exporte ton ordinogramme en PNG pour le rendre, avec le secret de l'histoire (chut : ne le dis pas aux autres groupes !).</li>
+    </ol>
+    <p class="legend note">
+      <span><i class="sh o"></i>Situation de départ</span>
+      <span><i class="sh"></i>Événement</span>
+      <span><i class="sh d"></i>Choix, action</span>
+      <span><i class="sh k"></i>Fin</span>
+      <span>➜ Lien entre les composants</span>
+    </p>
+    <p class="note" style="text-align:center">Activité « Le lapin de Pâques » : idée originale de Jessica Mottard (dossier de didactique romande de l'informatique, HEP Vaud / Université de Genève, 2020).</p>
+  </div>
+
+  <div class="card">
+    <h2>Les étapes</h2>
+    <p class="tools">
+      <button class="btn tab on" id="t1">Étape 1 : une histoire</button>
+      <button class="btn tab alt" id="t2">Étape 2 : toutes les histoires</button>
+      <button class="btn alt" id="cp">Copier l'étape 1 dans l'étape 2</button>
+    </p>
+    <p class="note" id="hint" style="text-align:center"></p>
+  </div>
+
+  <div class="card">
+    <h2>Le jeu de cartes</h2>
+    <p id="cnt" class="note" style="text-align:center"></p>
+    <div class="game">
+      <div id="rcw" style="flex:1 1 320px;max-width:460px"></div>
+      <div class="deck" id="deck"></div>
+    </div>
+    <p id="gm" style="text-align:center;min-height:1.4em"></p>
+    <p id="pth" class="note" style="text-align:center"></p>
+    <p class="tools"><button class="btn alt" id="gr">📜 Revoir les règles</button> <button class="btn alt" id="gz">↺ Recommencer le jeu</button></p>
+  </div>
+
+  <div class="card">
+    <div class="pi" style="text-align:center">Nom : <input type="text" id="nm"> Prénom : <input type="text" id="pn"> Classe : <input type="text" id="cl" style="width:80px"></div>
+    <h2 id="ht">Ton ordinogramme : étape 1</h2>
+    <p class="tools">
+      <button class="btn" id="aS">⬭ Départ</button>
+      <button class="btn" id="aE">▭ Événement</button>
+      <button class="btn" id="aC">◇ Choix / action</button>
+      <button class="btn" id="aF">⬬ Fin</button>
+      <button class="btn alt lk" id="lk">➜ Relier</button>
+      <button class="btn alt" id="ed">✎ Modifier le texte</button>
+      <button class="btn alt" id="dl">🗑 Supprimer</button>
+      <button class="btn alt" id="rz">Tout effacer</button>
+    </p>
+    <p class="note" id="st"></p>
+    <svg id="bd" class="board" viewBox="0 0 1050 820" xmlns="http://www.w3.org/2000/svg"></svg>
+    <p class="pi" style="text-align:center">Le secret de l'histoire : <input type="text" id="sc" style="width:260px"></p>
+    <p class="tools"><button class="btn" id="png">📥 Exporter en PNG</button></p>
+    <p class="note" style="text-align:center">Glisse une forme pour la déplacer. Double-clic sur une forme ou une flèche pour changer son texte. Pour une flèche : clique sur « Relier », puis sur la forme de départ, puis sur celle d'arrivée.</p>
+  </div>
+
+  <div class="card">
+    <h2>Exemples et solutions</h2>
+    <p class="tools">
+      <select id="sel"><option value="ex1">Exemple 1 : Météo</option><option value="ex2">Exemple 2 : Médiathèque</option></select>
+      <button class="btn alt" id="sol">🔒 Voir les solutions</button>
+    </p>
+    <svg id="vw" class="board" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+</div>
+<script src="ex_rouge.js"></script>
+<script>
+var NS = "http://www.w3.org/2000/svg";
+var KIND = { s: "Départ", e: "Événement", c: "Question ?", f: "Fin" };
+
+function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+function wrap(t, m) {
+  var w = t.split(/ +/).filter(Boolean), L = [], c = "";
+  w.forEach(function (x) { if (c && (c + " " + x).length > m) { L.push(c); c = x; } else c = c ? c + " " + x : x; });
+  if (c) L.push(c);
+  return L.length ? L : [""];
+}
+function fit(n) {
+  var L = wrap(n.t, n.k === "c" ? 14 : 20), mx = 0;
+  L.forEach(function (s) { if (s.length > mx) mx = s.length; });
+  var w = mx * 7.6 + 26, h = L.length * 17 + 16;
+  n.l = L;
+  if (n.k === "c") { n.w = Math.max(130, w * 1.7); n.h = Math.max(76, h * 1.9); }
+  else if (n.k === "s" || n.k === "f") { n.w = Math.max(90, w * 1.25); n.h = Math.max(44, h * 1.25); }
+  else { n.w = Math.max(110, w); n.h = Math.max(36, h); }
+}
+function mk(nodes, edges) {
+  var B = { nodes: [], edges: [], seq: 0 };
+  nodes.forEach(function (a) { var n = { id: a[0], k: a[1], t: a[2], x: a[3], y: a[4] }; fit(n); B.nodes.push(n); });
+  edges.forEach(function (a, i) { B.edges.push({ id: "e" + i, a: a[0], b: a[1], lab: a[2] || "" }); });
+  return B;
+}
+function edge(n, tx, ty) {
+  var dx = tx - n.x, dy = ty - n.y;
+  if (!dx && !dy) return [n.x, n.y];
+  var hw = n.w / 2, hh = n.h / 2, s;
+  if (n.k === "c") s = 1 / (Math.abs(dx) / hw + Math.abs(dy) / hh);
+  else if (n.k === "e") s = Math.min(hw / Math.max(Math.abs(dx), 1e-9), hh / Math.max(Math.abs(dy), 1e-9));
+  else s = 1 / Math.sqrt(dx * dx / (hw * hw) + dy * dy / (hh * hh));
+  return [n.x + dx * s, n.y + dy * s];
+}
+function draw(svg, B, sel, from) {
+  var h = '<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#000"/></marker></defs>';
+  var M = {};
+  B.nodes.forEach(function (n) { M[n.id] = n; });
+  B.edges.forEach(function (e) {
+    var a = M[e.a], b = M[e.b];
+    if (!a || !b) return;
+    var p = edge(a, b.x, b.y), q = edge(b, a.x, a.y);
+    var on = sel && sel.t === "e" && sel.id === e.id;
+    var l = 'x1="' + p[0] + '" y1="' + p[1] + '" x2="' + q[0] + '" y2="' + q[1] + '"';
+    h += '<g data-e="' + e.id + '"><line ' + l + ' stroke="transparent" stroke-width="16"/><line ' + l +
+      ' stroke="' + (on ? "#ff8800" : "#000") + '" stroke-width="' + (on ? 3 : 1.6) + '" marker-end="url(#ar)"/>';
+    if (e.lab) {
+      h += '<text x="' + ((p[0] + q[0]) / 2) + '" y="' + ((p[1] + q[1]) / 2 - 5) + '" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" paint-order="stroke" stroke="#fff" stroke-width="4" fill="#222">' + esc(e.lab) + "</text>";
+    }
+    h += "</g>";
+  });
+  B.nodes.forEach(function (n) {
+    var on = (sel && sel.t === "n" && sel.id === n.id) || from === n.id;
+    var fill = n.k === "f" ? "#000" : "#e3f5e7", fg = n.k === "f" ? "#fff" : "#111";
+    var sk = on ? "#ff8800" : (n.k === "f" ? "#000" : "#2e9a54"), sw = on ? 3.5 : 1.6;
+    var st = 'fill="' + fill + '" stroke="' + sk + '" stroke-width="' + sw + '"';
+    h += '<g data-n="' + n.id + '" style="cursor:move">';
+    if (n.k === "e") h += '<rect x="' + (n.x - n.w / 2) + '" y="' + (n.y - n.h / 2) + '" width="' + n.w + '" height="' + n.h + '" ' + st + "/>";
+    else if (n.k === "c") h += '<polygon points="' + n.x + "," + (n.y - n.h / 2) + " " + (n.x + n.w / 2) + "," + n.y + " " + n.x + "," + (n.y + n.h / 2) + " " + (n.x - n.w / 2) + "," + n.y + '" ' + st + "/>";
+    else h += '<ellipse cx="' + n.x + '" cy="' + n.y + '" rx="' + (n.w / 2) + '" ry="' + (n.h / 2) + '" ' + st + "/>";
+    var y0 = n.y - (n.l.length - 1) * 8.5 + 5;
+    h += '<text text-anchor="middle" font-family="Arial,sans-serif" font-size="13" fill="' + fg + '">';
+    n.l.forEach(function (s, i) { h += '<tspan x="' + n.x + '" y="' + (y0 + i * 17) + '">' + esc(s) + "</tspan>"; });
+    h += "</text></g>";
+  });
+  svg.innerHTML = h;
+}
+
+/* ---------- Éditeur ---------- */
+var BD = { 1: { nodes: [], edges: [], seq: 0 }, 2: { nodes: [], edges: [], seq: 0 } };
+var cur = 1, sel = null, link = false, from = null, drag = null, last = { id: null, t: 0 };
+var bd = document.getElementById("bd"), st = document.getElementById("st");
+
+function CB() { return BD[cur]; }
+function render() { draw(bd, CB(), sel, from); }
+function nodeById(id) { return CB().nodes.filter(function (n) { return n.id === id; })[0]; }
+function pt(e) {
+  var p = bd.createSVGPoint();
+  p.x = e.clientX; p.y = e.clientY;
+  var q = p.matrixTransform(bd.getScreenCTM().inverse());
+  return [q.x, q.y];
+}
+function add(k) {
+  var b = CB(), n = { id: "n" + (++b.seq), k: k, t: KIND[k], x: 160, y: 80 };
+  fit(n);
+  for (var y = 70; y < 780; y += 70) {
+    for (var x = 130; x < 950; x += 190) {
+      var free = b.nodes.every(function (m) {
+        return Math.abs(m.x - x) >= (m.w + n.w) / 2 + 12 || Math.abs(m.y - y) >= (m.h + n.h) / 2 + 12;
+      });
+      if (free) { n.x = x; n.y = y; y = 9999; break; }
+    }
+  }
+  b.nodes.push(n);
+  sel = { t: "n", id: n.id };
+  render();
+}
+function doLink(id) {
+  if (!from) { from = id; st.textContent = "Clique maintenant sur la forme d'arrivée."; render(); return; }
+  if (from === id) { from = null; render(); return; }
+  var b = CB(), src = nodeById(from), lab = "";
+  if (src.k === "c") lab = prompt("Texte sur la flèche (ex. : Oui, Non, Manger…) :", "") || "";
+  b.edges.push({ id: "e" + (++b.seq), a: from, b: id, lab: lab.trim() });
+  from = null;
+  st.textContent = "Flèche créée. Clique sur une autre forme de départ, ou sur « Relier » pour terminer.";
+  render();
+}
+function editSel() {
+  if (!sel) { st.textContent = "Sélectionne d'abord une forme ou une flèche."; return; }
+  var b = CB();
+  if (sel.t === "n") {
+    var n = nodeById(sel.id), v = prompt("Texte :", n.t);
+    if (v !== null && v.trim()) { n.t = v.trim(); fit(n); render(); }
+  } else {
+    var ed = b.edges.filter(function (x) { return x.id === sel.id; })[0], v2 = prompt("Texte de la flèche :", ed.lab);
+    if (v2 !== null) { ed.lab = v2.trim(); render(); }
+  }
+}
+function delSel() {
+  if (!sel) { st.textContent = "Sélectionne d'abord une forme ou une flèche."; return; }
+  var b = CB();
+  if (sel.t === "n") {
+    var id = sel.id;
+    b.nodes = b.nodes.filter(function (n) { return n.id !== id; });
+    b.edges = b.edges.filter(function (x) { return x.a !== id && x.b !== id; });
+  } else {
+    var eid = sel.id;
+    b.edges = b.edges.filter(function (x) { return x.id !== eid; });
+  }
+  sel = null; render();
+}
+function setLink(on) {
+  link = on; from = null;
+  document.getElementById("lk").classList.toggle("on", on);
+  st.textContent = on ? "Mode flèche : clique sur la forme de départ, puis sur la forme d'arrivée." : "";
+  render();
+}
+
+bd.addEventListener("pointerdown", function (e) {
+  var gn = e.target.closest("[data-n]"), ge = e.target.closest("[data-e]"), now = Date.now(), id;
+  if (gn) {
+    id = gn.getAttribute("data-n");
+    if (link) { e.preventDefault(); doLink(id); return; }
+    var dbl = last.id === id && now - last.t < 400;
+    last = { id: id, t: now };
+    sel = { t: "n", id: id };
+    var n = nodeById(id), p = pt(e);
+    drag = { n: n, dx: p[0] - n.x, dy: p[1] - n.y };
+    render();
+    if (dbl) { drag = null; editSel(); }
+  } else if (ge && !link) {
+    id = ge.getAttribute("data-e");
+    var dbl2 = last.id === id && now - last.t < 400;
+    last = { id: id, t: now };
+    sel = { t: "e", id: id };
+    render();
+    if (dbl2) editSel();
+  } else if (!link) {
+    sel = null; render();
+  }
+});
+window.addEventListener("pointermove", function (e) {
+  if (!drag) return;
+  var p = pt(e);
+  drag.n.x = Math.max(0, Math.min(1050, p[0] - drag.dx));
+  drag.n.y = Math.max(0, Math.min(820, p[1] - drag.dy));
+  render();
+});
+window.addEventListener("pointerup", function () { drag = null; });
+window.addEventListener("keydown", function (e) {
+  var tg = (e.target.tagName || "").toLowerCase();
+  if (tg === "input" || tg === "textarea" || tg === "select") return;
+  if (e.key === "Delete" || e.key === "Backspace") { e.preventDefault(); delSel(); }
+  else if (e.key === "Escape") setLink(false);
+});
+
+document.getElementById("aS").onclick = function () { add("s"); };
+document.getElementById("aE").onclick = function () { add("e"); };
+document.getElementById("aC").onclick = function () { add("c"); };
+document.getElementById("aF").onclick = function () { add("f"); };
+document.getElementById("lk").onclick = function () { setLink(!link); };
+document.getElementById("ed").onclick = editSel;
+document.getElementById("dl").onclick = delSel;
+document.getElementById("rz").onclick = function () {
+  if (confirm("Tout effacer sur cette étape ?")) { BD[cur] = { nodes: [], edges: [], seq: 0 }; sel = null; from = null; render(); }
+};
+function step(n) {
+  cur = n; sel = null; from = null;
+  document.getElementById("t1").classList.toggle("on", n === 1);
+  document.getElementById("t1").classList.toggle("alt", n !== 1);
+  document.getElementById("t2").classList.toggle("on", n === 2);
+  document.getElementById("t2").classList.toggle("alt", n !== 2);
+  document.getElementById("ht").textContent = "Ton ordinogramme : étape " + n;
+  render();
+  renderCards();
+}
+document.getElementById("t1").onclick = function () { step(1); };
+document.getElementById("t2").onclick = function () { step(2); };
+document.getElementById("cp").onclick = function () {
+  if (BD[2].nodes.length && !confirm("L'étape 2 contient déjà un schéma : le remplacer ?")) return;
+  BD[2] = JSON.parse(JSON.stringify(BD[1]));
+  step(2);
+};
+
+document.getElementById("png").onclick = function () {
+  var b = CB();
+  if (!b.nodes.length) { alert("Ton ordinogramme est vide."); return; }
+  sel = null; from = null; render();
+  var c = bd.cloneNode(true);
+  c.removeAttribute("class"); c.removeAttribute("id");
+  c.setAttribute("xmlns", NS);
+  c.setAttribute("width", 2100); c.setAttribute("height", 1768);
+  c.setAttribute("viewBox", "0 -64 1050 884");
+  var who = [document.getElementById("pn").value, document.getElementById("nm").value, document.getElementById("cl").value].join(" ").replace(/\s+/g, " ").trim();
+  var title = "Ordinogramme du lapin de Pâques, étape " + cur + (who ? " : " + who : "");
+  var sc = document.getElementById("sc").value.trim();
+  c.insertAdjacentHTML("afterbegin",
+    '<rect x="0" y="-64" width="1050" height="884" fill="#fff"/>' +
+    '<text x="12" y="-38" font-family="Arial,sans-serif" font-size="18" font-weight="bold" fill="#000">' + esc(title) + "</text>" +
+    '<text x="12" y="-14" font-family="Arial,sans-serif" font-size="15" fill="#000">' + esc("Secret de l'histoire : " + (sc || "…")) + "</text>");
+  var url = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(new XMLSerializer().serializeToString(c));
+  var img = new Image();
+  img.onload = function () {
+    var cv = document.createElement("canvas");
+    cv.width = 2100; cv.height = 1768;
+    var g = cv.getContext("2d");
+    g.fillStyle = "#fff"; g.fillRect(0, 0, cv.width, cv.height);
+    g.drawImage(img, 0, 0, cv.width, cv.height);
+    cv.toBlob(function (bl) {
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(bl);
+      a.download = "ordinogramme_etape" + cur + ".png";
+      a.click();
+    });
+  };
+  img.onerror = function () { alert("L'export a échoué. Essaie avec un autre navigateur."); };
+  img.src = url;
+};
+
+/* ---------- Exemples et solutions (lecture seule) ---------- */
+var DIAG = {
+  ex1: mk([["s", "s", "Réveil", 300, 40], ["a", "e", "Regarde par la fenêtre", 300, 115], ["d", "c", "Quel temps fait-il ?", 300, 235],
+    ["bus", "e", "Bus", 110, 370], ["pi", "e", "Pieds", 300, 370], ["ve", "e", "Vélo", 490, 370], ["f", "f", "École", 300, 470]],
+    [["s", "a"], ["a", "d"], ["d", "bus", "Pluie"], ["d", "pi", "Neige"], ["d", "ve", "Soleil"], ["bus", "f"], ["pi", "f"], ["ve", "f"]]),
+  ex2: mk([["s", "s", "Médiathèque", 300, 40], ["c", "e", "Cherche un livre", 300, 115], ["d", "c", "Lequel prends-tu ?", 300, 235],
+    ["m1", "e", "Pas le bon", 70, 235], ["m2", "e", "Pas le bon", 530, 235], ["r", "e", "Le bon", 300, 355], ["f", "f", "Partir", 300, 440]],
+    [["s", "c"], ["c", "d"], ["d", "m1", "Magazine"], ["m1", "c"], ["d", "m2", "Manga"], ["m2", "c"], ["d", "r", "Roman"], ["r", "f"]]),
+  s1: mk([["s", "s", "Réveil", 200, 40], ["n1", "e", "Inspecter la pièce", 200, 115], ["d1", "c", "Que fais-tu ?", 200, 235],
+    ["n2", "e", "Tu t'endors", 200, 355], ["f", "f", "Fin : indice 2", 200, 440]],
+    [["s", "n1"], ["n1", "d1"], ["d1", "n2", "Manger le chocolat"], ["n2", "f"]]),
+  s2: mk([["s", "s", "Réveil", 350, 40], ["n1", "e", "Inspecter la pièce", 350, 115], ["d1", "c", "Que fais-tu ?", 350, 235],
+    ["n3", "e", "« Ne mange pas l'œuf\u00a0!\u00a0»", 95, 120], ["n2", "e", "Tu t'endors", 170, 355], ["f2", "f", "Fin : indice 2", 170, 450],
+    ["n4", "e", "Un lapin surgit et disparaît", 620, 235], ["d2", "c", "Que fais-tu ?", 620, 350],
+    ["n5", "e", "23h50 : plus de lapin, tout devient noir", 440, 480], ["f48", "f", "Fin : indice Pâques", 440, 590],
+    ["n6", "e", "Tu rattrapes le lapin, il cherche son œuf", 800, 480], ["d3", "c", "Dire que tu as vu l'œuf ?", 800, 590],
+    ["n7", "e", "Le lapin repart, tout devient noir", 680, 700], ["f77", "f", "Fin : indice 1", 680, 785],
+    ["n8", "e", "Retour à la cabane, « Oh il est l'heure\u00a0!\u00a0»", 935, 700], ["f42", "f", "Fin : indice 9", 935, 785]],
+    [["s", "n1"], ["n1", "d1"], ["d1", "n2", "Manger le chocolat"], ["n2", "f2"], ["d1", "n3", "Lire le papier"], ["n3", "n1"],
+     ["d1", "n4", "Sortir"], ["n4", "d2"], ["d2", "n5", "Ramasser la montre"], ["n5", "f48"], ["d2", "n6", "Courir après le lapin"],
+     ["n6", "d3"], ["d3", "n7", "Non"], ["n7", "f77"], ["d3", "n8", "Oui"], ["n8", "f42"]])
+};
+var vw = document.getElementById("vw"), selv = document.getElementById("sel");
+function show(key) {
+  var B = DIAG[key], x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+  B.nodes.forEach(function (n) {
+    x0 = Math.min(x0, n.x - n.w / 2); x1 = Math.max(x1, n.x + n.w / 2);
+    y0 = Math.min(y0, n.y - n.h / 2); y1 = Math.max(y1, n.y + n.h / 2);
+  });
+  vw.setAttribute("viewBox", (x0 - 20) + " " + (y0 - 20) + " " + (x1 - x0 + 40) + " " + (y1 - y0 + 40));
+  draw(vw, B, null, null);
+}
+selv.onchange = function () { show(selv.value); };
+document.getElementById("sol").onclick = function () {
+  if (!confirm("Les solutions servent à la correction. Les afficher ?")) return;
+  if (!selv.querySelector('option[value="s1"]')) {
+    selv.insertAdjacentHTML("beforeend", '<option value="s1">Solution étape 1 : un exemple d\'histoire</option><option value="s2">Solution étape 2 : toutes les histoires</option>');
+  }
+  selv.value = "s2"; show("s2");
+};
+
+/* ---------- Jeu de cartes numérique ---------- */
+var RULES = "Vous ne pouvez retourner qu'une carte à la fois. Une seule carte à la fois peut être face visible sur la table. La carte suivante est indiquée par une flèche suivie d'un nombre. L'histoire commence à la carte 0.";
+var FIN_T = "Vous vous réveillez, c'était un rêve. Il y a un papier posé sur votre oreiller avec ";
+var CARDS = {
+  0: { t: "Vous vous réveillez dans une cabane dans la forêt. Il fait jour et vous êtes seul/e.", n: 65 },
+  65: { t: "Vous inspectez la pièce. La porte de la cabane est entrouverte. Sur une petite table, il y a une feuille pliée en deux et un œuf en chocolat.",
+    o: [["Je mange l'œuf en chocolat.", 28], ["Je ramasse le papier et le déplie.", 39], ["Je sors de la pièce.", 8]] },
+  28: { t: "Vous vous sentez soudainement fatigué/e et vous vous endormez.", n: 84 },
+  39: { t: "Il est écrit : « Ne mangez pas l'œuf en chocolat ! »", n: 65 },
+  8: { t: "Vous passez la porte et vous êtes dans la forêt. Soudain, un lapin surgit de nulle part et s'écrie : « Je suis en retard ! ». Il disparaît aussitôt mais il a laissé une montre derrière lui.",
+    o: [["Je ramasse la montre.", 19], ["Je cours après le lapin.", 72]] },
+  19: { t: "Sur la montre, il est indiqué 23h50. Vous essayez de retrouver le lapin. Malheureusement, vous ne le trouvez pas. Soudain, la montre sonne et indique 00h00. Vous vous retrouvez dans le noir total.", n: 48 },
+  72: { t: "Vous êtes rapide et vous rattrapez vite le lapin. Incroyable, il parle et vous explique qu'il cherche son œuf de Pâques.",
+    o: [["Je lui dis où j'ai vu un œuf en chocolat.", 15], ["Je ne lui dis rien.", 33]] },
+  33: { t: "Le lapin vous salue car il est pressé et repart à la recherche de son œuf. Vous continuez votre chemin et soudain tout devient noir.", n: 77 },
+  15: { t: "Vous retournez sur vos pas. Le lapin vous remercie de lui avoir permis de retrouver son œuf de Pâques. Il sort la montre qu'il a récupérée en chemin et s'exclame « Oh il est l'heure ! ». Une brillante lumière vous aveugle.", n: 42 },
+  48: { f: 1, t: FIN_T + "« Pâques » écrit dessus." },
+  84: { f: 1, t: FIN_T + "« 2 » écrit dessus." },
+  77: { f: 1, t: FIN_T + "« 1 » écrit dessus." },
+  42: { f: 1, t: "Vous vous réveillez, c'était un rêve. Il y a un petit mot posé sur votre oreiller avec un 9 dessiné dessus et un message : « Un code secret se dissimule dans les fins alternatives de cette histoire. »" }
+};
+var DECK = [77, 28, 15, 48, 39, 8, 65, 84, 0, 42, 72, 19, 33];
+var G = { ready: false, shown: null, pend: null, used: {}, taken: {}, fins: {}, path: [] };
+
+function lab(n) { return n > 0 && n < 10 ? "0" + n : String(n); }
+function cnt(o) { return Object.keys(o).length; }
+function gmsg(t, ok) { var e = document.getElementById("gm"); e.className = ok ? "ok" : "ko"; e.textContent = t || ""; }
+
+function renderCards() {
+  var grey = cur === 2, h;
+  document.getElementById("hint").textContent = cur === 1
+    ? "Étape 1 : joue une histoire jusqu'à une fin et construis son ordinogramme au fur et à mesure."
+    : "Étape 2 : trouve toutes les histoires. Les cartes déjà découvertes sont grisées et les choix déjà pris sont marqués.";
+  var dk = document.getElementById("deck");
+  dk.innerHTML = "";
+  DECK.forEach(function (n) {
+    var b = document.createElement("button");
+    b.className = "dc" + (G.shown === n ? " on" : "") + (grey && G.used[n] ? " gr" : "");
+    b.textContent = lab(n);
+    b.title = "Carte " + lab(n);
+    b.onclick = function () { pick(n); };
+    dk.appendChild(b);
+  });
+  if (!G.ready) {
+    h = '<div class="rc"><span class="nb">INDICATIONS</span><div class="tx">' + esc(RULES) + '</div><button class="btn" id="rd">J\'ai lu les règles</button></div>';
+  } else if (G.shown === null) {
+    h = '<div class="rc"><span class="nb">À toi de jouer</span><div class="tx">Prends la carte <b>0</b> dans le tas (clique dessus).</div></div>';
+  } else {
+    var c = CARDS[G.shown];
+    h = '<div class="rc' + (c.f ? " fin" : "") + '"><span class="nb">' + lab(G.shown) + "</span>" + (c.f ? '<b style="float:right">FIN</b>' : "") +
+      '<div class="tx">' + esc(c.t) + "</div>";
+    if (c.o) {
+      h += '<div class="qq">Que faites-vous ?</div>';
+      c.o.forEach(function (o, i) {
+        var tk = grey && G.taken[G.shown + ">" + o[1]];
+        h += '<button class="op' + (G.pend === o[1] ? " sel" : "") + '" data-i="' + i + '"><span>' + esc(o[0]) + (tk ? ' <span class="tag">(déjà pris)</span>' : "") + "</span><i>→ " + lab(o[1]) + "</i></button>";
+      });
+    } else if (c.f) {
+      h += '<div class="nxt">Recommence à la carte 0 pour trouver d\'autres fins possibles.</div>';
+    } else {
+      h += '<div class="nxt">Retourne cette carte et dévoile la carte<br><b style="font-size:1.4em">→ ' + lab(c.n) + "</b></div>";
+    }
+    h += "</div>";
+  }
+  var w = document.getElementById("rcw");
+  w.innerHTML = h;
+  var rd = document.getElementById("rd");
+  if (rd) rd.onclick = function () { G.ready = true; gmsg("Prends maintenant la carte 0.", true); renderCards(); };
+  w.querySelectorAll(".op").forEach(function (b) {
+    b.onclick = function () {
+      G.pend = CARDS[G.shown].o[+b.getAttribute("data-i")][1];
+      gmsg("Maintenant, clique sur la carte " + lab(G.pend) + " dans le tas.", true);
+      renderCards();
+    };
+  });
+  document.getElementById("cnt").textContent = "Cartes découvertes : " + cnt(G.used) + " / 13 · Fins trouvées : " + cnt(G.fins) + " / 4";
+  document.getElementById("pth").textContent = G.path.length ? "Parcours de cette histoire : " + G.path.map(lab).join(" → ") : "";
+}
+function reveal(n) {
+  var prev = G.shown;
+  if (prev !== null && !CARDS[prev].f) G.taken[prev + ">" + n] = 1;
+  G.shown = n; G.used[n] = 1; G.path.push(n);
+  var c = CARDS[n];
+  G.pend = c.o || c.f ? null : c.n;
+  if (c.f) {
+    G.fins[n] = 1;
+    gmsg("Fin de l'histoire ! " + (cur === 1 ? "Termine ton ordinogramme, puis passe à l'étape 2." : "Continue jusqu'à avoir trouvé toutes les fins."), true);
+  } else gmsg(c.o ? "Choisis une réponse sur la carte." : "Clique sur la carte " + lab(c.n) + ".", true);
+  renderCards();
+}
+function pick(n) {
+  if (!G.ready) { gmsg("Lis d'abord les règles (carte Indications)."); return; }
+  if (G.shown === null) {
+    if (n !== 0) { gmsg("L'histoire commence à la carte 0."); return; }
+    reveal(0); return;
+  }
+  if (CARDS[G.shown].f) {
+    if (n !== 0) { gmsg("Pour une nouvelle histoire, recommence à la carte 0."); return; }
+    G.shown = null; G.path = []; reveal(0); return;
+  }
+  if (G.pend === null) { gmsg("Choisis d'abord une réponse sur la carte face visible."); return; }
+  if (n !== G.pend) { gmsg("Ce n'est pas la carte indiquée par ton choix : cherche la carte " + lab(G.pend) + "."); return; }
+  reveal(n);
+}
+document.getElementById("gr").onclick = function () { G.ready = false; G.shown = null; G.pend = null; G.path = []; gmsg(""); renderCards(); };
+document.getElementById("gz").onclick = function () {
+  if (!confirm("Tout remettre à zéro (cartes découvertes comprises) ?")) return;
+  G = { ready: true, shown: null, pend: null, used: {}, taken: {}, fins: {}, path: [] };
+  gmsg("Prends la carte 0.", true); renderCards();
+};
+renderCards();
+show("ex1");
+render();
+</script>
+</body>
+</html>

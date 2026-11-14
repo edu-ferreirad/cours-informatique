@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Conversion de bases - 1ère matu</title>
+<link rel="stylesheet" href="ex_rouge.css">
+<style>
+.q{margin:14px 0;padding:12px;border:1px solid #5a1a1a;border-radius:6px;text-align:left}
+.fi{display:inline-block;margin:6px 26px 6px 0;white-space:nowrap}
+.fld label{color:#fff}
+.fld input{text-align:center;font-family:monospace;font-size:1.05em}
+.meth{background:rgba(255,255,255,.06);border-left:3px solid #ff6666;padding:8px 12px;margin-top:8px;text-align:left;color:#ffd9d9}
+.meth b{color:#fff}
+.st{margin-left:18px}
+.sep{border-top:1px dashed #884;margin:8px 0}
+.lv.on{background:#ff6666;box-shadow:0 0 12px #ff6666}
+.tools{text-align:center}
+details{margin:8px 0}
+summary{cursor:pointer;color:#fff;font-weight:bold}
+table.ref{width:auto;margin:10px auto;border-collapse:collapse}
+table.ref td,table.ref th{border:1px solid #5a1a1a;padding:4px 10px;text-align:center;font-family:monospace}
+table.ref th{color:#fff}
+.score{font-size:1.1em;margin-left:8px}
+.mb{padding:6px 12px;font-size:.9em}
+</style>
+</head>
+<body>
+<canvas id="matrix"></canvas>
+<div class="wrap">
+  <h1>Conversion de bases</h1>
+  <p style="text-align:center"><a class="back" href="index.html">⬅ Retour au menu</a></p>
+
+  <div class="card">
+    <h2>Consignes</h2>
+    <p>À l'aide du cours, réponds aux questions sur la conversion de bases (temps conseillé : 20 minutes, tout le matériel sauf Internet).</p>
+    <p><b>La méthode du cours (hexadécimal) :</b></p>
+    <ol>
+      <li>Découpe le nombre binaire en <b>groupes de 4 bits</b>, en partant de la droite (un octet = 2 groupes).</li>
+      <li>Pour chaque groupe, trouve son <b>pseudo-décimal</b> : sa valeur de 0 à 15 (tableau « sur 4 bits »).</li>
+      <li>Convertis chaque pseudo-décimal en <b>hexa</b> : 0 à 9 restent identiques, puis 10 = A, 11 = B, 12 = C, 13 = D, 14 = E, 15 = F.</li>
+    </ol>
+    <p class="note">Dans l'autre sens : chaque chiffre hexa → son pseudo-décimal → ses 4 bits.</p>
+    <details>
+      <summary>📋 Afficher les tableaux de référence</summary>
+      <table class="ref" id="ref"></table>
+    </details>
+  </div>
+
+  <div class="card">
+    <h2>Partie 1 : l'exercice du cours</h2>
+    <div id="b1"></div>
+    <p class="tools"><button class="btn" id="v1">Vérifier</button><span class="score" id="s1"></span></p>
+  </div>
+
+  <div class="card">
+    <h2>Partie 2 : entraînement à l'hexadécimal</h2>
+    <p class="tools">
+      <button class="btn lv on" data-l="1">Facile</button>
+      <button class="btn alt lv" data-l="2">Moyen</button>
+      <button class="btn alt lv" data-l="3">Difficile</button>
+      <button class="btn alt" id="nw">↻ Nouvel exercice</button>
+    </p>
+    <p class="note" id="ld" style="text-align:center"></p>
+    <div id="b2"></div>
+    <p class="tools"><button class="btn" id="v2">Vérifier</button><span class="score" id="s2"></span></p>
+  </div>
+</div>
+<script src="ex_rouge.js"></script>
+<script>
+var HX = "0123456789ABCDEF";
+function ri(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = ri(0, i), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+function distinct(n, a, b) { var s = {}, o = []; while (o.length < n) { var v = ri(a, b); if (!s[v]) { s[v] = 1; o.push(v); } } return o; }
+function pad4(s) { while (s.length % 4) s = "0" + s; return s; }
+function bits(v, n) { var s = v.toString(2); while (s.length < n) s = "0" + s; return s; }
+
+/* ---------- Méthode pas à pas (reprend les tableaux du cours) ---------- */
+function mBinHex(b) {
+  var p = pad4(b), g = p.match(/.{4}/g), z = p.length - b.length, h = "", r = "";
+  h += "<div>Binaire : <b>" + b + "</b>" + (z ? " → on complète à gauche avec " + z + " zéro" + (z > 1 ? "s" : "") + " : <b>" + p + "</b>" : "") + "</div>";
+  h += "<div>① Groupes de 4 bits depuis la droite : <b>" + g.join(" ") + "</b></div>";
+  h += "<div>② Pseudo-décimal puis ③ hexa, groupe par groupe :</div>";
+  g.forEach(function (x) {
+    var v = parseInt(x, 2);
+    r += HX[v];
+    h += '<div class="st"><b>' + x + "</b> → " + v + " → <b>" + HX[v] + "</b></div>";
+  });
+  return h + "<div>Résultat : <b>" + r + "</b></div>";
+}
+function mHexBin(x) {
+  var h = "<div>Hexa : <b>" + x + "</b>. Pour chaque chiffre : hexa → pseudo-décimal → 4 bits.</div>", s = "";
+  x.split("").forEach(function (c) {
+    var v = HX.indexOf(c), b = bits(v, 4);
+    s += b;
+    h += '<div class="st"><b>' + c + "</b> → " + v + " → <b>" + b + "</b></div>";
+  });
+  var t = s.replace(/^0+(?=.)/, "");
+  return h + "<div>On colle les groupes : <b>" + s.match(/.{4}/g).join(" ") + "</b>" + (t !== s ? " (sans les zéros inutiles à gauche : <b>" + t + "</b>)" : "") + "</div>";
+}
+function mDecBin(n) {
+  var h = "<div>Divisions successives par 2 (on garde le reste) :</div>", q = n, r = [];
+  while (q > 0) {
+    var d = Math.floor(q / 2), m = q % 2;
+    h += '<div class="st">' + q + " ÷ 2 = " + d + " reste <b>" + m + "</b></div>";
+    r.unshift(m); q = d;
+  }
+  return h + "<div>On lit les restes de bas en haut : <b>" + r.join("") + "</b></div>";
+}
+function mBinDec(b) {
+  var t = [];
+  b.split("").forEach(function (c, i) { if (c === "1") t.push(Math.pow(2, b.length - 1 - i)); });
+  return "<div>Poids des bits à 1 : " + t.join(" + ") + " = <b>" + parseInt(b, 2) + "</b></div>";
+}
+var SEP = '<div class="sep"></div>';
+
+/* ---------- Affichage et correction ---------- */
+function norm(f, v) {
+  v = String(v).replace(/\s+/g, "").toUpperCase();
+  return f.w ? v : v.replace(/^0+(?=.)/, "");
+}
+function renderSet(box, qs, num0) {
+  box.innerHTML = "";
+  box._qs = qs;
+  qs.forEach(function (q, i) {
+    var d = document.createElement("div");
+    d.className = "q";
+    var h = "<div><b>Question " + (num0 + i) + ".</b> " + q.p + '</div><div class="fld">';
+    q.f.forEach(function (f) {
+      h += '<span class="fi"><label>' + f.l + ' : <input type="text" size="' + (f.s || 14) + '" autocomplete="off" spellcheck="false"></label><span class="r"></span></span>';
+    });
+    h += '</div><button class="btn alt mb">💡 Méthode pas à pas</button><div class="meth hide">' + q.m + "</div>";
+    d.innerHTML = h;
+    var mb = d.querySelector(".mb"), me = d.querySelector(".meth");
+    mb.onclick = function () { me.classList.toggle("hide"); };
+    box.appendChild(d);
+  });
+}
+function verify(box, sc) {
+  var ok = 0, tot = 0;
+  box._qs.forEach(function (q, i) {
+    var d = box.children[i], ins = d.querySelectorAll("input"), rs = d.querySelectorAll(".r");
+    q.f.forEach(function (f, j) {
+      tot++;
+      var good = norm(f, ins[j].value) === norm(f, f.a);
+      if (good) ok++;
+      rs[j].innerHTML = good ? ' <span class="ok">✔</span>' : ' <span class="ko">✘</span> <span class="note">' + f.a + "</span>";
+    });
+  });
+  sc.innerHTML = '<span class="' + (ok === tot ? "ok" : "ko") + '">' + ok + " / " + tot + "</span>";
+}
+
+/* ---------- Partie 1 : exercice du cours ---------- */
+function part1() {
+  var dec = [7, 51, 128, 131, 234], hx = ["12", "DADA", "5F3"], m1 = "", f1 = [], f2 = [], m2 = "";
+  dec.forEach(function (n, i) {
+    f1.push({ l: n + " =", k: "bin", a: n.toString(2), s: 12 });
+    m1 += (i ? SEP : "") + "<div><b>" + n + "</b></div>" + mDecBin(n);
+  });
+  hx.forEach(function (x, i) {
+    var n = parseInt(x, 16), b = n.toString(2);
+    f2.push({ l: x + " en binaire", k: "bin", a: b, s: 18 });
+    f2.push({ l: x + " en décimal", k: "dec", a: String(n), s: 8 });
+    m2 += (i ? SEP : "") + "<div><b>" + x + "</b></div>" + mHexBin(x) + mBinDec(b);
+  });
+  return [
+    { p: "Convertis, en nombres binaires, les nombres décimaux suivants : 7, 51, 128, 131, 234.", f: f1, m: m1 },
+    { p: "Convertis, en nombres binaires puis en nombres décimaux, les nombres hexadécimaux suivants : 12, DADA et 5F3.", f: f2, m: m2 }
+  ];
+}
+
+/* ---------- Partie 2 : trois niveaux ---------- */
+var LD = {
+  1: "Facile : un chiffre hexadécimal ↔ un groupe de 4 bits.",
+  2: "Moyen : un octet (8 bits) ↔ 2 chiffres hexadécimaux.",
+  3: "Difficile : nombres de longueur quelconque, décimal ↔ binaire ↔ hexadécimal."
+};
+function genFacile() {
+  var qs = [];
+  shuffle(distinct(2, 10, 15).concat(distinct(1, 1, 9))).forEach(function (v) {
+    var c = HX[v];
+    qs.push({ p: "Convertis le chiffre hexadécimal <b>" + c + "</b> en binaire (sur 4 bits).", f: [{ l: "Binaire", k: "bin", w: 4, a: bits(v, 4), s: 8 }], m: mHexBin(c) });
+  });
+  shuffle(distinct(1, 10, 15).concat(distinct(2, 1, 9))).forEach(function (v) {
+    var b = bits(v, 4);
+    qs.push({ p: "Convertis le groupe de 4 bits <b>" + b + "</b> en hexadécimal.", f: [{ l: "Hexa", k: "hex", a: HX[v], s: 4 }], m: mBinHex(b) });
+  });
+  return qs;
+}
+function genMoyen() {
+  var qs = [], i, v, b, x;
+  for (i = 0; i < 6; i++) {
+    v = ri(17, 255); b = bits(v, 8); x = HX[v >> 4] + HX[v & 15];
+    if (i < 3) qs.push({ p: "Convertis l'octet <b>" + b + "</b> en hexadécimal.", f: [{ l: "Hexa (2 chiffres)", k: "hex", w: 2, a: x, s: 6 }], m: mBinHex(b) });
+    else qs.push({ p: "Convertis le nombre hexadécimal <b>" + x + "</b> en binaire (sur 8 bits).", f: [{ l: "Binaire (8 bits)", k: "bin", w: 8, a: b, s: 12 }], m: mHexBin(x) });
+  }
+  return qs;
+}
+function genDifficile() {
+  var qs = [], i, n, b, x, L, k;
+  for (i = 0; i < 2; i++) {
+    n = ri(150, 999); b = n.toString(2); x = n.toString(16).toUpperCase();
+    qs.push({ p: "Convertis le nombre décimal <b>" + n + "</b> en binaire, puis en hexadécimal.",
+      f: [{ l: "Binaire", k: "bin", a: b, s: 14 }, { l: "Hexa", k: "hex", a: x, s: 6 }], m: mDecBin(n) + SEP + mBinHex(b) });
+  }
+  shuffle([5, 6, 7, 9, 10, 11]).slice(0, 2).forEach(function (len) {
+    b = "1";
+    for (k = 1; k < len; k++) b += ri(0, 1);
+    x = parseInt(b, 2).toString(16).toUpperCase();
+    qs.push({ p: "Convertis le nombre binaire <b>" + b + "</b> (" + len + " bits) en hexadécimal.", f: [{ l: "Hexa", k: "hex", a: x, s: 6 }], m: mBinHex(b) });
+  });
+  for (i = 0; i < 2; i++) {
+    L = ri(3, 4); x = HX[ri(1, 15)];
+    for (k = 1; k < L; k++) x += HX[ri(0, 15)];
+    n = parseInt(x, 16); b = n.toString(2);
+    qs.push({ p: "Convertis le nombre hexadécimal <b>" + x + "</b> en binaire, puis en décimal.",
+      f: [{ l: "Binaire", k: "bin", a: b, s: 18 }, { l: "Décimal", k: "dec", a: String(n), s: 8 }], m: mHexBin(x) + SEP + mBinDec(b) });
+  }
+  return qs;
+}
+var GEN = { 1: genFacile, 2: genMoyen, 3: genDifficile }, lvl = 1;
+var b1 = document.getElementById("b1"), b2 = document.getElementById("b2");
+function newSet() {
+  document.getElementById("ld").textContent = LD[lvl];
+  document.getElementById("s2").textContent = "";
+  renderSet(b2, GEN[lvl](), 1);
+}
+document.querySelectorAll(".lv").forEach(function (b) {
+  b.onclick = function () {
+    lvl = +b.getAttribute("data-l");
+    document.querySelectorAll(".lv").forEach(function (o) {
+      var on = o === b;
+      o.classList.toggle("on", on);
+      o.classList.toggle("alt", !on);
+    });
+    newSet();
+  };
+});
+document.getElementById("nw").onclick = newSet;
+document.getElementById("v1").onclick = function () { verify(b1, document.getElementById("s1")); };
+document.getElementById("v2").onclick = function () { verify(b2, document.getElementById("s2")); };
+
+/* ---------- Tableaux de référence ---------- */
+var ref = "<tr><th>Binaire</th><th>Pseudo-décimal</th><th>Hexa</th><th></th><th>Binaire</th><th>Pseudo-décimal</th><th>Hexa</th></tr>";
+for (var r = 0; r < 8; r++) {
+  ref += "<tr><td>" + bits(r, 4) + "</td><td>" + r + "</td><td>" + HX[r] + "</td><td></td><td>" + bits(r + 8, 4) + "</td><td>" + (r + 8) + "</td><td>" + HX[r + 8] + "</td></tr>";
+}
+document.getElementById("ref").innerHTML = ref;
+
+renderSet(b1, part1(), 1);
+newSet();
+</script>
+</body>
+</html>
