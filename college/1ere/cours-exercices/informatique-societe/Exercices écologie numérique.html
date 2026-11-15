@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mission Éco-agent numérique</title>
+<style>
+:root{
+  --bg:#12040a; --panel:#220912; --panel2:#2d0f1b; --line:#ff6666; --ink:#ffffff; --soft:#ffd2d2;
+  --accent:#ff9999; --ok:#5ee09a; --ko:#ff7a8a; --gold:#ffd166; --muted:#e6b8b8;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:radial-gradient(circle at 20% 0%,#3a0b1c 0,var(--bg) 55%);color:var(--ink);font-family:Arial,Helvetica,sans-serif;line-height:1.45}
+.wrap{max-width:880px;margin:0 auto;padding:14px 16px 40px}
+h1{font-size:1.35em;margin:0;color:#fff;text-shadow:0 0 10px #ff6666}
+h2{font-size:1.2em;margin:0 0 6px;color:var(--accent)}
+.hud{position:sticky;top:0;z-index:5;background:rgba(18,4,10,.95);border-bottom:1px solid var(--line);padding:10px 0 8px;margin-bottom:14px}
+.hudrow{display:flex;flex-wrap:wrap;align-items:center;gap:10px;justify-content:space-between}
+.xp{flex:1;min-width:200px}
+.xpbar{height:14px;background:#3b1424;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.xpfill{height:100%;width:0;background:linear-gradient(90deg,#ff6666,var(--gold));transition:width .5s}
+.xptext{font-size:.85em;color:var(--soft);margin-top:3px}
+.grade{background:var(--panel2);border:1px solid var(--line);border-radius:20px;padding:4px 12px;font-size:.9em;color:var(--gold);white-space:nowrap}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{background:var(--panel);color:var(--soft);border:1px solid #7a2a3c;border-radius:16px;padding:5px 11px;font-size:.85em;cursor:pointer;font-family:inherit}
+.chip[aria-current="step"]{border-color:var(--line);color:#fff;background:#4a1527}
+.chip:disabled{opacity:.45;cursor:not-allowed}
+.chip.done{border-color:var(--ok);color:var(--ok)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px;margin-bottom:14px;box-shadow:0 0 14px rgba(255,102,102,.18)}
+.q{font-size:1.1em;margin:0 0 12px}
+.meta{font-size:.85em;color:var(--muted);margin-bottom:8px}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+button{font-family:inherit}
+.opt,.btn{background:var(--panel2);color:#fff;border:2px solid #7a2a3c;border-radius:8px;padding:11px 14px;font-size:1em;cursor:pointer;text-align:left}
+.opt:hover:not(:disabled),.btn:hover:not(:disabled){border-color:var(--line);background:#43142a}
+.opt:focus-visible,.btn:focus-visible,.chip:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.opt.ok{border-color:var(--ok);background:#12351f}
+.opt.ko{border-color:var(--ko);background:#40121b}
+.opt:disabled{cursor:default}
+.btn.primary{background:#ff6666;color:#1a0308;border-color:#ff6666;font-weight:bold;text-align:center}
+.btn.primary:hover:not(:disabled){background:#ff8f8f}
+.row{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.fb{margin-top:12px;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:#1a0710}
+.fb.ok{border-color:var(--ok)} .fb.ko{border-color:var(--ko)}
+.fb strong.ok{color:var(--ok)} .fb strong.ko{color:var(--ko)}
+table.data{border-collapse:collapse;width:100%;margin:8px 0 12px;font-size:.95em}
+table.data td{border:1px solid #7a2a3c;padding:6px 9px}
+table.data td:last-child{text-align:right;white-space:nowrap;font-weight:bold}
+.statement{font-size:1.15em;font-weight:bold;color:#fff;background:#12040a;border-left:5px solid var(--line);padding:10px 12px;border-radius:4px;margin:6px 0}
+.big{font-size:2.4em;font-weight:bold;color:var(--gold)}
+.ordered{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+.slot{border:2px dashed #7a2a3c;border-radius:8px;padding:9px 12px;min-height:42px;color:var(--soft)}
+.slot.filled{border-style:solid;border-color:var(--line);color:#fff}
+.badges{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+.badge{background:var(--panel2);border:1px solid #7a2a3c;border-radius:10px;padding:10px 12px;min-width:150px;text-align:center}
+.badge.won{border-color:var(--gold)}
+.badge .ic{font-size:1.8em;display:block}
+input[type=text],textarea{width:100%;background:#12040a;color:#fff;border:2px solid #7a2a3c;border-radius:8px;padding:9px;font-family:inherit;font-size:1em}
+main:focus{outline:none}
+label{display:block;margin:10px 0 4px;color:var(--soft)}
+.streak{color:var(--gold);font-weight:bold}
+@keyframes pop{0%{transform:scale(.8);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s ease-out}
+@media (prefers-reduced-motion:reduce){.pop{animation:none}.xpfill{transition:none}}
+@media print{.hud .chips,.row,.noprint{display:none!important}body{background:#fff;color:#000}.card{border-color:#000;box-shadow:none;background:#fff}h1,h2,.big{color:#000;text-shadow:none}.badge{background:#fff}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hud">
+    <div class="hudrow">
+      <h1>🌍 Mission Éco-agent numérique</h1>
+      <span class="grade" id="grade">Grade : Recrue du numérique</span>
+    </div>
+    <div class="hudrow" style="margin-top:8px">
+      <div class="xp">
+        <div class="xpbar" role="progressbar" aria-valuemin="0" aria-valuemax="30" aria-valuenow="0" id="xpbar"><div class="xpfill" id="xpfill"></div></div>
+        <div class="xptext" id="xptext">0 / 30 points</div>
+      </div>
+    </div>
+    <nav class="chips" id="chips" aria-label="Missions"></nav>
+  </header>
+  <main id="stage"></main>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------- utilitaires ---------- */
+var NB = '\u00a0';
+function fr(t){
+  return String(t)
+    .replace(/ ([%:;?!»])/g, NB + '$1')
+    .replace(/« /g, '«' + NB)
+    .replace(/(\d) (TWh|Mt|logements|élèves|points|pt|h)\b/g, '$1' + NB + '$2');
+}
+function el(tag, attrs, kids){
+  var e = document.createElement(tag);
+  if (attrs) for (var k in attrs){
+    if (k === 'class') e.className = attrs[k];
+    else if (k === 'text') e.textContent = fr(attrs[k]);
+    else if (k.indexOf('on') === 0) e.addEventListener(k.slice(2), attrs[k]);
+    else e.setAttribute(k, attrs[k]);
+  }
+  (kids || []).forEach(function(c){
+    if (c == null) return;
+    e.appendChild(typeof c === 'string' ? document.createTextNode(fr(c)) : c);
+  });
+  return e;
+}
+function shuffle(a){
+  var b = a.slice();
+  for (var i = b.length - 1; i > 0; i--){
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = b[i]; b[i] = b[j]; b[j] = t;
+  }
+  return b;
+}
+var stage = document.getElementById('stage');
+function clear(node){ while (node.firstChild) node.removeChild(node.firstChild); }
+
+/* ---------- état et HUD ---------- */
+var MISSIONS = [
+  {title:'Chiffres-clés', icon:'🔢', max:6},
+  {title:'Détective des chiffres', icon:'🕵️', max:9},
+  {title:'Fort impact ou à nuancer ?', icon:'⚖️', max:12},
+  {title:'Mon smartphone est fissuré', icon:'📱', max:3}
+];
+var MAXTOTAL = 30;
+var live = [0, 0, 0, 0];
+var done = [false, false, false, false];
+var current = -1; // -1 = intro, 4 = fin
+
+var GRADES = [
+  {min:28, name:'Maître du numérique responsable'},
+  {min:21, name:'Éco-expert'},
+  {min:11, name:'Éco-agent'},
+  {min:0,  name:'Recrue du numérique'}
+];
+function total(){ return live.reduce(function(a, b){ return a + b; }, 0); }
+function gradeOf(p){ for (var i = 0; i < GRADES.length; i++) if (p >= GRADES[i].min) return GRADES[i].name; return GRADES[3].name; }
+function award(i, pts){ live[i] += pts; updateHud(); }
+
+function updateHud(){
+  var p = total();
+  document.getElementById('xpfill').style.width = Math.round(100 * p / MAXTOTAL) + '%';
+  document.getElementById('xptext').textContent = fr(p + ' / ' + MAXTOTAL + ' points');
+  document.getElementById('xpbar').setAttribute('aria-valuenow', String(p));
+  document.getElementById('grade').textContent = fr('Grade : ' + gradeOf(p));
+  var chips = document.getElementById('chips'); clear(chips);
+  MISSIONS.forEach(function(m, i){
+    var unlocked = i === 0 || done[i - 1] || done[i];
+    var c = el('button', {'class': 'chip' + (done[i] ? ' done' : ''), type: 'button',
+      text: (done[i] ? '✓ ' : '') + (i + 1) + '. ' + m.title});
+    if (i === current) c.setAttribute('aria-current', 'step');
+    if (!unlocked) c.disabled = true;
+    c.addEventListener('click', function(){ if (!done[i]) go(i); });
+    chips.appendChild(c);
+  });
+}
+
+function go(i){
+  current = i;
+  if (i >= 0 && i < 4) live[i] = 0;
+  updateHud();
+  clear(stage);
+  if (i === -1) renderIntro();
+  else if (i === 0) mission1();
+  else if (i === 1) mission2();
+  else if (i === 2) mission3();
+  else if (i === 3) mission4();
+  else renderEnd();
+  window.scrollTo(0, 0);
+  try { stage.focus(); } catch (e) {}
+}
+function finish(i){
+  done[i] = true;
+  clear(stage);
+  var pts = live[i], max = MISSIONS[i].max;
+  var msg = pts === max ? 'Mission parfaite !' : (pts >= max * 0.7 ? 'Belle mission !' : 'Mission terminée : tu peux encore progresser.');
+  var card = el('div', {'class': 'card pop'}, [
+    el('h2', {text: MISSIONS[i].icon + ' Mission ' + (i + 1) + ' terminée'}),
+    el('p', {'class': 'big', text: pts + ' / ' + max}),
+    el('p', {text: msg}),
+    el('div', {'class': 'row'}, [
+      el('button', {'class': 'btn primary', type: 'button',
+        text: i < 3 ? 'Mission suivante →' : 'Voir mon grade final →',
+        onclick: function(){ go(i + 1); }})
+    ])
+  ]);
+  stage.appendChild(card);
+  updateHud();
+  var b = card.querySelector('button'); if (b) b.focus();
+}
+
+/* ---------- composant QCM ---------- */
+function mcq(container, q, onDone){
+  // q: {text, options:[...], correct:index, why}
+  var box = el('div', {'class': 'card'});
+  box.appendChild(el('p', {'class': 'q', text: q.text}));
+  var order = shuffle(q.options.map(function(o, i){ return {o: o, i: i}; }));
+  var opts = el('div', {'class': 'opts'});
+  var buttons = [];
+  var fb = el('div', {'class': 'fb', hidden: 'hidden', role: 'status'});
+  order.forEach(function(item){
+    var b = el('button', {'class': 'opt', type: 'button', text: item.o});
+    b.addEventListener('click', function(){
+      var good = item.i === q.correct;
+      buttons.forEach(function(x){
+        x.btn.disabled = true;
+        if (x.i === q.correct) x.btn.classList.add('ok');
+      });
+      if (!good) b.classList.add('ko');
+      if (good) b.classList.add('ok');
+      fb.hidden = false;
+      fb.className = 'fb ' + (good ? 'ok' : 'ko');
+      clear(fb);
+      fb.appendChild(el('strong', {'class': good ? 'ok' : 'ko', text: good ? '✓ Bonne réponse. ' : '✗ Pas tout à fait. '}));
+      fb.appendChild(document.createTextNode(fr(q.why)));
+      var next = el('div', {'class': 'row'}, [
+        el('button', {'class': 'btn primary', type: 'button', text: 'Suite →', onclick: function(){ onDone(good); }})
+      ]);
+      box.appendChild(next);
+      next.firstChild.focus();
+    });
+    buttons.push({btn: b, i: item.i});
+    opts.appendChild(b);
+  });
+  box.appendChild(opts);
+  box.appendChild(fb);
+  container.appendChild(box);
+  return box;
+}
+
+/* ---------- intro ---------- */
+function renderIntro(){
+  stage.appendChild(el('div', {'class': 'card pop'}, [
+    el('h2', {text: 'Bienvenue, agent·e !'}),
+    el('p', {text: 'Ta mission : prouver que tu maîtrises les chiffres de l’écologie numérique, du monde jusqu’à Genève, et que tu sais repérer les erreurs.'}),
+    el('p', {text: '4 missions, 30 points au total. Plus tu marques de points, plus ton grade monte :'}),
+    el('p', {class: 'meta', text: 'Recrue du numérique (0 à 10) · Éco-agent (11 à 20) · Éco-expert (21 à 27) · Maître du numérique responsable (28 et plus)'}),
+    el('p', {class: 'meta', text: 'Tu peux garder le cours sous les yeux. Les chiffres viennent de la présentation et des documents de référence.'}),
+    el('div', {'class': 'row'}, [
+      el('button', {'class': 'btn primary', type: 'button', text: 'Commencer la mission 1 →', onclick: function(){ go(0); }})
+    ])
+  ]));
+}
+
+/* ---------- mission 1 : chiffres-clés ---------- */
+var Q1 = [
+  {text:'Combien de déchets électroniques le monde a-t-il produits en 2022 ?', options:['34 millions de tonnes','62 millions de tonnes','82 millions de tonnes','120 millions de tonnes'], correct:1,
+   why:'62 Mt en 2022, soit +82 % depuis 2010 (ONU/UIT, Global E-waste Monitor 2024).'},
+  {text:'Quelle part de ces déchets est collectée et recyclée correctement ?', options:['12 %','22 %','52 %','80 %'], correct:1,
+   why:'Seulement 22,3 % : les déchets augmentent cinq fois plus vite que le recyclage documenté.'},
+  {text:'Quelle part de l’empreinte carbone d’un appareil vient de sa fabrication ?', options:['21 %','50 %','78 %','95 %'], correct:2,
+   why:'≈ 78 % pour la fabrication contre 21 % pour l’utilisation (étude ADEME-Arcep, France).'},
+  {text:'Quelle consommation d’électricité l’AIE prévoit-elle pour les data centers en 2030 ?', options:['415 TWh','945 TWh','1 700 TWh','3 000 TWh'], correct:1,
+   why:'945 TWh, contre 415 TWh en 2024 : un peu plus que la consommation du Japon.'},
+  {text:'Combien de logements le data center D4 d’Infomaniak chauffe-t-il à Genève ?', options:['600','2 000','6 000','60 000'], correct:2,
+   why:'Environ 6 000 logements : toute l’électricité du data center est revalorisée en chaleur.'},
+  {text:'Combien d’élèves ont répondu au sondage du concours Jeunes reporters ?', options:['93','350','935','9 350'], correct:2,
+   why:'935 élèves de cycles d’orientation genevois.'}
+];
+function mission1(){
+  var i = 0, streak = 0;
+  function next(){
+    clear(stage);
+    if (i >= Q1.length){ finish(0); return; }
+    stage.appendChild(el('div', {'class': 'meta', text: 'Mission 1 · question ' + (i + 1) + ' sur ' + Q1.length +
+      (streak >= 2 ? '  ·  🔥 série de ' + streak : '')}));
+    mcq(stage, Q1[i], function(good){
+      if (good){ award(0, 1); streak++; } else { streak = 0; }
+      i++; next();
+    });
+  }
+  next();
+}
+
+/* ---------- mission 2 : détective ---------- */
+var STM = [
+  {text:'« 68,4 % des ados sont prêts à regarder des vidéos en qualité standard. »', truth:true,
+   data:[['Oui, sans problème','32 %'],['Oui, mais pas toujours','36,4 %'],['Non, je préfère la HD','15,8 %'],['Non, je n’y avais jamais pensé','15,8 %']],
+   why:'32 % + 36,4 % = 68,4 % : la phrase est exacte.'},
+  {text:'« 72 % des ados sont d’accord de recycler leurs appareils. »', truth:false,
+   data:[['Oui, bien sûr','46 %'],['Oui, mais seulement si c’est facile','32 %'],['Non, je ne pense pas y arriver','11 %'],['Non, ça ne m’intéresse pas','11 %']],
+   why:'46 % + 32 % = 78 %, pas 72 %.',
+   fix:{text:'Quelle est la bonne valeur ?', options:['78 %','72 %','46 %'], correct:0}},
+  {text:'« Tous les adultes interrogés citent l’obsolescence programmée. »', truth:false,
+   data:[['Obsolescence programmée','6 réponses sur 15'],['Envie de nouveauté','6 réponses sur 15'],['Les sociétés veulent de l’argent','6 réponses sur 15']],
+   why:'6 adultes sur 15, soit 40 % : pas « tous ».',
+   fix:{text:'Quelle est la bonne formulation ?', options:['40 % des adultes (6 sur 15) citent l’obsolescence programmée','100 % des adultes citent l’obsolescence programmée','6 % des adultes citent l’obsolescence programmée'], correct:0}},
+  {text:'« 47,9 % des élèves utilisent leur smartphone plus de trois heures par jour. »', truth:false,
+   data:[['Question posée','Combien d’heures par jour passes-tu sur Internet ?'],['3 à 5 heures','30,3 %'],['Plus de 5 heures','17,6 %']],
+   why:'30,3 % + 17,6 % = 47,9 %, mais la question portait sur Internet en général, pas sur le smartphone.',
+   fix:{text:'Quelle est la bonne formulation ?', options:['47,9 % des élèves passent plus de 3 h par jour sur Internet','47,9 % des élèves jouent plus de 3 h par jour','47,9 % des élèves n’ont pas de smartphone'], correct:0}},
+  {text:'« 72,9 % des ados sont prêts à réduire leur temps sur les réseaux sociaux. »', truth:true,
+   data:[['Oui, je suis prêt(e)','29,3 %'],['Oui, mais seulement un peu','43,6 %'],['Non, c’est difficile','11,9 %'],['Non, je ne pense pas que ce soit nécessaire','15,2 %']],
+   why:'29,3 % + 43,6 % = 72,9 % : la phrase est exacte.'}
+];
+function mission2(){
+  var i = 0;
+  function next(){
+    clear(stage);
+    if (i >= STM.length){ finalQ(); return; }
+    var s = STM[i];
+    var box = el('div', {'class': 'card'});
+    box.appendChild(el('div', {'class': 'meta', text: 'Mission 2 · phrase ' + (i + 1) + ' sur ' + STM.length + ' · compare avec les données du sondage'}));
+    box.appendChild(el('div', {'class': 'statement', text: s.text}));
+    var tb = el('table', {'class': 'data'});
+    s.data.forEach(function(r){ tb.appendChild(el('tr', null, [el('td', {text: r[0]}), el('td', {text: r[1]})])); });
+    box.appendChild(tb);
+    var fb = el('div', {'class': 'fb', hidden: 'hidden', role: 'status'});
+    var btns = el('div', {'class': 'row'});
+    function verdict(sayTrue){
+      var good = (sayTrue === s.truth);
+      if (good) award(1, 1);
+      Array.prototype.forEach.call(btns.querySelectorAll('button'), function(b){ b.disabled = true; });
+      fb.hidden = false; fb.className = 'fb ' + (good ? 'ok' : 'ko'); clear(fb);
+      fb.appendChild(el('strong', {'class': good ? 'ok' : 'ko', text: good ? '✓ Bien vu. ' : '✗ Raté. '}));
+      fb.appendChild(document.createTextNode(fr((s.truth ? 'Cette phrase est vraie. ' : 'Cette phrase est fausse ou imprécise. ') + s.why)));
+      if (!s.truth && good){
+        // correction à choisir
+        var fixHost = el('div');
+        box.appendChild(fixHost);
+        mcq(fixHost, {text: s.fix.text, options: s.fix.options, correct: s.fix.correct, why: s.why}, function(ok){
+          if (ok) award(1, 1);
+          i++; next();
+        });
+        var firstCard = fixHost.firstChild; firstCard.style.marginTop = '12px';
+      } else {
+        var nb = el('div', {'class': 'row'}, [el('button', {'class': 'btn primary', type: 'button', text: 'Suite →', onclick: function(){ i++; next(); }})]);
+        box.appendChild(nb); nb.firstChild.focus();
+      }
+    }
+    btns.appendChild(el('button', {'class': 'btn', type: 'button', text: '✔ Vrai', onclick: function(){ verdict(true); }}));
+    btns.appendChild(el('button', {'class': 'btn', type: 'button', text: '✘ Faux ou imprécis', onclick: function(){ verdict(false); }}));
+    box.appendChild(btns); box.appendChild(fb);
+    stage.appendChild(box);
+  }
+  function finalQ(){
+    clear(stage);
+    stage.appendChild(el('div', {'class': 'meta', text: 'Mission 2 · dernière question'}));
+    mcq(stage, {text:'Le micro-trottoir a interrogé 15 adultes. Que peut-on en conclure ?',
+      options:['Les résultats sont indicatifs, mais l’échantillon est trop petit pour généraliser à tout Genève','Les résultats valent pour toute la population genevoise','Les résultats sont faux parce que les adultes mentent'], correct:0,
+      why:'Avec 15 personnes, un seul avis change le résultat de plus de 6 points. On garde un esprit critique.'},
+      function(good){ if (good) award(1, 1); finish(1); });
+  }
+  next();
+}
+
+/* ---------- mission 3 : tri des gestes ---------- */
+var CATS = [
+  {id:'fab', label:'Fabrication', help:'agit sur la fabrication ou la fin de vie des appareils'},
+  {id:'use', label:'Usage', help:'réduit la consommation au quotidien'},
+  {id:'nua', label:'À nuancer', help:'effet faible ou à vérifier'}
+];
+var GESTES = [
+  {t:'Garder son téléphone plus longtemps', c:'fab', why:'La fabrication pèse ≈ 78 % de l’empreinte : allonger la vie évite d’en refaire un.'},
+  {t:'Acheter un appareil reconditionné', c:'fab', why:'Un appareil reconditionné évite la fabrication d’un appareil neuf.'},
+  {t:'Regarder en basse résolution', c:'use', why:'Moins de données transférées et moins d’énergie utilisée par les serveurs pendant l’usage.'},
+  {t:'Couper les notifications inutiles', c:'use', why:'Moins d’échanges de données et d’usage de l’écran au quotidien.'},
+  {t:'Écrire un long message plutôt que plusieurs', c:'nua', why:'Effet très faible comparé à la fabrication des appareils.'},
+  {t:'Choisir un abonnement qui compense son carbone', c:'nua', why:'À vérifier : que fait réellement la compensation ? Risque de greenwashing.'},
+  {t:'Mettre une protection sur l’écran', c:'fab', why:'Un écran protégé dure plus longtemps : moins d’appareils à fabriquer.'},
+  {t:'Faire des appels audio plutôt que vidéo', c:'use', why:'La vidéo consomme plus de bande passante : c’est un geste d’usage.'},
+  {t:'Utiliser un cloud suisse', c:'nua', why:'Protège surtout les données ; l’effet sur le climat dépend de l’électricité utilisée.'},
+  {t:'Rapporter un vieil appareil au recyclage', c:'fab', why:'Le recyclage récupère des matériaux et limite l’extraction : cela concerne la fin de vie.'},
+  {t:'Télécharger une fois et conserver le fichier', c:'use', why:'Évite des transferts de données répétés : c’est un geste d’usage.'}
+];
+function mission3(){
+  var items = shuffle(GESTES), i = 0;
+  function next(){
+    clear(stage);
+    if (i >= items.length){ lastQ(); return; }
+    var g = items[i];
+    var box = el('div', {'class': 'card'});
+    box.appendChild(el('div', {'class': 'meta', text: 'Mission 3 · geste ' + (i + 1) + ' sur ' + items.length}));
+    box.appendChild(el('div', {'class': 'statement', text: g.t}));
+    var fb = el('div', {'class': 'fb', hidden: 'hidden', role: 'status'});
+    var opts = el('div', {'class': 'opts'});
+    CATS.forEach(function(c){
+      var b = el('button', {'class': 'opt', type: 'button'}, [el('strong', {text: c.label}), el('br'), el('span', {text: c.help})]);
+      b.addEventListener('click', function(){
+        var good = (c.id === g.c);
+        if (good) award(2, 1);
+        Array.prototype.forEach.call(opts.querySelectorAll('button'), function(x){ x.disabled = true; });
+        b.classList.add(good ? 'ok' : 'ko');
+        fb.hidden = false; fb.className = 'fb ' + (good ? 'ok' : 'ko'); clear(fb);
+        var right = CATS.filter(function(k){ return k.id === g.c; })[0].label;
+        fb.appendChild(el('strong', {'class': good ? 'ok' : 'ko', text: good ? '✓ Exact. ' : '✗ C’était « ' + right + ' ». '}));
+        fb.appendChild(document.createTextNode(fr(g.why)));
+        var nb = el('div', {'class': 'row'}, [el('button', {'class': 'btn primary', type: 'button', text: 'Suite →', onclick: function(){ i++; next(); }})]);
+        box.appendChild(nb); nb.firstChild.focus();
+      });
+      opts.appendChild(b);
+    });
+    box.appendChild(opts); box.appendChild(fb);
+    stage.appendChild(box);
+  }
+  function lastQ(){
+    clear(stage);
+    stage.appendChild(el('div', {'class': 'meta', text: 'Mission 3 · question finale'}));
+    mcq(stage, {text:'Pourquoi le geste « écrire un long message plutôt que plusieurs » est-il à nuancer ?',
+      options:['Son effet est très faible face à la fabrication des appareils, qui pèse ≈ 78 % de l’empreinte','Il pollue plus que la fabrication d’un smartphone','Il est interdit par la loi suisse'], correct:0,
+      why:'Les usages comptent beaucoup moins que les appareils : mieux vaut agir d’abord sur la durée de vie.'},
+      function(good){ if (good) award(2, 1); finish(2); });
+  }
+  next();
+}
+
+/* ---------- mission 4 : smartphone fissuré ---------- */
+var STEPS = [
+  'Ne pas acheter : se demander si c’est nécessaire',
+  'Faire durer : réparer, protéger, garder',
+  'Acheter reconditionné',
+  'Recycler l’ancien appareil',
+  'Alléger ses usages'
+];
+function mission4(){
+  stage.appendChild(el('div', {'class': 'card'}, [
+    el('div', {'class': 'meta', text: 'Mission 4 · scénario'}),
+    el('p', {'class': 'q', text: 'L’écran de ton smartphone de deux ans est fissuré, mais il fonctionne encore. Tu hésites à en acheter un neuf.'})
+  ]));
+  var picked = [];
+  var box = el('div', {'class': 'card'});
+  box.appendChild(el('p', {'class': 'q', text: 'a) Choisis les trois premières pistes, dans l’ordre vu en cours.'}));
+  var slots = el('div', {'class': 'ordered'});
+  var slotEls = [0, 1, 2].map(function(n){
+    var s = el('div', {'class': 'slot', text: 'Piste ' + (n + 1)}); slots.appendChild(s); return s;
+  });
+  box.appendChild(slots);
+  var opts = el('div', {'class': 'opts'});
+  var fb = el('div', {'class': 'fb', hidden: 'hidden', role: 'status'});
+  var optBtns = STEPS.map(function(t, idx){
+    var b = el('button', {'class': 'opt', type: 'button', text: t});
+    b.addEventListener('click', function(){
+      if (picked.length >= 3) return;
+      picked.push(idx); b.disabled = true;
+      var s = slotEls[picked.length - 1]; s.textContent = fr((picked.length) + '. ' + t); s.classList.add('filled');
+      if (picked.length === 3) check();
+    });
+    opts.appendChild(b); return b;
+  });
+  box.appendChild(opts);
+  box.appendChild(el('div', {'class': 'row'}, [
+    el('button', {'class': 'btn', type: 'button', text: '↺ Recommencer', onclick: function(){
+      if (picked.length === 3 && !fb.hidden) return;
+      picked = []; optBtns.forEach(function(b){ b.disabled = false; });
+      slotEls.forEach(function(s, n){ s.textContent = fr('Piste ' + (n + 1)); s.classList.remove('filled'); });
+    }})
+  ]));
+  box.appendChild(fb);
+  stage.appendChild(box);
+  function check(){
+    var good = picked[0] === 0 && picked[1] === 1 && picked[2] === 2;
+    if (good) award(3, 1);
+    optBtns.forEach(function(b){ b.disabled = true; });
+    fb.hidden = false; fb.className = 'fb ' + (good ? 'ok' : 'ko'); clear(fb);
+    fb.appendChild(el('strong', {'class': good ? 'ok' : 'ko', text: good ? '✓ Bon ordre. ' : '✗ Ordre à revoir. '}));
+    fb.appendChild(document.createTextNode(fr('Dans le cours : 1. ne pas acheter, 2. faire durer, 3. acheter reconditionné, 4. recycler, 5. alléger ses usages.')));
+    var nb = el('div', {'class': 'row'}, [el('button', {'class': 'btn primary', type: 'button', text: 'Suite →', onclick: function(){ partB(); }})]);
+    box.appendChild(nb); nb.firstChild.focus();
+  }
+  function partB(){
+    clear(stage);
+    stage.appendChild(el('div', {'class': 'meta', text: 'Mission 4 · question b'}));
+    mcq(stage, {text:'b) Pourquoi garder ou réparer vaut-il mieux qu’acheter neuf ?',
+      options:['Parce que la fabrication représente ≈ 78 % de l’empreinte carbone d’un appareil','Parce qu’un téléphone neuf consomme plus de batterie','Parce que les téléphones réparés sont gratuits'], correct:0,
+      why:'Chaque appareil évité, c’est une fabrication évitée, et c’est elle qui pèse le plus.'},
+      function(good){ if (good) award(3, 1); partC(); });
+  }
+  function partC(){
+    clear(stage);
+    stage.appendChild(el('div', {'class': 'meta', text: 'Mission 4 · question c'}));
+    mcq(stage, {text:'c) Si tu dois vraiment changer, quelle option est la plus responsable ?',
+      options:['Acheter un appareil reconditionné et déposer l’ancien dans un point de collecte','Acheter le dernier modèle neuf et garder l’ancien dans un tiroir','Acheter neuf et jeter l’ancien à la poubelle'], correct:0,
+      why:'Le reconditionné évite une fabrication neuve, et la collecte permet de recycler l’ancien.'},
+      function(good){ if (good) award(3, 1); finish(3); });
+  }
+}
+
+/* ---------- fin ---------- */
+function renderEnd(){
+  var p = total(), g = gradeOf(p);
+  var card = el('div', {'class': 'card pop'});
+  card.appendChild(el('h2', {text: '🏅 Mission accomplie'}));
+  card.appendChild(el('p', {'class': 'big', text: p + ' / ' + MAXTOTAL}));
+  card.appendChild(el('p', {text: 'Grade obtenu : ' + g}));
+  var badges = el('div', {'class': 'badges'});
+  MISSIONS.forEach(function(m, i){
+    var won = live[i] >= Math.ceil(m.max * 0.7);
+    badges.appendChild(el('div', {'class': 'badge' + (won ? ' won' : '')}, [
+      el('span', {'class': 'ic', text: won ? m.icon : '🔒'}),
+      el('strong', {text: m.title}),
+      el('div', {'class': 'meta', text: live[i] + ' / ' + m.max + (won ? ' · badge obtenu' : ' · badge à gagner')})
+    ]));
+  });
+  card.appendChild(badges);
+  card.appendChild(el('label', {'for': 'nom', text: 'Ton prénom (pour la capture d’écran ou l’impression)'}));
+  var nom = el('input', {type: 'text', id: 'nom', maxlength: '40', autocomplete: 'off'});
+  card.appendChild(nom);
+  var who = el('p', {'class': 'meta', text: ''});
+  nom.addEventListener('input', function(){
+    who.textContent = nom.value ? fr('Agent·e ' + nom.value + ' · ' + g + ' · ' + p + ' / ' + MAXTOTAL + ' · ' + new Date().toLocaleDateString('fr-CH')) : '';
+  });
+  card.appendChild(who);
+  card.appendChild(el('h2', {text: 'Défi créatif (bonus, non noté ici)', style: 'margin-top:16px'}));
+  card.appendChild(el('p', {text: 'Invente un 17e écogeste numérique et un slogan de dix mots maximum. Montre-les à ton enseignant pour gagner 3 points bonus.', class: 'noprint'}));
+  card.appendChild(el('label', {'for': 'geste', text: 'Mon 17e écogeste'}));
+  card.appendChild(el('input', {type: 'text', id: 'geste', maxlength: '120', autocomplete: 'off'}));
+  card.appendChild(el('label', {'for': 'slogan', text: 'Mon slogan'}));
+  card.appendChild(el('input', {type: 'text', id: 'slogan', maxlength: '120', autocomplete: 'off'}));
+  card.appendChild(el('div', {'class': 'row'}, [
+    el('button', {'class': 'btn', type: 'button', text: '🖨 Imprimer', onclick: function(){ window.print(); }}),
+    el('button', {'class': 'btn primary', type: 'button', text: '↺ Rejouer', onclick: function(){
+      live = [0, 0, 0, 0]; done = [false, false, false, false]; go(-1);
+    }})
+  ]));
+  stage.appendChild(card);
+}
+
+stage.setAttribute('tabindex', '-1');
+updateHud();
+go(-1);
+})();
+</script>
+</body>
+</html>
