@@ -433,7 +433,7 @@ function mission4(){
   box.appendChild(slots);
   var opts = el('div', {'class': 'opts'});
   var fb = el('div', {'class': 'fb', hidden: 'hidden', role: 'status'});
-  var optBtns = STEPS.map(function(t, idx){
+  var optBtns = shuffle(STEPS.map(function(t, idx){ return {t: t, idx: idx}; })).map(function(it){ var t = it.t, idx = it.idx;
     var b = el('button', {'class': 'opt', type: 'button', text: t});
     b.addEventListener('click', function(){
       if (picked.length >= 3) return;
