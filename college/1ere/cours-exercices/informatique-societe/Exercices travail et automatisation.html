@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mission Futur du travail</title>
+<style>
+:root{--bg:#12040a;--panel:#220912;--panel2:#2d0f1b;--line:#ff6666;--soft:#ffd2d2;--accent:#ff9999;--ok:#5ee09a;--ko:#ff7a8a;--gold:#ffd166;--muted:#e6b8b8}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:radial-gradient(circle at 20% 0%,#3a0b1c 0,var(--bg) 55%);color:#fff;font-family:Arial,Helvetica,sans-serif;line-height:1.45}
+.wrap{max-width:880px;margin:0 auto;padding:14px 16px 40px}
+h1{font-size:1.3em;margin:0;color:#fff;text-shadow:0 0 10px #ff6666}
+h2{font-size:1.2em;margin:0 0 6px;color:var(--accent)}
+.hud{position:sticky;top:0;z-index:5;background:rgba(18,4,10,.95);border-bottom:1px solid var(--line);padding:10px 0 8px;margin-bottom:14px}
+.hudrow{display:flex;flex-wrap:wrap;align-items:center;gap:10px;justify-content:space-between}
+.xp{flex:1;min-width:200px}
+.xpbar{height:14px;background:#3b1424;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.xpfill{height:100%;width:0;background:linear-gradient(90deg,#ff6666,var(--gold));transition:width .5s}
+.xptext{font-size:.85em;color:var(--soft);margin-top:3px}
+.grade{background:var(--panel2);border:1px solid var(--line);border-radius:20px;padding:4px 12px;font-size:.9em;color:var(--gold)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{background:var(--panel);color:var(--soft);border:1px solid #7a2a3c;border-radius:16px;padding:5px 11px;font-size:.85em;cursor:pointer;font-family:inherit}
+.chip[aria-current="step"]{border-color:var(--line);color:#fff;background:#4a1527}
+.chip:disabled{opacity:.45;cursor:not-allowed}
+.chip.done{border-color:var(--ok);color:var(--ok)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px;margin-bottom:14px;box-shadow:0 0 14px rgba(255,102,102,.18)}
+.q{font-size:1.1em;margin:0 0 12px}
+.meta{font-size:.85em;color:var(--muted);margin-bottom:8px}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+button{font-family:inherit}
+.opt,.btn{background:var(--panel2);color:#fff;border:2px solid #7a2a3c;border-radius:8px;padding:11px 14px;font-size:1em;cursor:pointer;text-align:left}
+.opt:hover:not(:disabled),.btn:hover:not(:disabled){border-color:var(--line);background:#43142a}
+.opt:focus-visible,.btn:focus-visible,.chip:focus-visible,input:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.opt.ok{border-color:var(--ok);background:#12351f}
+.opt.ko{border-color:var(--ko);background:#40121b}
+.opt:disabled{cursor:default}
+.btn.primary{background:#ff6666;color:#1a0308;border-color:#ff6666;font-weight:bold;text-align:center}
+.btn.primary:hover:not(:disabled){background:#ff8f8f}
+.row{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.fb{margin-top:12px;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:#1a0710}
+.fb.ok{border-color:var(--ok)}.fb.ko{border-color:var(--ko)}
+.fb strong.ok{color:var(--ok)}.fb strong.ko{color:var(--ko)}
+table.data{border-collapse:collapse;width:100%;margin:8px 0 12px;font-size:.95em}
+table.data td{border:1px solid #7a2a3c;padding:6px 9px}
+table.data td:last-child{text-align:right;font-weight:bold}
+.statement{font-size:1.15em;font-weight:bold;background:#12040a;border-left:5px solid var(--line);padding:10px 12px;border-radius:4px;margin:6px 0}
+.big{font-size:2.4em;font-weight:bold;color:var(--gold);margin:6px 0}
+.ordered{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+.slot{border:2px dashed #7a2a3c;border-radius:8px;padding:9px 12px;min-height:42px;color:var(--soft)}
+.slot.filled{border-style:solid;border-color:var(--line);color:#fff}
+.badges{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+.badge{background:var(--panel2);border:1px solid #7a2a3c;border-radius:10px;padding:10px 12px;min-width:150px;text-align:center}
+.badge.won{border-color:var(--gold)}
+.badge .ic{font-size:1.8em;display:block}
+input[type=text]{width:100%;background:#12040a;color:#fff;border:2px solid #7a2a3c;border-radius:8px;padding:9px;font-family:inherit;font-size:1em}
+label{display:block;margin:10px 0 4px;color:var(--soft)}
+main:focus{outline:none}
+@keyframes pop{0%{transform:scale(.8);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s ease-out}
+@media (prefers-reduced-motion:reduce){.pop{animation:none}.xpfill{transition:none}}
+@media print{.hud .chips,.row,.noprint{display:none!important}body{background:#fff;color:#000}.card{border-color:#000;box-shadow:none;background:#fff}h1,h2,.big{color:#000;text-shadow:none}.badge{background:#fff}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hud">
+    <div class="hudrow"><h1 id="title"></h1><span class="grade" id="grade"></span></div>
+    <div class="hudrow" style="margin-top:8px"><div class="xp">
+      <div class="xpbar" role="progressbar" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0" id="xpbar"><div class="xpfill" id="xpfill"></div></div>
+      <div class="xptext" id="xptext"></div></div></div>
+    <nav class="chips" id="chips" aria-label="Missions"></nav>
+  </header>
+  <main id="stage" tabindex="-1"></main>
+</div>
+<script>
+(function(){
+'use strict';
+var CFG = {"title": "Mission Futur du travail", "icon": "🧑‍🔧", "welcome": {"h": "Bienvenue, explorateur·trice !", "p": "Ta mission : comprendre comment l’automatisation change le travail, lire les prévisions avec esprit critique et repérer la fracture numérique."}, "grades": ["Observateur·trice", "Analyste du travail", "Expert·e de l’automatisation", "Maître·sse du futur du travail"], "creative": "Choisis un métier qui t’intéresse et décris en deux phrases ce qui pourrait être automatisé, et ce qui ne le sera pas.", "missions": [{"title": "Les bases", "icon": "🧠", "intro": "Cinq questions sur les notions et les chiffres.", "type": "mcq", "questions": [{"text": "Que signifie automatiser une tâche ?", "options": ["La faire exécuter par une machine ou un logiciel", "La supprimer", "La faire à la main", "La faire plus lentement"], "correct": 0, "why": "Une machine ou un logiciel la prend en charge."}, {"text": "Quelle étude annonçait 47 % d’emplois à haut risque ?", "options": ["Frey et Osborne (Oxford, 2013)", "L’OCDE (2016)", "Une enquête de 2024", "Aucune"], "correct": 0, "why": "Frey et Osborne, 2013, pour les États-Unis."}, {"text": "Pourquoi l’OCDE trouve-t-elle seulement 9 % ?", "options": ["Elle analyse les tâches dans chaque emploi", "Elle ne regarde que les médecins", "Elle ne compte que la Suisse", "Elle ignore l’automatisation"], "correct": 0, "why": "Elle raisonne par tâches et non par métiers entiers."}, {"text": "Quelles tâches sont les plus faciles à automatiser ?", "options": ["Répétitives et bien définies", "Créatives et imprévisibles", "Fondées sur la relation humaine", "Qui demandent du jugement"], "correct": 0, "why": "Les tâches répétitives sont les premières touchées."}, {"text": "Qu’est-ce que la fracture numérique ?", "options": ["Des inégalités d’accès et de compétences numériques", "Un écran cassé", "Une panne", "Un virus"], "correct": 0, "why": "Inégalités d’accès, d’usage et de compétences."}]}, {"title": "Tâche facile à automatiser ou non ?", "icon": "🗂️", "intro": "Classe chaque tâche.", "type": "sort", "cats": [{"id": "aut", "label": "Facile à automatiser", "help": "répétitive, bien définie"}, {"id": "hum", "label": "Reste très humaine", "help": "relation, jugement, créativité"}], "items": [{"t": "Trier des factures selon des règles fixes", "c": "aut", "why": "Règles claires et répétitives."}, {"t": "Accompagner un élève en difficulté", "c": "hum", "why": "Relation et adaptation."}, {"t": "Saisir des données d’un formulaire dans un tableau", "c": "aut", "why": "Répétitif."}, {"t": "Négocier un conflit entre collègues", "c": "hum", "why": "Jugement et relation."}, {"t": "Traduire un texte simple", "c": "aut", "why": "Déjà très automatisé, avec relecture."}, {"t": "Concevoir une affiche originale pour un événement", "c": "hum", "why": "Créativité et intention."}, {"t": "Calculer des totaux dans un tableur", "c": "aut", "why": "Règles mathématiques fixes."}]}, {"title": "Lire une prévision", "icon": "🧐", "intro": "Vrai ou faux ?", "type": "tf", "items": [{"text": "« Selon Oxford, 47 % des emplois américains étaient à haut risque d’automatisation. »", "truth": true, "data": [["Oxford 2013 (États-Unis)", "47 %"], ["OCDE 2016 (pays de l’OCDE)", "9 %"]], "why": "C’est le chiffre de l’étude de 2013."}, {"text": "« Les deux études donnent le même résultat. »", "truth": false, "data": [["Oxford 2013", "47 %"], ["OCDE 2016", "9 %"]], "why": "Les résultats diffèrent beaucoup à cause de la méthode.", "fix": {"text": "Pourquoi diffèrent-elles ?", "options": ["L’une raisonne par métiers, l’autre par tâches", "L’une est plus colorée", "L’une date de 1990"], "correct": 0}}, {"text": "« Une prévision chiffrée est une certitude. »", "truth": false, "why": "Elle dépend de la méthode et d’hypothèses.", "fix": {"text": "Que faire avec une prévision ?", "options": ["Demander comment elle a été calculée", "La croire sans réserve", "L’ignorer toujours"], "correct": 0}}, {"text": "« Le travail de plateforme soulève des questions de statut et de protection sociale. »", "truth": true, "why": "C’est un enjeu central."}]}, {"title": "Se préparer", "icon": "🎓", "intro": "Remets les étapes d’une démarche d’orientation dans l’ordre.", "type": "order", "pick": 4, "prompt": "Quel est l’ordre logique ?", "steps": ["Repérer ses intérêts et compétences", "Se renseigner sur les métiers et leur évolution", "Identifier les compétences à acquérir", "Se former et ajuster en continu"], "correct": [0, 1, 2, 3], "why": "Intérêts, information, compétences, formation continue.", "final": {"text": "Quelle compétence résiste le mieux à l’automatisation ?", "options": ["Les compétences humaines : communication, esprit critique, créativité", "La saisie répétitive", "Le tri de fichiers", "Le calcul simple"], "correct": 0, "why": "Elles sont plus difficiles à automatiser."}}]};
+var NB = '\u00a0';
+function fr(t){
+  return String(t).replace(/ ([%:;?!»])/g, NB + '$1').replace(/« /g, '«' + NB)
+    .replace(/(\d) (TWh|Mt|kg|h|t|ans|logements|élèves|points|pt|CHF|€)\b/g, '$1' + NB + '$2');
+}
+function el(tag, attrs, kids){
+  var e = document.createElement(tag);
+  if (attrs) for (var k in attrs){
+    if (k === 'class') e.className = attrs[k];
+    else if (k === 'text') e.textContent = fr(attrs[k]);
+    else if (k.indexOf('on') === 0) e.addEventListener(k.slice(2), attrs[k]);
+    else e.setAttribute(k, attrs[k]);
+  }
+  (kids || []).forEach(function(c){ if (c != null) e.appendChild(typeof c === 'string' ? document.createTextNode(fr(c)) : c); });
+  return e;
+}
+function shuffle(a){ var b = a.slice(); for (var i = b.length - 1; i > 0; i--){ var j = Math.floor(Math.random() * (i + 1)); var t = b[i]; b[i] = b[j]; b[j] = t; } return b; }
+function clear(n){ while (n.firstChild) n.removeChild(n.firstChild); }
+var stage = document.getElementById('stage');
+
+/* ----- calcul des points maximum ----- */
+function maxOf(m){
+  var n = 0;
+  if (m.type === 'mcq') n = m.questions.length;
+  else if (m.type === 'sort') n = m.items.length;
+  else if (m.type === 'tf') m.items.forEach(function(s){ n += 1 + ((!s.truth && s.fix) ? 1 : 0); });
+  else if (m.type === 'order') n = m.pick;
+  if (m.final) n += 1;
+  return n;
+}
+CFG.missions.forEach(function(m){ m.max = maxOf(m); });
+var MAXTOTAL = CFG.missions.reduce(function(a, m){ return a + m.max; }, 0);
+var N = CFG.missions.length;
+var live = CFG.missions.map(function(){ return 0; });
+var done = CFG.missions.map(function(){ return false; });
+var current = -1;
+
+function total(){ return live.reduce(function(a, b){ return a + b; }, 0); }
+function gradeOf(p){
+  var r = MAXTOTAL ? p / MAXTOTAL : 0, g = CFG.grades;
+  if (r >= 0.93) return g[3]; if (r >= 0.70) return g[2]; if (r >= 0.37) return g[1]; return g[0];
+}
+function award(i, pts){ live[i] += pts; updateHud(); }
+function updateHud(){
+  var p = total();
+  document.getElementById('title').textContent = fr(CFG.icon + ' ' + CFG.title);
+  document.getElementById('xpfill').style.width = Math.round(100 * p / MAXTOTAL) + '%';
+  document.getElementById('xptext').textContent = fr(p + ' / ' + MAXTOTAL + ' points');
+  var bar = document.getElementById('xpbar'); bar.setAttribute('aria-valuenow', String(p)); bar.setAttribute('aria-valuemax', String(MAXTOTAL));
+  document.getElementById('grade').textContent = fr('Grade : ' + gradeOf(p));
+  var chips = document.getElementById('chips'); clear(chips);
+  CFG.missions.forEach(function(m, i){
+    var c = el('button', {'class': 'chip' + (done[i] ? ' done' : ''), type: 'button', text: (done[i] ? '✓ ' : '') + (i + 1) + '. ' + m.title});
+    if (i === current) c.setAttribute('aria-current', 'step');
+    if (!(i === 0 || done[i - 1] || done[i])) c.disabled = true;
+    c.addEventListener('click', function(){ if (!done[i]) go(i); });
+    chips.appendChild(c);
+  });
+}
+function go(i){
+  current = i;
+  if (i >= 0 && i < N) live[i] = 0;
+  updateHud(); clear(stage);
+  if (i === -1) renderIntro(); else if (i >= N) renderEnd(); else startMission(i);
+  window.scrollTo(0, 0);
+  try { stage.focus(); } catch (e) {}
+}
+function finish(i){
+  done[i] = true; clear(stage);
+  var pts = live[i], max = CFG.missions[i].max;
+  var msg = pts === max ? 'Mission parfaite !' : (pts >= max * 0.7 ? 'Belle mission !' : 'Mission terminée : tu peux encore progresser.');
+  var card = el('div', {'class': 'card pop'}, [
+    el('h2', {text: CFG.missions[i].icon + ' Mission ' + (i + 1) + ' terminée'}),
+    el('p', {'class': 'big', text: pts + ' / ' + max}), el('p', {text: msg}),
+    el('div', {'class': 'row'}, [el('button', {'class': 'btn primary', type: 'button', text: i < N - 1 ? 'Mission suivante →' : 'Voir mon grade final →', onclick: function(){ go(i + 1); }})])
+  ]);
+  stage.appendChild(card); updateHud();
+  var b = card.querySelector('button'); if (b) b.focus();
+}
+function nextBtn(box, label, fn){
+  var row = el('div', {'class': 'row'}, [el('button', {'class': 'btn primary', type: 'button', text: label || 'Suite →', onclick: fn})]);
+  box.appendChild(row); row.firstChild.focus();
+}
+function feedback(box, good, goodTxt, badTxt, why){
+  var fb = el('div', {'class': 'fb ' + (good ? 'ok' : 'ko'), role: 'status'});
+  fb.appendChild(el('strong', {'class': good ? 'ok' : 'ko', text: good ? goodTxt : badTxt}));
+  fb.appendChild(document.createTextNode(fr(why)));
+  box.appendChild(fb); return fb;
+}
+
+/* ----- QCM ----- */
+function mcq(container, q, onDone){
+  var box = el('div', {'class': 'card'});
+  box.appendChild(el('p', {'class': 'q', text: q.text}));
+  var opts = el('div', {'class': 'opts'}), btns = [];
+  shuffle(q.options.map(function(o, i){ return {o: o, i: i}; })).forEach(function(it){
+    var b = el('button', {'class': 'opt', type: 'button', text: it.o});
+    b.addEventListener('click', function(){
+      var good = it.i === q.correct;
+      btns.forEach(function(x){ x.b.disabled = true; if (x.i === q.correct) x.b.classList.add('ok'); });
+      if (!good) b.classList.add('ko');
+      feedback(box, good, '✓ Bonne réponse. ', '✗ Pas tout à fait. ', q.why);
+      nextBtn(box, 'Suite →', function(){ onDone(good); });
+    });
+    btns.push({b: b, i: it.i}); opts.appendChild(b);
+  });
+  box.appendChild(opts); container.appendChild(box); return box;
+}
+
+/* ----- démarrage d'une mission ----- */
+function startMission(i){
+  var m = CFG.missions[i];
+  var card = el('div', {'class': 'card pop'}, [
+    el('h2', {text: m.icon + ' Mission ' + (i + 1) + ' : ' + m.title}),
+    el('p', {text: m.intro || ''}),
+    el('p', {'class': 'meta', text: m.max + ' points à gagner'}),
+    el('div', {'class': 'row'}, [el('button', {'class': 'btn primary', type: 'button', text: 'C’est parti →', onclick: function(){ clear(stage); RUN[m.type](i, m); }})])
+  ]);
+  stage.appendChild(card); card.querySelector('button').focus();
+}
+function runFinal(i, m){
+  clear(stage);
+  stage.appendChild(el('div', {'class': 'meta', text: 'Mission ' + (i + 1) + ' · question finale'}));
+  mcq(stage, m.final, function(good){ if (good) award(i, 1); finish(i); });
+}
+var RUN = {};
+RUN.mcq = function(i, m){
+  var k = 0, streak = 0;
+  (function next(){
+    clear(stage);
+    if (k >= m.questions.length){ if (m.final) runFinal(i, m); else finish(i); return; }
+    stage.appendChild(el('div', {'class': 'meta', text: 'Mission ' + (i + 1) + ' · question ' + (k + 1) + ' sur ' + m.questions.length + (streak >= 2 ? '  ·  🔥 série de ' + streak : '')}));
+    mcq(stage, m.questions[k], function(good){ if (good){ award(i, 1); streak++; } else streak = 0; k++; next(); });
+  })();
+};
+RUN.sort = function(i, m){
+  var items = shuffle(m.items), k = 0;
+  (function next(){
+    clear(stage);
+    if (k >= items.length){ if (m.final) runFinal(i, m); else finish(i); return; }
+    var g = items[k], box = el('div', {'class': 'card'});
+    box.appendChild(el('div', {'class': 'meta', text: 'Mission ' + (i + 1) + ' · élément ' + (k + 1) + ' sur ' + items.length}));
+    box.appendChild(el('div', {'class': 'statement', text: g.t}));
+    var opts = el('div', {'class': 'opts'});
+    m.cats.forEach(function(c){
+      var b = el('button', {'class': 'opt', type: 'button'}, [el('strong', {text: c.label}), el('br'), el('span', {text: c.help || ''})]);
+      b.addEventListener('click', function(){
+        var good = c.id === g.c;
+        if (good) award(i, 1);
+        Array.prototype.forEach.call(opts.querySelectorAll('button'), function(x){ x.disabled = true; });
+        b.classList.add(good ? 'ok' : 'ko');
+        var right = m.cats.filter(function(z){ return z.id === g.c; })[0].label;
+        feedback(box, good, '✓ Exact. ', '✗ C’était « ' + right + ' ». ', g.why);
+        nextBtn(box, 'Suite →', function(){ k++; next(); });
+      });
+      opts.appendChild(b);
+    });
+    box.appendChild(opts); stage.appendChild(box);
+  })();
+};
+RUN.tf = function(i, m){
+  var k = 0;
+  (function next(){
+    clear(stage);
+    if (k >= m.items.length){ if (m.final) runFinal(i, m); else finish(i); return; }
+    var s = m.items[k], box = el('div', {'class': 'card'});
+    box.appendChild(el('div', {'class': 'meta', text: 'Mission ' + (i + 1) + ' · affirmation ' + (k + 1) + ' sur ' + m.items.length}));
+    box.appendChild(el('div', {'class': 'statement', text: s.text}));
+    if (s.data){ var tb = el('table', {'class': 'data'}); s.data.forEach(function(r){ tb.appendChild(el('tr', null, [el('td', {text: r[0]}), el('td', {text: r[1]})])); }); box.appendChild(tb); }
+    var row = el('div', {'class': 'row'});
+    function verdict(sayTrue){
+      var good = sayTrue === s.truth;
+      if (good) award(i, 1);
+      Array.prototype.forEach.call(row.querySelectorAll('button'), function(b){ b.disabled = true; });
+      feedback(box, good, '✓ Bien vu. ', '✗ Raté. ', (s.truth ? 'Cette affirmation est exacte. ' : 'Cette affirmation est fausse ou imprécise. ') + s.why);
+      if (!s.truth && good && s.fix){
+        var host = el('div'); box.appendChild(host);
+        mcq(host, {text: s.fix.text, options: s.fix.options, correct: s.fix.correct, why: s.why}, function(ok){ if (ok) award(i, 1); k++; next(); });
+        host.firstChild.style.marginTop = '12px';
+      } else nextBtn(box, 'Suite →', function(){ k++; next(); });
+    }
+    row.appendChild(el('button', {'class': 'btn', type: 'button', text: '✔ Vrai', onclick: function(){ verdict(true); }}));
+    row.appendChild(el('button', {'class': 'btn', type: 'button', text: '✘ Faux ou imprécis', onclick: function(){ verdict(false); }}));
+    box.appendChild(row); stage.appendChild(box);
+  })();
+};
+RUN.order = function(i, m){
+  var picked = [], box = el('div', {'class': 'card'});
+  box.appendChild(el('p', {'class': 'q', text: m.prompt}));
+  var slots = el('div', {'class': 'ordered'}), slotEls = [];
+  for (var n = 0; n < m.pick; n++){ var s = el('div', {'class': 'slot', text: 'Étape ' + (n + 1)}); slots.appendChild(s); slotEls.push(s); }
+  box.appendChild(slots);
+  var opts = el('div', {'class': 'opts'}), btns = [], locked = false;
+  shuffle(m.steps.map(function(t, idx){ return {t: t, idx: idx}; })).forEach(function(it){
+    var b = el('button', {'class': 'opt', type: 'button', text: it.t});
+    b.addEventListener('click', function(){
+      if (locked || picked.length >= m.pick) return;
+      picked.push(it.idx); b.disabled = true;
+      var sl = slotEls[picked.length - 1]; sl.textContent = fr(picked.length + '. ' + it.t); sl.classList.add('filled');
+      if (picked.length === m.pick) check();
+    });
+    btns.push(b); opts.appendChild(b);
+  });
+  box.appendChild(opts);
+  box.appendChild(el('div', {'class': 'row'}, [el('button', {'class': 'btn', type: 'button', text: '↺ Recommencer', onclick: function(){
+    if (locked) return; picked = []; btns.forEach(function(b){ b.disabled = false; });
+    slotEls.forEach(function(sl, n){ sl.textContent = fr('Étape ' + (n + 1)); sl.classList.remove('filled'); });
+  }})]));
+  stage.appendChild(box);
+  function check(){
+    locked = true; btns.forEach(function(b){ b.disabled = true; });
+    var ok = 0; for (var n = 0; n < m.pick; n++) if (picked[n] === m.correct[n]) ok++;
+    award(i, ok);
+    feedback(box, ok === m.pick, '✓ Ordre parfait. ', '✗ ' + ok + ' sur ' + m.pick + ' à la bonne place. ', m.why);
+    nextBtn(box, 'Suite →', function(){ if (m.final) runFinal(i, m); else finish(i); });
+  }
+};
+
+/* ----- intro et fin ----- */
+function renderIntro(){
+  stage.appendChild(el('div', {'class': 'card pop'}, [
+    el('h2', {text: CFG.welcome.h}),
+    el('p', {text: CFG.welcome.p}),
+    el('p', {'class': 'meta', text: N + ' missions, ' + MAXTOTAL + ' points au total. Plus tu marques de points, plus ton grade monte :'}),
+    el('p', {'class': 'meta', text: CFG.grades.join(' · ')}),
+    el('p', {'class': 'meta', text: 'Tu peux garder le cours sous les yeux.'}),
+    el('div', {'class': 'row'}, [el('button', {'class': 'btn primary', type: 'button', text: 'Commencer la mission 1 →', onclick: function(){ go(0); }})])
+  ]));
+}
+function renderEnd(){
+  var p = total(), g = gradeOf(p), card = el('div', {'class': 'card pop'});
+  card.appendChild(el('h2', {text: '🏅 Mission accomplie'}));
+  card.appendChild(el('p', {'class': 'big', text: p + ' / ' + MAXTOTAL}));
+  card.appendChild(el('p', {text: 'Grade obtenu : ' + g}));
+  var badges = el('div', {'class': 'badges'});
+  CFG.missions.forEach(function(m, i){
+    var won = live[i] >= Math.ceil(m.max * 0.7);
+    badges.appendChild(el('div', {'class': 'badge' + (won ? ' won' : '')}, [
+      el('span', {'class': 'ic', text: won ? m.icon : '🔒'}), el('strong', {text: m.title}),
+      el('div', {'class': 'meta', text: live[i] + ' / ' + m.max + (won ? ' · badge obtenu' : ' · badge à gagner')})]));
+  });
+  card.appendChild(badges);
+  card.appendChild(el('label', {'for': 'nom', text: 'Ton prénom (pour la capture d’écran ou l’impression)'}));
+  var nom = el('input', {type: 'text', id: 'nom', maxlength: '40', autocomplete: 'off'}); card.appendChild(nom);
+  var who = el('p', {'class': 'meta', text: ''});
+  nom.addEventListener('input', function(){ who.textContent = nom.value ? fr('Agent·e ' + nom.value + ' · ' + g + ' · ' + p + ' / ' + MAXTOTAL + ' · ' + new Date().toLocaleDateString('fr-CH')) : ''; });
+  card.appendChild(who);
+  if (CFG.creative){
+    card.appendChild(el('h2', {text: 'Défi créatif (bonus, non noté ici)', style: 'margin-top:16px'}));
+    card.appendChild(el('p', {text: CFG.creative, 'class': 'noprint'}));
+    card.appendChild(el('label', {'for': 'cr', text: 'Ma proposition'}));
+    card.appendChild(el('input', {type: 'text', id: 'cr', maxlength: '200', autocomplete: 'off'}));
+  }
+  card.appendChild(el('div', {'class': 'row'}, [
+    el('button', {'class': 'btn', type: 'button', text: '🖨 Imprimer', onclick: function(){ window.print(); }}),
+    el('button', {'class': 'btn primary', type: 'button', text: '↺ Rejouer', onclick: function(){ live = live.map(function(){ return 0; }); done = done.map(function(){ return false; }); go(-1); }})]));
+  stage.appendChild(card);
+}
+updateHud(); go(-1);
+})();
+</script>
+</body>
+</html>
