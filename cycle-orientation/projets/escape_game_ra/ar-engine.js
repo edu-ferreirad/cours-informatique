@@ -244,6 +244,31 @@ if (typeof window !== "undefined") window.ArEngine = ArEngine;
 // l'approche getUserMedia classique, même en mode Android.
 // ============================================================================
 
+// ---------------------------------------------------------------------------
+// TOUCHERS SUR L'INTERFACE ≠ TOUCHERS SUR LES OBJETS (RA Android)
+// En RA immersive, chaque toucher d'écran déclenche aussi un événement XR
+// « select » — y compris quand on touche un bouton de l'overlay (Oui / Non,
+// Quitter, Aide…). Si le rond de visée restait sur un objet, le toucher sur
+// « Non » re-sélectionnait l'objet visé et rouvrait la confirmation : il
+// fallait tourner le téléphone hors de la cible. Deux protections :
+//  1) « beforexrselect » annulé sur l'overlay : le toucher d'un bouton ne
+//     produit plus de sélection XR (méthode officielle de dom-overlay) ;
+//  2) repli pour les navigateurs qui ne le gèrent pas : tout « select » dans
+//     les 700 ms qui suivent un toucher sur un bouton de l'overlay est ignoré.
+// ---------------------------------------------------------------------------
+let lastUiTapAt = -1e9;
+function uiTapRecent() { return performance.now() - lastUiTapAt < 700; }
+(function guardOverlayTaps() {
+  if (typeof document === "undefined") return;
+  const root = document.getElementById("xr-overlay-root");
+  if (!root) return;
+  root.addEventListener("beforexrselect", (e) => e.preventDefault());
+  const mark = (e) => { if (e.target !== root) lastUiTapAt = performance.now(); };
+  root.addEventListener("pointerdown", mark, true);
+  root.addEventListener("touchstart", mark, true);
+  root.addEventListener("click", mark, true);
+})();
+
 const ArXR = (() => {
   let renderer = null, scene = null, camera = null;
   let session = null;
@@ -322,7 +347,7 @@ const ArXR = (() => {
 
     let done = false;
     session.addEventListener("select", () => {
-      if (done) return;
+      if (done || uiTapRecent()) return;
       done = true;
 
       const pos = new THREE.Vector3();
@@ -596,6 +621,7 @@ const ArXR = (() => {
     }
 
     session.addEventListener("select", (event) => {
+      if (uiTapRecent()) return; // toucher sur un bouton de l'overlay, pas sur la scène
       // Premier tap de CETTE session = calibration (voir point de repère
       // affiché avant l'appel). Chaque porte RA recalibre dans SA propre
       // session — c'est ce qui évite le décalage d'une session à l'autre.
@@ -733,7 +759,7 @@ const ArXR = (() => {
   return { isAvailable, calibrate, isCalibrated, exploreChapter, endSession, resetCalibration, fakeCalibrate, setJitterEnabled, recalibrate, adjustHeight };
 })();
 
-if (typeof window !== "undefined") window.ArXR = ArXR;
+if (typeof window !== "undefined") { window.ArXR = ArXR; ArXR.uiTapRecent = uiTapRecent; }
 
 // Boutons ⬆️ / ⬇️ de l'overlay RA : remontent / descendent tous les objets de 20 cm
 document.addEventListener("click", (e) => {

@@ -767,8 +767,8 @@ function missionItems(ch) {
 }
 function searchHintLine() {
   return state.mode === "android"
-    ? "🧭 Recherche en réalité augmentée : visez avec le rond central avant de toucher."
-    : "🧭 Recherche en réalité augmentée : calibrez le cap face à la porte, tournez lentement (flèche et bips), puis « Scanner ».";
+    ? "🧭 Recherche en réalité augmentée : visez avec le rond central avant de toucher. ↺ Recalibrez à chaque recherche (près de l'armoire grise, face à la porte). ⚠ Lisez bien : une fois l'objet validé, on ne peut plus retourner dans la salle RA."
+    : "🧭 Recherche en réalité augmentée : calibrez le cap face à la porte, tournez lentement (flèche et bips), puis « Scanner ». ⚠ Lisez bien ce qui s'affiche : une fois l'objet validé, on ne peut plus retourner dans la salle RA.";
 }
 function makeDocButton(doc) {
   const b = el("button", "doc-btn", "📎 Ouvrir : " + doc.label);
@@ -796,7 +796,7 @@ function renderRulesForMode() {
   const rules = ipad ? [
     "Chaque page a deux blocs : 📖 L'HISTOIRE (le récit) et 🎯 TA MISSION (la liste de ce qu'il faut faire). Lisez toujours les deux.",
     "Résolvez l'énigme, puis cherchez dans la salle l'objet qui s'y réfère. Pour la recherche : placez-vous au seuil de la porte, face à la porte, appuyez sur « Calibrer le cap », puis tournez lentement. Une flèche et des bips vous guident ; visez l'objet et appuyez sur « Scanner ».",
-    "Un mauvais objet affiche « Dommage » : pas de panique, cherchez encore. Le bon objet déclenche des confettis et un bouton « Continuer ».",
+    "Un mauvais objet affiche « Dommage » : pas de panique, cherchez encore. Le bon objet s'affiche en grand : lisez-le et notez ce qui est demandé. ⚠ Quand vous appuyez sur « Continuer », la recherche se ferme et on ne peut plus y retourner.",
     "Gardez l'iPad à hauteur de poitrine, toujours dans le même sens (vertical ou horizontal). Quand plusieurs objets sont proches, visez-les un par un, lentement : le jeu vous le signale.",
     "Le porte-documents 🗂️ (bouton en bas à droite, une fois les outils trouvés) contient les tables de décodage, la roue de César et les paroles. Quand il sert, un bouton « 📎 Ouvrir » apparaît dans la mission.",
     "Bloqués ? Le bouton ❓ Aide explique quoi faire pour chaque problème. Pour un indice, utilisez « Besoin d'un indice ? » (le premier est gratuit, les suivants coûtent des points).",
@@ -804,7 +804,7 @@ function renderRulesForMode() {
     "Activez le son de l'iPad dès le départ (effets sonores, indices audio). Si Safari recharge la page, le bouton « Reprendre ma partie » vous ramène au chapitre en cours."
   ] : [
     "Chaque page a deux blocs : 📖 L'HISTOIRE (le récit) et 🎯 TA MISSION (la liste de ce qu'il faut faire). Lisez toujours les deux.",
-    "Résolvez l'énigme, puis explorez la salle en réalité augmentée pour confirmer l'objet trouvé — un mauvais objet affiche « Dommage », pas de panique, cherchez encore. Le bon objet déclenche des confettis et un bouton « Continuer ».",
+    "Résolvez l'énigme, puis explorez la salle en réalité augmentée pour confirmer l'objet trouvé — un mauvais objet affiche « Dommage », pas de panique, cherchez encore. ↺ À CHAQUE recherche en RA, il faut recalibrer (près de l'armoire grise, face à la porte). ⚠ Une fois l'objet confirmé, la RA se ferme : lisez bien avant de confirmer, on ne peut pas y retourner.",
     "Bloqués ? Un vieil archiviste attend près de la porte en réalité augmentée — il donne un indice contre des points. Le bouton ❓ Aide explique aussi quoi faire pour chaque problème.",
     "On ne démonte rien : radiateurs, rideaux, projecteur, bureaux, crochets, armoires restent en place. Tout le reste peut être utile.",
     "En réalité augmentée, visez bien avec le petit rond au centre de l'écran avant de toucher — surtout pour les objets rapprochés, où un mauvais visage peut sélectionner le mauvais objet.",
@@ -829,6 +829,17 @@ function syncXrButtons() {
   const b = document.getElementById("xr-dossier-btn");
   if (b) b.classList.toggle("hidden", !state.dossierUnlocked);
 }
+function openImageViewer(title, src) {
+  let modal = document.getElementById("image-viewer-modal");
+  if (!modal) { modal = el("div", "carnet-modal hidden"); modal.id = "image-viewer-modal"; document.body.appendChild(modal); }
+  xrModalHost().appendChild(modal);
+  modal.innerHTML = `<div class="carnet-inner"><div class="carnet-header"><div class="chapter-title" style="font-size:18px;">${escapeHtml(title)}</div><button class="btn-secondary viewer-close" style="width:auto; padding:8px 14px;">Fermer</button></div><img class="viewer-img" src="${src}" alt=""></div>`;
+  $(".viewer-close", modal).addEventListener("click", () => modal.classList.add("hidden"));
+  modal.classList.remove("hidden");
+}
+const READ_WELL = "⚠ Lisez bien : quand vous validez l'objet, la recherche en réalité augmentée se ferme et vous ne pourrez plus y retourner.";
+const RECALIBRATE_NOTE = "↺ À chaque recherche en RA, il faut recalibrer : placez-vous près de l'armoire grise, face à la porte, et touchez l'écran quand le jeu le demande.";
+
 function openAide() {
   const modal = $("#aide-modal");
   xrModalHost().appendChild(modal);
@@ -841,7 +852,8 @@ function openAide() {
   const sections = [
     ["🧭 La recherche d'objet ne marche pas bien", ipad
       ? `<ul><li>Placez-vous au seuil de la porte, face à la porte, puis appuyez sur « Calibrer le cap ».</li><li>Tournez lentement, iPad à hauteur de poitrine, toujours dans le même sens (vertical ou horizontal). Si l'iPad a tourné, le jeu propose « Recalibrer le cap ».</li><li>Plusieurs objets proches ? Visez-les un par un, lentement.</li><li>La boussole se trompe près des armoires métalliques : éloignez-vous un peu.</li><li>Boussole refusée ? Fermez puis rouvrez Safari et acceptez « Mouvement et orientation ». Sinon, vous pouvez scanner directement.</li></ul>`
-      : `<ul><li>Visez avec le petit rond au centre de l'écran avant de toucher.</li><li>Si les objets semblent décalés, recalibrez face à la porte, près de l'armoire grise.</li></ul>`],
+      : `<ul><li>Visez avec le petit rond au centre de l'écran avant de toucher.</li><li>↺ Il faut recalibrer à CHAQUE recherche en RA : près de l'armoire grise, face à la porte.</li><li>Si les objets semblent décalés, recalibrez de la même façon.</li></ul>`],
+    ["📖 Je n'ai pas eu le temps de lire ou de noter", `<ul><li>Une fois l'objet validé, la recherche en RA se ferme : on ne peut pas y retourner. Lisez bien avant d'appuyer sur « Continuer ».</li><li>Chapitre 5 : le bulletin de Clément Clé reste affiché sous l'énigme ; notez les 4 chiffres entourés.</li><li>Chapitre 6 : le bouton « 📄 Revoir le bulletin » est sur le cadenas.</li></ul>`],
     ["📷 La caméra reste noire", `<ul><li>Vérifiez que Safari a le droit d'utiliser la caméra (fenêtre d'autorisation d'Apple).</li><li>Fermez les autres applications qui utilisent la caméra, puis rechargez la page : « Reprendre ma partie » vous ramène au chapitre en cours.</li></ul>`],
     ["🔊 Je n'entends rien", `<ul><li>Montez le volume de l'iPad et vérifiez qu'il n'est pas en silencieux.</li><li>Touchez l'écran une fois : iPadOS autorise le son seulement après un toucher.</li><li>Le bouton 🔊 d'un chapitre lit l'histoire à voix haute.</li></ul>`],
     ["⌨️ Ma réponse est refusée", `<ul><li>Écrivez le mot-clé : majuscules, accents, tirets, « le / la / un » et petites fautes n'ont pas d'importance.</li><li>Relisez l'histoire : la réponse s'y cache. Il faut parfois aussi trouver l'objet en réalité augmentée.</li><li>Utilisez « Besoin d'un indice ? » : le premier est gratuit selon le niveau.</li></ul>`],
@@ -1238,6 +1250,14 @@ function renderMinimalArGate(container, ch, onFoundFn, introText) {
           playTone("right");
           if (navigator.vibrate) navigator.vibrate(200);
           guideEl.textContent = "";
+          {
+            const fsrc = (hit.image && hit.image.src) || (window.GAME_ASSETS && window.GAME_ASSETS[hit.assetKey]);
+            const foundPanel = el("div", "ar-found-media");
+            foundPanel.innerHTML = (fsrc ? `<img src="${fsrc}" alt="">` : "")
+              + (hit.assetKey === "bulletin_clement_cle" ? `<p class="ar-found-note">✏️ Notez, dans l'ordre, les 4 chiffres entourés : ce sera le code du cadenas.</p>` : "")
+              + `<p class="ar-found-warn">${READ_WELL}</p>`;
+            block.appendChild(foundPanel);
+          }
           const btn = el("button", "btn-primary", "Continuer →");
           btn.style.flex = "1";
           btn.addEventListener("click", () => {
@@ -1286,6 +1306,7 @@ function renderSpatialGate(container, ch, onFoundFn, introText) {
   dommage.style.minHeight = "18px";
 
   const launchBtn = el("button", "immersive-launch", "Explorer en RA");
+  container.appendChild(el("p", "launch-note", RECALIBRATE_NOTE + " " + READ_WELL));
   container.appendChild(launchBtn);
   container.appendChild(dommage);
 
@@ -1404,6 +1425,7 @@ function renderSpatialGate(container, ch, onFoundFn, introText) {
           ? `<img src="${anchor.image.src}" alt="">`
           : `<div class="xr-inspect-emoji">${anchor.emoji || "❔"}</div>`;
         $("#xr-inspect-label").textContent = anchor.label;
+        media.insertAdjacentHTML("beforeend", `<p class="xr-inspect-note">${anchor.assetKey === "bulletin_clement_cle" ? "✏️ Notez les 4 chiffres entourés. " : ""}${READ_WELL}</p>`);
         panel.classList.remove("hidden");
         const yesBtn = $("#xr-inspect-yes"), noBtn = $("#xr-inspect-no");
         const close = () => panel.classList.add("hidden");
@@ -1635,6 +1657,14 @@ function renderPuzzle(container, ch) {
 
   else if (p.type === "bulletin-code") {
     container.appendChild(el("div", "chapter-text", `<strong>${p.prompt}</strong>`));
+    // Le bulletin reste affiché ici : sur iPad (boussole) il n'y a pas de zoom sur l'objet,
+    // et dans les deux modes on ne peut pas retourner dans la salle RA une fois l'objet trouvé.
+    const bsrc = window.GAME_ASSETS && window.GAME_ASSETS[p.bulletinImageKey];
+    if (bsrc) {
+      const fig = el("div", "bulletin-figure");
+      fig.innerHTML = `<img src="${bsrc}" alt="Bulletin de Clément Clé"><p class="bulletin-note">✏️ Notez, dans l'ordre, les 4 chiffres entourés : ce sera le code du cadenas. Vous pourrez revoir ce bulletin au chapitre 6.</p>`;
+      container.appendChild(fig);
+    }
     renderAnswerForm(container, ch);
   }
 }
@@ -1653,6 +1683,13 @@ function renderCodeLock(container, code, onUnlocked) {
     <div class="answer-feedback"></div>
   `;
   container.appendChild(widget);
+  const bulletinSrc = window.GAME_ASSETS && window.GAME_ASSETS.bulletin_clement_cle;
+  if (bulletinSrc) {
+    const rb = el("button", "doc-btn", "📄 Revoir le bulletin de Clément Clé");
+    rb.type = "button";
+    rb.addEventListener("click", () => openImageViewer("Bulletin de Clément Clé — notez les 4 chiffres entourés, dans l'ordre", bulletinSrc));
+    widget.appendChild(rb);
+  }
   const inputs = $all("input", widget);
   const feedback = $(".answer-feedback", widget);
   inputs.forEach((inp, i) => {
