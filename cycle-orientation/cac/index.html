@@ -1,1 +1,33 @@
-
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cours d’informatique – 10ème et 11ème</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-page="index">
+<canvas id="matrix"></canvas>
+<div id="gate">
+  <h1 data-i="gate">Espace 10ème et 11ème</h1>
+  <p data-i="pw">Entrez le mot de passe</p>
+  <input id="pwd" type="password" autocomplete="off">
+  <p><button id="ok" data-i="ok">Valider</button></p>
+  <p id="err"></p>
+</div>
+<div class="box" id="app" hidden>
+  <div class="top"><a href="https://edu-ferreirad.github.io/cours-informatique/index.html" data-i="home">⬅ Retour à l’accueil général</a>
+    <label><span data-i="lang">Langue</span> :
+      <select id="langSel" aria-label="Langue"><option value="fr">Français</option><option value="en">English</option><option value="pt">Português</option><option value="es">Español</option></select></label></div>
+  <h1 data-i="title">Cours d’informatique – 10ème et 11ème</h1>
+  <div class="menu">
+    <a class="btn" href="cours.html" data-i="m_cours">Cours</a>
+    <a class="btn" href="examens.html" data-i="m_ex">Examens</a>
+    <a class="btn" href="classeur.html" data-i="m_cl">Classeur</a>
+    <a class="btn" href="jeux.html" data-i="m_je">Jeux</a>
+  </div>
+  <p class="note" data-i="lv">x</p>
+</div>
+<script src="common.js"></script>
+</body>
+</html>
