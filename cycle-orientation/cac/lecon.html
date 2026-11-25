@@ -5,7 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Cours</title>
 <link rel="stylesheet" href="style.css">
-<style>figure{margin:18px 0;padding:10px;border:1px solid #003366;border-radius:6px;background:#00060f}img{max-width:100%;height:auto;border-radius:4px;display:block;margin:0 auto}.tr{white-space:pre-line;line-height:1.5;margin-top:10px;max-width:70ch}.tr b{color:#fff}</style>
+<style>
+figure{margin:18px 0;padding:12px;border:1px solid #003366;border-radius:6px;background:#00060f}
+img{max-width:100%;height:auto;border-radius:4px;display:block;margin:0 auto}
+.tr{margin-top:12px;line-height:1.55;max-width:75ch}
+.tr h3{color:#fff;font-size:1.15em;margin:.2em 0 .5em;text-shadow:0 0 6px #005588}
+.tr h4{color:#9fd8ff;font-size:1em;margin:1em 0 .3em}
+.tr p{margin:.55em 0}
+.tr ul{margin:.4em 0 .8em;padding-left:1.3em}
+.tr li{margin:.28em 0}
+.tr li.s{list-style:circle;margin-left:1.2em}
+#bar{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+#bar .btn{font-size:.95em;padding:8px 14px}
+iframe.pdf{width:100%;height:82vh;border:1px solid #005588;border-radius:6px;background:#fff}
+</style>
 </head>
 <body data-page="lecon">
 <canvas id="matrix"></canvas>
@@ -14,25 +27,65 @@
     <label><span data-i="lang">Langue</span> :
       <select id="langSel" aria-label="Langue"><option value="fr">Français</option><option value="en">English</option><option value="pt">Português</option><option value="es">Español</option></select></label></div>
   <h1 id="lt"></h1>
+  <div id="bar" translate="no"></div>
   <div id="lc"></div>
 </div>
 <script src="common.js"></script>
+<script src="pdfs.js"></script>
 <script src="translate.js"></script>
 <script>
 const id=(new URLSearchParams(location.search).get("id")||"").replace(/[^a-z0-9-]/g,"");
 const esc=t=>t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const LT={fr:{pdf:"📄 Ouvrir le PDF original",tog:"🔀 PDF / pages",orig:"PDF original (en français)"},en:{pdf:"📄 Open the original PDF (French)",tog:"🔀 PDF / pages",orig:"Original PDF (in French)"},pt:{pdf:"📄 Abrir o PDF original (francês)",tog:"🔀 PDF / páginas",orig:"PDF original (em francês)"},es:{pdf:"📄 Abrir el PDF original (francés)",tog:"🔀 PDF / páginas",orig:"PDF original (en francés)"}};
+let view=null;
+function fmt(tx){
+  const R=tx.replace(/\r/g,"").split("\n");
+  while(R.length&&/^\s*\d{1,2}\s*$/.test(R[R.length-1]))R.pop();
+  let h="",ul=false,first=true;
+  const close=()=>{if(ul){h+="</ul>";ul=false}};
+  for(const raw of R){
+    const s=raw.trim();if(!s){close();continue}
+    if(first){h+="<h3>"+esc(s)+"</h3>";first=false;continue}
+    const bul=/^[•\-–]\s+/.test(s),sub=!bul&&/^\s{2,}/.test(raw);
+    if(bul||sub){if(!ul){h+="<ul>";ul=true}h+=(bul?"<li>"+esc(s.replace(/^[•\-–]\s+/,"")):'<li class="s">'+esc(s))+"</li>";continue}
+    close();
+    const head=s.length<=48&&(/:$/.test(s)||(s===s.toUpperCase()&&/[A-ZÀ-Ý]/.test(s)));
+    h+=head?"<h4>"+esc(s)+"</h4>":"<p>"+esc(s)+"</p>";
+  }
+  close();return h;
+}
+function merge(tx){
+  const out=[];
+  for(const raw of tx.split("\n")){
+    const s=raw.trim();if(!s)continue;
+    const p=out.length?out[out.length-1]:"";
+    if(p&&!/[.:!?;…»)]$/.test(p)&&!/^[•\-–]/.test(s)&&/^[a-zàâçéèêëîïôûùüœ(«"]/.test(s)&&!/^[•\-–]/.test(p))out[out.length-1]=p+" "+s;
+    else out.push(s);
+  }
+  return out.join("\n");
+}
 window.onLang=function(l){
   if(typeof LECON==="undefined")return;
-  const D=LECON,T=D.t[l]||D.t.fr;document.title=T;
-  const h=$("lt");h.textContent=T;h.setAttribute("translate",D.auto?"yes":"no");
-  $("lc").innerHTML=(D.auto&&l!=="fr"?'<p class="note" translate="no">'+L[l].auto+"</p>":"")+D.img.map((f,i)=>{
-    const tx=l==="fr"?"":(D.auto?D.fr[i]:D.tr[l][i])||"";
-    const [hd,...r]=esc(tx).split("\n");
-    return '<figure><img loading="lazy" src="lecons/'+id+'/'+f+'" alt="'+(i+1)+'">'+(tx?'<div class="tr"'+(D.auto?"":' translate="no"')+"><b>"+hd+"</b>\n"+r.join("\n")+"</div>":"")+"</figure>";
-  }).join("");
-  if(D.auto&&window.gtLoad)gtLoad(l);
+  const D=LECON,T=D.t[l]||D.t.fr,pdf=(window.PDFS||{})[id],lt=LT[l]||LT.fr;document.title=T;
+  const h=$("lt");h.textContent=T;h.setAttribute("translate",D.t[l]?"no":"yes");
+  if(view===null||l!==window.__vl){view=(l==="fr"&&pdf&&innerWidth>=900)?"pdf":"img";window.__vl=l}
+  $("bar").innerHTML=(pdf?'<a class="btn" target="_blank" rel="noopener" href="'+encodeURI(pdf)+'">'+lt.pdf+"</a>":"")+(l==="fr"&&pdf?'<button id="tog">'+lt.tog+"</button>":"");
+  if(l==="fr"&&pdf&&view==="pdf"){
+    $("lc").innerHTML='<iframe class="pdf" src="'+encodeURI(pdf)+'" title="PDF"></iframe>';
+    if(window.gtLoad)gtLoad("fr");
+  }else{
+    let fb=false;
+    const figs=D.img.map((f,i)=>{
+      let tx="",own=true;
+      if(l!=="fr"){tx=(D.tr&&D.tr[l]&&D.tr[l][i])||"";if(!tx&&D.fr&&D.fr[i]){tx=merge(D.fr[i]);own=false;fb=true}}
+      return '<figure><img loading="lazy" src="lecons/'+id+'/'+f+'" alt="'+(i+1)+'">'+(tx?'<div class="tr"'+(own?' translate="no"':"")+">"+fmt(tx)+"</div>":"")+"</figure>";
+    });
+    $("lc").innerHTML=(fb?'<p class="note" translate="no">'+L[l].auto+"</p>":"")+figs.join("");
+    if(window.gtLoad)gtLoad(fb?l:"fr");
+  }
+  const b=$("tog");if(b)b.onclick=()=>{view=view==="pdf"?"img":"pdf";window.onLang(lang)};
 };
-if(id){const e=document.createElement("script");e.src="lecon/"+id+".js";e.onload=()=>window.onLang(lang);document.body.appendChild(e)}
+if(id){const e=document.createElement("script");e.src="lecons/"+id+".js";e.onload=()=>window.onLang(lang);document.body.appendChild(e)}
 </script>
 </body>
 </html>
