@@ -77,7 +77,7 @@ window.onLang=function(l){
     let fb=false;
     const figs=D.img.map((f,i)=>{
       let tx="",own=true;
-      if(l!=="fr"){tx=(D.tr&&D.tr[l]&&D.tr[l][i])||"";if(!tx&&D.fr&&D.fr[i]){tx=merge(D.fr[i]);own=false;fb=true}}
+      if(l!=="fr"){tx=(D.tr&&D.tr[l]&&D.tr[l][i])||"";if(!tx&&D.fr&&D.fr[i]&&D.fr[i].trim().length>25){tx=merge(D.fr[i]);own=false;fb=true}}
       return '<figure><img loading="lazy" src="lecons/'+id+'/'+f+'" alt="'+(i+1)+'">'+(tx?'<div class="tr"'+(own?' translate="no"':"")+">"+fmt(tx)+"</div>":"")+"</figure>";
     });
     $("lc").innerHTML=(fb?'<p class="note" translate="no">'+L[l].auto+"</p>":"")+figs.join("");
